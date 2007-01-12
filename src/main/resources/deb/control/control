@@ -1,0 +1,9 @@
+Package: @NAME@
+Version: @VERSION@
+Section: misc
+Priority: optional
+Architecture: all
+Installed-Size: @SIZE@
+Maintainer: Torsten Curdt <tcurdt@apache.org>
+Description: Ant tasks to build deb files
+ bla bla bla

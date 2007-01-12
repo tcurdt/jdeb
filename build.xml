@@ -1,0 +1,42 @@
+<project name="jdeb" default="package" basedir=".">
+  <description>A sample ant file to execute the deb ant task</description>
+
+  <property name="build" value="target"/>
+  <property name="deb" value="${build}/deb"/>
+  <property name="version" value="1.0"/>
+  
+  
+  <target name="package">
+
+    <taskdef name="deb"
+             classname="org.vafer.jdeb.DebAntTask"
+             classpath="target/jdeb-0.1-SNAPSHOT.jar"/>
+
+    <taskdef name="md5"
+             classname="org.vafer.jdeb.ChecksumAntTask"
+             classpath="target/jdeb-0.1-SNAPSHOT.jar"/>
+
+
+    <copy todir="${deb}/control">
+      <fileset dir="src/main/resources/deb/control"/>
+      <filterset>
+        <filter token="VERSION" value="${version}"/>
+        <filter token="NAME" value="${ant.project.name}"/>
+        <filter token="SIZE" value="1"/>
+      </filterset>
+    </copy>
+        
+    <copy todir="${deb}/data">
+      <fileset dir="src/main/resources/deb/data"/>
+    </copy>
+
+    <md5 destfile="${deb}/control/md5sums" basedir="${deb}/data" />
+    
+    <tar tarfile="${deb}/control.tar.gz" basedir="${deb}/control" compression="gzip"/>
+    <tar tarfile="${deb}/data.tar.gz" basedir="${deb}/data" compression="gzip"/>
+    
+    <deb destfile="jdeb.deb" control="${deb}/control.tar.gz" data="${deb}/data.tar.gz" />
+
+  </target>
+
+</project>
