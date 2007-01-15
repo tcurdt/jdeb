@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<project name="Dependency">
+
+<!--
+  <bannerLeft>
+    <name>JDeb</name>
+    <src>http://maven.apache.org/images/apache-maven-project.png</src>
+    <href>http://vafer.org/projects/jdeb</href>
+  </bannerLeft>
+
+  <bannerRight>
+    <src>http://maven.apache.org/images/maven-small.gif</src>
+  </bannerRight>
+-->
+  <publishDate format="dd MMM yyyy" />
+
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-vafer-skin</artifactId>
+    <version>1.0</version>
+  </skin>
+
+  <body>
+    <links>
+      <item name="Blog" href="http://vafer.org/blog/"/>
+    </links>
+
+    <menu name="Project">
+      <item name="About" href="index.html"/>
+      <item name="How to use" href="howto.html"/>
+      <item name="Downloads" href="downloads.html"/>
+    </menu>
+
+    ${reports}
+
+  </body>
+</project>

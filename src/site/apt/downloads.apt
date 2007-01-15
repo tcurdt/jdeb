@@ -1,0 +1,20 @@
+Downloads
+
+ The official releases are available through the maven2 repository on repo1.maver.org.
+
+* Version 0.1
+
+  The current trunk and not yet released
+
+ Only if you require snaphots include the vafer.org repository into your maven2
+ pom or settings xml file.
+
++----------------------
+<repositories>
+  <repository>
+    <id>vafer.org</id>
+    <name>vafer.org Maven Snapshot Repository</name>
+    <url>https://vafer.org/repository/snaphots</url>
+  </repository>
+  ...
++----------------------

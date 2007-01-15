@@ -62,6 +62,7 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.2</version>
+      <scope>tests</scope>
     </dependency>
     <dependency>
       <groupId>ant</groupId>
@@ -124,7 +125,7 @@
     </snapshotRepository>
     <site>
       <id>website</id>
-      <url>scpexe://vafer.org/home/tcurdt/apache2/vafer.org/root/projects/dependency</url>
+      <url>scpexe://vafer.org/home/tcurdt/apache2/vafer.org/root/projects/jdeb</url>
     </site>
   </distributionManagement>
 </project>

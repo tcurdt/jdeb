@@ -1,0 +1,29 @@
+Howto use "jdeb"
+
+ You use the standard tar tasks to zip up the control and the data section of a deb archive. Jdeb then can combine them and turn them into a proper debian package.
+
++--------------------
+  <target name="deb" depends="...">
+
+    <taskdef name="deb" classname="org.vafer.jdeb.DebAntTask" />
+    <taskdef name="md5" classname="org.vafer.jdeb.ChecksumAntTask" />
+
+    <copy todir="${dst.deb.dir}/control">
+      <fileset dir="${src.deb.dir}/control"/>
+      <filterset>
+        <filter token="VERSION" value="${project.version}"/>
+        <filter token="NAME" value="${project.name}"/>
+        <filter token="SIZE" value="${project.size}"/>
+      </filterset>
+    </copy>
+
+    <md5 destfile="${dst.deb.dir}/control/md5sums" basedir="${dst.deb.dir}/data" />
+    
+    <tar tarfile="${dst.deb.dir}/control.tar.gz" basedir="${dst.deb.dir}/control" compression="gzip"/>
+    <tar tarfile="${dst.deb.dir}/data.tar.gz" basedir="${dst.deb.dir}/data" compression="gzip"/>
+    
+    <deb destfile="${target.dir}/${project.name}.deb" control="${dst.deb.dir}/control.tar.gz" data="${dst.deb.dir}/data.tar.gz" />
+
+  </target>  
++--------------------
+
