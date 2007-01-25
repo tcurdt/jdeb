@@ -5,13 +5,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ArEntry extends AbstractArEntry{
+public class FileArEntry extends AbstractArEntry{
 
 	private final File file;
+	private final String name;
 	
-	public ArEntry( final File pFile, final int pUserId, final int pGroupId, final int pMode ) {
+	public FileArEntry( final File pFile, final int pUserId, final int pGroupId, final int pMode ) {
+		this(pFile, pFile.getName(), pUserId, pGroupId, pMode);
+	}
+
+	public FileArEntry( final File pFile, final String pName, final int pUserId, final int pGroupId, final int pMode ) {
 		super(pUserId, pGroupId, pMode);
 		file = pFile;
+		name = pName;
 	}
 
 	public InputStream getData() throws IOException  {
@@ -27,7 +33,7 @@ public class ArEntry extends AbstractArEntry{
 	}
 
 	public String getName() {
-		return file.getName();
+		return name;
 	}
 	
 }

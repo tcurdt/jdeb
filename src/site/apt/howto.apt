@@ -1,29 +1,39 @@
 Howto use "jdeb"
 
- You use the standard tar tasks to zip up the control and the data section of a deb archive. Jdeb then can combine them and turn them into a proper debian package.
-
+ The jdeb ant task can package up a directory as Debain package. You have to provide the control files defining meta information about the package (except the md5sums which gets created automatically)
 +--------------------
-  <target name="deb" depends="...">
+  <target name="package">
+    <taskdef name="deb" classname="org.vafer.jdeb.DebAntTask"/>
 
-    <taskdef name="deb" classname="org.vafer.jdeb.DebAntTask" />
-    <taskdef name="md5" classname="org.vafer.jdeb.ChecksumAntTask" />
-
-    <copy todir="${dst.deb.dir}/control">
-      <fileset dir="${src.deb.dir}/control"/>
+    <copy todir="${deb}/control">
+      <fileset dir="src/main/resources/deb/control"/>
       <filterset>
-        <filter token="VERSION" value="${project.version}"/>
-        <filter token="NAME" value="${project.name}"/>
-        <filter token="SIZE" value="${project.size}"/>
+        <filter token="VERSION" value="${version}"/>
+        <filter token="NAME" value="${ant.project.name}"/>
+        <filter token="SIZE" value="1"/>
       </filterset>
     </copy>
+        
+    <deb destfile="jdeb.deb" control="${deb}/control" data="src/main/resources/deb/data" />
+  </target>
++--------------------
 
-    <md5 destfile="${dst.deb.dir}/control/md5sums" basedir="${dst.deb.dir}/data" />
-    
-    <tar tarfile="${dst.deb.dir}/control.tar.gz" basedir="${dst.deb.dir}/control" compression="gzip"/>
-    <tar tarfile="${dst.deb.dir}/data.tar.gz" basedir="${dst.deb.dir}/data" compression="gzip"/>
-    
-    <deb destfile="${target.dir}/${project.name}.deb" control="${dst.deb.dir}/control.tar.gz" data="${dst.deb.dir}/data.tar.gz" />
+ For binary packages it might be important to retain permissions, ownerships and links. When you provide the original tar as input the meta data will be kept intact gets included directly into the deb. You can apply simple modifications like prefixing or stripping of paths though.
 
-  </target>  
++--------------------
+  <target name="repackage">
+    <taskdef name="deb" classname="org.vafer.jdeb.DebAntTask" />
+
+    <copy todir="${deb}/control">
+      <fileset dir="src/main/resources/deb/control"/>
+      <filterset>
+        <filter token="VERSION" value="${version}"/>
+        <filter token="NAME" value="${ant.project.name}"/>
+        <filter token="SIZE" value="1"/>
+      </filterset>
+    </copy>
+        
+    <deb destfile="jdeb.deb" control="${deb}/control" data="src/release.tgz" strip="1" prefix="/opt/java"/>
+  </target>
 +--------------------
 
