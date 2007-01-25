@@ -8,14 +8,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.Resource;
+import org.apache.tools.ant.types.ResourceCollection;
+import org.apache.tools.ant.types.resources.FileResource;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
 import org.apache.tools.tar.TarOutputStream;
@@ -27,9 +30,10 @@ public class DebAntTask extends Task {
 
     private File deb;
     private File control;
-    private File data;
     private int strip = 0;
     private String prefix = "";
+    private Collection dataFiles = new ArrayList();
+    
     
     public void setDestfile(File deb) {
     	this.deb = deb;
@@ -40,7 +44,7 @@ public class DebAntTask extends Task {
     }
     
     public void setData(File data) {
-    	this.data = data;
+    	dataFiles.add(new FileResource(data));
     }
 
     public void setStrip(int strip) {
@@ -55,20 +59,24 @@ public class DebAntTask extends Task {
     	this.prefix = prefix + '/';
     }
 	
+    public void add(ResourceCollection res) {
+    	dataFiles.add(res);
+    }
+
+    
 	public void execute() {
 		
 		if (control == null || !control.isDirectory()) {
 			throw new BuildException("you need to point the 'control' attribute to the control directory");
 		}
 				
-		if (data == null) {
-			throw new BuildException("you need to point the 'data' attribute either to the tgz or the directory with the data");
+		if (dataFiles.size() == 0) {
+			throw new BuildException("you need to provide at least one pointer to a tgz or directory with the data");
 		}
 
 		if (deb == null) {
 			throw new BuildException("you need to point the 'destfile' attribute to where the deb is supposed to be created");
 		}
-		
 
 		File tempData = null;
 		File tempControl = null;
@@ -77,8 +85,24 @@ public class DebAntTask extends Task {
 			tempData = File.createTempFile("deb", "data");
 			tempControl = File.createTempFile("deb", "control");
 			
-			Map digests = buildData(data, tempData);
-			buildControl(control, digests, tempControl);
+			final StringBuffer md5sum = new StringBuffer();
+			for (Iterator it = dataFiles.iterator(); it.hasNext();) {
+				final ResourceCollection rc = (ResourceCollection) it.next();
+				
+				for (Iterator rit = rc.iterator(); rit.hasNext();) {
+					final Resource resource = (Resource) rit.next();
+					
+					if (!(resource instanceof FileResource)) {
+						throw new BuildException("only file resources are supported " + resource);
+					}
+					
+					final File data = ((FileResource)resource).getFile();
+
+					buildData(data, tempData, md5sum);					
+				}
+				
+			}
+			buildControl(control, md5sum.toString(), tempControl);
 						
 			ArArchive ar = new ArArchive(new FileOutputStream(deb));
 			ar.add(new StaticArEntry("debian-binary",  0, 0, 33188, "2.0\n"));
@@ -136,9 +160,7 @@ public class DebAntTask extends Task {
 		return s.substring(x+1);
 	}
 	
-	private Map buildData( final File src, final File dst ) throws Exception {
-		final Map map = new HashMap();
-		
+	private void buildData( final File src, final File dst, final StringBuffer md5sum ) throws Exception {
 		// FIXME: merge both cases via visitor
 		if (src.isFile()) {
 			final TarInputStream inputStream = new TarInputStream(new GZIPInputStream(new FileInputStream(src)));
@@ -162,7 +184,7 @@ public class DebAntTask extends Task {
 
 				copy(inputStream, new DigestOutputStream(outputStream, digest));
 								
-				log("name:" + entry.getName() +
+				log("adding data file name:" + entry.getName() +
 						" size:" + entry.getSize() +
 						" mode:" + entry.getMode() +
 						" linkname:" + entry.getLinkName() +
@@ -176,7 +198,7 @@ public class DebAntTask extends Task {
 				
 				outputStream.closeEntry();
 				
-				map.put(entry.getName(), toHex(digest.digest()));
+				md5sum.append(entry.getName()).append(" ").append(toHex(digest.digest())).append('\n');
 			}
 			
 			inputStream.close();
@@ -195,14 +217,8 @@ public class DebAntTask extends Task {
 						entry.setName(prefix + stripPath(strip, file.getAbsolutePath().substring(src.getAbsolutePath().length())));
 						
 						InputStream inputStream = new FileInputStream(file);
-
-						outputStream.putNextEntry(entry);
-			
-						digest.reset();
-
-						copy(inputStream, new DigestOutputStream(outputStream, digest));
-										
-						log("name:" + entry.getName() +
+						
+						log("adding data file name:" + entry.getName() +
 								" size:" + entry.getSize() +
 								" mode:" + entry.getMode() +
 								" linkname:" + entry.getLinkName() +
@@ -213,10 +229,16 @@ public class DebAntTask extends Task {
 								" modtime:" + entry.getModTime() +
 								" md5: " + toHex(digest.digest())
 						);
-						
+
+						outputStream.putNextEntry(entry);
+			
+						digest.reset();
+
+						copy(inputStream, new DigestOutputStream(outputStream, digest));
+																
 						outputStream.closeEntry();
 						
-						map.put(entry.getName(), toHex(digest.digest()));
+						md5sum.append(entry.getName()).append(" ").append(toHex(digest.digest())).append('\n');
 
 						inputStream.close();
 
@@ -228,14 +250,11 @@ public class DebAntTask extends Task {
 						
 			outputStream.close();
 			
-		}
-		
-		return map;
-
+		}		
 	}
 	
 	
-	private void buildControl( final File src, final Map digests, final File dst ) throws Exception {
+	private void buildControl( final File src, final String digests, final File dst ) throws Exception {
 		final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(dst)));
 		outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
@@ -248,20 +267,11 @@ public class DebAntTask extends Task {
 					
 					InputStream inputStream = new FileInputStream(file);
 
+					log("adding control file " + entry.getName());
+
 					outputStream.putNextEntry(entry);
 		
-					copy(inputStream, outputStream);
-									
-					log("name:" + entry.getName() +
-							" size:" + entry.getSize() +
-							" mode:" + entry.getMode() +
-							" linkname:" + entry.getLinkName() +
-							" username:" + entry.getUserName() +
-							" userid:" + entry.getUserId() +
-							" groupname:" + entry.getGroupName() +
-							" groupid:" + entry.getGroupId() +
-							" modtime:" + entry.getModTime()
-					);
+					copy(inputStream, outputStream);								
 					
 					outputStream.closeEntry();
 					
@@ -273,19 +283,12 @@ public class DebAntTask extends Task {
 			}				
 		});
 
-		// FIXME: no real point for a map ...just creat the stringbuffer while we create the data.tgz
-		StringBuffer sb = new StringBuffer();
-		for (Iterator it = digests.entrySet().iterator(); it.hasNext();) {
-			final Map.Entry entry = (Map.Entry) it.next();
-			final String path = (String) entry.getKey();
-			final String md5 = (String) entry.getValue();
-			sb.append(md5).append(" ").append(path).append('\n');
-		}
-		
-		byte[] data = sb.toString().getBytes("UTF-8");
+		byte[] data = digests.getBytes("UTF-8");
 		
 		TarEntry entry = new TarEntry("md5sums");
 		entry.setSize(data.length);
+
+		log("adding control file " + entry.getName());
 
 		outputStream.putNextEntry(entry);
 		outputStream.write(data);

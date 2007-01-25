@@ -20,7 +20,9 @@
       </filterset>
     </copy>
         
-    <deb destfile="jdeb.deb" control="${deb}/control" data="src/main/resources/deb/data" />
+    <deb destfile="jdeb.deb" control="${deb}/control">
+    	<dirset dir="src/main/resources/deb/data"/>
+	</deb>
 
   </target>
 
