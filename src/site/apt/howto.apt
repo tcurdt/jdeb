@@ -14,7 +14,9 @@ Howto use "jdeb"
       </filterset>
     </copy>
         
-    <deb destfile="jdeb.deb" control="${deb}/control" data="src/main/resources/deb/data" />
+    <deb destfile="jdeb.deb" control="${deb}/control">
+      <data src="src/main/resources/deb/data"/>
+    </deb>
   </target>
 +--------------------
 
@@ -33,7 +35,9 @@ Howto use "jdeb"
       </filterset>
     </copy>
         
-    <deb destfile="jdeb.deb" control="${deb}/control" data="src/release.tgz" strip="1" prefix="/opt/java"/>
+    <deb destfile="jdeb.deb" control="${deb}/control">
+      <data src="src/release.tgz" strip="1" prefix="/opt/java"/>
+    </dev>
   </target>
 +--------------------
 
