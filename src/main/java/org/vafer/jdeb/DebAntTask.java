@@ -16,9 +16,6 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
-import org.apache.tools.ant.types.Resource;
-import org.apache.tools.ant.types.ResourceCollection;
-import org.apache.tools.ant.types.resources.FileResource;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
 import org.apache.tools.tar.TarOutputStream;
@@ -30,9 +27,8 @@ public class DebAntTask extends Task {
 
     private File deb;
     private File control;
-    private int strip = 0;
-    private String prefix = "";
-    private Collection dataFiles = new ArrayList();
+
+    private Collection dataCollection = new ArrayList();
     
     
     public void setDestfile(File deb) {
@@ -43,26 +39,52 @@ public class DebAntTask extends Task {
     	this.control = control;
     }
     
-    public void setData(File data) {
-    	dataFiles.add(new FileResource(data));
-    }
-
-    public void setStrip(int strip) {
-    	this.strip = strip;
+	
+    public static class Data {
+    	
+    	private String prefix = "";
+    	private int strip = 0;
+    	private File data;
+    	
+    	public void setStrip(int strip) {
+    		this.strip = strip;
+    	}
+    	
+    	public void setPrefix(String prefix) {
+    		if (!prefix.endsWith("/")) {
+        		this.prefix = prefix + "/";
+        		return;
+    		}
+    		
+    		this.prefix = prefix;
+    	}
+    	
+    	public void setSrc(File data) {
+    		this.data = data;
+    	}
+    	
+    	public File getFile() {
+    		return data;
+    	}
+    	
+    	public int getStrip() {
+    		return strip;
+    	}
+    	
+    	public String getPrefix() {
+    		return prefix;
+    	}
+    	
+    	public String toString() {
+    		return data.toString();
+    	}
     }
     
-    public void setPrefix(String prefix) {
-    	if (prefix.endsWith("/")) {
-        	this.prefix = prefix;
-        	return;
-    	}
-    	this.prefix = prefix + '/';
+    
+    public void addData(Data data) {
+    	dataCollection.add(data);
     }
-	
-    public void add(ResourceCollection res) {
-    	dataFiles.add(res);
-    }
-
+    
     
 	public void execute() {
 		
@@ -70,7 +92,7 @@ public class DebAntTask extends Task {
 			throw new BuildException("you need to point the 'control' attribute to the control directory");
 		}
 				
-		if (dataFiles.size() == 0) {
+		if (dataCollection.size() == 0) {
 			throw new BuildException("you need to provide at least one pointer to a tgz or directory with the data");
 		}
 
@@ -84,24 +106,24 @@ public class DebAntTask extends Task {
 		try {
 			tempData = File.createTempFile("deb", "data");
 			tempControl = File.createTempFile("deb", "control");
+
+			
+			final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(tempData)));
+			outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 			
 			final StringBuffer md5sum = new StringBuffer();
-			for (Iterator it = dataFiles.iterator(); it.hasNext();) {
-				final ResourceCollection rc = (ResourceCollection) it.next();
-				
-				for (Iterator rit = rc.iterator(); rit.hasNext();) {
-					final Resource resource = (Resource) rit.next();
-					
-					if (!(resource instanceof FileResource)) {
-						throw new BuildException("only file resources are supported " + resource);
-					}
-					
-					final File data = ((FileResource)resource).getFile();
 
-					buildData(data, tempData, md5sum);					
-				}
+
+			for (Iterator it = dataCollection.iterator(); it.hasNext();) {
+				final Data data = (Data) it.next();
+
+				log("*** adding data from " + data);
 				
+				buildData(data, outputStream, md5sum);					
 			}
+			
+			outputStream.close();
+			
 			buildControl(control, md5sum.toString(), tempControl);
 						
 			ArArchive ar = new ArArchive(new FileOutputStream(deb));
@@ -160,12 +182,16 @@ public class DebAntTask extends Task {
 		return s.substring(x+1);
 	}
 	
-	private void buildData( final File src, final File dst, final StringBuffer md5sum ) throws Exception {
+	private void buildData( final Data srcData, final TarOutputStream outputStream, final StringBuffer md5sum ) throws Exception {
+		final File src = srcData.getFile();
+		
+		if (!src.exists()) {
+			return;
+		}
+		
 		// FIXME: merge both cases via visitor
 		if (src.isFile()) {
 			final TarInputStream inputStream = new TarInputStream(new GZIPInputStream(new FileInputStream(src)));
-			final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(dst)));
-			outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 			
 			final MessageDigest digest = MessageDigest.getInstance("MD5");
 	
@@ -176,7 +202,7 @@ public class DebAntTask extends Task {
 					break;
 				}
 
-				entry.setName(prefix + stripPath(strip, entry.getName()));
+				entry.setName(srcData.getPrefix() + stripPath(srcData.getStrip(), entry.getName()));
 				
 				outputStream.putNextEntry(entry);
 	
@@ -202,10 +228,7 @@ public class DebAntTask extends Task {
 			}
 			
 			inputStream.close();
-			outputStream.close();
 		} else {
-			final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(dst)));
-			outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
 			final MessageDigest digest = MessageDigest.getInstance("MD5");
 	
@@ -214,7 +237,7 @@ public class DebAntTask extends Task {
 					try {
 						TarEntry entry = new TarEntry(file);
 						
-						entry.setName(prefix + stripPath(strip, file.getAbsolutePath().substring(src.getAbsolutePath().length())));
+						entry.setName(file.getAbsolutePath().substring(src.getAbsolutePath().length()));
 						
 						InputStream inputStream = new FileInputStream(file);
 						
@@ -246,10 +269,7 @@ public class DebAntTask extends Task {
 						e.printStackTrace();
 					}
 				}				
-			});
-						
-			outputStream.close();
-			
+			});						
 		}		
 	}
 	
