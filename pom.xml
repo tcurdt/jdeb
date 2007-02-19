@@ -4,7 +4,7 @@
   <groupId>org.vafer</groupId>
   <artifactId>jdeb</artifactId>
   <name>jdeb</name>
-  <version>0.1</version>
+  <version>0.2-SNAPSHOT</version>
   <description>This project provides an ant task to build deb archives</description>
   <url>http://vafer.org/projects/jdeb</url>
   <developers>
