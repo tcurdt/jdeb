@@ -4,7 +4,7 @@
   <groupId>org.vafer</groupId>
   <artifactId>jdeb</artifactId>
   <name>jdeb</name>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.1</version>
   <description>This project provides an ant task to build deb archives</description>
   <url>http://vafer.org/projects/jdeb</url>
   <developers>
@@ -26,9 +26,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:http://vafer.org/svn/projects/jdeb/trunk</connection>
-    <developerConnection>scm:svn:https://vafer.org/svn/projects/jdeb/trunk</developerConnection>
-    <url>http://vafer.org/svn/projects/jdeb</url>
+    <connection>scm:svn:http://vafer.org/svn/projects/jdeb/tags/jdeb-0.1</connection>
+    <developerConnection>scm:svn:https://vafer.org/svn/projects/jdeb/tags/jdeb-0.1</developerConnection>
+    <url>http://vafer.org/svn/projects/jdeb/tags/jdeb-0.1</url>
   </scm>
   <build>
       
