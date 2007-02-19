@@ -154,15 +154,14 @@ public class DebAntTask extends Task {
 	
 	
 	private void iterate( File dir, FileVisitor visitor) {
+	    visitor.visit(dir);
+
 		if (dir.isDirectory()) {
 			File[] childs = dir.listFiles();
 			for (int i = 0; i < childs.length; i++) {
 				iterate(childs[i], visitor);
 			}
-			return;
 		}
-		
-		visitor.visit(dir);
 	}
 	
 	private String stripPath( final int p, final String s ) {
@@ -203,7 +202,7 @@ public class DebAntTask extends Task {
 				}
 
 				entry.setName(srcData.getPrefix() + stripPath(srcData.getStrip(), entry.getName()));
-				
+
 				outputStream.putNextEntry(entry);
 	
 				digest.reset();
@@ -237,7 +236,29 @@ public class DebAntTask extends Task {
 					try {
 						TarEntry entry = new TarEntry(file);
 						
-						entry.setName(file.getAbsolutePath().substring(src.getAbsolutePath().length()));
+						String localName = file.getAbsolutePath().substring(src.getAbsolutePath().length());
+						
+						if ("".equals(localName)) {
+						    return;
+						}
+						
+						entry.setName(srcData.getPrefix() + stripPath(srcData.getStrip(), localName.substring(1)));
+						
+						if (file.isDirectory()) {
+						    log("adding data directory name:" + entry.getName() +
+								" size:" + entry.getSize() +
+								" mode:" + entry.getMode() +
+								" linkname:" + entry.getLinkName() +
+								" username:" + entry.getUserName() +
+								" userid:" + entry.getUserId() +
+								" groupname:" + entry.getGroupName() +
+								" groupid:" + entry.getGroupId() +
+								" modtime:" + entry.getModTime()
+						        );
+						    outputStream.putNextEntry(entry);
+						    outputStream.closeEntry();
+						    return;
+						}
 						
 						InputStream inputStream = new FileInputStream(file);
 						
@@ -280,6 +301,11 @@ public class DebAntTask extends Task {
 
 		iterate(src, new FileVisitor() {
 			public void visit( File file ) {
+			    
+			    if (file.isDirectory()) {
+			        return;
+			    }
+			    
 				try {
 					TarEntry entry = new TarEntry(file);
 					
