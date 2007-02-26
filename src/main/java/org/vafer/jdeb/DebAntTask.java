@@ -154,9 +154,16 @@ public class DebAntTask extends Task {
 	
 	
 	private void iterate( File dir, FileVisitor visitor) {
+
+		// FIXME: make configurable
+		if (".svn".equals(dir.getName())) {				
+			return;
+		}		
+		
 	    visitor.visit(dir);
 
 		if (dir.isDirectory()) {
+			
 			File[] childs = dir.listFiles();
 			for (int i = 0; i < childs.length; i++) {
 				iterate(childs[i], visitor);
