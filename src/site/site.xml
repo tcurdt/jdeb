@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="Dependency">
+<project name="jdeb - Building Debian packages in Java">
 
 <!--
   <bannerLeft>

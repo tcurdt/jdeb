@@ -1,3 +1,4 @@
 o create maven plugin
 o control file validation
 o package size calculation
+o specifying ownerships/permissions and links

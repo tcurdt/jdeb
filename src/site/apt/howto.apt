@@ -1,6 +1,6 @@
 Howto use "jdeb"
 
- The jdeb ant task can package up a directory as Debain package. You have to provide the control files defining meta information about the package (except the md5sums which gets created automatically)
+ The jdeb ant task can package up a directory as Debian package. You have to provide the control files defining meta information about the package (except the md5sums which gets created automatically)
 
 +--------------------
   <target name="package">
