@@ -106,6 +106,9 @@ public class DebAntTask extends Task {
 		try {
 			tempData = File.createTempFile("deb", "data");
 			tempControl = File.createTempFile("deb", "control");
+			
+			tempData.deleteOnExit();
+			tempControl.deleteOnExit();
 
 			
 			final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(tempData)));
@@ -134,18 +137,12 @@ public class DebAntTask extends Task {
 			
 		} catch(Exception e) {
 			
-			if (tempData != null) {
-				tempData.delete();
-			}
-
-			if (tempControl != null) {
-				tempControl.delete();
-			}
-			
 			e.printStackTrace();
 			
 			throw new BuildException("could not create deb package", e);
 		}
+		
+		log("created " + deb);
 	}
 	
 	private static interface FileVisitor {
@@ -188,6 +185,19 @@ public class DebAntTask extends Task {
 		return s.substring(x+1);
 	}
 	
+	private String stripLeadingSlash( String s ) {
+		if (s == null) {
+			return s;
+		}
+		if (s.length() == 0) {
+			return s;
+		}
+		if (s.charAt(0) == '/') {
+			return s.substring(1);
+		}
+		return s;
+	}
+	
 	private void buildData( final Data srcData, final TarOutputStream outputStream, final StringBuffer md5sum ) throws Exception {
 		final File src = srcData.getFile();
 		
@@ -208,29 +218,37 @@ public class DebAntTask extends Task {
 					break;
 				}
 
-				entry.setName(srcData.getPrefix() + stripPath(srcData.getStrip(), entry.getName()));
+				entry.setName(stripLeadingSlash(srcData.getPrefix() + stripPath(srcData.getStrip(), entry.getName())));
 
 				outputStream.putNextEntry(entry);
+					
+				if (entry.isDirectory()) {
+					//copy(inputStream, outputStream);
+					outputStream.closeEntry();
+				} else {
+				
+					digest.reset();
 	
-				digest.reset();
+					copy(inputStream, new DigestOutputStream(outputStream, digest));
 
-				copy(inputStream, new DigestOutputStream(outputStream, digest));
-								
-				log("adding data file name:" + entry.getName() +
-						" size:" + entry.getSize() +
-						" mode:" + entry.getMode() +
-						" linkname:" + entry.getLinkName() +
-						" username:" + entry.getUserName() +
-						" userid:" + entry.getUserId() +
-						" groupname:" + entry.getGroupName() +
-						" groupid:" + entry.getGroupId() +
-						" modtime:" + entry.getModTime() +
-						" md5: " + toHex(digest.digest())
-				);
-				
-				outputStream.closeEntry();
-				
-				md5sum.append(entry.getName()).append(" ").append(toHex(digest.digest())).append('\n');
+					String md5 = toHex(digest.digest());
+					
+					log("adding data file name:" + entry.getName() +
+							" size:" + entry.getSize() +
+							" mode:" + entry.getMode() +
+							" linkname:" + entry.getLinkName() +
+							" username:" + entry.getUserName() +
+							" userid:" + entry.getUserId() +
+							" groupname:" + entry.getGroupName() +
+							" groupid:" + entry.getGroupId() +
+							" modtime:" + entry.getModTime() +
+							" md5: " + md5 
+					);
+					
+					outputStream.closeEntry();
+					
+					md5sum.append(md5).append(" ").append(entry.getName()).append('\n');
+				}
 			}
 			
 			inputStream.close();
@@ -249,26 +267,25 @@ public class DebAntTask extends Task {
 						    return;
 						}
 						
-						entry.setName(srcData.getPrefix() + stripPath(srcData.getStrip(), localName.substring(1)));
+						entry.setName(stripLeadingSlash(srcData.getPrefix() + stripPath(srcData.getStrip(), localName.substring(1))));
 						
-						if (file.isDirectory()) {
-						    log("adding data directory name:" + entry.getName() +
-								" size:" + entry.getSize() +
-								" mode:" + entry.getMode() +
-								" linkname:" + entry.getLinkName() +
-								" username:" + entry.getUserName() +
-								" userid:" + entry.getUserId() +
-								" groupname:" + entry.getGroupName() +
-								" groupid:" + entry.getGroupId() +
-								" modtime:" + entry.getModTime()
-						        );
-						    outputStream.putNextEntry(entry);
+					    outputStream.putNextEntry(entry);
+
+					    if (file.isDirectory()) {
 						    outputStream.closeEntry();
 						    return;
 						}
 						
 						InputStream inputStream = new FileInputStream(file);
 						
+						digest.reset();
+
+						copy(inputStream, new DigestOutputStream(outputStream, digest));
+						
+						String md5 = toHex(digest.digest());
+						
+						outputStream.closeEntry();
+
 						log("adding data file name:" + entry.getName() +
 								" size:" + entry.getSize() +
 								" mode:" + entry.getMode() +
@@ -278,18 +295,10 @@ public class DebAntTask extends Task {
 								" groupname:" + entry.getGroupName() +
 								" groupid:" + entry.getGroupId() +
 								" modtime:" + entry.getModTime() +
-								" md5: " + toHex(digest.digest())
+								" md5: " + md5
 						);
-
-						outputStream.putNextEntry(entry);
-			
-						digest.reset();
-
-						copy(inputStream, new DigestOutputStream(outputStream, digest));
-																
-						outputStream.closeEntry();
 						
-						md5sum.append(entry.getName()).append(" ").append(toHex(digest.digest())).append('\n');
+						md5sum.append(md5).append(" ").append(entry.getName()).append('\n');
 
 						inputStream.close();
 
