@@ -3,7 +3,7 @@ package org.vafer.jdeb.ar;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class ArArchive {
+public final class ArArchive {
 	
 	private final OutputStream out;
 	private long offset = 0;

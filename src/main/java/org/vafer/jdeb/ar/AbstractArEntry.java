@@ -28,7 +28,7 @@ public abstract class AbstractArEntry {
 	
 	
 	private long write( final String pData, final OutputStream pOut ) throws IOException {
-		byte[] data = pData.getBytes("ascii");
+		final byte[] data = pData.getBytes("ascii");
 		pOut.write(data);
 		return data.length;		
 	}
@@ -99,10 +99,11 @@ public abstract class AbstractArEntry {
 	
 	private long writeData( final OutputStream pOut ) throws IOException {
 		
-        byte[] buffer = new byte[2048];
+        final byte[] buffer = new byte[2048];
+        final InputStream input = getData();
         long count = 0;
         int n = 0;
-        InputStream input = getData();
+        
         while (-1 != (n = input.read(buffer))) {
             pOut.write(buffer, 0, n);
             count += n;
@@ -112,6 +113,8 @@ public abstract class AbstractArEntry {
         	pOut.write('\n');
         	count++;
         }
+        
+        input.close();
         
         return count;
 	}

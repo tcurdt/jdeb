@@ -4,26 +4,50 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class StaticArEntry extends AbstractArEntry {
+public final class StaticArEntry extends AbstractArEntry {
 
 	private final String name;
-	private final byte[] data;
+	private final StringBuffer buffer;
+	private byte[] data;
 	
 	public StaticArEntry( final String pName, final int pUserId, final int pGroupId, final int pMode, final String pData) {
 		super(pUserId, pGroupId, pMode);
 		name = pName;
-		data = pData.getBytes();
+		buffer = new StringBuffer(pData);
 	}
 
+	public StaticArEntry( final String pName, final int pUserId, final int pGroupId, final int pMode ) {
+		super(pUserId, pGroupId, pMode);
+		name = pName;
+		buffer = new StringBuffer();
+	}
+
+	
+	private void unmodifable() {
+		if (data == null) {
+			data = buffer.toString().getBytes();			
+		}
+	}
+	
 	public InputStream getData() throws IOException {
-		return new ByteArrayInputStream(data);
+		unmodifable();
+		return new ByteArrayInputStream(buffer.toString().getBytes());
 	}
 
+	public StringBuffer append( final String pData ) {
+		if (data != null) {
+			throw new RuntimeException("unmodifiable now");
+		}
+		buffer.append(pData);
+		return buffer;
+	}
+	
 	public long getLastModified() {
 		return System.currentTimeMillis();
 	}
 
 	public long getLength() {
+		unmodifable();
 		return data.length; 
 	}
 

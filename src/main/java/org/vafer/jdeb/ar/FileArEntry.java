@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class FileArEntry extends AbstractArEntry{
+public final class FileArEntry extends AbstractArEntry {
 
 	private final File file;
 	private final String name;
