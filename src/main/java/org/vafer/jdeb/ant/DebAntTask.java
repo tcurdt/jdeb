@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Task;
+import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Processor;
 
-public class DebAntTask extends Task {
+public class DebAntTask extends MatchingTask {
 
     private File deb;
     private File control;
@@ -28,11 +28,11 @@ public class DebAntTask extends Task {
     
 	
     public void addDataFiles( DataFiles data ) {
-    	dataProducers.add(data.getDataProducer());
+    	dataProducers.add(data);
     }
     
     public void addDataArchive( DataArchive data ) {
-    	dataProducers.add(data.getDataProducer());
+    	dataProducers.add(data);
     }
     
 	public void execute() {
@@ -57,14 +57,14 @@ public class DebAntTask extends Task {
 		final Processor processor = new Processor(new Console() {
 			public void println(String s) {
 				log(s);
-			}
-			
+			}			
 		});
 		
 		try {
 			processor.createDeb(controlFiles, data, new FileOutputStream(deb));
 		} catch (Exception e) {
-			log("failed to create dbeian archive " + e);
+			log("failed to create debian package " + e);
+			e.printStackTrace();
 		}
 		
 		log("created " + deb);

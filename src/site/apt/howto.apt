@@ -4,7 +4,7 @@ Howto use "jdeb"
 
 +--------------------
   <target name="package">
-    <taskdef name="deb" classname="org.vafer.jdeb.DebAntTask"/>
+    <taskdef name="deb" classname="org.vafer.jdeb.ant.DebAntTask"/>
 
     <copy todir="${deb}/control">
       <fileset dir="src/main/resources/deb/control"/>
@@ -16,7 +16,9 @@ Howto use "jdeb"
     </copy>
         
     <deb destfile="jdeb.deb" control="${deb}/control">
-      <data src="src/main/resources/deb/data"/>
+      <dataFiles dir="src/main/resources/deb/data">
+        <exclude name="**/.svn"/>
+      </dataFiles>
     </deb>
   </target>
 +--------------------
@@ -25,7 +27,7 @@ Howto use "jdeb"
 
 +--------------------
   <target name="repackage">
-    <taskdef name="deb" classname="org.vafer.jdeb.DebAntTask" />
+    <taskdef name="deb" classname="org.vafer.jdeb.ant.DebAntTask" />
 
     <copy todir="${deb}/control">
       <fileset dir="src/main/resources/deb/control"/>
@@ -37,7 +39,9 @@ Howto use "jdeb"
     </copy>
         
     <deb destfile="jdeb.deb" control="${deb}/control">
-      <data src="src/release.tgz" strip="1" prefix="./opt/java"/>
+      <dataArchive archive="src/release.tgz">
+        <exclude name="**/.svn"/>
+      </dataArchive>
     </dev>
   </target>
 +--------------------
