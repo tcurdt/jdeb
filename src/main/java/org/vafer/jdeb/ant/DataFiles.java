@@ -6,19 +6,31 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.tools.ant.DirectoryScanner;
-import org.apache.tools.ant.types.AbstractFileSet;
+import org.apache.tools.ant.types.PatternSet;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Utils;
 
-public class DataFiles extends AbstractFileSet implements DataProducer {
+public class DataFiles extends PatternSet implements DataProducer {
 
+	private DirectoryScanner scanner = new DirectoryScanner();
+	
+	public void setDir( File dir ) {
+		scanner.setBasedir(dir);
+	}
+	
 	public void produce( final DataConsumer receiver ) {
 
 		try {
-	        final DirectoryScanner ds = getDirectoryScanner(getProject());
-	        final String[] files = ds.getIncludedFiles();
-	    	final File baseDir = ds.getBasedir();
+			scanner.setIncludes(getIncludePatterns(getProject()));
+			scanner.setExcludes(getExcludePatterns(getProject()));
+			scanner.setCaseSensitive(true);
+			scanner.setFollowSymlinks(true);
+
+			scanner.scan();
+			
+			final String[] files = scanner.getIncludedFiles();
+	    	final File baseDir = scanner.getBasedir();
 	        for (int i = 0; i < files.length; i++) {
 	        	final File file = new File(baseDir, files[i]);
 				InputStream inputStream = null;

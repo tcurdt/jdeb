@@ -129,8 +129,6 @@ public class Processor {
 				    return;
 				}
 			    
-				console.println("file: " + filename);
-				
 			    digest.reset();
 			    
 				Utils.copy(inputStream, new DigestOutputStream(outputStream, digest));
@@ -140,7 +138,7 @@ public class Processor {
 				outputStream.closeEntry();
 
 				console.println(
-						"adding data file name:" + entry.getName() +
+						"file:" + entry.getName() +
 						" size:" + entry.getSize() +
 						" mode:" + entry.getMode() +
 						" linkname:" + entry.getLinkName() +
