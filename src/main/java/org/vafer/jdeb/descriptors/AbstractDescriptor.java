@@ -9,9 +9,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class AbstractDescriptor {
-
 	
 	private final Map values = new HashMap();
+	
+	public AbstractDescriptor() {
+	}
+
+	public AbstractDescriptor( AbstractDescriptor descriptor ) {
+		values.putAll(descriptor.values);
+	}
 
 	protected void parse( InputStream is ) throws IOException, ParseException {
 		final BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -64,7 +70,6 @@ public abstract class AbstractDescriptor {
 	}
 	
 	private void add( String key, String value ) {
-		System.out.println(key + " = " + value);
 		values.put(key, value);
 	}
 	
@@ -78,7 +83,7 @@ public abstract class AbstractDescriptor {
 			final String key = keys[i];
 			final String value = (String) values.get(key);
 			if (value != null) {
-				s.append(key).append(": ").append(value);
+				s.append(key).append(": ").append(value).append('\n');
 			}			
 		}
 		return s.toString();

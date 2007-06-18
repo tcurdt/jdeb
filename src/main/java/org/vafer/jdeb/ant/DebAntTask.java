@@ -47,7 +47,7 @@ public class DebAntTask extends MatchingTask {
 			throw new BuildException("You need to point the 'control' attribute to the control directory.");
 		}
 
-		if (changes != null && !changes.isFile()) {
+		if (changes != null && changes.isDirectory()) {
 			throw new BuildException("If you want the changes written out provide the file via 'changes' attribute.");			
 		}
 		
@@ -73,14 +73,17 @@ public class DebAntTask extends MatchingTask {
 		try {
 			final ChangesDescriptor changesDescriptor = processor.createDeb(controlFiles, data, new FileOutputStream(deb));
 
+			log("created " + deb);
+
 			if (changes != null) {
 				processor.createChanges(changesDescriptor, new FileOutputStream(changes));
+
+				log("created changes file " + changes);
 			}			
 		} catch (Exception e) {
 			log("failed to create debian package " + e);
 			e.printStackTrace();
 		}
 		
-		log("created " + deb);
 	}
 }

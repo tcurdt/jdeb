@@ -30,12 +30,9 @@ Description: revision @REVISION@, jetty java servlet container
 		"Description"
 	};
 	
-	public PackageDescriptor() {		
+	public PackageDescriptor() {
 	}
 
-	public PackageDescriptor( AbstractDescriptor descriptor ) {		
-	}
-	
 	public PackageDescriptor( InputStream is )  throws IOException, ParseException {		
 		parse(is);
 	}

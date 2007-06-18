@@ -74,8 +74,11 @@ public class Processor {
 
 		// TODO:
 		
+		console.println(changesDescriptor.toString());
+		
 		// write out		
 		pChangesOutput.write(changesDescriptor.toString().getBytes());
+		pChangesOutput.close();
 	}
 	
 	private PackageDescriptor buildControl( final File[] pControlFiles, final StringBuffer md5s, final File pOutput ) throws FileNotFoundException, IOException, ParseException {
@@ -138,6 +141,23 @@ public class Processor {
 		outputStream.write(data);
 		outputStream.closeEntry();		
 	}
+
+	
+	private static class Total {
+		private BigInteger count = BigInteger.valueOf(0);
+
+		public void add(long size) {
+			count = count.add(BigInteger.valueOf(size));
+		}
+		
+		public String toString() {
+			return "" + count;
+		}
+		
+		public BigInteger toBigInteger() {
+			return count;
+		}
+	}
 	
 	private StringBuffer buildData( final DataProducer[] pData, final File pOutput ) throws NoSuchAlgorithmException, IOException {
 		final StringBuffer md5s = new StringBuffer();
@@ -147,7 +167,7 @@ public class Processor {
 
 		final MessageDigest digest = MessageDigest.getInstance("MD5");
 
-		final BigInteger totalSize = BigInteger.ZERO;
+		final Total total = new Total();
 		
 		final DataConsumer receiver = new DataConsumer() {
 			public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
@@ -171,7 +191,7 @@ public class Processor {
 				    return;
 				}
 			    
-			    totalSize.add(BigInteger.valueOf(size));
+			    total.add(size);
 			    
 			    digest.reset();
 			    
@@ -206,7 +226,7 @@ public class Processor {
 
 		outputStream.close();
 
-		console.println("total size: " + totalSize);
+		console.println("total size: " + total);
 		
 		return md5s;
 	}

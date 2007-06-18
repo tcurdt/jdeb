@@ -46,7 +46,8 @@ public final class ChangesDescriptor extends AbstractDescriptor {
 	public ChangesDescriptor() {		
 	}
 
-	public ChangesDescriptor( AbstractDescriptor descriptor ) {
+	public ChangesDescriptor(AbstractDescriptor descriptor) {
+		super(descriptor);
 	}
 	
 	public ChangesDescriptor( InputStream is ) throws IOException, ParseException {		
