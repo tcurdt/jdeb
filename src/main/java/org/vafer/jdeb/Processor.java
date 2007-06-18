@@ -7,9 +7,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.tools.tar.TarEntry;
@@ -17,17 +19,19 @@ import org.apache.tools.tar.TarOutputStream;
 import org.vafer.jdeb.ar.ArArchive;
 import org.vafer.jdeb.ar.FileArEntry;
 import org.vafer.jdeb.ar.StaticArEntry;
+import org.vafer.jdeb.descriptors.ChangesDescriptor;
+import org.vafer.jdeb.descriptors.PackageDescriptor;
 
 public class Processor {
 
 	private final Console console;
-	
+		
 	public Processor( Console pConsole ) {
 		console = pConsole;
 	}
 	
-	public void createDeb( File[] pControlFiles, DataProducer[] pData, OutputStream pDebOuput ) throws PackagingException {
-
+	public ChangesDescriptor createDeb( File[] pControlFiles, DataProducer[] pData, OutputStream pDebOuput ) throws PackagingException {
+		
 		File tempData = null;
 		File tempControl = null;
 		
@@ -39,13 +43,19 @@ public class Processor {
 			final StringBuffer md5s = buildData(pData, tempData);
 			
 			console.println("building control");
-			buildControl(pControlFiles, md5s, tempControl);
+			final PackageDescriptor packageDescriptor = buildControl(pControlFiles, md5s, tempControl);
 						
 			final ArArchive ar = new ArArchive(pDebOuput);
 			ar.add(new StaticArEntry("debian-binary", 0, 0, 33188, "2.0\n"));
 			ar.add(new FileArEntry(tempControl,"control.tar.gz", 0, 0, 33188));
 			ar.add(new FileArEntry(tempData, "data.tar.gz", 0, 0, 33188));
 			ar.close();
+			
+			final ChangesDescriptor changesDescriptor = new ChangesDescriptor(packageDescriptor); 
+			
+			// add deb to changes descriptor
+			
+			return changesDescriptor;
 			
 		} catch(Exception e) {
 			throw new PackagingException("could not create deb package", e);
@@ -59,7 +69,19 @@ public class Processor {
 		}
 	}
 
-	private void buildControl( final File[] pControlFiles, final StringBuffer md5s, final File pOutput ) throws FileNotFoundException, IOException {
+	public void createChanges( ChangesDescriptor changesDescriptor, OutputStream pChangesOutput ) throws IOException {
+		// sign changes
+
+		// TODO:
+		
+		// write out		
+		pChangesOutput.write(changesDescriptor.toString().getBytes());
+	}
+	
+	private PackageDescriptor buildControl( final File[] pControlFiles, final StringBuffer md5s, final File pOutput ) throws FileNotFoundException, IOException, ParseException {
+		
+		PackageDescriptor packageDescriptor = null;
+		
 		final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
 		outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
@@ -67,12 +89,19 @@ public class Processor {
 			final File file = pControlFiles[i];
 
 			if (file.isDirectory()) {
-		        return;
+		        break;
 		    }
 
 			final TarEntry entry = new TarEntry(file);
 			
-			entry.setName(file.getName());
+			final String name = file.getName();
+			
+			entry.setName(name);
+			
+			if ("control".equals(name)) {
+				packageDescriptor = new PackageDescriptor(new FileInputStream(file));
+				continue;
+			}			
 			
 			final InputStream inputStream = new FileInputStream(file);
 
@@ -86,17 +115,28 @@ public class Processor {
 			
 		}
 
-		final byte[] data = md5s.toString().getBytes("UTF-8");
+		if (packageDescriptor == null) {
+			packageDescriptor = new PackageDescriptor();
+		}
 		
-		final TarEntry entry = new TarEntry("md5sums");
+		addEntry("control", packageDescriptor.toString(), outputStream);
+		
+		addEntry("md5sums", md5s.toString(), outputStream);
+		
+		outputStream.close();
+		
+		return packageDescriptor;
+	}
+
+	private void addEntry( String name, String content, TarOutputStream outputStream ) throws IOException {
+		final byte[] data = content.getBytes("UTF-8");
+		
+		final TarEntry entry = new TarEntry(name);
 		entry.setSize(data.length);
 
 		outputStream.putNextEntry(entry);
 		outputStream.write(data);
-		outputStream.closeEntry();
-		
-		outputStream.close();
-		
+		outputStream.closeEntry();		
 	}
 	
 	private StringBuffer buildData( final DataProducer[] pData, final File pOutput ) throws NoSuchAlgorithmException, IOException {
@@ -107,6 +147,8 @@ public class Processor {
 
 		final MessageDigest digest = MessageDigest.getInstance("MD5");
 
+		final BigInteger totalSize = BigInteger.ZERO;
+		
 		final DataConsumer receiver = new DataConsumer() {
 			public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
 
@@ -128,6 +170,8 @@ public class Processor {
 				    outputStream.closeEntry();
 				    return;
 				}
+			    
+			    totalSize.add(BigInteger.valueOf(size));
 			    
 			    digest.reset();
 			    
@@ -162,6 +206,8 @@ public class Processor {
 
 		outputStream.close();
 
+		console.println("total size: " + totalSize);
+		
 		return md5s;
 	}
 	
