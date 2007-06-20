@@ -74,23 +74,22 @@ public class SigningUtils {
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 
-        final byte[] linefeed = "\r\n".getBytes("UTF-8");
+        final byte[] newline = "\r\n".getBytes("UTF-8");
+        
+        processLine(reader.readLine(), armoredOutput, signatureGenerator);
         
         while(true) {
         	final String line = reader.readLine();
         	
         	if (line == null) {
+            	armoredOutput.write(newline);
         		break;
         	}
         	        	
-        	final byte[] data = line.getBytes("UTF-8");
-        	
-        	armoredOutput.write(data);
-        	signatureGenerator.update(data);
+        	armoredOutput.write(newline);
+        	signatureGenerator.update(newline);
 
-        	armoredOutput.write(linefeed);
-        	signatureGenerator.update(linefeed);
-        	
+            processLine(line, armoredOutput, signatureGenerator);        	
         }
         
         armoredOutput.endClearText();
@@ -101,5 +100,23 @@ public class SigningUtils {
 
         armoredOutput.close();
 		
+	}
+
+
+	private static void processLine( String line, ArmoredOutputStream armoredOutput, PGPSignatureGenerator signatureGenerator ) throws IOException, SignatureException {
+    	final char[] chars = line.toCharArray();
+    	int len = chars.length;
+
+    	while(len > 0) {
+    		if (!Character.isWhitespace(chars[len-1])) {
+    			break;
+    		}
+    		len--;
+    	}
+
+    	final byte[] data = line.substring(0, len).getBytes("UTF-8");
+    	
+    	armoredOutput.write(data);
+    	signatureGenerator.update(data);
 	}
 }
