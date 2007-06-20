@@ -1,5 +1,6 @@
 package org.vafer.jdeb;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,16 +12,20 @@ import java.math.BigInteger;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
 import java.text.ParseException;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarOutputStream;
+import org.bouncycastle.openpgp.PGPException;
 import org.vafer.jdeb.ar.ArArchive;
 import org.vafer.jdeb.ar.FileArEntry;
 import org.vafer.jdeb.ar.StaticArEntry;
 import org.vafer.jdeb.descriptors.ChangesDescriptor;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
+import org.vafer.jdeb.signing.SigningUtils;
 
 public class Processor {
 
@@ -39,10 +44,10 @@ public class Processor {
 			tempData = File.createTempFile("deb", "data");			
 			tempControl = File.createTempFile("deb", "control");			
 			
-			console.println("building data");
+			console.println("Building data");
 			final StringBuffer md5s = buildData(pData, tempData);
 			
-			console.println("building control");
+			console.println("Building control");
 			final PackageDescriptor packageDescriptor = buildControl(pControlFiles, md5s, tempControl);
 						
 			final ArArchive ar = new ArArchive(pDebOuput);
@@ -58,7 +63,7 @@ public class Processor {
 			return changesDescriptor;
 			
 		} catch(Exception e) {
-			throw new PackagingException("could not create deb package", e);
+			throw new PackagingException("Could not create deb package", e);
 		} finally {
 			if (tempData != null) {
 				tempData.delete();
@@ -69,16 +74,41 @@ public class Processor {
 		}
 	}
 
-	public void createChanges( ChangesDescriptor changesDescriptor, OutputStream pChangesOutput ) throws IOException {
-		// sign changes
+	public void createChanges( ChangesDescriptor changesDescriptor, OutputStream output ) throws IOException {
+		createChanges(changesDescriptor, null, null, null, output);
+	}
 
-		// TODO:
+	public void createChanges( ChangesDescriptor changesDescriptor, InputStream ring, String key, String passphrase, OutputStream output ) throws IOException {
 		
-		console.println(changesDescriptor.toString());
+		final String changes = changesDescriptor.toString();
+
+		console.println(changes);
+
+		final byte[] changesBytes = changes.getBytes("UTF-8");
 		
-		// write out		
-		pChangesOutput.write(changesDescriptor.toString().getBytes());
-		pChangesOutput.close();
+		if (ring == null || key == null || passphrase == null) {			
+			output.write(changesBytes);
+			output.close();			
+			return;
+		}
+		
+		console.println("Signing changes with key " + key);
+		
+		final InputStream input = new ByteArrayInputStream(changesBytes);
+		
+		try {
+			SigningUtils.clearSign(input, ring, key, passphrase, output);		
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (SignatureException e) {
+			e.printStackTrace();
+		} catch (PGPException e) {
+			e.printStackTrace();
+		} catch (NoSuchProviderException e) {
+			e.printStackTrace();
+		}
+		
+		output.close();
 	}
 	
 	private PackageDescriptor buildControl( final File[] pControlFiles, final StringBuffer md5s, final File pOutput ) throws FileNotFoundException, IOException, ParseException {
@@ -226,7 +256,7 @@ public class Processor {
 
 		outputStream.close();
 
-		console.println("total size: " + total);
+		console.println("Total size: " + total);
 		
 		return md5s;
 	}

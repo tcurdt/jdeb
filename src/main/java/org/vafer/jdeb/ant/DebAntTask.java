@@ -1,6 +1,7 @@
 package org.vafer.jdeb.ant;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +18,9 @@ public class DebAntTask extends MatchingTask {
     private File deb;
     private File control;
     private File changes;
+    private File keyring;
+    private String key;
+    private String passphrase;
     
     private Collection dataProducers = new ArrayList();
     
@@ -33,6 +37,18 @@ public class DebAntTask extends MatchingTask {
     	this.changes = changes;
     }
 	
+    public void setKeyring( File keyring ) {
+    	this.keyring = keyring;
+    }
+    
+    public void setKey( String key ) {
+    	this.key = key;
+    }
+    
+    public void setPassphrase( String passphrase ) {
+    	this.passphrase = passphrase;
+    }
+    
     public void addDataFiles( DataFiles data ) {
     	dataProducers.add(data);
     }
@@ -73,15 +89,16 @@ public class DebAntTask extends MatchingTask {
 		try {
 			final ChangesDescriptor changesDescriptor = processor.createDeb(controlFiles, data, new FileOutputStream(deb));
 
-			log("created " + deb);
+			log("Created " + deb);
 
 			if (changes != null) {
-				processor.createChanges(changesDescriptor, new FileOutputStream(changes));
+				
+				processor.createChanges(changesDescriptor, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changes));
 
-				log("created changes file " + changes);
+				log("Created changes file " + changes);
 			}			
 		} catch (Exception e) {
-			log("failed to create debian package " + e);
+			log("Failed to create debian package " + e);
 			e.printStackTrace();
 		}
 		
