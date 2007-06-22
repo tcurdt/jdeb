@@ -46,12 +46,16 @@ public final class ChangesDescriptor extends AbstractDescriptor {
 	public ChangesDescriptor() {		
 	}
 
-	public ChangesDescriptor(AbstractDescriptor descriptor) {
-		super(descriptor);
+	public ChangesDescriptor( final AbstractDescriptor pDescriptor ) {
+		super(pDescriptor);
 	}
 	
-	public ChangesDescriptor( InputStream is ) throws IOException, ParseException {		
-		parse(is);
+	public ChangesDescriptor( final InputStream pInput ) throws IOException, ParseException {		
+		parse(pInput);
+	}
+	
+	public void addFile( final InputStream pInput, final String pName ) {
+		// TODO
 	}
 	
 	public String toString() {

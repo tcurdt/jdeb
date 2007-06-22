@@ -5,6 +5,6 @@ import java.io.InputStream;
 
 public interface DataConsumer {
 
-	void onEachFile( InputStream is, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size) throws IOException;
+	void onEachFile( InputStream input, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size) throws IOException;
 
 }

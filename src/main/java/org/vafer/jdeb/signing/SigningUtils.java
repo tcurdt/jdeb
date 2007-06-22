@@ -23,11 +23,11 @@ import org.bouncycastle.openpgp.PGPSignature;
 import org.bouncycastle.openpgp.PGPSignatureGenerator;
 import org.bouncycastle.openpgp.PGPUtil;
 
-public class SigningUtils {
+public final class SigningUtils {
 
-    private static PGPSecretKey getSecretKey( InputStream is, String keyId ) throws IOException, PGPException {
+    private static PGPSecretKey getSecretKey( final InputStream pInput, final String pKey ) throws IOException, PGPException {
 
-        final PGPSecretKeyRingCollection pgpSec = new PGPSecretKeyRingCollection(PGPUtil.getDecoderStream(is));
+        final PGPSecretKeyRingCollection pgpSec = new PGPSecretKeyRingCollection(PGPUtil.getDecoderStream(pInput));
 
     	final Iterator rIt = pgpSec.getKeyRings();
 
@@ -38,7 +38,7 @@ public class SigningUtils {
 			while (kIt.hasNext()) {
 				final PGPSecretKey k = (PGPSecretKey) kIt.next();
 
-				if (k.isSigningKey() && Long.toHexString(k.getKeyID() & 0xFFFFFFFFL).equals(keyId.toLowerCase())) {
+				if (k.isSigningKey() && Long.toHexString(k.getKeyID() & 0xFFFFFFFFL).equals(pKey.toLowerCase())) {
 					return k;
 				}
 			}
@@ -48,12 +48,12 @@ public class SigningUtils {
 	}
 
 	
-	public static void clearSign( InputStream input, InputStream keyring, String key, String passphrase, OutputStream output ) throws IOException, PGPException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException {
+	public static void clearSign( final InputStream pInput, final InputStream pKeyring, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException, PGPException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException {
 		
 		Security.addProvider( new BouncyCastleProvider() );
         
-        final PGPSecretKey secretKey = getSecretKey(keyring, key);
-        final PGPPrivateKey privateKey = secretKey.extractPrivateKey(passphrase.toCharArray(), "BC");
+        final PGPSecretKey secretKey = getSecretKey(pKeyring, pKey);
+        final PGPPrivateKey privateKey = secretKey.extractPrivateKey(pPassphrase.toCharArray(), "BC");
                 
         final int digest = PGPUtil.SHA1;
 
@@ -68,11 +68,11 @@ public class SigningUtils {
 //            signatureGenerator.setHashedSubpackets(subpackageGenerator.generate());
 //        }
 	
-        final ArmoredOutputStream armoredOutput = new ArmoredOutputStream(output);
+        final ArmoredOutputStream armoredOutput = new ArmoredOutputStream(pOutput);
         
         armoredOutput.beginClearText(digest);
 
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
 
         final byte[] newline = "\r\n".getBytes("UTF-8");
         
@@ -103,8 +103,8 @@ public class SigningUtils {
 	}
 
 
-	private static void processLine( String line, ArmoredOutputStream armoredOutput, PGPSignatureGenerator signatureGenerator ) throws IOException, SignatureException {
-    	final char[] chars = line.toCharArray();
+	private static void processLine( final String pLine, final ArmoredOutputStream pArmoredOutput, final PGPSignatureGenerator pSignatureGenerator ) throws IOException, SignatureException {
+    	final char[] chars = pLine.toCharArray();
     	int len = chars.length;
 
     	while(len > 0) {
@@ -114,9 +114,9 @@ public class SigningUtils {
     		len--;
     	}
 
-    	final byte[] data = line.substring(0, len).getBytes("UTF-8");
+    	final byte[] data = pLine.substring(0, len).getBytes("UTF-8");
     	
-    	armoredOutput.write(data);
-    	signatureGenerator.update(data);
+    	pArmoredOutput.write(data);
+    	pSignatureGenerator.update(data);
 	}
 }

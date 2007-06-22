@@ -15,12 +15,12 @@ public abstract class AbstractDescriptor {
 	public AbstractDescriptor() {
 	}
 
-	public AbstractDescriptor( AbstractDescriptor descriptor ) {
-		values.putAll(descriptor.values);
+	public AbstractDescriptor( final AbstractDescriptor pDescriptor ) {
+		values.putAll(pDescriptor.values);
 	}
 
-	protected void parse( InputStream is ) throws IOException, ParseException {
-		final BufferedReader br = new BufferedReader(new InputStreamReader(is));
+	protected void parse( final InputStream pInput ) throws IOException, ParseException {
+		final BufferedReader br = new BufferedReader(new InputStreamReader(pInput));
 		StringBuffer buffer = new StringBuffer();
 		String key = null;
 		int linenr = 0;
@@ -30,7 +30,7 @@ public abstract class AbstractDescriptor {
 			if (line == null) {
 				if (buffer.length() > 0) {
 					// flush value of previous key
-					add(key, buffer.toString());
+					set(key, buffer.toString());
 					buffer = null;
 				}
 				break;
@@ -45,7 +45,7 @@ public abstract class AbstractDescriptor {
 				
 				if (buffer.length() > 0) {
 					// flush value of previous key
-					add(key, buffer.toString());
+					set(key, buffer.toString());
 					buffer = new StringBuffer();
 				}
 				
@@ -69,18 +69,22 @@ public abstract class AbstractDescriptor {
 		
 	}
 	
-	private void add( String key, String value ) {
-		values.put(key, value);
+	public void set( final String pKey, final String pValue ) {
+		values.put(pKey, pValue);
+	}
+	
+	public String get( final String pKey ) {
+		return (String)values.get(pKey);
 	}
 	
 	public boolean isValid() {
 		return true;
 	}
 
-	public String toString( String[] keys ) {
+	String toString( final String[] pKeys ) {
 		final StringBuffer s = new StringBuffer();
-		for (int i = 0; i < keys.length; i++) {
-			final String key = keys[i];
+		for (int i = 0; i < pKeys.length; i++) {
+			final String key = pKeys[i];
 			final String value = (String) values.get(key);
 			if (value != null) {
 				s.append(key).append(": ").append(value).append('\n');

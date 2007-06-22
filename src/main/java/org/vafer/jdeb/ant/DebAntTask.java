@@ -92,6 +92,8 @@ public class DebAntTask extends MatchingTask {
 			log("Created " + deb);
 
 			if (changes != null) {
+
+				changesDescriptor.addFile(new FileInputStream(deb), deb.getName());
 				
 				processor.createChanges(changesDescriptor, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changes));
 

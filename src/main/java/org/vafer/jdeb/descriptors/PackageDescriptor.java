@@ -33,8 +33,8 @@ Description: revision @REVISION@, jetty java servlet container
 	public PackageDescriptor() {
 	}
 
-	public PackageDescriptor( InputStream is )  throws IOException, ParseException {		
-		parse(is);
+	public PackageDescriptor( final InputStream pInput )  throws IOException, ParseException {		
+		parse(pInput);
 	}
 
 	public String toString() {

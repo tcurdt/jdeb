@@ -25,17 +25,30 @@ import org.vafer.jdeb.ar.FileArEntry;
 import org.vafer.jdeb.ar.StaticArEntry;
 import org.vafer.jdeb.descriptors.ChangesDescriptor;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
+import org.vafer.jdeb.mapping.Mapper;
 import org.vafer.jdeb.signing.SigningUtils;
 
 public class Processor {
 
 	private final Console console;
+	private final Mapper mapper;
+
+	public Processor( final Console pConsole ) {
+		this(pConsole, new Mapper() {
+			public TarEntry map( final TarEntry pEntry ) {
+				return pEntry;
+			}
+			
+		});
 		
-	public Processor( Console pConsole ) {
-		console = pConsole;
 	}
 	
-	public ChangesDescriptor createDeb( File[] pControlFiles, DataProducer[] pData, OutputStream pDebOuput ) throws PackagingException {
+	public Processor( final Console pConsole, final Mapper pMapper ) {
+		console = pConsole;
+		mapper = pMapper;
+	}
+	
+	public ChangesDescriptor createDeb( File[] pControlFiles, DataProducer[] pData, OutputStream pOuput ) throws PackagingException {
 		
 		File tempData = null;
 		File tempControl = null;
@@ -45,20 +58,19 @@ public class Processor {
 			tempControl = File.createTempFile("deb", "control");			
 			
 			console.println("Building data");
-			final StringBuffer md5s = buildData(pData, tempData);
+			final StringBuffer md5s = new StringBuffer();
+			final BigInteger size = buildData(pData, tempData, md5s);
 			
 			console.println("Building control");
-			final PackageDescriptor packageDescriptor = buildControl(pControlFiles, md5s, tempControl);
+			final PackageDescriptor packageDescriptor = buildControl(pControlFiles, size, md5s, tempControl);
 						
-			final ArArchive ar = new ArArchive(pDebOuput);
+			final ArArchive ar = new ArArchive(pOuput);
 			ar.add(new StaticArEntry("debian-binary", 0, 0, 33188, "2.0\n"));
 			ar.add(new FileArEntry(tempControl,"control.tar.gz", 0, 0, 33188));
 			ar.add(new FileArEntry(tempData, "data.tar.gz", 0, 0, 33188));
 			ar.close();
 			
 			final ChangesDescriptor changesDescriptor = new ChangesDescriptor(packageDescriptor); 
-			
-			// add deb to changes descriptor
 			
 			return changesDescriptor;
 			
@@ -74,30 +86,30 @@ public class Processor {
 		}
 	}
 
-	public void createChanges( ChangesDescriptor changesDescriptor, OutputStream output ) throws IOException {
-		createChanges(changesDescriptor, null, null, null, output);
+	public void createChanges( final ChangesDescriptor pChangesDescriptor, final OutputStream pOutput ) throws IOException {
+		createChanges(pChangesDescriptor, null, null, null, pOutput);
 	}
 
-	public void createChanges( ChangesDescriptor changesDescriptor, InputStream ring, String key, String passphrase, OutputStream output ) throws IOException {
+	public void createChanges( final ChangesDescriptor pChangesDescriptor, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException {
 		
-		final String changes = changesDescriptor.toString();
+		final String changes = pChangesDescriptor.toString();
 
 		console.println(changes);
 
 		final byte[] changesBytes = changes.getBytes("UTF-8");
 		
-		if (ring == null || key == null || passphrase == null) {			
-			output.write(changesBytes);
-			output.close();			
+		if (pRing == null || pKey == null || pPassphrase == null) {			
+			pOutput.write(changesBytes);
+			pOutput.close();			
 			return;
 		}
 		
-		console.println("Signing changes with key " + key);
+		console.println("Signing changes with key " + pKey);
 		
 		final InputStream input = new ByteArrayInputStream(changesBytes);
 		
 		try {
-			SigningUtils.clearSign(input, ring, key, passphrase, output);		
+			SigningUtils.clearSign(input, pRing, pKey, pPassphrase, pOutput);		
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		} catch (SignatureException e) {
@@ -108,10 +120,10 @@ public class Processor {
 			e.printStackTrace();
 		}
 		
-		output.close();
+		pOutput.close();
 	}
 	
-	private PackageDescriptor buildControl( final File[] pControlFiles, final StringBuffer md5s, final File pOutput ) throws FileNotFoundException, IOException, ParseException {
+	private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuffer pChecksums, final File pOutput ) throws FileNotFoundException, IOException, ParseException {
 		
 		PackageDescriptor packageDescriptor = null;
 		
@@ -151,29 +163,31 @@ public class Processor {
 		if (packageDescriptor == null) {
 			packageDescriptor = new PackageDescriptor();
 		}
+
+		packageDescriptor.set("Installed-Size", pDataSize.toString());
 		
 		addEntry("control", packageDescriptor.toString(), outputStream);
 		
-		addEntry("md5sums", md5s.toString(), outputStream);
+		addEntry("md5sums", pChecksums.toString(), outputStream);
 		
 		outputStream.close();
 		
 		return packageDescriptor;
 	}
 
-	private void addEntry( String name, String content, TarOutputStream outputStream ) throws IOException {
-		final byte[] data = content.getBytes("UTF-8");
+	private void addEntry( final String pName, final String pContent, final TarOutputStream pOutput ) throws IOException {
+		final byte[] data = pContent.getBytes("UTF-8");
 		
-		final TarEntry entry = new TarEntry(name);
+		final TarEntry entry = new TarEntry(pName);
 		entry.setSize(data.length);
 
-		outputStream.putNextEntry(entry);
-		outputStream.write(data);
-		outputStream.closeEntry();		
+		pOutput.putNextEntry(entry);
+		pOutput.write(data);
+		pOutput.closeEntry();		
 	}
 
 	
-	private static class Total {
+	private static final class Total {
 		private BigInteger count = BigInteger.valueOf(0);
 
 		public void add(long size) {
@@ -189,20 +203,19 @@ public class Processor {
 		}
 	}
 	
-	private StringBuffer buildData( final DataProducer[] pData, final File pOutput ) throws NoSuchAlgorithmException, IOException {
-		final StringBuffer md5s = new StringBuffer();
+	private BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums ) throws NoSuchAlgorithmException, IOException {
 		
 		final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
 		outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
 		final MessageDigest digest = MessageDigest.getInstance("MD5");
 
-		final Total total = new Total();
+		final Total dataSize = new Total();
 		
 		final DataConsumer receiver = new DataConsumer() {
 			public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
 
-				final TarEntry entry = new TarEntry(filename);
+				TarEntry entry = new TarEntry(filename);
 				
 				// link?
 				entry.setUserName(user);
@@ -211,6 +224,8 @@ public class Processor {
 				entry.setUserId(gid);
 				entry.setMode(mode);
 				entry.setSize(inputStream == null?0:size);
+				
+				entry = mapper.map(entry);
 
 				outputStream.putNextEntry(entry);
 				
@@ -221,7 +236,7 @@ public class Processor {
 				    return;
 				}
 			    
-			    total.add(size);
+			    dataSize.add(size);
 			    
 			    digest.reset();
 			    
@@ -244,7 +259,7 @@ public class Processor {
 						" md5: " + md5
 				);
 				
-				md5s.append(md5).append(" ").append(entry.getName()).append('\n');
+				pChecksums.append(md5).append(" ").append(entry.getName()).append('\n');
 
 			}					
 		};
@@ -256,9 +271,9 @@ public class Processor {
 
 		outputStream.close();
 
-		console.println("Total size: " + total);
+		console.println("Total size: " + dataSize);
 		
-		return md5s;
+		return dataSize.count;
 	}
 	
 

@@ -6,23 +6,23 @@ import java.io.OutputStream;
 
 public final class Utils {
 
-	public static int copy(InputStream input, OutputStream output) throws IOException {
-        byte[] buffer = new byte[2048];
+	public static int copy( final InputStream pInput, final OutputStream pOutput ) throws IOException {
+        final byte[] buffer = new byte[2048];
         int count = 0;
         int n = 0;
-        while (-1 != (n = input.read(buffer))) {
-                output.write(buffer, 0, n);
+        while (-1 != (n = pInput.read(buffer))) {
+                pOutput.write(buffer, 0, n);
                 count += n;
         }
         return count;
      }
 
-	public static String toHex(byte[] b) {
+	public static String toHex( final byte[] pBytes ) {
     	final StringBuffer sb = new StringBuffer();
 
-    	for (int i = 0; i < b.length; ++i) {
-    		sb.append(Integer.toHexString((b[i]>>4) & 0x0f));
-    		sb.append(Integer.toHexString(b[i] & 0x0f));
+    	for (int i = 0; i < pBytes.length; ++i) {
+    		sb.append(Integer.toHexString((pBytes[i]>>4) & 0x0f));
+    		sb.append(Integer.toHexString(pBytes[i] & 0x0f));
     	}
 
     	return sb.toString();
@@ -30,7 +30,7 @@ public final class Utils {
 
 	public static String stripPath( final int p, final String s ) {
 
-		if (p<=0) {
+		if (p <= 0) {
 			return s;
 		}
 
@@ -45,7 +45,7 @@ public final class Utils {
 		return s.substring(x+1);
 	}
 
-	public static String stripLeadingSlash( String s ) {
+	public static String stripLeadingSlash( final String s ) {
 		if (s == null) {
 			return s;
 		}
