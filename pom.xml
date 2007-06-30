@@ -43,13 +43,19 @@
                             <goal>ueberjar</goal>
                         </goals>
                         <configuration>
-                            <stripUnusedClasses>true</stripUnusedClasses>
-                            <includeDependencies>
-                                <param>org.bouncycastle:bcpg-jdk12</param>
-                            </includeDependencies>
-                            <includeDependenciesInRelocation>
-                                <param>org.bouncycastle:bcpg-jdk12</param>
-                            </includeDependenciesInRelocation>
+                            <stripUnusedClasses>false</stripUnusedClasses>
+                            <analyse>
+                                <include>
+                                    <include>org.bouncycastle:bcpg-jdk12</include>                           
+                                    <include>org.bouncycastle:bcprov-jdk12</include>
+                                </include>
+                            </analyse>
+                            <relocate>
+                                <include>
+                                    <include>org.bouncycastle:bcpg-jdk12</include>                           
+                                    <include>org.bouncycastle:bcprov-jdk12</include>
+                                </include>
+                            </relocate>
                         </configuration>
                     </execution>
                 </executions>

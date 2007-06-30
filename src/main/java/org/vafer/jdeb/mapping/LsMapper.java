@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.tools.tar.TarEntry;
 
@@ -17,8 +19,31 @@ import org.apache.tools.tar.TarEntry;
 public final class LsMapper implements Mapper {
 
 	private final Map mapping;
+
 	
-	public LsMapper( final InputStream pInput ) throws IOException {
+	public final static class ParseError extends Exception {
+
+		private static final long serialVersionUID = 1L;
+
+		public ParseError() {
+			super();
+		}
+
+		public ParseError(String message, Throwable cause) {
+			super(message, cause);
+		}
+
+		public ParseError(String message) {
+			super(message);
+		}
+
+		public ParseError(Throwable cause) {
+			super(cause);
+		}
+		
+	};
+	
+	public LsMapper( final InputStream pInput ) throws IOException, ParseError {
 		mapping = parse(pInput);
 	}
 	
@@ -34,43 +59,90 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 
 ./trunk/target/test-classes/org/vafer/dependency/classes:
 	 */
+	
+	final private Pattern basePattern = Pattern.compile("^\\./(.*):$");
+	final private Pattern totalPattern = Pattern.compile("^total ([0-9]+)$");
+	final private Pattern dirPattern = Pattern.compile("^d([rwx-]{9})\\s+([0-9]+)\\s+(.*)\\s+(.*)\\s+([0-9]+)\\s+(.*)\\s+[\\.]{1,2}$");
+	final private Pattern filePattern = Pattern.compile("^([d-])([rwx-]{9})\\s+([0-9]+)\\s+(.*)\\s+(.*)\\s+([0-9]+)\\s+(.*)\\s+(.*)$");
+	final private Pattern newlinePattern = Pattern.compile("$");
 
-	private String readBase( final BufferedReader reader ) throws IOException {
+	private String readBase( final BufferedReader reader ) throws IOException, ParseError {
 		final String line = reader.readLine();
 		if (line == null) {
 			return null;
 		}
-		return line.substring(2, line.length() - 1);
+		final Matcher matcher = basePattern.matcher(line);
+		if (!matcher.matches()) {
+			throw new ParseError("expected base line but got \"" + line + "\"");
+		}
+		return matcher.group(1);
 	}
 
-	private int readTotal( final BufferedReader reader ) throws IOException {
-		reader.readLine();
-		return 0;
-	}
-
-	private TarEntry readDir( final BufferedReader reader, final String base ) throws IOException {
-		reader.readLine();
-		reader.readLine();
-		return new TarEntry(base);
-	}
-
-	private TarEntry readFile( final BufferedReader reader, final String base ) throws IOException {
+	private String readTotal( final BufferedReader reader ) throws IOException, ParseError {
 		final String line = reader.readLine();
+		final Matcher matcher = totalPattern.matcher(line);
+		if (!matcher.matches()) {
+			throw new ParseError("expected total line but got \"" + line + "\"");
+		}
+		return matcher.group(1);
+	}
 
-		if (line.length() < 50) {
-			return null;
+	private TarEntry readDir( final BufferedReader reader, final String base ) throws IOException, ParseError {
+		final String current = reader.readLine();
+		final Matcher currentMatcher = dirPattern.matcher(current);
+		if (!currentMatcher.matches()) {
+			throw new ParseError("expected dirline but got \"" + current + "\"");
 		}
 
-		return new TarEntry(base + "/" + line.substring(50));
+		final String parent = reader.readLine();
+		final Matcher parentMatcher = dirPattern.matcher(parent);
+		if (!parentMatcher.matches()) {
+			throw new ParseError("expected dirline but got \"" + parent + "\"");
+		}
+		
+		final TarEntry entry = new TarEntry(base);
+		//entry.setGroupName(currentMatcher.group(2));
+		
+		return entry;
+	}
+
+	private TarEntry readFile( final BufferedReader reader, final String base ) throws IOException, ParseError {
+		
+		while(true) {
+			final String line = reader.readLine();
+			
+			if (line == null) {
+				return null;
+			}
+			
+			final Matcher matcher = filePattern.matcher(line);
+			if (!matcher.matches()) {
+				final Matcher newlineMatcher = newlinePattern.matcher(line);
+				if (newlineMatcher.matches()) {
+					return null;
+				}
+				throw new ParseError("expected file line but got \"" + line + "\"");
+			}
+			
+			final String type = matcher.group(1);
+			if (type.startsWith("-")) {
+				final TarEntry entry = new TarEntry(base + "/" + matcher.group(8));
+
+				//entry.setGroupName(currentMatcher.group(2));
+				
+				return entry;				
+			}			
+		}
+		
 	}
 	
-	private Map parse( final InputStream pInput ) throws IOException {
+	private Map parse( final InputStream pInput ) throws IOException, ParseError {
 		final Map mapping = new HashMap();
 		
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
 		
 		while(true) {
-			
+
 			final String base = readBase(reader);
 
 			if (base == null) {
@@ -80,7 +152,6 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 			readTotal(reader);
 			final TarEntry dir = readDir(reader, base);
 			mapping.put(dir.getName(), dir);
-			System.out.println(dir.getName());
 
 			while(true) {
 				final TarEntry file = readFile(reader, base);
@@ -90,8 +161,6 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 				}
 				
 				mapping.put(file.getName(), file);
-
-				System.out.println(file.getName());
 			}
 		}
 		
