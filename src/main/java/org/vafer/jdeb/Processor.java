@@ -15,6 +15,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.tools.tar.TarEntry;
@@ -48,7 +50,38 @@ public class Processor {
 		mapper = pMapper;
 	}
 	
-	public ChangesDescriptor createDeb( File[] pControlFiles, DataProducer[] pData, OutputStream pOuput ) throws PackagingException {
+	
+	private static class InformationOutputStream extends DigestOutputStream {
+
+		private final MessageDigest digest;
+		private long size;
+		
+		public InformationOutputStream(OutputStream pStream, MessageDigest pDigest) {
+			super(pStream, pDigest);
+			digest = pDigest;
+			size = 0;
+		}
+		
+		public String getMd5() {
+			return Utils.toHex(digest.digest());
+		}
+		
+		public void write(byte[] b, int off, int len) throws IOException {
+			super.write(b, off, len);
+			size += len;
+		}
+
+		public void write(int b) throws IOException {
+			super.write(b);
+			size++;
+		}
+
+		public long getSize() {
+			return size;
+		}
+	}
+	
+	public ChangesDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final OutputStream pOutput ) throws PackagingException {
 		
 		File tempData = null;
 		File tempControl = null;
@@ -64,14 +97,24 @@ public class Processor {
 			console.println("Building control");
 			final PackageDescriptor packageDescriptor = buildControl(pControlFiles, size, md5s, tempControl);
 						
-			final ArArchive ar = new ArArchive(pOuput);
+			final InformationOutputStream output = new InformationOutputStream(pOutput, MessageDigest.getInstance("MD5"));
+
+			final ArArchive ar = new ArArchive(output);
 			ar.add(new StaticArEntry("debian-binary", 0, 0, 33188, "2.0\n"));
 			ar.add(new FileArEntry(tempControl,"control.tar.gz", 0, 0, 33188));
 			ar.add(new FileArEntry(tempData, "data.tar.gz", 0, 0, 33188));
 			ar.close();
 			
 			final ChangesDescriptor changesDescriptor = new ChangesDescriptor(packageDescriptor); 
-			
+
+			final StringBuffer files = new StringBuffer("\n");
+			files.append(' ').append(output.getMd5());
+			files.append(' ').append(output.getSize());
+			files.append(' ').append(changesDescriptor.get("Section"));
+			files.append(' ').append(changesDescriptor.get("Priority"));
+			files.append(' ').append(changesDescriptor.get("Package")).append('_').append(changesDescriptor.get("Version")).append(".deb");			
+			changesDescriptor.set("Files", files.toString());
+			 
 			return changesDescriptor;
 			
 		} catch(Exception e) {
@@ -91,7 +134,21 @@ public class Processor {
 	}
 
 	public void createChanges( final ChangesDescriptor pChangesDescriptor, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException {
-		
+
+		final SimpleDateFormat dateformat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+		pChangesDescriptor.set("Format", "1.7");
+		pChangesDescriptor.set("Date", dateformat.format(new Date())); // Mon, 26 Mar 2007 11:44:04 +0200
+		pChangesDescriptor.set("Binary", pChangesDescriptor.get("Package"));
+		pChangesDescriptor.set("Distribution", "tvp");
+		pChangesDescriptor.set("Urgency", "low");
+		pChangesDescriptor.set("Changed-By", pChangesDescriptor.get("Maintainer"));
+
+		final StringBuffer sb = new StringBuffer("\n");
+		sb.append(' ').append(pChangesDescriptor.get("Package")).append(" (").append(pChangesDescriptor.get("Version")).append(") ");
+		sb.append(pChangesDescriptor.get("Distribution")).append("; urgency=").append(pChangesDescriptor.get("Urgency")).append("\n");
+		sb.append(" * SOMETHING").append('\n');
+		pChangesDescriptor.set("Changes", sb.toString());
+				
 		final String changes = pChangesDescriptor.toString();
 
 		console.println(changes);

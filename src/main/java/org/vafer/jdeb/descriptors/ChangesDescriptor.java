@@ -34,7 +34,7 @@ public final class ChangesDescriptor extends AbstractDescriptor {
 		"Binary",
 		"Architecture",
 		"Version",
-		"Dsitribution",
+		"Distribution",
 		"Urgency",
 		"Maintainer",
 		"Changed-By",

@@ -62,8 +62,8 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 	
 	final private Pattern basePattern = Pattern.compile("^\\./(.*):$");
 	final private Pattern totalPattern = Pattern.compile("^total ([0-9]+)$");
-	final private Pattern dirPattern = Pattern.compile("^d([rwx-]{9})\\s+([0-9]+)\\s+(.*)\\s+(.*)\\s+([0-9]+)\\s+(.*)\\s+[\\.]{1,2}$");
-	final private Pattern filePattern = Pattern.compile("^([d-])([rwx-]{9})\\s+([0-9]+)\\s+(.*)\\s+(.*)\\s+([0-9]+)\\s+(.*)\\s+(.*)$");
+	final private Pattern dirPattern = Pattern.compile("^d([rwx-]{9})\\s+([0-9]+)\\s+(\\S*)\\s+(\\S*)\\s+([0-9]+)\\s+(.*)\\s+[\\.]{1,2}$");
+	final private Pattern filePattern = Pattern.compile("^([d-])([rwx-]{9})\\s+([0-9]+)\\s+(\\S*)\\s+(\\S*)\\s+([0-9]+)\\s+(.*)\\s+(.*)$");
 	final private Pattern newlinePattern = Pattern.compile("$");
 
 	private String readBase( final BufferedReader reader ) throws IOException, ParseError {
@@ -101,11 +101,46 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 		}
 		
 		final TarEntry entry = new TarEntry(base);
-		//entry.setGroupName(currentMatcher.group(2));
+		
+		entry.setMode(convertModeFromString(currentMatcher.group(1)));
+		entry.setUserName(currentMatcher.group(3));
+		entry.setGroupName(currentMatcher.group(4));
 		
 		return entry;
 	}
 
+	
+	private int convertModeFromString( final String mode ) {
+		
+		final char[] m = mode.toCharArray();
+		/*
+		   -rwxrwxrwx
+
+		   4000    set-user-ID-on-execution bit
+           2000    set-user-ID-on-execution bit
+           1000    sticky bit
+           0400    allow read by owner.
+           0200    allow write by owner.
+           0100    execute / search
+           0040    allow read by group members.
+           0020    allow write by group members.
+           0010    execute / search
+           0004    allow read by others.
+           0002    allow write by others.
+           0001    execute / search
+		 */
+		// TODO: simplified - needs fixing
+		int sum = 0;
+		int bit = 1;
+		for(int i=m.length-1; i>=0 ; i--) {
+			if (m[i] != '-') {
+				sum += bit;
+			}
+			bit += bit;
+		}
+		return sum;
+	}
+	
 	private TarEntry readFile( final BufferedReader reader, final String base ) throws IOException, ParseError {
 		
 		while(true) {
@@ -115,8 +150,8 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 				return null;
 			}
 			
-			final Matcher matcher = filePattern.matcher(line);
-			if (!matcher.matches()) {
+			final Matcher currentMatcher = filePattern.matcher(line);
+			if (!currentMatcher.matches()) {
 				final Matcher newlineMatcher = newlinePattern.matcher(line);
 				if (newlineMatcher.matches()) {
 					return null;
@@ -124,12 +159,14 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 				throw new ParseError("expected file line but got \"" + line + "\"");
 			}
 			
-			final String type = matcher.group(1);
+			final String type = currentMatcher.group(1);
 			if (type.startsWith("-")) {
-				final TarEntry entry = new TarEntry(base + "/" + matcher.group(8));
+				final TarEntry entry = new TarEntry(base + "/" + currentMatcher.group(8));
 
-				//entry.setGroupName(currentMatcher.group(2));
-				
+				entry.setMode(convertModeFromString(currentMatcher.group(2)));
+				entry.setUserName(currentMatcher.group(4));
+				entry.setGroupName(currentMatcher.group(5));
+
 				return entry;				
 			}			
 		}

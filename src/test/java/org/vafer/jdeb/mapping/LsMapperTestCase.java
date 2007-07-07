@@ -27,6 +27,24 @@ public final class LsMapperTestCase extends TestCase {
 		"drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes\n" +
 		"\n";
 	
+	public void testModes() throws Exception {
+		final ByteArrayInputStream is = new ByteArrayInputStream(output.getBytes("UTF-8"));
+		
+		final Mapper mapper = new LsMapper(is);
+
+		final TarEntry entry1 = mapper.map(new TarEntry("trunk/target/test-classes/org/vafer/dependency"));
+		
+		assertEquals(493, entry1.getMode());
+		assertEquals("tcurdt", entry1.getUserName());
+		assertEquals("tcurdt", entry1.getGroupName());
+		
+		final TarEntry entry2 = mapper.map(new TarEntry("trunk/target/test-classes/org/vafer/dependency/DependenciesTestCase.class"));
+
+		assertEquals(420, entry2.getMode());
+		assertEquals("tcurdt", entry2.getUserName());
+		assertEquals("tcurdt", entry2.getGroupName());
+	}
+	
 	public void testSuccessfulParsing() throws Exception {
 		final ByteArrayInputStream is = new ByteArrayInputStream(output.getBytes("UTF-8"));
 		

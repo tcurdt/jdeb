@@ -87,6 +87,8 @@ public class DebAntTask extends MatchingTask {
 		});
 		
 		try {
+			
+			
 			final ChangesDescriptor changesDescriptor = processor.createDeb(controlFiles, data, new FileOutputStream(deb));
 
 			log("Created " + deb);
