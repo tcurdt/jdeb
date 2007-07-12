@@ -13,16 +13,15 @@ import org.apache.tools.tar.TarInputStream;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 
-public class DataArchive extends PatternSet implements DataProducer {
+public final class DataProducerArchive extends PatternSet implements DataProducer {
 
-	private File archive;
+	private final File archive;
 	
-	public void setArchive( File archive ) {
-		this.archive = archive;
+	public DataProducerArchive( final File pArchive ) {
+		archive = pArchive;
 	}
-	
-	
-	public void produce( DataConsumer receiver ) {
+		
+	public void produce( final DataConsumer receiver ) {
 		
 		String[] excludes = getExcludePatterns(getProject());
 		excludes = (excludes!=null) ? excludes : new String[0];

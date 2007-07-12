@@ -49,11 +49,7 @@ public class DebAntTask extends MatchingTask {
     	this.passphrase = passphrase;
     }
     
-    public void addDataFiles( DataFiles data ) {
-    	dataProducers.add(data);
-    }
-    
-    public void addDataArchive( DataArchive data ) {
+    public void addData( Data data ) {
     	dataProducers.add(data);
     }
     

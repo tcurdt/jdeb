@@ -11,19 +11,21 @@ import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Utils;
 
-public class DataFiles extends PatternSet implements DataProducer {
+public final class DataProducerDirectory implements DataProducer {
 
-	private DirectoryScanner scanner = new DirectoryScanner();
+	private final DirectoryScanner scanner = new DirectoryScanner();
+	private final PatternSet patternSet;
 	
-	public void setDir( File dir ) {
-		scanner.setBasedir(dir);
+	public DataProducerDirectory( final File pDir, final PatternSet pPatternSet ) {
+		scanner.setBasedir(pDir);
+		patternSet = pPatternSet;
 	}
 	
 	public void produce( final DataConsumer receiver ) {
-
+		
 		try {
-			scanner.setIncludes(getIncludePatterns(getProject()));
-			scanner.setExcludes(getExcludePatterns(getProject()));
+			scanner.setIncludes(patternSet.getIncludePatterns(patternSet.getProject()));
+			scanner.setExcludes(patternSet.getExcludePatterns(patternSet.getProject()));
 			scanner.setCaseSensitive(true);
 			scanner.setFollowSymlinks(true);
 
