@@ -278,7 +278,7 @@ public class Processor {
 				entry.setUserName(user);
 				entry.setUserId(uid);
 				entry.setUserName(group);
-				entry.setUserId(gid);
+				entry.setGroupId(gid);
 				entry.setMode(mode);
 				entry.setSize(inputStream == null?0:size);
 				

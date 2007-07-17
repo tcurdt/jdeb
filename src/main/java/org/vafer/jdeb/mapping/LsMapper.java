@@ -209,6 +209,15 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 		final TarEntry entry = (TarEntry) mapping.get(pEntry.getName());
 		
 		if (entry != null) {
+
+			final TarEntry newEntry = new TarEntry(entry.getName());
+			newEntry.setUserId(pEntry.getUserId());
+			newEntry.setGroupId(pEntry.getGroupId());
+			newEntry.setUserName(pEntry.getUserName());
+			newEntry.setGroupName(pEntry.getGroupName());
+			newEntry.setMode(pEntry.getMode());
+			newEntry.setSize(pEntry.getSize());
+			
 			return entry;
 		}
 		

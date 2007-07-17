@@ -41,7 +41,7 @@ public final class DebAntTask extends MatchingTask {
 	private org.vafer.jdeb.ant.DebAntTask task = new org.vafer.jdeb.ant.DebAntTask();
 
 	public DebAntTask() {
-		System.err.print("ATTENTION: you are using the wrong task. Please use " + org.vafer.jdeb.ant.DebAntTask.class.getName());
+		System.err.println("ATTENTION: you are using the wrong task. Please use " + org.vafer.jdeb.ant.DebAntTask.class.getName());
 	}
 
 	public void add(FileSelector arg0) {

@@ -1,4 +1,4 @@
-package org.vafer.jdeb.ant;
+package org.vafer.jdeb.producers;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,28 +6,27 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.tools.ant.DirectoryScanner;
-import org.apache.tools.ant.types.PatternSet;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Utils;
+import org.vafer.jdeb.mapping.Mapper;
 
-public final class DataProducerDirectory implements DataProducer {
+public final class DataProducerDirectory extends AbstractDataProducer implements DataProducer {
 
 	private final DirectoryScanner scanner = new DirectoryScanner();
-	private final PatternSet patternSet;
 	
-	public DataProducerDirectory( final File pDir, final PatternSet pPatternSet ) {
+	public DataProducerDirectory( final File pDir, final String[] pIncludes, final String[] pExcludes, final Mapper pMapper ) {
+		super(pIncludes, pExcludes, pMapper);
 		scanner.setBasedir(pDir);
-		patternSet = pPatternSet;
+		scanner.setIncludes(pIncludes);
+		scanner.setExcludes(pExcludes);
+		scanner.setCaseSensitive(true);
+		scanner.setFollowSymlinks(true);
 	}
 	
 	public void produce( final DataConsumer receiver ) {
 		
 		try {
-			scanner.setIncludes(patternSet.getIncludePatterns(patternSet.getProject()));
-			scanner.setExcludes(patternSet.getExcludePatterns(patternSet.getProject()));
-			scanner.setCaseSensitive(true);
-			scanner.setFollowSymlinks(true);
 
 			scanner.scan();
 			
