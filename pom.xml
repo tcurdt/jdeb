@@ -71,7 +71,7 @@
                         <exclude>**/Abstract*</exclude>
                     </excludes>
                     <testFailureIgnore>true</testFailureIgnore>
-                    <skip>true</skip>
+                    <skip>false</skip>
                 </configuration>
             </plugin>
         </plugins>
