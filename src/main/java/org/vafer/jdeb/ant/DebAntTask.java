@@ -106,13 +106,12 @@ public class DebAntTask extends MatchingTask {
 			log("Created " + deb);
 
 			if (changes != null) {
-
 				final TextfileChangesProvider changesProvider = new TextfileChangesProvider(new FileInputStream("changes.txt"), packageDescriptor);
 				final ChangeSet[] changeSets = changesProvider.getChangesSets();
 
 				processor.createChanges(packageDescriptor, changeSets, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changes));
 
-				changesProvider.save(new FileOutputStream("changes2.txt"));
+				changesProvider.save(new FileOutputStream("changes.txt"));
 				
 				log("Created changes file " + changes);
 			}			
