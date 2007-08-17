@@ -18,7 +18,6 @@ package org.vafer.jdeb.producers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.tools.tar.TarEntry;
@@ -58,13 +57,12 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 					continue;					
 				}
 				
-				InputStream inputStream = archiveInputStream;
-				
 				if (entry.isDirectory()) {
-					inputStream = null;							
+					receiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+					continue;
 				}
 				
-				receiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());						
+				receiver.onEachFile(archiveInputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());						
 			}
 			
 		} catch (IOException e) {

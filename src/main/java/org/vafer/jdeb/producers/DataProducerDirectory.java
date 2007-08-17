@@ -20,10 +20,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.apache.tools.ant.DirectoryScanner;
+import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
-import org.vafer.jdeb.Utils;
 import org.vafer.jdeb.mapping.Mapper;
+import org.vafer.jdeb.utils.Utils;
 
 public final class DataProducerDirectory extends AbstractDataProducer implements DataProducer {
 
@@ -49,9 +50,13 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
 			final String[] dirs = scanner.getIncludedDirectories();
 	        for (int i = 0; i < dirs.length; i++) {
 	        	final File file = new File(baseDir, dirs[i]);
-				final String filename = getFilename(baseDir, file);	
+				final String dirname = getFilename(baseDir, file);	
 				
-				receiver.onEachFile(null, filename, "", "root", 0, "root", 0, 33188, file.length());
+				if ("".equals(dirname)) {
+					continue;
+				}
+				
+				receiver.onEachDir(dirname, "", "root", 0, "root", 0, TarEntry.DEFAULT_DIR_MODE, file.length());
 	        }
 	    	
 			final String[] files = scanner.getIncludedFiles();
@@ -60,7 +65,7 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
 	        	final File file = new File(baseDir, files[i]);
 				final String filename = getFilename(baseDir, file);
 				
-				receiver.onEachFile(new FileInputStream(file), filename, "", "root", 0, "root", 0, 33188, file.length());
+				receiver.onEachFile(new FileInputStream(file), filename, "", "root", 0, "root", 0, TarEntry.DEFAULT_FILE_MODE, file.length());
 	        }
 		} catch (IOException e) {
 			e.printStackTrace();

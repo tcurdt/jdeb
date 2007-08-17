@@ -16,7 +16,7 @@
 package org.vafer.jdeb.mapping;
 
 import org.apache.tools.tar.TarEntry;
-import org.vafer.jdeb.Utils;
+import org.vafer.jdeb.utils.Utils;
 
 public final class PrefixMapper implements Mapper {
 

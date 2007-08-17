@@ -26,7 +26,9 @@ import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Processor;
-import org.vafer.jdeb.descriptors.ChangesDescriptor;
+import org.vafer.jdeb.changes.ChangeSet;
+import org.vafer.jdeb.changes.TextfileChangesProvider;
+import org.vafer.jdeb.descriptors.PackageDescriptor;
 
 public class DebAntTask extends MatchingTask {
 
@@ -98,17 +100,20 @@ public class DebAntTask extends MatchingTask {
 		});
 		
 		try {
-						
-			final ChangesDescriptor changesDescriptor = processor.createDeb(controlFiles, data, new FileOutputStream(deb));
+
+			final PackageDescriptor packageDescriptor = processor.createDeb(controlFiles, data, new FileOutputStream(deb));
 
 			log("Created " + deb);
 
 			if (changes != null) {
 
-				changesDescriptor.addFile(new FileInputStream(deb), deb.getName());
-				
-				processor.createChanges(changesDescriptor, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changes));
+				final TextfileChangesProvider changesProvider = new TextfileChangesProvider(new FileInputStream("changes.txt"), packageDescriptor);
+				final ChangeSet[] changeSets = changesProvider.getChangesSets();
 
+				processor.createChanges(packageDescriptor, changeSets, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changes));
+
+				changesProvider.save(new FileOutputStream("changes2.txt"));
+				
 				log("Created changes file " + changes);
 			}			
 		} catch (Exception e) {

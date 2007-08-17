@@ -21,26 +21,26 @@ import java.text.ParseException;
 
 public final class PackageDescriptor extends AbstractDescriptor {
 
-	/*
-Package: @NAME@
-Version: @VERSION@+r@REVISION@
-Section: misc
-Priority: optional
-Architecture: @ARCH@
-Installed-Size: @SIZE@
-Depends: tvp-jrockit-jdk (>= 1.5)
-Maintainer: Torsten Curdt <torsten@joost.com>
-Description: revision @REVISION@, jetty java servlet container
-	 */
-	
 	private final static String[] keys = {
 		"Package",
 		"Version",
 		"Section",
 		"Priority",
 		"Architecture",
-		"Installed-Size",
+		"Maintainer",
+		"Description",
+		"Essential",
 		"Depends",
+		"Installed-Size",
+		"Source"
+	};
+
+	private final static String[] mandatoryKeys = {
+		"Package",
+		"Version",
+		"Section",
+		"Priority",
+		"Architecture",
 		"Maintainer",
 		"Description"
 	};
@@ -50,6 +50,16 @@ Description: revision @REVISION@, jetty java servlet container
 
 	public PackageDescriptor( final InputStream pInput )  throws IOException, ParseException {		
 		parse(pInput);
+	}
+
+	public boolean isValid() {
+		for (int i = 0; i < mandatoryKeys.length; i++) {
+			if (get(mandatoryKeys[i]) == null) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 
 	public String toString() {

@@ -65,7 +65,7 @@ public final class Data extends PatternSet implements DataProducer {
 	 * @deprecated
 	 */
 	public void setPrefix( final String pPrefix ) {
-		System.err.println("ATTENTION: the prefix attribue is deprecated.");
+		System.err.println("ATTENTION: the prefix attribute is deprecated. Please specify it on a mapper element inside the data element.");
 		if (mapper == null) {
 			mapper = new Mapper();
 			mapper.setType("prefix");
@@ -77,7 +77,7 @@ public final class Data extends PatternSet implements DataProducer {
 	 * @deprecated
 	 */
 	public void setStrip( final int pStrip ) {
-		System.err.println("ATTENTION: the prefix attribue is deprecated.");
+		System.err.println("ATTENTION: the strip attribute is deprecated. Please specify it on a mapper element inside the data element.");
 		if (mapper == null) {
 			mapper = new Mapper();
 			mapper.setType("prefix");

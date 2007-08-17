@@ -40,16 +40,35 @@ import org.bouncycastle.openpgp.PGPException;
 import org.vafer.jdeb.ar.ArArchive;
 import org.vafer.jdeb.ar.FileArEntry;
 import org.vafer.jdeb.ar.StaticArEntry;
+import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.descriptors.ChangesDescriptor;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 import org.vafer.jdeb.mapping.Mapper;
 import org.vafer.jdeb.signing.SigningUtils;
+import org.vafer.jdeb.utils.InformationOutputStream;
+import org.vafer.jdeb.utils.Utils;
 
 public class Processor {
 
 	private final Console console;
 	private final Mapper mapper;
 
+	private static final class Total {
+		private BigInteger count = BigInteger.valueOf(0);
+
+		public void add(long size) {
+			count = count.add(BigInteger.valueOf(size));
+		}
+		
+		public String toString() {
+			return "" + count;
+		}
+		
+		public BigInteger toBigInteger() {
+			return count;
+		}
+	}
+	
 	public Processor( final Console pConsole ) {
 		this(pConsole, new Mapper() {
 			public TarEntry map( final TarEntry pEntry ) {
@@ -64,39 +83,8 @@ public class Processor {
 		console = pConsole;
 		mapper = pMapper;
 	}
-	
-	
-	private static class InformationOutputStream extends DigestOutputStream {
-
-		private final MessageDigest digest;
-		private long size;
 		
-		public InformationOutputStream(OutputStream pStream, MessageDigest pDigest) {
-			super(pStream, pDigest);
-			digest = pDigest;
-			size = 0;
-		}
-		
-		public String getMd5() {
-			return Utils.toHex(digest.digest());
-		}
-		
-		public void write(byte[] b, int off, int len) throws IOException {
-			super.write(b, off, len);
-			size += len;
-		}
-
-		public void write(int b) throws IOException {
-			super.write(b);
-			size++;
-		}
-
-		public long getSize() {
-			return size;
-		}
-	}
-	
-	public ChangesDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final OutputStream pOutput ) throws PackagingException {
+	public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final OutputStream pOutput ) throws PackagingException {
 		
 		File tempData = null;
 		File tempControl = null;
@@ -111,7 +99,7 @@ public class Processor {
 			
 			console.println("Building control");
 			final PackageDescriptor packageDescriptor = buildControl(pControlFiles, size, md5s, tempControl);
-						
+			
 			final InformationOutputStream output = new InformationOutputStream(pOutput, MessageDigest.getInstance("MD5"));
 
 			final ArArchive ar = new ArArchive(output);
@@ -119,19 +107,25 @@ public class Processor {
 			ar.add(new FileArEntry(tempControl,"control.tar.gz", 0, 0, 33188));
 			ar.add(new FileArEntry(tempData, "data.tar.gz", 0, 0, 33188));
 			ar.close();
-			
-			final ChangesDescriptor changesDescriptor = new ChangesDescriptor(packageDescriptor); 
 
-			final StringBuffer files = new StringBuffer("\n");
-			files.append(' ').append(output.getMd5());
-			files.append(' ').append(output.getSize());
-			files.append(' ').append(changesDescriptor.get("Section"));
-			files.append(' ').append(changesDescriptor.get("Priority"));
-			files.append(' ').append(changesDescriptor.get("Package")).append('_').append(changesDescriptor.get("Version")).append(".deb");			
-			changesDescriptor.set("Files", files.toString());
-			 
-			return changesDescriptor;
+			packageDescriptor.set("Date", new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(new Date())); // Mon, 26 Mar 2007 11:44:04 +0200
+
+			if (packageDescriptor.get("Distribution") == null) {
+				packageDescriptor.set("Distribution", "unknown");
+			}
 			
+			if (packageDescriptor.get("Urgency") == null) {
+				packageDescriptor.set("Urgency", "low");
+			}
+
+			// intermediate values
+			packageDescriptor.set("MD5", output.getMd5());
+			packageDescriptor.set("Size", "" + output.getSize());
+			packageDescriptor.set("SimpleDate", new SimpleDateFormat("dd.MM.yyyy").format(new Date()));
+			
+			
+			return packageDescriptor;
+						
 		} catch(Exception e) {
 			throw new PackagingException("Could not create deb package", e);
 		} finally {
@@ -144,27 +138,22 @@ public class Processor {
 		}
 	}
 
-	public void createChanges( final ChangesDescriptor pChangesDescriptor, final OutputStream pOutput ) throws IOException {
-		createChanges(pChangesDescriptor, null, null, null, pOutput);
-	}
+	public ChangesDescriptor createChanges( final PackageDescriptor pPackageDescriptor, final ChangeSet[] pChangeSets, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException {
 
-	public void createChanges( final ChangesDescriptor pChangesDescriptor, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException {
+		final ChangesDescriptor changesDescriptor = new ChangesDescriptor(pPackageDescriptor, pChangeSets);
+		
+		changesDescriptor.set("Format", "1.7");
+		changesDescriptor.set("Binary", changesDescriptor.get("Package"));
 
-		final SimpleDateFormat dateformat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
-		pChangesDescriptor.set("Format", "1.7");
-		pChangesDescriptor.set("Date", dateformat.format(new Date())); // Mon, 26 Mar 2007 11:44:04 +0200
-		pChangesDescriptor.set("Binary", pChangesDescriptor.get("Package"));
-		pChangesDescriptor.set("Distribution", "tvp");
-		pChangesDescriptor.set("Urgency", "low");
-		pChangesDescriptor.set("Changed-By", pChangesDescriptor.get("Maintainer"));
-
-		final StringBuffer sb = new StringBuffer("\n");
-		sb.append(' ').append(pChangesDescriptor.get("Package")).append(" (").append(pChangesDescriptor.get("Version")).append(") ");
-		sb.append(pChangesDescriptor.get("Distribution")).append("; urgency=").append(pChangesDescriptor.get("Urgency")).append("\n");
-		sb.append(" * SOMETHING").append('\n');
-		pChangesDescriptor.set("Changes", sb.toString());
-				
-		final String changes = pChangesDescriptor.toString();
+		final StringBuffer files = new StringBuffer("\n");
+		files.append(' ').append(changesDescriptor.get("MD5"));
+		files.append(' ').append(changesDescriptor.get("Size"));
+		files.append(' ').append(changesDescriptor.get("Section"));
+		files.append(' ').append(changesDescriptor.get("Priority"));
+		files.append(' ').append(changesDescriptor.get("Package")).append('_').append(changesDescriptor.get("Version")).append(".deb");			
+		changesDescriptor.set("Files", files.toString());
+		 
+		final String changes = changesDescriptor.toString();
 
 		console.println(changes);
 
@@ -173,7 +162,7 @@ public class Processor {
 		if (pRing == null || pKey == null || pPassphrase == null) {			
 			pOutput.write(changesBytes);
 			pOutput.close();			
-			return;
+			return changesDescriptor;
 		}
 		
 		console.println("Signing changes with key " + pKey);
@@ -193,6 +182,8 @@ public class Processor {
 		}
 		
 		pOutput.close();
+
+		return changesDescriptor;
 	}
 	
 	private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuffer pChecksums, final File pOutput ) throws FileNotFoundException, IOException, ParseException {
@@ -247,34 +238,6 @@ public class Processor {
 		return packageDescriptor;
 	}
 
-	private void addEntry( final String pName, final String pContent, final TarOutputStream pOutput ) throws IOException {
-		final byte[] data = pContent.getBytes("UTF-8");
-		
-		final TarEntry entry = new TarEntry(pName);
-		entry.setSize(data.length);
-
-		pOutput.putNextEntry(entry);
-		pOutput.write(data);
-		pOutput.closeEntry();		
-	}
-
-	
-	private static final class Total {
-		private BigInteger count = BigInteger.valueOf(0);
-
-		public void add(long size) {
-			count = count.add(BigInteger.valueOf(size));
-		}
-		
-		public String toString() {
-			return "" + count;
-		}
-		
-		public BigInteger toBigInteger() {
-			return count;
-		}
-	}
-	
 	private BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums ) throws NoSuchAlgorithmException, IOException {
 		
 		final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
@@ -285,29 +248,55 @@ public class Processor {
 		final Total dataSize = new Total();
 		
 		final DataConsumer receiver = new DataConsumer() {
-			public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+			public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
 
-				TarEntry entry = new TarEntry(filename);
+				if (!dirname.endsWith("/")) {
+					dirname = dirname + "/";
+				}
 				
-				// link?
+				if (!dirname.startsWith("/")) {
+					dirname = "/" + dirname;
+				}
+				
+				TarEntry entry = new TarEntry(dirname);
+				
+				// FIXME: link is in the constructor
 				entry.setUserName(user);
 				entry.setUserId(uid);
 				entry.setUserName(group);
 				entry.setGroupId(gid);
 				entry.setMode(mode);
-				entry.setSize(inputStream == null?0:size);
+				entry.setSize(0);
 				
 				entry = mapper.map(entry);
 
 				outputStream.putNextEntry(entry);
 				
-			    if (inputStream == null) {
-					console.println("dir: " + filename);
+				console.println("dir: " + dirname);
 
-				    outputStream.closeEntry();
-				    return;
+			    outputStream.closeEntry();
+			}
+						
+			public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+
+				if (!filename.startsWith("/")) {
+					filename = "/" + filename;
 				}
-			    
+
+				TarEntry entry = new TarEntry(filename);
+				
+				// FIXME: link is in the constructor
+				entry.setUserName(user);
+				entry.setUserId(uid);
+				entry.setUserName(group);
+				entry.setGroupId(gid);
+				entry.setMode(mode);
+				entry.setSize(size);
+				
+				entry = mapper.map(entry);
+
+				outputStream.putNextEntry(entry);
+							    
 			    dataSize.add(size);
 			    
 			    digest.reset();
@@ -348,6 +337,16 @@ public class Processor {
 		return dataSize.count;
 	}
 	
+	private static void addEntry( final String pName, final String pContent, final TarOutputStream pOutput ) throws IOException {
+		final byte[] data = pContent.getBytes("UTF-8");
+		
+		final TarEntry entry = new TarEntry(pName);
+		entry.setSize(data.length);
+
+		pOutput.putNextEntry(entry);
+		pOutput.write(data);
+		pOutput.closeEntry();		
+	}
 
 
 }

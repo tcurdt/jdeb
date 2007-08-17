@@ -15,37 +15,14 @@
  */
 package org.vafer.jdeb.descriptors;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.ParseException;
+import org.vafer.jdeb.changes.ChangeSet;
 
 public final class ChangesDescriptor extends AbstractDescriptor {
-
-	/*
-	Format: 1.7
-	Date: Mon, 26 Mar 2007 11:44:04 +0200
-	Binary: tvp-conflicts tvp-standard tvp-minimal
-	Architecture: all
-	Version: 0.1.23
-	Distribution: tvp
-	Urgency: low
-	Maintainer: Thom May <thom@theveniceproject.com>
-	Changed-By: Thom May <thom@joost.com>
-	Description: 
-	 tvp-standard - Minimal core of TVP services
-	Changes: 
-	 tvp-standard (0.1.23) tvp; urgency=low
-	 .
-	   * BLA
-	   * BLUB
-	Files: 
-	 b5bcdd0bb123bb16808e8d4deb381d80 3856 base optional tvp-standard_0.1.23_i386.deb
-	 
-	 */
 
 	private final static String[] keys = {
 		"Format",
 		"Date",
+		"Source",
 		"Binary",
 		"Architecture",
 		"Version",
@@ -55,22 +32,54 @@ public final class ChangesDescriptor extends AbstractDescriptor {
 		"Changed-By",
 		"Descrition",
 		"Changes",
+		"Closes",
+		"Files"
+	};
+	
+	private final static String[] mandatoryKeys = {
+		"Format",
+		"Date",
+		"Source",
+		"Binary",
+		"Architecture",
+		"Version",
+		"Distribution",
+		"Urgency",
+		"Maintainer",
+		"Descrition",
+		"Changes",
 		"Files"
 	};
 
-	public ChangesDescriptor() {		
-	}
-
-	public ChangesDescriptor( final AbstractDescriptor pDescriptor ) {
+	private final ChangeSet[] changeSets;
+	
+	public ChangesDescriptor( final AbstractDescriptor pDescriptor, final ChangeSet[] pChangeSets ) {
 		super(pDescriptor);
+		changeSets = pChangeSets;
+
+		final ChangeSet lastestChangeSet = changeSets[0];
+		
+		set("Urgency", lastestChangeSet.getUrgency());
+		set("Changed-By", lastestChangeSet.getChangedBy());
+
+		final StringBuffer sb = new StringBuffer("\n");
+
+		for (int i = 0; i < changeSets.length; i++) {
+			final ChangeSet changeSet = changeSets[i];
+			sb.append(changeSet.toString());			
+		}
+
+		set("Changes", sb.toString());
 	}
 	
-	public ChangesDescriptor( final InputStream pInput ) throws IOException, ParseException {		
-		parse(pInput);
-	}
-	
-	public void addFile( final InputStream pInput, final String pName ) {
-		// TODO
+	public boolean isValid() {
+		for (int i = 0; i < mandatoryKeys.length; i++) {
+			if (get(mandatoryKeys[i]) == null) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	public String toString() {

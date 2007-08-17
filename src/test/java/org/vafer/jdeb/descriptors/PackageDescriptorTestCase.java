@@ -32,6 +32,6 @@ public final class PackageDescriptorTestCase extends TestCase {
 				 "Key3: Value3\n").getBytes());
 		
 		final PackageDescriptor d = new PackageDescriptor(is);
-		assertTrue(d.isValid());
+		assertFalse(d.isValid());
 	}
 }
