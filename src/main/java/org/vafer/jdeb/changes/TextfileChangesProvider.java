@@ -40,10 +40,12 @@ public final class TextfileChangesProvider implements ChangesProvider {
 			
 			if (line.startsWith("release ")) {
 
-				final String[] changes = (String[]) changesColl.toArray(new String[changesColl.size()]);
-				final ChangeSet changeSet = new ChangeSet(packageName, version, date, distribution, urgency, changedBy, changes);
-				changeSetColl.add(changeSet);
-				changesColl.clear();
+				if (changesColl.size() > 0) {
+					final String[] changes = (String[]) changesColl.toArray(new String[changesColl.size()]);
+					final ChangeSet changeSet = new ChangeSet(packageName, version, date, distribution, urgency, changedBy, changes);
+					changeSetColl.add(changeSet);
+					changesColl.clear();
+				}
 				
 				final String[] tokens = line.substring("release ".length()).split(",");
 				for (int i = 0; i < tokens.length; i++) {
