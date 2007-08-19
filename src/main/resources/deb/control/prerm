@@ -1,2 +1,0 @@
-# This script typically stops any daemons which are associated with a package.
-# It is executed before the removal of files associated with the package.

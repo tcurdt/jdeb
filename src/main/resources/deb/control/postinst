@@ -1,7 +1,0 @@
-# This script typically completes any required configuration of the package
-# foo once foo has been unpacked from its Debian archive (".deb") file. Often,
-# 'postinst' scripts ask the user for input, and/or warn the user that if he
-# accepts default values, he should remember to go back and re-configure that
-# package as the situation warrants. Many 'postinst' scripts then execute any
-# commands necessary to start or restart a service once a new package has been
-# installed or upgraded.

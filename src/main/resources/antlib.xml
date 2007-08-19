@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<antlib>
-  <taskdef name="registerarchive" classname="org.apache.ant.tla.RegisterArchive" />
-</antlib>
