@@ -243,8 +243,12 @@ public final class DebAntTask extends MatchingTask {
 		task.setCaseSensitive(arg0);
 	}
 
-	public void setChanges(File changes) {
-		task.setChanges(changes);
+	public void setChangesIn(File changes) {
+		task.setChangesIn(changes);
+	}
+
+	public void setChangesOut(File changes) {
+		task.setChangesOut(changes);
 	}
 
 	public void setControl(File control) {

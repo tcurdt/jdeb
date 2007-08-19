@@ -34,8 +34,9 @@ public class DebAntTask extends MatchingTask {
 
     private File deb;
     private File control;
-    private File changes;
     private File keyring;
+    private File changesIn;
+    private File changesOut;
     private String key;
     private String passphrase;
     
@@ -50,8 +51,12 @@ public class DebAntTask extends MatchingTask {
     	this.control = control;
     }
     
-    public void setChanges( File changes ) {
-    	this.changes = changes;
+    public void setChangesIn( File changes ) {
+    	this.changesIn = changes;
+    }
+
+    public void setChangesOut( File changes ) {
+    	this.changesOut = changes;
     }
 	
     public void setKeyring( File keyring ) {
@@ -76,8 +81,14 @@ public class DebAntTask extends MatchingTask {
 			throw new BuildException("You need to point the 'control' attribute to the control directory.");
 		}
 
-		if (changes != null && changes.isDirectory()) {
-			throw new BuildException("If you want the changes written out provide the file via 'changes' attribute.");			
+		if (changesOut != null && changesOut.isDirectory()) {
+			throw new BuildException("If you want the changes written out provide the output file via 'changesOut' attribute.");			
+		}
+
+		if (changesOut != null) {
+			if (changesIn == null || changesIn.isDirectory()) {
+				throw new BuildException("If you want the changes written out provide the changes via 'changesIn' attribute.");
+			}
 		}
 		
 		if (dataProducers.size() == 0) {
@@ -105,15 +116,15 @@ public class DebAntTask extends MatchingTask {
 
 			log("Created " + deb);
 
-			if (changes != null) {
-				final TextfileChangesProvider changesProvider = new TextfileChangesProvider(new FileInputStream("changes.txt"), packageDescriptor);
+			if (changesOut != null) {
+				final TextfileChangesProvider changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
 				final ChangeSet[] changeSets = changesProvider.getChangesSets();
 
-				processor.createChanges(packageDescriptor, changeSets, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changes));
+				processor.createChanges(packageDescriptor, changeSets, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
 
-				changesProvider.save(new FileOutputStream("changes.txt"));
+				changesProvider.save(new FileOutputStream(changesIn));
 				
-				log("Created changes file " + changes);
+				log("Created changes file " + changesOut);
 			}			
 		} catch (Exception e) {
 			log("Failed to create debian package " + e);
