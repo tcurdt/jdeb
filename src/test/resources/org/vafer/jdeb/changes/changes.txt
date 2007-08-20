@@ -1,0 +1,2 @@
+release date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
+ * debian changes support

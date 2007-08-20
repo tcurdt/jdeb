@@ -121,8 +121,6 @@ public class Processor {
 			// intermediate values
 			packageDescriptor.set("MD5", output.getMd5());
 			packageDescriptor.set("Size", "" + output.getSize());
-			packageDescriptor.set("SimpleDate", new SimpleDateFormat("dd.MM.yyyy").format(new Date()));
-			
 			
 			return packageDescriptor;
 						

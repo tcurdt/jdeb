@@ -1,17 +1,21 @@
 package org.vafer.jdeb.changes;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 public final class ChangeSet {
 
 	private final String packageName;
 	private final String version;
-	private final String date;
+	private final Date date;
 	private final String distribution;
 	private final String urgency;
 	private final String changedBy;
 	private final String[] changes;
 	
-	public ChangeSet( String pPackageName, String pVersion, String pDate, String pDistribution, String pUrgency, String pChangedBy, final String[] pChanges ) {
+	public ChangeSet( String pPackageName, String pVersion, Date pDate, String pDistribution, String pUrgency, String pChangedBy, final String[] pChanges ) {
 		changes = pChanges;
 		packageName = pPackageName;
 		version = pVersion;
@@ -31,6 +35,10 @@ public final class ChangeSet {
       -- maintainer name <email address>[two spaces]  date
     */
 	
+	public static DateFormat createDateForma() {
+		return new SimpleDateFormat("HH:mm dd.MM.yyyy");
+	}
+	
 	public String getPackage() {
 		return packageName;
 	}
@@ -39,7 +47,7 @@ public final class ChangeSet {
 		return version;
 	}
 	
-	public String getDate() {
+	public Date getDate() {
 		return date;
 	}
 	
@@ -61,12 +69,15 @@ public final class ChangeSet {
 	
 	public String toString() {
 		final StringBuffer sb = new StringBuffer();
+
+		final DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+		
 		sb.append(" ").append(getPackage()).append(" (").append(getVersion()).append(") ");
 		sb.append(getDistribution()).append("; urgency=").append(getUrgency()).append("\n");
 		for (int i = 0; i < changes.length; i++) {
 			sb.append(" * ").append(changes[i]).append("\n");
 		}
-		sb.append("-- ").append(getChangedBy()).append("  ").append(getDate()).append("\n");
+		sb.append("-- ").append(getChangedBy()).append("  ").append(df.format(getDate())).append("\n");
 		return sb.toString();
 	}
 }

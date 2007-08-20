@@ -7,8 +7,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 
@@ -16,19 +20,23 @@ public final class TextfileChangesProvider implements ChangesProvider {
 
 	private final ChangeSet[] changeSets;
 	
-	public TextfileChangesProvider( final InputStream pInput, final PackageDescriptor pDescriptor ) throws IOException {		
+	public TextfileChangesProvider( final InputStream pInput, final PackageDescriptor pDescriptor ) throws IOException, ParseException {		
 				
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
 
+		final SimpleDateFormat tdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+
 		String packageName = pDescriptor.get("Package");
 		String version = pDescriptor.get("Version");
-		String date = pDescriptor.get("SimpleDate");
+		Date date = tdf.parse(pDescriptor.get("Date"));
 		String distribution = pDescriptor.get("Distribution");
 		String urgency = pDescriptor.get("Urgency");
 		String changedBy = pDescriptor.get("Maintainer");
 		final Collection changesColl = new ArrayList();
 		final Collection changeSetColl = new ArrayList();
-				
+
+		final DateFormat sdf = ChangeSet.createDateForma();
+		
 		while(true) {
 			final String line = reader.readLine();
 			if (line == null) {
@@ -59,7 +67,7 @@ public final class TextfileChangesProvider implements ChangesProvider {
 					} else if ("by".equals(key)) {
 						changedBy = value;
 					} else if ("date".equals(key)) {
-						date = value;
+						date = sdf.parse(value);
 					} else if ("version".equals(key)) {
 						version = value;
 					}
@@ -80,11 +88,13 @@ public final class TextfileChangesProvider implements ChangesProvider {
 	public void save( final OutputStream pOutput ) throws IOException {
 		final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(pOutput));
 		
+		final DateFormat df = ChangeSet.createDateForma();
+		
 		for (int i = 0; i < changeSets.length; i++) {
 			final ChangeSet changeSet = changeSets[i];
 			
 			writer.write("release ");
-			writer.write("date=" + changeSet.getDate() + ",");
+			writer.write("date=" + df.format(changeSet.getDate()) + ",");
 			writer.write("version=" + changeSet.getVersion() + ",");
 			writer.write("urgency=" + changeSet.getUrgency() + ",");
 			writer.write("by=" + changeSet.getChangedBy());
