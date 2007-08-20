@@ -30,7 +30,7 @@ public final class ChangesDescriptor extends AbstractDescriptor {
 		"Urgency",
 		"Maintainer",
 		"Changed-By",
-		"Descrition",
+		"Description",
 		"Changes",
 		"Closes",
 		"Files"
@@ -46,7 +46,7 @@ public final class ChangesDescriptor extends AbstractDescriptor {
 		"Distribution",
 		"Urgency",
 		"Maintainer",
-		"Descrition",
+		"Description",
 		"Changes",
 		"Files"
 	};
@@ -64,7 +64,7 @@ public final class ChangesDescriptor extends AbstractDescriptor {
 
 		final StringBuffer sb = new StringBuffer("\n");
 
-		for (int i = 0; i < changeSets.length; i++) {
+		for (int i = 0; i < 1; i++) {
 			final ChangeSet changeSet = changeSets[i];
 			sb.append(changeSet.toString());			
 		}

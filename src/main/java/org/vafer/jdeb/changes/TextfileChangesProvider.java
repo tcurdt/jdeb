@@ -24,7 +24,8 @@ public final class TextfileChangesProvider implements ChangesProvider {
 				
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
 
-		final SimpleDateFormat tdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+		final DateFormat tdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+		final DateFormat sdf = ChangeSet.createDateForma();
 
 		String packageName = pDescriptor.get("Package");
 		String version = pDescriptor.get("Version");
@@ -35,7 +36,6 @@ public final class TextfileChangesProvider implements ChangesProvider {
 		final Collection changesColl = new ArrayList();
 		final Collection changeSetColl = new ArrayList();
 
-		final DateFormat sdf = ChangeSet.createDateForma();
 		
 		while(true) {
 			final String line = reader.readLine();
