@@ -1,6 +1,6 @@
 Howto use "jdeb"
 
- The jdeb ant task can package up a directory as Debian package. You have to provide the control files defining meta information about the package (except the md5sums which gets created automatically)
+ The jdeb ant task can package up a directory as Debian package. You have to provide the control files defining meta information about the package (except the md5sums which gets created automatically). It creates the archive and if you want even a signed changes file.
 
 +--------------------
   <target name="package">
@@ -16,33 +16,71 @@ Howto use "jdeb"
     </copy>
         
     <deb destfile="jdeb.deb" control="${deb}/control">
-      <dataFiles dir="src/main/resources/deb/data">
+      <data src="src/main/resources/deb/data">
         <exclude name="**/.svn"/>
-      </dataFiles>
+      </data>
     </deb>
   </target>
 +--------------------
 
- For binary packages it might be important to retain permissions, ownerships and links. When you provide the original tar as input the meta data will be kept intact gets included directly into the deb. You can apply simple modifications like prefixing or stripping of paths though.
+ For cross platform builds it might be important to retain permissions, ownerships and links. When you provide the original tar as input the meta data will be kept intact gets included directly into the deb. You can apply simple modifications like prefixing or stripping of paths though.
 
-+--------------------
-  <target name="repackage">
-    <taskdef name="deb" classname="org.vafer.jdeb.ant.DebAntTask" />
-
-    <copy todir="${deb}/control">
-      <fileset dir="src/main/resources/deb/control"/>
-      <filterset>
-        <filter token="VERSION" value="${version}"/>
-        <filter token="NAME" value="${ant.project.name}"/>
-        <filter token="SIZE" value="1"/>
-      </filterset>
-    </copy>
-        
++--------------------        
     <deb destfile="jdeb.deb" control="${deb}/control">
-      <dataArchive archive="src/release.tgz">
+      <data src="src/release.tgz">
+        <mapper type="prefix" strip="1" prefix="/somewhere/else"/>
         <exclude name="**/.svn"/>
-      </dataArchive>
-    </dev>
-  </target>
+      </data>
+    </deb>
 +--------------------
 
+ For more complex permission and ownership adjustments you can use a "ls" mapper. It allows you to define permissons and ownerships in a text file and even under windows you will be able to build your debian package.
+
++--------------------        
+    <deb destfile="jdeb.deb" control="${deb}/control">
+      <data src="src/release.tgz">
+        <mapper type="ls" src="mapping.txt" />
+      </data>
+    </deb>
++--------------------
+
+ The mapper will apply the output of an "ls -laR > mapping.txt" command that should look like this
+
++--------------------        
+ ./trunk/target/test-classes/org/vafer/dependency:
+ total 176
+ drwxr-xr-x   23 tcurdt  tcurdt   782 Jun 25 03:48 .
+ drwxr-xr-x    3 tcurdt  tcurdt   102 Jun 25 03:48 ..
+ -rw-r--r--    1 tcurdt  tcurdt  2934 Jun 25 03:48 DependenciesTestCase.class
+ -rw-r--r--    1 tcurdt  tcurdt   786 Jun 25 03:48 JarCombiningTestCase$1.class
+ -rw-r--r--    1 tcurdt  tcurdt  2176 Jun 25 03:48 WarTestCase.class
+ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
++--------------------        
+
+ In order to also create a changes file you will need to provide the input and output of the changes. The input file is a much simpler file where you should list your changes. When you do a release jdeb will add the release line and create a debian format standard changes file for you. Every change should be starting with the " * " and one line only.
+
++--------------------
+ * changes for the next release
+release date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
+ * debian changes support
++--------------------
+
+ You have to call jdeb like this
+
++--------------------        
+    <deb destfile="jdeb.deb" control="${deb}/control" changesIn="changes.txt" changesOut="jdeb.changes">
+      <data src="some/dir"/>
+    </deb>
++--------------------
+
+ If you want the changes to be signed, make sure you have the {{{http://www.bouncycastle.org/java.html}bouncycastle jar}} in your classpath (just copy it into the $ANT_HOME/lib folder - next to jdeb). Then you can sign your changes file with
+
++--------------------        
+    <deb destfile="jdeb.deb" control="${deb}/control" changesIn="changes.txt" changesOut="jdeb.changes"
+      key="2E074D8F"
+      passphrase="secret"
+      keyring="/Users/tcurdt/.gnupg/secring.gpg"
+      >
+      <data src="some/dir"/>
+    </deb>
++--------------------
