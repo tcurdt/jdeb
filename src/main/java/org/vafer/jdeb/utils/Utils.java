@@ -19,6 +19,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * Simple utils functions.
+ * 
+ * ATTENTION: don't use outside of jdeb
+ * 
+ * @author tcurdt
+ */
 public final class Utils {
 
 	public static int copy( final InputStream pInput, final OutputStream pOutput ) throws IOException {

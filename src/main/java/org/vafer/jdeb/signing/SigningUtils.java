@@ -62,7 +62,20 @@ public final class SigningUtils {
 		return null;
 	}
 
-	
+	/**
+	 * Create a clear sign signature over the input data. (Not detached)
+	 * 
+	 * @param pInput
+	 * @param pKeyring
+	 * @param pKey
+	 * @param pPassphrase
+	 * @param pOutput
+	 * @throws IOException
+	 * @throws PGPException
+	 * @throws NoSuchProviderException
+	 * @throws NoSuchAlgorithmException
+	 * @throws SignatureException
+	 */
 	public static void clearSign( final InputStream pInput, final InputStream pKeyring, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException, PGPException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException {
 		
 		Security.addProvider( new BouncyCastleProvider() );

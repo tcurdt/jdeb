@@ -15,6 +15,11 @@
  */
 package org.vafer.jdeb;
 
+/**
+ * Provides Data to a DataConsumer.
+ * 
+ * @author tcurdt
+ */
 public interface DataProducer {
 
 	void produce( DataConsumer receiver );

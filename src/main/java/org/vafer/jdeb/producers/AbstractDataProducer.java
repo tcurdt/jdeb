@@ -21,6 +21,11 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
 import org.vafer.jdeb.mapping.NullMapper;
 
+/**
+ * Base Producer class providing including/excluding.
+ * 
+ * @author tcurdt
+ */
 public abstract class AbstractDataProducer implements DataProducer {
 
 	private final String[] includes;

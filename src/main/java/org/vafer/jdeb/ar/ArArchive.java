@@ -18,6 +18,11 @@ package org.vafer.jdeb.ar;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * Simple ArArchive implementation
+ * 
+ * @author tcurdt
+ */
 public final class ArArchive {
 	
 	private final OutputStream out;

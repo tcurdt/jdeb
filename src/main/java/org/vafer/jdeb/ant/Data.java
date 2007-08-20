@@ -23,6 +23,14 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
 
+
+/**
+ * Ant "data" elment acting as a factory for DataProducers.
+ * So far Archive and Directory producers are supported.
+ * Both support the usual ant pattern set matching.
+ * 
+ * @author tcurdt
+ */
 public final class Data extends PatternSet implements DataProducer {
 
 	private File src;

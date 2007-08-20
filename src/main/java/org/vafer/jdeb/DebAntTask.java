@@ -48,7 +48,7 @@ import org.apache.tools.ant.types.selectors.modifiedselector.ModifiedSelector;
 import org.vafer.jdeb.ant.Data;
 
 /**
- * @deprecated
+ * @deprecated please use org.vafer.jdeb.ant.DebAntTask
  * @author tcurdt
  */
 public final class DebAntTask extends MatchingTask {

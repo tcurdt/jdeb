@@ -19,6 +19,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 
+/**
+ * Reflecting the package control file
+ * 
+ * @author tcurdt
+ */
 public final class PackageDescriptor extends AbstractDescriptor {
 
 	private final static String[] keys = {

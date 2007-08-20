@@ -17,6 +17,11 @@ package org.vafer.jdeb.mapping;
 
 import org.apache.tools.tar.TarEntry;
 
+/**
+ * Maps one entry to another. So you modify ownerships permissions etc in a Mapper. 
+ * 
+ * @author tcurdt
+ */
 public interface Mapper {
 
 	public TarEntry map( final TarEntry entry );

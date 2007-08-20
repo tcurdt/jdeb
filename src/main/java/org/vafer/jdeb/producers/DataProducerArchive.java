@@ -26,6 +26,11 @@ import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
 
+/**
+ * Providing data from an archive keeping permissions and ownerships.
+ * 
+ * @author tcurdt
+ */
 public final class DataProducerArchive extends AbstractDataProducer implements DataProducer {
 
 	private final File archive;

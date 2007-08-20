@@ -22,6 +22,12 @@ import org.vafer.jdeb.mapping.LsMapper;
 import org.vafer.jdeb.mapping.NullMapper;
 import org.vafer.jdeb.mapping.PrefixMapper;
 
+/**
+ * Ant "mapper" element acting as factory for the entry mapper.
+ * So far type "ls" and "prefix" are supported.
+ * 
+ * @author tcurdt
+ */
 public final class Mapper {
 
 	private String mtype;

@@ -26,10 +26,16 @@ import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Processor;
-import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 
+/**
+ * AntTask for creating debian archives.
+ * Even supports signed changes files.
+ * 
+ * @author tcurdt
+ */
+		
 public class DebAntTask extends MatchingTask {
 
     private File deb;
@@ -112,16 +118,17 @@ public class DebAntTask extends MatchingTask {
 		
 		try {
 
-			final PackageDescriptor packageDescriptor = processor.createDeb(controlFiles, data, new FileOutputStream(deb));
+			final PackageDescriptor packageDescriptor = processor.createDeb(controlFiles, data, deb);
 
 			log("Created " + deb);
 
 			if (changesOut != null) {
+				// for now only support reading the changes form a textfile provider
 				final TextfileChangesProvider changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
-				final ChangeSet[] changeSets = changesProvider.getChangesSets();
+				
+				processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
 
-				processor.createChanges(packageDescriptor, changeSets, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
-
+				// write the release information to this file
 				changesProvider.save(new FileOutputStream(changesIn));
 				
 				log("Created changes file " + changesOut);

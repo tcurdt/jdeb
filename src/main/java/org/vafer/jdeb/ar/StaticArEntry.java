@@ -19,6 +19,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * ArEntry coming from memory
+ * 
+ * @author tcurdt
+ */
 public final class StaticArEntry extends AbstractArEntry {
 
 	private final String name;

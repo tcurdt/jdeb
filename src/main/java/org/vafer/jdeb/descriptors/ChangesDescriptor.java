@@ -17,6 +17,11 @@ package org.vafer.jdeb.descriptors;
 
 import org.vafer.jdeb.changes.ChangeSet;
 
+/**
+ * Reflecting a changes file
+ * 
+ * @author tcurdt
+ */
 public final class ChangesDescriptor extends AbstractDescriptor {
 
 	private final static String[] keys = {

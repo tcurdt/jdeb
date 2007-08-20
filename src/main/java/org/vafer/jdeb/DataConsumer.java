@@ -18,6 +18,11 @@ package org.vafer.jdeb;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * A DataConsumer consumes Data produced from a producer.
+ * 
+ * @author tcurdt
+ */
 public interface DataConsumer {
 
 	void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException;

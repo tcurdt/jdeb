@@ -26,6 +26,12 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
 import org.vafer.jdeb.utils.Utils;
 
+/**
+ * DataProducer iterating over a directory.
+ * For cross-platform permissions and ownerships you probably want to use a Mapper, too. 
+ * 
+ * @author tcurdt
+ */
 public final class DataProducerDirectory extends AbstractDataProducer implements DataProducer {
 
 	private final DirectoryScanner scanner = new DirectoryScanner();

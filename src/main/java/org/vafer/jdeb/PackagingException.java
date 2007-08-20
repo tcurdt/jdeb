@@ -15,6 +15,11 @@
  */
 package org.vafer.jdeb;
 
+/**
+ * Something went wrong while building the package
+ * 
+ * @author tcurdt
+ */
 public final class PackagingException extends Exception {
 
 	private static final long serialVersionUID = 1L;

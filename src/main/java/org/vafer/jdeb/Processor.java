@@ -41,6 +41,7 @@ import org.vafer.jdeb.ar.ArArchive;
 import org.vafer.jdeb.ar.FileArEntry;
 import org.vafer.jdeb.ar.StaticArEntry;
 import org.vafer.jdeb.changes.ChangeSet;
+import org.vafer.jdeb.changes.ChangesProvider;
 import org.vafer.jdeb.descriptors.ChangesDescriptor;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 import org.vafer.jdeb.mapping.Mapper;
@@ -48,6 +49,12 @@ import org.vafer.jdeb.signing.SigningUtils;
 import org.vafer.jdeb.utils.InformationOutputStream;
 import org.vafer.jdeb.utils.Utils;
 
+/**
+ * The processor does the actual work of building the deb related files.
+ * It is been used by the ant task and (later) the maven plugin.
+ * 
+ * @author tcurdt
+ */
 public class Processor {
 
 	private final Console console;
@@ -84,7 +91,16 @@ public class Processor {
 		mapper = pMapper;
 	}
 
-	public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final OutputStream pOutput ) throws PackagingException {
+	/**
+	 * Create the debian archive with from the provided control files and data producers.
+	 * 
+	 * @param pControlFiles
+	 * @param pData
+	 * @param pOutput
+	 * @return PackageDescriptor
+	 * @throws PackagingException
+	 */
+	public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput ) throws PackagingException {
 
 		File tempData = null;
 		File tempControl = null;
@@ -100,7 +116,7 @@ public class Processor {
 			console.println("Building control");
 			final PackageDescriptor packageDescriptor = buildControl(pControlFiles, size, md5s, tempControl);
 
-			final InformationOutputStream output = new InformationOutputStream(pOutput, MessageDigest.getInstance("MD5"));
+			final InformationOutputStream output = new InformationOutputStream(new FileOutputStream(pOutput), MessageDigest.getInstance("MD5"));
 
 			final ArArchive ar = new ArArchive(output);
 			ar.add(new StaticArEntry("debian-binary", 0, 0, 33188, "2.0\n"));
@@ -121,6 +137,7 @@ public class Processor {
 			// intermediate values
 			packageDescriptor.set("MD5", output.getMd5());
 			packageDescriptor.set("Size", "" + output.getSize());
+			packageDescriptor.set("File", pOutput.getName());
 
 			return packageDescriptor;
 
@@ -136,9 +153,23 @@ public class Processor {
 		}
 	}
 
-	public ChangesDescriptor createChanges( final PackageDescriptor pPackageDescriptor, final ChangeSet[] pChangeSets, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException {
+	/**
+	 * Create changes file based on the provided PackageDescriptor.
+	 * If pRing, pKey and pPassphrase are provided the changes file will also be signed.
+	 * It returns a ChangesDescriptor reflecting the changes  
+	 * @param pPackageDescriptor
+	 * @param pChangeSets
+	 * @param pRing
+	 * @param pKey
+	 * @param pPassphrase
+	 * @param pOutput
+	 * @return ChangesDescriptor
+	 * @throws IOException
+	 */
+	public ChangesDescriptor createChanges( final PackageDescriptor pPackageDescriptor, final ChangesProvider pChangesProvider, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException {
 
-		final ChangesDescriptor changesDescriptor = new ChangesDescriptor(pPackageDescriptor, pChangeSets);
+		final ChangeSet[] changeSets = pChangesProvider.getChangesSets();
+		final ChangesDescriptor changesDescriptor = new ChangesDescriptor(pPackageDescriptor, changeSets);
 
 		changesDescriptor.set("Format", "1.7");
 
@@ -159,7 +190,7 @@ public class Processor {
 		files.append(' ').append(changesDescriptor.get("Size"));
 		files.append(' ').append(changesDescriptor.get("Section"));
 		files.append(' ').append(changesDescriptor.get("Priority"));
-		files.append(' ').append(changesDescriptor.get("Package")).append('_').append(changesDescriptor.get("Version")).append('_').append(changesDescriptor.get("Architecture")).append(".deb");			
+		files.append(' ').append(changesDescriptor.get("File"));			
 		changesDescriptor.set("Files", files.toString());
 
 		if (!changesDescriptor.isValid()) {
@@ -200,6 +231,17 @@ public class Processor {
 		return changesDescriptor;
 	}
 
+	/**
+	 * Build control archive of the deb
+	 * @param pControlFiles
+	 * @param pDataSize
+	 * @param pChecksums
+	 * @param pOutput
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
 	private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuffer pChecksums, final File pOutput ) throws FileNotFoundException, IOException, ParseException {
 
 		PackageDescriptor packageDescriptor = null;
@@ -252,6 +294,15 @@ public class Processor {
 		return packageDescriptor;
 	}
 
+	/**
+	 * Build the data archive of the deb from the provided DataProducers
+	 * @param pData
+	 * @param pOutput
+	 * @param pChecksums
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 * @throws IOException
+	 */
 	private BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums ) throws NoSuchAlgorithmException, IOException {
 
 		final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));

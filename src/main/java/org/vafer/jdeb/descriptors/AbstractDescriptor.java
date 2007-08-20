@@ -23,6 +23,11 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A descriptor holds the usual key value pairs
+ * 
+ * @author tcurdt
+ */
 public abstract class AbstractDescriptor {
 	
 	private final Map values = new HashMap();

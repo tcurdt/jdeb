@@ -19,6 +19,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * Base class for ArEntries
+ * 
+ * @author tcurdt
+ */
 public abstract class AbstractArEntry {
 
 	private final int userId;

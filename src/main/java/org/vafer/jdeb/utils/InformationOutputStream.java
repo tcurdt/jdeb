@@ -20,7 +20,11 @@ import java.io.OutputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 
-
+/**
+ * Convinience class to provide MD5 and length of a stream.
+ *  
+ * @author tcurdt
+ */
 public class InformationOutputStream extends DigestOutputStream {
 
 	private final MessageDigest digest;

@@ -18,6 +18,11 @@ package org.vafer.jdeb.mapping;
 import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.utils.Utils;
 
+/**
+ * Just adds a prefix to the entry coming in
+ *  
+ * @author tcurdt
+ */
 public final class PrefixMapper implements Mapper {
 
 	private final int strip;

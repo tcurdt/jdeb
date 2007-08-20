@@ -15,6 +15,11 @@
  */
 package org.vafer.jdeb;
 
+/**
+ * Plug in your favorite log implementation.
+ * 
+ * @author tcurdt
+ */
 public interface Console {
 
 	void println( String s );

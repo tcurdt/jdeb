@@ -27,7 +27,8 @@ import java.util.regex.Pattern;
 import org.apache.tools.tar.TarEntry;
 
 /**
- * ls -laR > mapping.txt 
+ * Reads permissions and ownerships from a "ls -laR > mapping.txt" dump and
+ * maps entries accordingly.
  * 
  * @author tcurdt
  */
