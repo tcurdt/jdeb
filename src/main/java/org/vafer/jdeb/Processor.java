@@ -27,8 +27,6 @@ import java.math.BigInteger;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,7 +34,6 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarOutputStream;
-import org.bouncycastle.openpgp.PGPException;
 import org.vafer.jdeb.ar.ArArchive;
 import org.vafer.jdeb.ar.FileArEntry;
 import org.vafer.jdeb.ar.StaticArEntry;
@@ -216,13 +213,7 @@ public class Processor {
 
 		try {
 			SigningUtils.clearSign(input, pRing, pKey, pPassphrase, pOutput);		
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (SignatureException e) {
-			e.printStackTrace();
-		} catch (PGPException e) {
-			e.printStackTrace();
-		} catch (NoSuchProviderException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

@@ -4,7 +4,7 @@
     <groupId>org.vafer</groupId>
     <artifactId>jdeb</artifactId>
     <name>jdeb</name>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
     <description>This project provides an ant task to build deb archives</description>
     <url>http://vafer.org/projects/jdeb</url>
     <developers>
@@ -34,29 +34,28 @@
         <plugins>
             <!--
             <plugin>
-                <artifactId>minijar-maven-plugin</artifactId>
+                <artifactId>shade-maven-plugin</artifactId>
                 <groupId>org.codehaus.mojo</groupId>
-                <version>1.0-alpha-4-SNAPSHOT</version>
+                <version>1.0-alpha-10</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>ueberjar</goal>
+                            <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <stripUnusedClasses>false</stripUnusedClasses>
-                            <analyse>
-                                <include>
-                                    <include>org.bouncycastle:bcpg-jdk12</include>                           
-                                    <include>org.bouncycastle:bcprov-jdk12</include>
-                                </include>
-                            </analyse>
-                            <relocate>
-                                <include>
-                                    <include>org.bouncycastle:bcpg-jdk12</include>                           
-                                    <include>org.bouncycastle:bcprov-jdk12</include>
-                                </include>
-                            </relocate>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.bouncycastle</pattern>
+                                </relocation>                                    
+                            </relocations>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>junit:junit</exclude>
+                                    <exclude>org.apache.ant:ant</exclude>
+                                    <exclude>org.apache.ant:ant-launcher</exclude>
+                                </excludes>
+                            </artifactSet>
                         </configuration>
                     </execution>
                 </executions>
