@@ -1,0 +1,21 @@
+On trunk
+
+  1) perform the release
+
+	  mvn clean install
+	  mvn release:clean release:prepare 
+	  mvn release:perform
+
+From the tag
+
+  2) rebuild the site
+
+      mvn clean site site:deploy
+ 
+  3) build the bundle
+
+      mvn clean install source:jar javadoc:jar repository:bundle-create
+ 
+  4) submit the bundle
+
+      open http://jira.codehaus.org/secure/CreateIssue.jspa?pid=10367&issuetype=3
