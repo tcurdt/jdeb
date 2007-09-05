@@ -3,3 +3,4 @@ o subversion log ChangesProvider
 o jira release notes ChangesProvider
 o read DEBFULLNAME and DEBEMAIL from the environment
 o distribution should come from the changes-in file "release distribution=staging"
+o "Conflicts:"
