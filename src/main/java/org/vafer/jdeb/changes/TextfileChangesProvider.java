@@ -96,14 +96,19 @@ public final class TextfileChangesProvider implements ChangesProvider {
 						date = sdf.parse(value);
 					} else if ("version".equals(key)) {
 						version = value;
+					} else if ("distribution".equals(key)) {
+						distribution = value;
 					}
-				}				
+				}
+				continue;
 			}
 			
 			if (line.startsWith(" * ")) {
 				changesColl.add(line.substring(" * ".length()));
+				continue;
 			}
 			
+			throw new ParseException("Unknown line syntax [" + line + "]", 0);
 		}
 		
 		reader.close();

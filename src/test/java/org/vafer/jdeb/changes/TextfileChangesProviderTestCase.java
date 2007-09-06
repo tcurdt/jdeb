@@ -28,15 +28,12 @@ public final class TextfileChangesProviderTestCase extends TestCase {
 		final String input =
 			" * change1\n" +
 			" * change2\n" +
-			"   bla bla\n" +
 			"release date=14:00 13.01.2007, version=12324, urgency=low, by=tcurdt@joost.com\n" +
 			" * change1\n" +
 			" * change2\n" +
-			"   bla bla\n" +
 			"release date=12:00 10.01.2007, version=10324, urgency=low, by=tcurdt@joost.com\n" +
 			" * change1\n" +
-			" * change2\n" +
-			"   bla bla\n";
+			" * change2\n";
 		
 		final PackageDescriptor descriptor = new PackageDescriptor();
 		descriptor.set("Package", "package");
@@ -50,4 +47,35 @@ public final class TextfileChangesProviderTestCase extends TestCase {
 		assertNotNull(changeSets);
 		assertEquals(3, changeSets.length);		
 	}
+
+	public void testDistributionFromChangesProvider() throws Exception {
+
+		final String input =
+			"release distribution=production\n" +
+			" * change1\n" +
+			" * change2\n" +
+			"release distribution=staging, date=14:00 13.01.2007, version=12324, urgency=low, by=tcurdt@joost.com\n" +
+			" * change1\n" +
+			" * change2\n" +
+			"release distribution=development, date=12:00 10.01.2007, version=10324, urgency=low, by=tcurdt@joost.com\n" +
+			" * change1\n" +
+			" * change2\n";
+		
+		final PackageDescriptor descriptor = new PackageDescriptor();
+		descriptor.set("Package", "package");
+		descriptor.set("Version", "version");
+		descriptor.set("Date", "Mon, 20 Aug 2007 15:25:57 +0200");
+		
+		final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes("UTF-8")), descriptor);
+		final ChangeSet[] changeSets = provider.getChangesSets();
+		
+		assertNotNull(changeSets);
+		assertEquals(3, changeSets.length);
+		
+		assertEquals("production", changeSets[0].getDistribution());
+		assertEquals("staging", changeSets[1].getDistribution());
+		assertEquals("development", changeSets[2].getDistribution());
+		
+	}
+
 }

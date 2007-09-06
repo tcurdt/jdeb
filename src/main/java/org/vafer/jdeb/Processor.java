@@ -131,6 +131,14 @@ public class Processor {
 				packageDescriptor.set("Urgency", "low");
 			}
 
+			if (packageDescriptor.get("Maintainer") == null) {
+				
+				final String debFullName = System.getenv("DEBFULLNAME");
+				final String debEmail = System.getenv("DEBEMAIL");
+				
+				packageDescriptor.set("Maintainer", debFullName + " <" + debEmail + ">");
+			}
+
 			// intermediate values
 			packageDescriptor.set("MD5", output.getMd5());
 			packageDescriptor.set("Size", "" + output.getSize());

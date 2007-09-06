@@ -23,3 +23,5 @@ From the tag
   5) submit the bundle
 
       open http://jira.codehaus.org/secure/CreateIssue.jspa?pid=10367&issuetype=3
+
+      url: http://vafer.org/repository/releases/org/vafer/jdeb/{VERSION}/jdeb-{VERSION}-bundle.jar
