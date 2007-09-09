@@ -21,12 +21,21 @@ import java.io.FileOutputStream;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.Console;
+import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Processor;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 
+/**
+ * Creates deb archive
+ *
+ * @goal deb
+ * @requiresDependencyResolution compile
+ * @execute phase="package"
+ */
 public final class DebMojo extends AbstractPluginMojo {
 
 	/**
@@ -34,6 +43,9 @@ public final class DebMojo extends AbstractPluginMojo {
      */
     private MavenProjectHelper projectHelper;
 
+    private File deb;
+    private File controlDir;
+    
 	/**
      * Main entry point
      * @throws MojoExecutionException on error
@@ -41,21 +53,41 @@ public final class DebMojo extends AbstractPluginMojo {
     public void execute()
         throws MojoExecutionException
     {
+    	if (deb == null) {
+    		deb = new File(buildDirectory, "target.deb");
+    	}
+    	
+    	if (controlDir == null) {
+    		controlDir = new File("src/deb/control");
+    	}
+    	
+    	if (!controlDir.exists() || !controlDir.isDirectory()) {
+    		throw new MojoExecutionException(controlDir + " needs to be a directory");
+    	}
+    	
+    	final File file = getProject().getArtifact().getFile();
+		final File[] controlFiles = controlDir.listFiles();
+		final DataProducer[] data = new DataProducer[] { new DataProducer() {
+			public void produce( final DataConsumer receiver ) {
+				try {
+					receiver.onEachFile(new FileInputStream(file), file.getName(), "", "root", 0, "root", 0, TarEntry.DEFAULT_FILE_MODE, file.length());
+				} catch (Exception e) {
+					getLog().error(e);
+				}
+			}			
+		}};
 
-    	final File changesIn = null;
+		final File changesIn = null;
     	final File changesOut = null;
     	final File keyring = null;
     	final String key = null;
     	final String passphrase = null;
-		final File deb = null;
-		final File[] controlFiles = null;		
-		final DataProducer[] data = null;
 		
 		final Processor processor = new Processor(new Console()
 		{
-			public void println(String s)
+			public void println( final String s )
 			{
-				getLog().debug(s);
+				getLog().info(s);
 			}			
 		});
 		
@@ -83,8 +115,7 @@ public final class DebMojo extends AbstractPluginMojo {
 		}
 		catch (Exception e)
 		{
-			getLog().error("Failed to create debian package " + e);
-			e.printStackTrace();
+			getLog().error("Failed to create debian package" + deb, e);
 		}    	
     }    
 

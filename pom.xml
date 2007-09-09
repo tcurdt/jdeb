@@ -3,6 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.vafer</groupId>
     <artifactId>jdeb</artifactId>
+    <packaging>maven-plugin</packaging>
     <name>jdeb</name>
     <version>0.3-SNAPSHOT</version>
     <description>This project provides an ant task to build deb archives</description>
@@ -61,6 +62,24 @@
                 </executions>
             </plugin>
             -->
+            <plugin>
+                <artifactId>jdeb</artifactId>
+                <groupId>org.vafer</groupId>
+                <version>0.3-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>deb</goal>
+                        </goals>
+                        <configuration>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
