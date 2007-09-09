@@ -15,6 +15,77 @@
  */
 package org.vafer.jdeb.maven;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProjectHelper;
+import org.vafer.jdeb.Console;
+import org.vafer.jdeb.DataProducer;
+import org.vafer.jdeb.Processor;
+import org.vafer.jdeb.changes.TextfileChangesProvider;
+import org.vafer.jdeb.descriptors.PackageDescriptor;
+
 public final class DebMojo extends AbstractPluginMojo {
+
+	/**
+     * @component
+     */
+    private MavenProjectHelper projectHelper;
+
+	/**
+     * Main entry point
+     * @throws MojoExecutionException on error
+     */
+    public void execute()
+        throws MojoExecutionException
+    {
+
+    	final File changesIn = null;
+    	final File changesOut = null;
+    	final File keyring = null;
+    	final String key = null;
+    	final String passphrase = null;
+		final File deb = null;
+		final File[] controlFiles = null;		
+		final DataProducer[] data = null;
+		
+		final Processor processor = new Processor(new Console()
+		{
+			public void println(String s)
+			{
+				getLog().debug(s);
+			}			
+		});
+		
+		try
+		{
+
+			final PackageDescriptor packageDescriptor = processor.createDeb(controlFiles, data, deb);
+
+			getLog().info("Attaching created debian archive " + deb);
+			projectHelper.attachArtifact( getProject(), "deb-archive", deb.getName(), deb );
+
+			if (changesOut != null)
+			{
+				// for now only support reading the changes form a textfile provider
+				final TextfileChangesProvider changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
+				
+				processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
+
+				// write the release information to this file
+				changesProvider.save(new FileOutputStream(changesIn));
+				
+				getLog().info("Attaching created debian changes file " + changesOut);
+				projectHelper.attachArtifact( getProject(), "deb-changes", changesOut.getName(), changesOut );
+			}			
+		}
+		catch (Exception e)
+		{
+			getLog().error("Failed to create debian package " + e);
+			e.printStackTrace();
+		}    	
+    }    
 
 }

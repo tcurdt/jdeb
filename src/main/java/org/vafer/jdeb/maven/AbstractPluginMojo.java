@@ -15,6 +15,37 @@
  */
 package org.vafer.jdeb.maven;
 
-public abstract class AbstractPluginMojo {
+import java.io.File;
 
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.project.MavenProject;
+
+public abstract class AbstractPluginMojo extends AbstractMojo {
+
+	/**
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
+    private MavenProject project;
+
+    /**
+     * @parameter expression="${project.build.directory}"
+     * @required
+     * @readonly
+     */
+    protected File buildDirectory;
+
+    protected MavenProject getProject()
+    {
+        if ( project.getExecutionProject() != null )
+        {
+            return project.getExecutionProject();
+        }
+        else
+        {
+            return project;
+        }
+    }
+    
 }
