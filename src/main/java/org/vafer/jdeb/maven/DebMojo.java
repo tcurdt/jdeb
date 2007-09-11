@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.Console;
@@ -45,6 +46,18 @@ public final class DebMojo extends AbstractPluginMojo {
 
     private File deb;
     private File controlDir;
+	private File changesIn = null;
+	private File changesOut = null;
+	private File keyring = null;
+	private String key = null;
+	private String passphrase = null;
+    
+    
+    private static String debNameFromProject( MavenProject project ) {
+    	final StringBuffer sb = new StringBuffer();
+    	sb.append(project.getArtifactId()).append("_").append(project.getVersion()).append(".deb");
+    	return sb.toString();
+    }
     
 	/**
      * Main entry point
@@ -54,11 +67,12 @@ public final class DebMojo extends AbstractPluginMojo {
         throws MojoExecutionException
     {
     	if (deb == null) {
-    		deb = new File(buildDirectory, "target.deb");
+    		deb = new File(buildDirectory, debNameFromProject(getProject()));
     	}
     	
     	if (controlDir == null) {
-    		controlDir = new File("src/deb/control");
+    		controlDir = new File(getProject().getBasedir(), "src/deb/control");
+    		getLog().info("Using default path to control directory " + controlDir);
     	}
     	
     	if (!controlDir.exists() || !controlDir.isDirectory()) {
@@ -77,11 +91,6 @@ public final class DebMojo extends AbstractPluginMojo {
 			}			
 		}};
 
-		final File changesIn = null;
-    	final File changesOut = null;
-    	final File keyring = null;
-    	final String key = null;
-    	final String passphrase = null;
 		
 		final Processor processor = new Processor(new Console()
 		{
@@ -115,7 +124,7 @@ public final class DebMojo extends AbstractPluginMojo {
 		}
 		catch (Exception e)
 		{
-			getLog().error("Failed to create debian package" + deb, e);
+			getLog().error("Failed to create debian package " + deb, e);
 		}    	
     }    
 
