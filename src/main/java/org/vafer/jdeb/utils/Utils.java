@@ -18,6 +18,8 @@ package org.vafer.jdeb.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.ParseException;
+import java.util.Map;
 
 /**
  * Simple utils functions.
@@ -80,4 +82,67 @@ public final class Utils {
 		return s;
 	}
 
+	
+    /**
+	 * Substitute the variables in the given expression with the
+	 * values from the Map.
+	 * 
+	 * @param pVariables
+	 * @param pExpression
+	 * @return
+	 */
+	public static String replaceVariables(final Map pVariables, final String pExpression, final String pOpen, final String pClose) throws ParseException {
+
+		final char[] s = pExpression.toCharArray();
+
+		final char[] open = pOpen.toCharArray();
+		final char[] close = pClose.toCharArray();
+
+		final StringBuffer out = new StringBuffer();
+		StringBuffer sb = new StringBuffer();
+		char[] watch = open;
+		int w = 0;
+		for (int i = 0; i < s.length; i++) {
+			char c = s[i];
+
+			if (c == watch[w]) {
+				w++;
+				if (watch.length == w) {
+					if (watch == open) {
+						// found open
+						out.append(sb);
+						sb = new StringBuffer();
+						watch = close;
+					} else if (watch == close) {
+						// found close
+						final String variable = (String) pVariables.get(sb
+								.toString());
+						if (variable != null) {
+							out.append(variable);
+						} else {
+							throw new ParseException("Unknown variable " + sb,i);
+						}
+						sb = new StringBuffer();
+						watch = open;
+					}
+					w = 0;
+				}
+			} else {
+				if (w > 0) {
+					sb.append(watch, 0, w);
+				}
+
+				sb.append(c);
+
+				w = 0;
+			}
+		}
+
+		if (watch == open) {
+			out.append(sb);
+		}
+
+		return out.toString();
+	}
+	
 }
