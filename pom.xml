@@ -63,7 +63,6 @@
             </plugin>
             -->
             <!--
-            -->
             <plugin>
                 <artifactId>jdeb</artifactId>
                 <groupId>org.vafer</groupId>
@@ -79,7 +78,7 @@
                     </execution>
                 </executions>
             </plugin>
-
+            -->
 
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
