@@ -4,3 +4,4 @@ Section: test
 Priority: test
 Architecture: test
 Description: test
+Maintainer: tcurdt

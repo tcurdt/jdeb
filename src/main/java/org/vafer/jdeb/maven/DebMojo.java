@@ -104,7 +104,19 @@ public final class DebMojo extends AbstractPluginMojo {
      */    	
 	private String passphrase = null;
     
-    
+    /**
+     * If not defaultPath is specified this  
+     * 
+     * @parameter expression="${defaultPath}" default-value="/srv/jetty/www"
+     */    	
+	private String defaultPath = "/srv/jetty/www";
+
+	/**
+	 * TODO: make configurable
+	 */
+	private DataProducer[] dataProducers = null;
+	
+	
 	/**
      * Main entry point
      * @throws MojoExecutionException on error
@@ -176,15 +188,19 @@ public final class DebMojo extends AbstractPluginMojo {
     	
     	final File file = getProject().getArtifact().getFile();
 		final File[] controlFiles = controlDir.listFiles();
-		final DataProducer[] data = new DataProducer[] { new DataProducer() {
+		
+		
+		if (dataProducers == null)
+		{
+			dataProducers = new DataProducer[] { new DataProducer() {
 			public void produce( final DataConsumer receiver ) {
 				try {
-					receiver.onEachFile(new FileInputStream(file), file.getName(), "", "root", 0, "root", 0, TarEntry.DEFAULT_FILE_MODE, file.length());
+					receiver.onEachFile(new FileInputStream(file), new File(new File(defaultPath), file.getName()).getAbsolutePath(), "", "root", 0, "root", 0, TarEntry.DEFAULT_FILE_MODE, file.length());
 				} catch (Exception e) {
 					getLog().error(e);
 				}
-			}			
-		}};
+			}}};
+		}
 
 		
 		final Processor processor = new Processor(new Console()
@@ -199,7 +215,7 @@ public final class DebMojo extends AbstractPluginMojo {
 		try
 		{
 
-			packageDescriptor = processor.createDeb(controlFiles, data, deb);
+			packageDescriptor = processor.createDeb(controlFiles, dataProducers, deb);
 
 			getLog().info("Attaching created debian archive " + deb);
 			projectHelper.attachArtifact( getProject(), "deb-archive", deb.getName(), deb );
