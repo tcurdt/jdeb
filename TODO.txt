@@ -1,3 +1,2 @@
-o create maven plugin
 o subversion log ChangesProvider
 o jira release notes ChangesProvider
