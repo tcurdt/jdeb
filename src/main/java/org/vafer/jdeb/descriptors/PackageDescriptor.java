@@ -58,17 +58,12 @@ public final class PackageDescriptor extends AbstractDescriptor {
 		parse(pInput);
 	}
 
-	public boolean isValid() {
-		for (int i = 0; i < mandatoryKeys.length; i++) {
-			if (get(mandatoryKeys[i]) == null) {
-				return false;
-			}
-		}
-		
-		return true;
+	public String[] getMandatoryKeys() {
+		return mandatoryKeys;
 	}
 
 	public String toString() {
 		return toString(keys);
 	}
+
 }

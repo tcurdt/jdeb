@@ -21,7 +21,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A descriptor holds the usual key value pairs
@@ -96,11 +98,26 @@ public abstract class AbstractDescriptor {
 	public String get( final String pKey ) {
 		return (String)values.get(pKey);
 	}
+
+	public abstract String[] getMandatoryKeys();
 	
 	public boolean isValid() {
-		return true;
+		return invalidKeys().size() == 0;
 	}
+	
+	public Set invalidKeys() {
+		final Set invalid = new HashSet();
 
+		final String[] mk = getMandatoryKeys();
+		for (int i = 0; i < mk.length; i++) {
+			if (get(mk[i]) == null) {
+				invalid.add(mk[i]);
+			}
+		}
+		
+		return invalid;
+	}
+	
 	String toString( final String[] pKeys ) {
 		final StringBuffer s = new StringBuffer();
 		for (int i = 0; i < pKeys.length; i++) {

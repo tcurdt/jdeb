@@ -116,26 +116,37 @@ public class DebAntTask extends MatchingTask {
 			}			
 		});
 		
+		final PackageDescriptor packageDescriptor;
 		try {
 
-			final PackageDescriptor packageDescriptor = processor.createDeb(controlFiles, data, deb);
+			packageDescriptor = processor.createDeb(controlFiles, data, deb);
 
 			log("Created " + deb);
 
-			if (changesOut != null) {
-				// for now only support reading the changes form a textfile provider
-				final TextfileChangesProvider changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
-				
-				processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
-
-				// write the release information to this file
-				changesProvider.save(new FileOutputStream(changesIn));
-				
-				log("Created changes file " + changesOut);
-			}			
 		} catch (Exception e) {
-			log("Failed to create debian package " + e);
+			log("Failed to create debian package " + deb + e);
 			e.printStackTrace();
+			return;
+		}
+
+		if (changesOut == null) {
+			return;
+		}
+
+		try {
+			// for now only support reading the changes form a textfile provider
+			final TextfileChangesProvider changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
+			
+			processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
+			
+			// write the release information to this file
+			changesProvider.save(new FileOutputStream(changesIn));
+			
+			log("Created changes file " + changesOut);
+		} catch (Exception e) {
+			log("Failed to create debian changes file " + changesOut + e);
+			e.printStackTrace();
+			return;
 		}
 		
 	}

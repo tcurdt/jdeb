@@ -195,31 +195,44 @@ public final class DebMojo extends AbstractPluginMojo {
 			}			
 		});
 		
+		final PackageDescriptor packageDescriptor;
 		try
 		{
 
-			final PackageDescriptor packageDescriptor = processor.createDeb(controlFiles, data, deb);
+			packageDescriptor = processor.createDeb(controlFiles, data, deb);
 
 			getLog().info("Attaching created debian archive " + deb);
 			projectHelper.attachArtifact( getProject(), "deb-archive", deb.getName(), deb );
-
-			if (changesIn != null)
-			{				
-				// for now only support reading the changes form a text file provider
-				final TextfileChangesProvider changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
-				
-				processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
-
-				// write the release information to this file
-				changesProvider.save(new FileOutputStream(changesIn));
-				
-				getLog().info("Attaching created debian changes file " + changesOut);
-				projectHelper.attachArtifact( getProject(), "deb-changes", changesOut.getName(), changesOut );
-			}			
 		}
 		catch (Exception e)
 		{
 			getLog().error("Failed to create debian package " + deb, e);
+			throw new MojoExecutionException("Failed to create debian package " + deb, e);
+		}    	
+
+		if (changesIn == null)
+		{
+			return;
+		}
+		
+		try
+		{
+
+			// for now only support reading the changes form a text file provider
+			final TextfileChangesProvider changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
+			
+			processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
+
+			// write the release information to this file
+			changesProvider.save(new FileOutputStream(changesIn));
+			
+			getLog().info("Attaching created debian changes file " + changesOut);
+			projectHelper.attachArtifact( getProject(), "deb-changes", changesOut.getName(), changesOut );
+		}
+		catch (Exception e)
+		{
+			getLog().error("Failed to create debian changes file " + changesOut, e);
+			throw new MojoExecutionException("Failed to create debian changes file " + changesOut, e);
 		}    	
     }    
 

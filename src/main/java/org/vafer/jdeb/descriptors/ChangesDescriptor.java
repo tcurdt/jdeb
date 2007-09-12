@@ -77,14 +77,8 @@ public final class ChangesDescriptor extends AbstractDescriptor {
 		set("Changes", sb.toString());
 	}
 	
-	public boolean isValid() {
-		for (int i = 0; i < mandatoryKeys.length; i++) {
-			if (get(mandatoryKeys[i]) == null) {
-				return false;
-			}
-		}
-		
-		return true;
+	public String[] getMandatoryKeys() {
+		return mandatoryKeys;
 	}
 	
 	public String toString() {

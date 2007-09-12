@@ -29,6 +29,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.zip.GZIPOutputStream;
 
@@ -40,6 +41,7 @@ import org.vafer.jdeb.ar.StaticArEntry;
 import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.ChangesProvider;
 import org.vafer.jdeb.descriptors.ChangesDescriptor;
+import org.vafer.jdeb.descriptors.InvalidDescriptorException;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 import org.vafer.jdeb.mapping.Mapper;
 import org.vafer.jdeb.signing.SigningUtils;
@@ -97,7 +99,7 @@ public class Processor {
 	 * @return PackageDescriptor
 	 * @throws PackagingException
 	 */
-	public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput ) throws PackagingException {
+	public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput ) throws PackagingException, InvalidDescriptorException {
 
 		File tempData = null;
 		File tempControl = null;
@@ -113,6 +115,10 @@ public class Processor {
 			console.println("Building control");
 			final PackageDescriptor packageDescriptor = buildControl(pControlFiles, size, md5s, tempControl);
 
+			if (!packageDescriptor.isValid()) {
+				throw new InvalidDescriptorException(packageDescriptor);
+			}
+
 			final InformationOutputStream output = new InformationOutputStream(new FileOutputStream(pOutput), MessageDigest.getInstance("MD5"));
 
 			final ArArchive ar = new ArArchive(output);
@@ -121,24 +127,6 @@ public class Processor {
 			ar.add(new FileArEntry(tempData, "data.tar.gz", 0, 0, 33188));
 			ar.close();
 
-			packageDescriptor.set("Date", new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(new Date())); // Mon, 26 Mar 2007 11:44:04 +0200
-
-			if (packageDescriptor.get("Distribution") == null) {
-				packageDescriptor.set("Distribution", "unknown");
-			}
-
-			if (packageDescriptor.get("Urgency") == null) {
-				packageDescriptor.set("Urgency", "low");
-			}
-
-			if (packageDescriptor.get("Maintainer") == null) {
-				
-				final String debFullName = System.getenv("DEBFULLNAME");
-				final String debEmail = System.getenv("DEBEMAIL");
-				
-				packageDescriptor.set("Maintainer", debFullName + " <" + debEmail + ">");
-			}
-
 			// intermediate values
 			packageDescriptor.set("MD5", output.getMd5());
 			packageDescriptor.set("Size", "" + output.getSize());
@@ -146,6 +134,8 @@ public class Processor {
 
 			return packageDescriptor;
 
+		} catch(InvalidDescriptorException e) {
+			throw e;
 		} catch(Exception e) {
 			throw new PackagingException("Could not create deb package", e);
 		} finally {
@@ -171,7 +161,7 @@ public class Processor {
 	 * @return ChangesDescriptor
 	 * @throws IOException
 	 */
-	public ChangesDescriptor createChanges( final PackageDescriptor pPackageDescriptor, final ChangesProvider pChangesProvider, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException {
+	public ChangesDescriptor createChanges( final PackageDescriptor pPackageDescriptor, final ChangesProvider pChangesProvider, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException, InvalidDescriptorException {
 
 		final ChangeSet[] changeSets = pChangesProvider.getChangesSets();
 		final ChangesDescriptor changesDescriptor = new ChangesDescriptor(pPackageDescriptor, changeSets);
@@ -199,13 +189,11 @@ public class Processor {
 		changesDescriptor.set("Files", files.toString());
 
 		if (!changesDescriptor.isValid()) {
-			console.println("Could not write changes descriptor. It's invalid!");
-			return changesDescriptor;
+			throw new InvalidDescriptorException(changesDescriptor);
 		}
 		
 		final String changes = changesDescriptor.toString();
-
-		console.println(changes);
+		//console.println(changes);
 
 		final byte[] changesBytes = changes.getBytes("UTF-8");
 
@@ -252,7 +240,7 @@ public class Processor {
 			final File file = pControlFiles[i];
 
 			if (file.isDirectory()) {
-				break;
+				continue;
 			}
 
 			final TarEntry entry = new TarEntry(file);
@@ -263,6 +251,28 @@ public class Processor {
 
 			if ("control".equals(name)) {
 				packageDescriptor = new PackageDescriptor(new FileInputStream(file));
+
+				if (packageDescriptor.get("Date") == null) {
+					packageDescriptor.set("Date", new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(new Date())); // Mon, 26 Mar 2007 11:44:04 +0200
+				}
+
+				if (packageDescriptor.get("Distribution") == null) {
+					packageDescriptor.set("Distribution", "unknown");
+				}
+
+				if (packageDescriptor.get("Urgency") == null) {
+					packageDescriptor.set("Urgency", "low");
+				}
+
+				if (packageDescriptor.get("Maintainer") == null) {
+					
+					final String debFullName = System.getenv("DEBFULLNAME");
+					final String debEmail = System.getenv("DEBEMAIL");
+					if (debFullName != null && debEmail != null) {
+						packageDescriptor.set("Maintainer", debFullName + " <" + debEmail + ">");
+					}
+				}				
+				
 				continue;
 			}			
 
@@ -279,7 +289,7 @@ public class Processor {
 		}
 
 		if (packageDescriptor == null) {
-			packageDescriptor = new PackageDescriptor();
+			throw new FileNotFoundException("No control file in " + Arrays.toString(pControlFiles));
 		}
 
 		packageDescriptor.set("Installed-Size", pDataSize.toString());
