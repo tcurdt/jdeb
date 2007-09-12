@@ -2,9 +2,15 @@ Downloads
 
  The official releases are available through the maven2 repository on repo1.maven.org.
 
-* Version 0.3
+* Version 0.4
 
   The current trunk and not yet released
+
+* Version 0.3, 21.08.2007
+
+  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.3.jar}jdeb-0.3 jar (binaries)}} \
+  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.3-sources.jar}jdeb-0.3 jar (sources)}} \
+  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.3.pom}jdeb-0.3 pom}}
 
 * Version 0.2, 21.08.2007
 

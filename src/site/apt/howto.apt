@@ -1,4 +1,44 @@
-Howto use "jdeb"
+Howto use "jdeb" with maven
+
+ Generating a default Debian package with maven is particular easy. Just add the plugin to your POM like this
++--------------------
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>jdeb</artifactId>
+                <groupId>org.vafer</groupId>
+                <version>0.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>deb</goal>
+                        </goals>
+                        <configuration>                        
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
++--------------------
+
+ At least the one main control file is required to be present at "src/deb/control/control". In contains the information for the Debian package descriptor. Usually it will look something along the lines of
+
++--------------------
+Package: @NAME@
+Version: @VERSION@
+Section: misc
+Priority: optional
+Architecture: @ARCH@
+Depends: jdk (>= 1.5)
+Maintainer: Torsten Curdt <torsten@vafer.org>
+Description: jetty java servlet container
+Distribution: development
++--------------------
+ 
+ If "Maintainer" is not set, jdeb will check the environment and construct the maintainer from the DEBEMAIL and DEBFULLNAME environment variables if present. The "Installed-Size" will also be injected. If a changes file is used, the "Distribution" usually comes from that file. The default changes file is called "CHANGES.txt". See below for the syntax of the content. Now if you do a "mvn clean install" the attached "deb" goal is getting called and the artifacts -the deb and potentially the changes file- will automatically get attached to the project.
+
+
+Howto use "jdeb" with ant
 
  The jdeb ant task can package up a directory as Debian package. You have to provide the control files defining meta information about the package (except the md5sums which gets created automatically). It creates the archive and if you want even a signed changes file.
 
@@ -34,7 +74,7 @@ Howto use "jdeb"
     </deb>
 +--------------------
 
- For more complex permission and ownership adjustments you can use a "ls" mapper. It allows you to define permissons and ownerships in a text file and even under windows you will be able to build your debian package.
+ For more complex permission and ownership adjustments you can use a "ls" mapper. It allows you to define permissions and ownerships in a text file and even under windows you will be able to build your debian package.
 
 +--------------------        
     <deb destfile="jdeb.deb" control="${deb}/control">
@@ -57,15 +97,14 @@ Howto use "jdeb"
  drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 +--------------------        
 
- In order to also create a changes file you will need to provide the input and output of the changes. The input file is a much simpler file where you should list your changes. When you do a release jdeb will add the release line and create a debian format standard changes file for you. Every change should be starting with the " * " and one line only.
+ In order to also create a changes file you will need to provide the input and output of the changes. The input file is a much simpler file where you should list your changes. Every change should be starting with the " * " and one line only.
 
 +--------------------
  * changes for the next release
-release date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
+release distribution=staging, date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
  * debian changes support
 +--------------------
-
- You have to call jdeb like this
+ When you do a release jdeb will add (or complete!) the release line and create a debian format standard changes file for you. (Don't forget to commit changes jdeb did to the file.) From ant you have to call jdeb like this
 
 +--------------------        
     <deb destfile="jdeb.deb" control="${deb}/control" changesIn="changes.txt" changesOut="jdeb.changes">
