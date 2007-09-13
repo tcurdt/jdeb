@@ -1,7 +1,7 @@
-Package: test
-Version: test
-Section: test
-Priority: test
-Architecture: test
-Description: test
-Maintainer: tcurdt
+Package: [[name]]
+Version: [[version]]
+Section: misc
+Priority: low
+Architecture: all
+Description: [[description]]
+Maintainer: tcurdt@vafer.org

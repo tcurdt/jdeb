@@ -47,6 +47,7 @@ import org.vafer.jdeb.mapping.Mapper;
 import org.vafer.jdeb.signing.SigningUtils;
 import org.vafer.jdeb.utils.InformationOutputStream;
 import org.vafer.jdeb.utils.Utils;
+import org.vafer.jdeb.utils.VariableResolver;
 
 /**
  * The processor does the actual work of building the deb related files.
@@ -58,6 +59,7 @@ public class Processor {
 
 	private final Console console;
 	private final Mapper mapper;
+	private final VariableResolver resolver;
 
 	private static final class Total {
 		private BigInteger count = BigInteger.valueOf(0);
@@ -75,19 +77,20 @@ public class Processor {
 		}
 	}
 
-	public Processor( final Console pConsole ) {
+	public Processor( final Console pConsole, final VariableResolver pResolver ) {
 		this(pConsole, new Mapper() {
 			public TarEntry map( final TarEntry pEntry ) {
 				return pEntry;
 			}
 
-		});
+		}, pResolver);
 
 	}
 
-	public Processor( final Console pConsole, final Mapper pMapper ) {
+	public Processor( final Console pConsole, final Mapper pMapper, final VariableResolver pResolver ) {
 		console = pConsole;
 		mapper = pMapper;
+		resolver = pResolver;
 	}
 
 	/**
@@ -250,7 +253,7 @@ public class Processor {
 			entry.setName(name);
 
 			if ("control".equals(name)) {
-				packageDescriptor = new PackageDescriptor(new FileInputStream(file));
+				packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
 
 				if (packageDescriptor.get("Date") == null) {
 					packageDescriptor.set("Date", new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(new Date())); // Mon, 26 Mar 2007 11:44:04 +0200

@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.ParseException;
-import java.util.Map;
+
 
 /**
  * Simple utils functions.
@@ -85,13 +85,13 @@ public final class Utils {
 	
     /**
 	 * Substitute the variables in the given expression with the
-	 * values from the Map.
+	 * values from the resolver
 	 * 
 	 * @param pVariables
 	 * @param pExpression
 	 * @return
 	 */
-	public static String replaceVariables(final Map pVariables, final String pExpression, final String pOpen, final String pClose) throws ParseException {
+	public static String replaceVariables(final VariableResolver pResolver, final String pExpression, final String pOpen, final String pClose) throws ParseException {
 
 		final char[] s = pExpression.toCharArray();
 
@@ -108,26 +108,30 @@ public final class Utils {
 			if (c == watch[w]) {
 				w++;
 				if (watch.length == w) {
+					// found the full token to watch for
+					
 					if (watch == open) {
 						// found open
 						out.append(sb);
 						sb = new StringBuffer();
+						// search for close
 						watch = close;
 					} else if (watch == close) {
 						// found close
-						final String variable = (String) pVariables.get(sb
-								.toString());
+						final String variable = (String) pResolver.get(sb.toString());
 						if (variable != null) {
 							out.append(variable);
 						} else {
-							throw new ParseException("Unknown variable " + sb,i);
+							throw new ParseException("Unknown variable " + sb, i);
 						}
 						sb = new StringBuffer();
+						// search for open
 						watch = open;
 					}
 					w = 0;
 				}
 			} else {
+
 				if (w > 0) {
 					sb.append(watch, 0, w);
 				}
@@ -138,9 +142,10 @@ public final class Utils {
 			}
 		}
 
-		if (watch == open) {
-			out.append(sb);
+		if (watch == close) {
+			out.append(open);
 		}
+		out.append(sb);
 
 		return out.toString();
 	}

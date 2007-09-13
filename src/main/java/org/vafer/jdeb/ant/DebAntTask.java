@@ -113,8 +113,8 @@ public class DebAntTask extends MatchingTask {
 		final Processor processor = new Processor(new Console() {
 			public void println(String s) {
 				log(s);
-			}			
-		});
+			}
+		}, null);
 		
 		final PackageDescriptor packageDescriptor;
 		try {

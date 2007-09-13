@@ -31,7 +31,9 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Processor;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
+import org.vafer.jdeb.utils.MapVariableResolver;
 import org.vafer.jdeb.utils.Utils;
+import org.vafer.jdeb.utils.VariableResolver;
 
 /**
  * Creates deb archive
@@ -49,9 +51,9 @@ public final class DebMojo extends AbstractPluginMojo {
 
     /**
      * Defines the pattern of the name of final artifacts.
-     * Possible substitutions are [artifactId] [version] [extension] and [groupId].
+     * Possible substitutions are [[artifactId]] [[version]] [[extension]] and [[groupId]].
      * 
-     * @parameter expression="${namePattern}" default-value="[artifactId]_[version].[extension]"
+     * @parameter expression="${namePattern}" default-value="[[artifactId]]_[[version]].[[extension]]"
      */
     private String namePattern;
 
@@ -127,17 +129,22 @@ public final class DebMojo extends AbstractPluginMojo {
     	// expand name pattern
     	final String debName;
     	final String changesName;    	
+
     	final Map variables = new HashMap();
+    	variables.put("name", getProject().getName());
     	variables.put("artifactId", getProject().getArtifactId());
     	variables.put("groupId", getProject().getGroupId());
-    	variables.put("version", getProject().getVersion());
+    	variables.put("version", getProject().getVersion().replace('-', '+'));
+    	variables.put("description", getProject().getDescription());
     	variables.put("extension", "deb");    	
+    	final VariableResolver resolver = new MapVariableResolver(variables);
+
     	try
     	{
-        	debName = Utils.replaceVariables(variables, namePattern, "[", "]"); 
-
+        	debName = Utils.replaceVariables(resolver, namePattern, "[[", "]]"); 
+        	
         	variables.put("extension", "changes");    	
-        	changesName = Utils.replaceVariables(variables, namePattern, "[", "]"); 
+        	changesName = Utils.replaceVariables(resolver, namePattern, "[[", "]]"); 
 		}
     	catch (ParseException e)
     	{
@@ -203,13 +210,16 @@ public final class DebMojo extends AbstractPluginMojo {
 		}
 
 		
-		final Processor processor = new Processor(new Console()
-		{
-			public void println( final String s )
-			{
-				getLog().info(s);
-			}			
-		});
+		final Processor processor = new Processor(
+				new Console()
+				{
+					public void println( final String s )
+					{
+						getLog().info(s);
+					}			
+				},
+				resolver
+		);
 		
 		final PackageDescriptor packageDescriptor;
 		try

@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 
+import org.vafer.jdeb.utils.VariableResolver;
+
 /**
  * Reflecting the package control file
  * 
@@ -52,9 +54,15 @@ public final class PackageDescriptor extends AbstractDescriptor {
 	};
 	
 	public PackageDescriptor() {
+		this(null);
 	}
 
-	public PackageDescriptor( final InputStream pInput )  throws IOException, ParseException {		
+	public PackageDescriptor( final VariableResolver pResolver ) {
+		super(pResolver);
+	}
+
+	public PackageDescriptor( final InputStream pInput, final VariableResolver pResolver )  throws IOException, ParseException {	
+		this(pResolver);
 		parse(pInput);
 	}
 

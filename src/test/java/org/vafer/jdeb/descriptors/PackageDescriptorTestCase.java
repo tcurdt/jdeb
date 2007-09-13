@@ -17,8 +17,12 @@ package org.vafer.jdeb.descriptors;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.TestCase;
+
+import org.vafer.jdeb.utils.MapVariableResolver;
 
 public final class PackageDescriptorTestCase extends TestCase {
 
@@ -31,7 +35,25 @@ public final class PackageDescriptorTestCase extends TestCase {
 				 " Value2.2\n" +
 				 "Key3: Value3\n").getBytes());
 		
-		final PackageDescriptor d = new PackageDescriptor(is);
+		final PackageDescriptor d = new PackageDescriptor(is, null);
 		assertFalse(d.isValid());
+	}
+	
+	public void testVariableSubstitution() {
+		
+		final Map map = new HashMap();
+		map.put("VERSION", "1.2");
+		map.put("MAINTAINER", "Torsten Curdt <tcurdt@vafer.org>");
+
+		final PackageDescriptor d = new PackageDescriptor(new MapVariableResolver(map));
+		d.set("Version", "[[VERSION]]");
+		d.set("Maintainer", "[[MAINTAINER]]");
+		d.set("NoResolve1", "test[[test");
+		d.set("NoResolve2", "[[test]]");
+		
+		assertEquals("1.2", d.get("Version"));
+		assertEquals("Torsten Curdt <tcurdt@vafer.org>", d.get("Maintainer"));
+		assertEquals("test[[test", d.get("NoResolve1"));
+		assertEquals("[[test]]", d.get("NoResolve2"));
 	}
 }
