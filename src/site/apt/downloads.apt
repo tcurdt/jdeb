@@ -6,23 +6,39 @@ Downloads
 
   The current trunk and not yet released
 
-* Version 0.3, 21.08.2007
+* Version 0.3, 15.09.2007
 
-  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.3.jar}jdeb-0.3 jar (binaries)}} \
-  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.3-sources.jar}jdeb-0.3 jar (sources)}} \
-  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.3.pom}jdeb-0.3 pom}}
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.3.jar}jdeb-0.3 jar (binaries)}} \
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.3-sources.jar}jdeb-0.3 jar (sources)}} \
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.3.pom}jdeb-0.3 pom}}
+
+ CHANGES
+
+ * Added plugin implementation for maven
+ 
+ * Added stricter descriptor validation
+ 
+ * Added maintainer lookup from environment (DEBEMAIL, DEBFULLNAME)
 
 * Version 0.2, 21.08.2007
 
-  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.2.jar}jdeb-0.2 jar (binaries)}} \
-  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.2-sources.jar}jdeb-0.2 jar (sources)}} \
-  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.2.pom}jdeb-0.2 pom}}
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.2.jar}jdeb-0.2 jar (binaries)}} \
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.2-sources.jar}jdeb-0.2 jar (sources)}} \
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.2.pom}jdeb-0.2 pom}}
+
+ CHANGES
+
+ * Added support for signed changes files
+ 
+ * Added support for mapping ownerships and rights
+ 
+ * Fixed the delete of the temporary files
 
 * Version 0.1, 19.02.2007 
 
-  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.1/jdeb-0.1.jar}jdeb-0.1 jar (binaries)}} \
-  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.1/jdeb-0.1-sources.jar}jdeb-0.1 jar (sources)}} \
-  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.1/jdeb-0.1.pom}jdeb-0.1 pom}}
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.1/jdeb-0.1.jar}jdeb-0.1 jar (binaries)}} \
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.1/jdeb-0.1-sources.jar}jdeb-0.1 jar (sources)}} \
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.1/jdeb-0.1.pom}jdeb-0.1 pom}}
 
  Only if you require snaphots include the vafer.org repository into your maven2
  pom or settings xml file.

@@ -1,6 +1,7 @@
 Howto use "jdeb" with maven
 
  Generating a default Debian package with maven is particular easy. Just add the plugin to your POM like this
+ 
 +--------------------
     <build>
         <plugins>
