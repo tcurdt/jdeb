@@ -6,21 +6,17 @@ On trunk
 	  mvn release:clean release:prepare 
 	  mvn release:perform
 
-  2) rebuild the site
-
-      mvn site site:deploy
- 
 From the tag
 
-  3) build the bundle
+  2) build the bundle
 
       mvn clean source:jar repository:bundle-create 
 
-  4) put the bundle online
+  3) put the bundle online
 
       scp target/*bundle* tcurdt@vafer.org:apache2/vafer.org/root/repository/releases/org/vafer/jdeb/{VERSION}
  
-  5) submit the bundle
+  4) submit the bundle
 
       open http://jira.codehaus.org/secure/CreateIssue.jspa?pid=10367&issuetype=3
 
