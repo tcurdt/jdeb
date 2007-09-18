@@ -8,9 +8,9 @@ Downloads
 
 * Version 0.3, 15.09.2007
 
- {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.3.jar}jdeb-0.3 jar (binaries)}} \
- {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.3-sources.jar}jdeb-0.3 jar (sources)}} \
- {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.2/jdeb-0.3.pom}jdeb-0.3 pom}}
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.3/jdeb-0.3.jar}jdeb-0.3 jar (binaries)}} \
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.3/jdeb-0.3-sources.jar}jdeb-0.3 jar (sources)}} \
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.3/jdeb-0.3.pom}jdeb-0.3 pom}}
 
  CHANGES
 
