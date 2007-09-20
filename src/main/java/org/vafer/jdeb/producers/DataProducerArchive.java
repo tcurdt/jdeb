@@ -35,8 +35,8 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 
 	private final File archive;
 	
-	public DataProducerArchive( final File pArchive, final String[] pIncludes, final String[] pExcludes, final Mapper pMapper ) {
-		super(pIncludes, pExcludes, pMapper);
+	public DataProducerArchive( final File pArchive, final String[] pIncludes, final String[] pExcludes, final Mapper[] pMappers ) {
+		super(pIncludes, pExcludes, pMappers);
 		archive = pArchive;
 	}
 		

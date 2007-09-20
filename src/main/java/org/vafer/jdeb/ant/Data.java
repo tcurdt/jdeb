@@ -34,14 +34,16 @@ import org.vafer.jdeb.producers.DataProducerDirectory;
 public final class Data extends PatternSet implements DataProducer {
 
 	private File src;
-	private Mapper mapper;
-	
+	private org.vafer.jdeb.mapping.Mapper[] mappers = new org.vafer.jdeb.mapping.Mapper[0];
+		
 	public void setSrc( final File pSrc ) {
 		src = pSrc;
 	}
 
-	public void setMapper( final Mapper pMapper ) {
-		mapper = pMapper;
+	public void addMapper( final Mapper pMapper ) {
+		final org.vafer.jdeb.mapping.Mapper[] newMappers = new org.vafer.jdeb.mapping.Mapper[mappers.length+1];
+		System.arraycopy(mappers, 0, newMappers, 0, mappers.length);
+		newMappers[mappers.length] = pMapper.createMapper();
 	}
 	
 	public void produce( final DataConsumer pReceiver ) {
@@ -56,42 +58,15 @@ public final class Data extends PatternSet implements DataProducer {
 				src,
 				getIncludePatterns(getProject()),
 				getExcludePatterns(getProject()),
-				(mapper != null) ? mapper.createMapper() : null
+				mappers
 				).produce(pReceiver);
 		} else {
 			new DataProducerDirectory(
 				src,
 				getIncludePatterns(getProject()),
 				getExcludePatterns(getProject()),
-				(mapper != null) ? mapper.createMapper() : null
+				mappers
 				).produce(pReceiver);			
 		}
 	}
-
-	
-	/**
-	 * @deprecated
-	 */
-	public void setPrefix( final String pPrefix ) {
-		System.err.println("ATTENTION: the prefix attribute is deprecated. Please specify it on a mapper element inside the data element.");
-		if (mapper == null) {
-			mapper = new Mapper();
-			mapper.setType("prefix");
-		}
-		mapper.setPrefix(pPrefix);
-	}
-	
-	/**
-	 * @deprecated
-	 */
-	public void setStrip( final int pStrip ) {
-		System.err.println("ATTENTION: the strip attribute is deprecated. Please specify it on a mapper element inside the data element.");
-		if (mapper == null) {
-			mapper = new Mapper();
-			mapper.setType("prefix");
-		}
-		mapper.setStrip(pStrip);
-	}
-
-
 }

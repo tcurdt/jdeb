@@ -267,15 +267,14 @@ public class Processor {
 					packageDescriptor.set("Urgency", "low");
 				}
 
-				if (packageDescriptor.get("Maintainer") == null) {
-					
-					final String debFullName = System.getenv("DEBFULLNAME");
-					final String debEmail = System.getenv("DEBEMAIL");
-					if (debFullName != null && debEmail != null) {
-						packageDescriptor.set("Maintainer", debFullName + " <" + debEmail + ">");
-					}
-				}				
-				
+				final String debFullName = System.getenv("DEBFULLNAME");
+				final String debEmail = System.getenv("DEBEMAIL");
+
+				if (debFullName != null && debEmail != null) {
+					packageDescriptor.set("Maintainer", debFullName + " <" + debEmail + ">");
+					console.println("Using maintainer from the environment variables.");
+				}
+
 				continue;
 			}			
 

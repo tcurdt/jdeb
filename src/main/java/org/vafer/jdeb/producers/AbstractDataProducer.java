@@ -19,7 +19,6 @@ import org.apache.tools.ant.types.selectors.SelectorUtils;
 import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
-import org.vafer.jdeb.mapping.NullMapper;
 
 /**
  * Base Producer class providing including/excluding.
@@ -30,13 +29,13 @@ public abstract class AbstractDataProducer implements DataProducer {
 
 	private final String[] includes;
 	private final String[] excludes;
-	private final Mapper mapper;
+	private final Mapper[] mappers;
 	
 	
-	public AbstractDataProducer( final String[] pIncludes, final String[] pExcludes, final Mapper pMapper ) {
+	public AbstractDataProducer( final String[] pIncludes, final String[] pExcludes, final Mapper[] pMapper ) {
 		excludes = (pExcludes != null) ? pExcludes : new String[0];
 		includes = (pIncludes != null) ? pIncludes : new String[] { "**" };
-		mapper = (pMapper != null) ? pMapper : new NullMapper();
+		mappers = (pMapper != null) ? pMapper : new Mapper[0];
 	}
 	
 	public boolean isIncluded( final String pName ) {
@@ -70,7 +69,11 @@ public abstract class AbstractDataProducer implements DataProducer {
 	
 	public TarEntry map( final TarEntry pEntry ) {
 		
-		final TarEntry entry = mapper.map(pEntry);
+		TarEntry entry = pEntry;
+
+		for (int i = 0; i < mappers.length; i++) {
+			entry = mappers[i].map(entry);
+		}
 		
 		return entry;
 	}

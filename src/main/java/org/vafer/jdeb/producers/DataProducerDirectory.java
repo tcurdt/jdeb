@@ -36,8 +36,8 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
 
 	private final DirectoryScanner scanner = new DirectoryScanner();
 	
-	public DataProducerDirectory( final File pDir, final String[] pIncludes, final String[] pExcludes, final Mapper pMapper ) {
-		super(pIncludes, pExcludes, pMapper);
+	public DataProducerDirectory( final File pDir, final String[] pIncludes, final String[] pExcludes, final Mapper[] pMappers ) {
+		super(pIncludes, pExcludes, pMappers);
 		scanner.setBasedir(pDir);
 		scanner.setIncludes(pIncludes);
 		scanner.setExcludes(pExcludes);

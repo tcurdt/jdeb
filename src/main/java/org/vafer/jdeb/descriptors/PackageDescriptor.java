@@ -39,6 +39,8 @@ public final class PackageDescriptor extends AbstractDescriptor {
 		"Essential",
 		"Depends",
 		"Conflicts",
+		"Provides",
+		"Replaces",
 		"Installed-Size",
 		"Source"
 	};

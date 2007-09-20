@@ -128,7 +128,8 @@ public final class TextfileChangesProvider implements ChangesProvider {
 			writer.write("date=" + df.format(changeSet.getDate()) + ",");
 			writer.write("version=" + changeSet.getVersion() + ",");
 			writer.write("urgency=" + changeSet.getUrgency() + ",");
-			writer.write("by=" + changeSet.getChangedBy());
+			writer.write("by=" + changeSet.getChangedBy() + ",");
+			writer.write("distribution=" + changeSet.getDistribution());
 			writer.write("\n");
 
 			final String[] changes = changeSet.getChanges();
