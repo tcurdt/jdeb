@@ -20,4 +20,11 @@ From the tag
 
       open http://jira.codehaus.org/secure/CreateIssue.jspa?pid=10367&issuetype=3
 
-      url: http://vafer.org/repository/releases/org/vafer/jdeb/{VERSION}/jdeb-{VERSION}-bundle.jar
+      summary: please upload the new jdeb 0.4 release
+      bundle: http://vafer.org/repository/releases/org/vafer/jdeb/{VERSION}/jdeb-{VERSION}-bundle.jar
+      project: http://vafer.org/projects/jdeb/index.html
+      contributor: http://vafer.org/projects/jdeb/team-list.html
+
+  5) download
+  
+      http://vafer.org/repository/releases/org/vafer/jdeb/{VERSION}/jdeb-{VERSION}.jar
