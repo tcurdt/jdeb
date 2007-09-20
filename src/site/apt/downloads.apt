@@ -2,9 +2,29 @@ Downloads
 
  The official releases are available through the maven2 repository on repo1.maven.org.
 
-* Version 0.4
+* Version 0.5
 
   The current trunk and not yet released
+
+
+* Version 0.4, 20.09.2007
+
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.4/jdeb-0.4.jar}jdeb-0.4 jar (binaries)}} \
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.4/jdeb-0.4-sources.jar}jdeb-0.4 jar (sources)}} \
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.4/jdeb-0.4.pom}jdeb-0.4 pom}}
+
+ CHANGES
+
+ * Fixed mapper support
+ 
+ * Added support for multiple mappers
+ 
+ * Added more fields to the package descriptor
+ 
+ * Changed lookup from environment (DEBEMAIL, DEBFULLNAME) to overrule the descriptor
+ 
+ * Removed deprecated prefix/strip syntax
+
 
 * Version 0.3, 15.09.2007
 
@@ -19,6 +39,7 @@ Downloads
  * Added stricter descriptor validation
  
  * Added maintainer lookup from environment (DEBEMAIL, DEBFULLNAME)
+
 
 * Version 0.2, 21.08.2007
 
