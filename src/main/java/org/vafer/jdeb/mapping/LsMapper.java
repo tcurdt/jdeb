@@ -227,14 +227,14 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 		if (entry != null) {
 
 			final TarEntry newEntry = new TarEntry(entry.getName());
-			newEntry.setUserId(pEntry.getUserId());
-			newEntry.setGroupId(pEntry.getGroupId());
-			newEntry.setUserName(pEntry.getUserName());
-			newEntry.setGroupName(pEntry.getGroupName());
-			newEntry.setMode(pEntry.getMode());
-			newEntry.setSize(pEntry.getSize());
+			newEntry.setUserId(entry.getUserId());
+			newEntry.setGroupId(entry.getGroupId());
+			newEntry.setUserName(entry.getUserName());
+			newEntry.setGroupName(entry.getGroupName());
+			newEntry.setMode(entry.getMode());
+			newEntry.setSize(entry.getSize());
 			
-			return entry;
+			return newEntry;
 		}
 		
 		return pEntry;

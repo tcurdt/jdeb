@@ -61,17 +61,48 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
 				if ("".equals(dirname)) {
 					continue;
 				}
+
+				if (!isIncluded(dirname)) {
+					continue;					
+				}
 				
-				receiver.onEachDir(dirname, "", "root", 0, "root", 0, TarEntry.DEFAULT_DIR_MODE, file.length());
+				TarEntry entry = new TarEntry(dirname);
+				entry.setUserId(0);
+				entry.setUserName("root");
+				entry.setGroupId(0);
+				entry.setGroupName("root");
+				entry.setMode(TarEntry.DEFAULT_DIR_MODE);
+
+				entry = map(entry);
+
+				entry.setSize(0);
+				
+				receiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
 	        }
-	    	
+
+	        	        
 			final String[] files = scanner.getIncludedFiles();
 
 			for (int i = 0; i < files.length; i++) {
 	        	final File file = new File(baseDir, files[i]);
 				final String filename = getFilename(baseDir, file);
+
+				if (!isIncluded(filename)) {
+					continue;					
+				}
 				
-				receiver.onEachFile(new FileInputStream(file), filename, "", "root", 0, "root", 0, TarEntry.DEFAULT_FILE_MODE, file.length());
+				TarEntry entry = new TarEntry(filename);
+				entry.setUserId(0);
+				entry.setUserName("root");
+				entry.setGroupId(0);
+				entry.setGroupName("root");
+				entry.setMode(TarEntry.DEFAULT_FILE_MODE);
+
+				entry = map(entry);
+
+				entry.setSize(file.length());
+
+				receiver.onEachFile(new FileInputStream(file), entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());						
 	        }
 		} catch (IOException e) {
 			e.printStackTrace();

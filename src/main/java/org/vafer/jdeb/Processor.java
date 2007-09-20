@@ -43,7 +43,6 @@ import org.vafer.jdeb.changes.ChangesProvider;
 import org.vafer.jdeb.descriptors.ChangesDescriptor;
 import org.vafer.jdeb.descriptors.InvalidDescriptorException;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
-import org.vafer.jdeb.mapping.Mapper;
 import org.vafer.jdeb.signing.SigningUtils;
 import org.vafer.jdeb.utils.InformationOutputStream;
 import org.vafer.jdeb.utils.Utils;
@@ -58,7 +57,6 @@ import org.vafer.jdeb.utils.VariableResolver;
 public class Processor {
 
 	private final Console console;
-	private final Mapper mapper;
 	private final VariableResolver resolver;
 
 	private static final class Total {
@@ -78,18 +76,7 @@ public class Processor {
 	}
 
 	public Processor( final Console pConsole, final VariableResolver pResolver ) {
-		this(pConsole, new Mapper() {
-			public TarEntry map( final TarEntry pEntry ) {
-				return pEntry;
-			}
-
-		}, pResolver);
-
-	}
-
-	public Processor( final Console pConsole, final Mapper pMapper, final VariableResolver pResolver ) {
 		console = pConsole;
-		mapper = pMapper;
 		resolver = pResolver;
 	}
 
@@ -339,12 +326,10 @@ public class Processor {
 				// FIXME: link is in the constructor
 				entry.setUserName(user);
 				entry.setUserId(uid);
-				entry.setUserName(group);
+				entry.setGroupName(group);
 				entry.setGroupId(gid);
 				entry.setMode(mode);
 				entry.setSize(0);
-
-				entry = mapper.map(entry);
 
 				outputStream.putNextEntry(entry);
 
@@ -364,12 +349,10 @@ public class Processor {
 				// FIXME: link is in the constructor
 				entry.setUserName(user);
 				entry.setUserId(uid);
-				entry.setUserName(group);
+				entry.setGroupName(group);
 				entry.setGroupId(gid);
 				entry.setMode(mode);
 				entry.setSize(size);
-
-				entry = mapper.map(entry);
 
 				outputStream.putNextEntry(entry);
 

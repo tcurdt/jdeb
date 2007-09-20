@@ -16,6 +16,9 @@
 package org.vafer.jdeb.ant;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 import org.apache.tools.ant.types.PatternSet;
 import org.vafer.jdeb.DataConsumer;
@@ -34,16 +37,14 @@ import org.vafer.jdeb.producers.DataProducerDirectory;
 public final class Data extends PatternSet implements DataProducer {
 
 	private File src;
-	private org.vafer.jdeb.mapping.Mapper[] mappers = new org.vafer.jdeb.mapping.Mapper[0];
+	private Collection mapperWrapper = new ArrayList();
 		
 	public void setSrc( final File pSrc ) {
 		src = pSrc;
 	}
 
 	public void addMapper( final Mapper pMapper ) {
-		final org.vafer.jdeb.mapping.Mapper[] newMappers = new org.vafer.jdeb.mapping.Mapper[mappers.length+1];
-		System.arraycopy(mappers, 0, newMappers, 0, mappers.length);
-		newMappers[mappers.length] = pMapper.createMapper();
+		mapperWrapper.add(pMapper);
 	}
 	
 	public void produce( final DataConsumer pReceiver ) {
@@ -51,6 +52,12 @@ public final class Data extends PatternSet implements DataProducer {
 		if (!src.exists()) {
 			System.err.println("ATTENTION: \"" + src + " \" is not existing. Ignoring unexisting data providers is deprecated. This will fail your build in later releases.");
 			return;
+		}
+
+		org.vafer.jdeb.mapping.Mapper[] mappers = new org.vafer.jdeb.mapping.Mapper[mapperWrapper.size()];
+		final Iterator it = mapperWrapper.iterator();
+		for (int i = 0; i < mappers.length; i++) {
+			mappers[i] = ((Mapper)it.next()).createMapper();
 		}
 		
 		if (src.isFile()) {

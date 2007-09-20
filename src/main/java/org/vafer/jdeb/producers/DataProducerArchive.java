@@ -54,13 +54,11 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 					break;
 				}
 
-				entry = map(entry);
-				
-				final String name = entry.getName();
-				
-				if (!isIncluded(name)) {
+				if (!isIncluded(entry.getName())) {
 					continue;					
-				}
+				}				
+
+				entry = map(entry);
 				
 				if (entry.isDirectory()) {
 					receiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());

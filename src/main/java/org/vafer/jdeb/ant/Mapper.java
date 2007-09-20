@@ -61,7 +61,6 @@ public final class Mapper {
 				e.printStackTrace();
 			}
 		}
-		
 		return new NullMapper();
 	}
 	
