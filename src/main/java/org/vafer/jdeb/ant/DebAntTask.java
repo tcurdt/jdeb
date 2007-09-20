@@ -43,6 +43,7 @@ public class DebAntTask extends MatchingTask {
     private File keyring;
     private File changesIn;
     private File changesOut;
+    private boolean changesAdd = true;
     private String key;
     private String passphrase;
     
@@ -65,6 +66,10 @@ public class DebAntTask extends MatchingTask {
     	this.changesOut = changes;
     }
 	
+    public void setChangesAdd( boolean changes ) {
+    	this.changesAdd = changes;
+    }
+    
     public void setKeyring( File keyring ) {
     	this.keyring = keyring;
     }
@@ -140,7 +145,9 @@ public class DebAntTask extends MatchingTask {
 			processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
 			
 			// write the release information to this file
-			changesProvider.save(new FileOutputStream(changesIn));
+			if (changesAdd) {
+				changesProvider.save(new FileOutputStream(changesIn));
+			}
 			
 			log("Created changes file " + changesOut);
 		} catch (Exception e) {
