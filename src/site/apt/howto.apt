@@ -36,7 +36,7 @@ Description: jetty java servlet container
 Distribution: development
 +--------------------
  
- If "Maintainer" is not set, jdeb will check the environment and construct the maintainer from the DEBEMAIL and DEBFULLNAME environment variables if present. The "Installed-Size" will also be injected. If a changes file is used, the "Distribution" usually comes from that file. The default changes file is called "CHANGES.txt". See below for the syntax of the content. Now if you do a "mvn clean install" the attached "deb" goal is getting called and the artifacts -the deb and potentially the changes file- will automatically get attached to the project.
+ If the enviroment variables DEBEMAIL and DEBFULLNAME are both set this will overrule the "Maintainer" set in there. The "Installed-Size" will also be injected. If a changes file is used, the "Distribution" usually comes from that file. The default changes file is called "CHANGES.txt". See below for the syntax of the content. Now if you do a "mvn clean install" the attached "deb" goal is getting called and the artifacts -the deb and potentially the changes file- will automatically get attached to the project.
 
 
 Howto use "jdeb" with ant
