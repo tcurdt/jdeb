@@ -84,7 +84,7 @@ Howto use "jdeb" with ant
     </deb>
 +--------------------
 
- The mapper will apply the output of an "ls -laR > mapping.txt" command that should look like this
+ The mapper will apply the output of an "( echo "./:" ; ls -laR ) > mapping.txt" command that should look like this
 
 +--------------------        
  ./trunk/target/test-classes/org/vafer/dependency:
