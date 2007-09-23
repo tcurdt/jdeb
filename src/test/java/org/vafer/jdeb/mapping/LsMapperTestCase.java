@@ -25,6 +25,10 @@ import org.vafer.jdeb.mapping.LsMapper.ParseError;
 public final class LsMapperTestCase extends TestCase {
 
 	private final static String output = 
+		"total 0\n" +
+		"drwxr-xr-x   23 tcurdt  tcurdt   782 Jun 25 03:48 .\n" +
+		"drwxr-xr-x    3 tcurdt  tcurdt   102 Jun 25 03:48 ..\n" +
+		"\n" +
 		"./trunk/target/test-classes/org/vafer/dependency:\n" +
 		"total 176\n" +
 		"drwxr-xr-x   23 tcurdt  tcurdt   782 Jun 25 03:48 .\n" +

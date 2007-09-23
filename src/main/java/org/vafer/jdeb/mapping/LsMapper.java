@@ -194,12 +194,18 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 		
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
 		
+		boolean first = true;
 		while(true) {
 
-			final String base = readBase(reader);
-
-			if (base == null) {
-				break;
+			final String base;
+			if (first) {
+				base = "";
+				first = false;
+			} else {
+				base = readBase(reader);
+				if (base == null) {
+					break;
+				}
 			}
 
 			readTotal(reader);
