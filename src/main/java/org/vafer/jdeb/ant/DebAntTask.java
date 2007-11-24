@@ -43,7 +43,7 @@ public class DebAntTask extends MatchingTask {
     private File keyring;
     private File changesIn;
     private File changesOut;
-    private boolean changesAdd = true;
+    private File changesSave;
     private String key;
     private String passphrase;
     
@@ -66,8 +66,8 @@ public class DebAntTask extends MatchingTask {
     	this.changesOut = changes;
     }
 	
-    public void setChangesAdd( boolean changes ) {
-    	this.changesAdd = changes;
+    public void setChangesSave( File changes ) {
+    	this.changesSave = changes;
     }
     
     public void setKeyring( File keyring ) {
@@ -134,27 +134,40 @@ public class DebAntTask extends MatchingTask {
 			return;
 		}
 
-		if (changesOut == null) {
+		final TextfileChangesProvider changesProvider;
+		
+		try {
+			if (changesOut == null) {
+				return;
+			}
+
+			// for now only support reading the changes form a textfile provider
+			changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
+			
+			processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
+
+			log("Created changes file " + changesOut);
+						
+		} catch (Exception e) {
+			log("Failed to create debian changes file " + changesOut);
+			e.printStackTrace();
 			return;
 		}
 
 		try {
-			// for now only support reading the changes form a textfile provider
-			final TextfileChangesProvider changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
-			
-			processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
-			
-			// write the release information to this file
-			if (changesAdd) {
-				changesProvider.save(new FileOutputStream(changesIn));
+			if (changesSave == null) {
+				return;
 			}
+
+			changesProvider.save(new FileOutputStream(changesSave));
+
+			log("Saved changes to file " + changesSave);
 			
-			log("Created changes file " + changesOut);
 		} catch (Exception e) {
-			log("Failed to create debian changes file " + changesOut + e);
+			log("Failed to save debian changes file " + changesSave);
 			e.printStackTrace();
 			return;
 		}
-		
+				
 	}
 }

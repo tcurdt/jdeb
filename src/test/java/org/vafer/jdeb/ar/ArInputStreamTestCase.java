@@ -15,39 +15,28 @@
  */
 package org.vafer.jdeb.ar;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 
-/**
- * Simple ArArchive implementation
- * 
- * @author tcurdt
- */
-public final class ArArchive {
-	
-	private final OutputStream out;
-	private long offset = 0;
-	
-	public ArArchive( final OutputStream pOut ) {
-		out = pOut;
-	}
-	
-	private long writeHeader() throws IOException {		
-		final String header = "!<arch>\n"; 
-		out.write(header.getBytes());
-		return header.length();
-	}
+import junit.framework.TestCase;
 
-	public void add( final AbstractArEntry pEntry ) throws IOException {
-		if (offset == 0) {
-			offset += writeHeader();
+public final class ArInputStreamTestCase extends TestCase {
+
+	public void testRead() throws Exception {
+		final File archive = new File(getClass().getResource("data.ar").getFile());
+
+		final ArInputStream ar = new ArInputStream(new FileInputStream(archive));
+		final ArEntry entry1 = ar.getNextEntry();
+
+		assertEquals("data.tgz", entry1.getName());
+		assertEquals(148, entry1.getLength());
+
+		for (int i = 0; i < entry1.getLength(); i++) {
+			ar.read();			
 		}
 		
-		offset += pEntry.write(out);
+		final ArEntry entry2 = ar.getNextEntry();
+		
+		assertNull(entry2);		
 	}
-	
-	public void close() throws IOException {
-		out.close();
-	}
-	
 }

@@ -1,0 +1,9 @@
+Package: test
+Version: 1.0.1
+Section: misc
+Priority: optional
+Architecture: i386
+Depends: some-package
+Maintainer: John Doe <john@doe.org>
+Description: revision @REVISION@, test package
+Distribution: development

@@ -35,9 +35,9 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarOutputStream;
-import org.vafer.jdeb.ar.ArArchive;
-import org.vafer.jdeb.ar.FileArEntry;
-import org.vafer.jdeb.ar.StaticArEntry;
+import org.codehaus.plexus.util.IOUtil;
+import org.vafer.jdeb.ar.ArEntry;
+import org.vafer.jdeb.ar.ArOutputStream;
 import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.ChangesProvider;
 import org.vafer.jdeb.descriptors.ChangesDescriptor;
@@ -80,6 +80,23 @@ public class Processor {
 		resolver = pResolver;
 	}
 
+	private void addTo( final ArOutputStream pOutput, final String pName, final String pContent ) throws IOException {
+		final byte[] content = pContent.getBytes(); 
+		pOutput.putNextEntry(new ArEntry(pName, content.length));
+		pOutput.write(content);
+	}
+
+	private void addTo( final ArOutputStream pOutput, final String pName, final File pContent ) throws IOException {
+		pOutput.putNextEntry(new ArEntry(pName, pContent.length()));
+		
+		final InputStream input = new FileInputStream(pContent);
+		try {
+			IOUtil.copy(input, pOutput);
+		} finally {
+			input.close();
+		}
+	}
+	
 	/**
 	 * Create the debian archive with from the provided control files and data producers.
 	 * 
@@ -111,10 +128,12 @@ public class Processor {
 
 			final InformationOutputStream output = new InformationOutputStream(new FileOutputStream(pOutput), MessageDigest.getInstance("MD5"));
 
-			final ArArchive ar = new ArArchive(output);
-			ar.add(new StaticArEntry("debian-binary", 0, 0, 33188, "2.0\n"));
-			ar.add(new FileArEntry(tempControl,"control.tar.gz", 0, 0, 33188));
-			ar.add(new FileArEntry(tempData, "data.tar.gz", 0, 0, 33188));
+			final ArOutputStream ar = new ArOutputStream(output);
+
+			addTo(ar, "debian-binary", "2.0\n");
+			addTo(ar, "control.tar.gz", tempControl);
+			addTo(ar, "data.tar.gz", tempData);
+			
 			ar.close();
 
 			// intermediate values
