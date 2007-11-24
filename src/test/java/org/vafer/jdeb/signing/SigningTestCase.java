@@ -56,6 +56,6 @@ public final class SigningTestCase extends TestCase {
 		
 		final byte[] output = os.toByteArray(); 
 		
-		assertEquals(expectedOutput.length, output.length);		
+		assertEquals(new String(expectedOutput), new String(output));		
 	}
 }

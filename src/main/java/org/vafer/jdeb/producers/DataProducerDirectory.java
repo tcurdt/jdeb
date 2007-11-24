@@ -56,7 +56,7 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
 			final String[] dirs = scanner.getIncludedDirectories();
 	        for (int i = 0; i < dirs.length; i++) {
 	        	final File file = new File(baseDir, dirs[i]);
-				final String dirname = getFilename(baseDir, file);	
+				String dirname = getFilename(baseDir, file);	
 				
 				if ("".equals(dirname)) {
 					continue;
@@ -64,6 +64,10 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
 
 				if (!isIncluded(dirname)) {
 					continue;					
+				}
+				
+				if ('/' != File.separatorChar) {
+					dirname = dirname.replace(File.separatorChar, '/');
 				}
 				
 				TarEntry entry = new TarEntry(dirname);
@@ -85,10 +89,14 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
 
 			for (int i = 0; i < files.length; i++) {
 	        	final File file = new File(baseDir, files[i]);
-				final String filename = getFilename(baseDir, file);
+				String filename = getFilename(baseDir, file);
 
 				if (!isIncluded(filename)) {
 					continue;					
+				}
+
+				if ('/' != File.separatorChar) {
+					filename = filename.replace(File.separatorChar, '/');
 				}
 				
 				TarEntry entry = new TarEntry(filename);

@@ -40,13 +40,13 @@ public final class DataProducerTestCase extends TestCase {
 			}
 		}, null);
 		
-		final File control = new File(getClass().getResource("deb/control/control").getFile());
-		final File archive = new File(getClass().getResource("deb/data.tgz").getFile());
-		final File directory = new File(getClass().getResource("deb/data").getFile());
+		final File control = new File(getClass().getResource("deb/control/control").toURI());
+		final File archive = new File(getClass().getResource("deb/data.tgz").toURI());
+		final File directory = new File(getClass().getResource("deb/data").toURI());
 		
 		final DataProducer[] data = new DataProducer[] {
 				new DataProducerArchive(archive, null, null, null),
-				new DataProducerDirectory(directory, null, null, null)
+				new DataProducerDirectory(directory, null, new String[] { "**/.svn/**" }, null)
 		};
 		
 		final File deb = File.createTempFile("jdeb", ".deb");

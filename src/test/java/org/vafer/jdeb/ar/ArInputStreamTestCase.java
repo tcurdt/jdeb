@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 public final class ArInputStreamTestCase extends TestCase {
 
 	public void testRead() throws Exception {
-		final File archive = new File(getClass().getResource("data.ar").getFile());
+		final File archive = new File(getClass().getResource("data.ar").toURI());
 
 		final ArInputStream ar = new ArInputStream(new FileInputStream(archive));
 		final ArEntry entry1 = ar.getNextEntry();
