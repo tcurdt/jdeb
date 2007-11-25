@@ -84,6 +84,13 @@ public final class DebMojo extends AbstractPluginMojo {
      * @parameter expression="${changesIn}"
      */    
     private File changesOut = null;
+
+    /**
+     * Explicitly define the file where to write the changes of the changes input to. 
+     * 
+     * @parameter expression="${changesSave}"
+     */    
+    private File changesSave = null;
     
     /**
      * The keyring file. Usually some/path/secring.gpg
@@ -241,17 +248,17 @@ public final class DebMojo extends AbstractPluginMojo {
 			return;
 		}
 		
+		
+		final TextfileChangesProvider changesProvider;
+		
 		try
 		{
 
 			// for now only support reading the changes form a text file provider
-			final TextfileChangesProvider changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
+			changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
 			
 			processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
 
-			// write the release information to this file
-			changesProvider.save(new FileOutputStream(changesIn));
-			
 			getLog().info("Attaching created debian changes file " + changesOut);
 			projectHelper.attachArtifact( getProject(), "deb-changes", changesOut.getName(), changesOut );
 		}
@@ -260,6 +267,21 @@ public final class DebMojo extends AbstractPluginMojo {
 			getLog().error("Failed to create debian changes file " + changesOut, e);
 			throw new MojoExecutionException("Failed to create debian changes file " + changesOut, e);
 		}    	
+
+    
+		try {
+			if (changesSave == null) {
+				return;
+			}
+
+			changesProvider.save(new FileOutputStream(changesSave));
+
+			getLog().info("Saved release information to file " + changesSave);
+			
+		} catch (Exception e) {
+			getLog().error("Failed to save release information to file " + changesSave);
+			throw new MojoExecutionException("Failed to save release information to file " + changesSave, e);
+		}    
     }    
 
 }

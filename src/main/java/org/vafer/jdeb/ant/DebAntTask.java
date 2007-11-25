@@ -86,22 +86,45 @@ public class DebAntTask extends MatchingTask {
     	dataProducers.add(data);
     }
     
+    private boolean isPossibleOutput( File file ) {
+    	
+    	if (file.exists()) {    		
+    		return file.isFile() && file.canWrite();
+    	}
+    	
+    	return true;
+    }
+    
 	public void execute() {
 		
 		if (control == null || !control.isDirectory()) {
 			throw new BuildException("You need to point the 'control' attribute to the control directory.");
 		}
 
-		if (changesOut != null && changesOut.isDirectory()) {
-			throw new BuildException("If you want the changes written out provide the output file via 'changesOut' attribute.");			
-		}
+		if (changesIn != null) {
+			
+			if (!changesIn.isFile() || !changesIn.canRead()) {
+				throw new BuildException("The 'changesIn' attribute needs to point to a readable file.");				
+			}
 
-		if (changesOut != null) {
-			if (changesIn == null || changesIn.isDirectory()) {
-				throw new BuildException("If you want the changes written out provide the changes via 'changesIn' attribute.");
+			if (changesOut == null) {
+				throw new BuildException("A 'changesIn' without a 'changesOut' does not make much sense.");
+			}
+			
+			if (!isPossibleOutput(changesOut)) {
+				throw new BuildException("Cannot write the output for 'changesOut' to " + changesOut);				
+			}
+
+			if (changesSave != null && !isPossibleOutput(changesSave)) {
+				throw new BuildException("Cannot write the output for 'changesSave' to " + changesSave);				
+			}
+			
+		} else {
+			if (changesOut != null || changesSave != null) {
+				throw new BuildException("The 'changesOut' or 'changesSave' attributes may only be used when there is a 'changesIn' specified.");							
 			}
 		}
-		
+				
 		if (dataProducers.size() == 0) {
 			throw new BuildException("You need to provide at least one reference to a tgz or directory with data.");
 		}
