@@ -2,9 +2,23 @@ Downloads
 
  The official releases are available through the maven2 repository on repo1.maven.org.
 
-* Version 0.5
+* Version 0.6
 
-  The current trunk and not yet released
+  The current trunk and not yet released.
+
+* Version 0.5, xx.xx.2007
+
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.5/jdeb-0.5.jar}jdeb-0.5 jar (binaries)}} \
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.5/jdeb-0.5-sources.jar}jdeb-0.5 jar (sources)}} \
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.5/jdeb-0.5.pom}jdeb-0.5 pom}}
+
+ CHANGES
+
+ * Removed deprecated ant task delegate.
+ 
+ * Added "changesSave" attribute to save release information to. No longer saving those information to "changesIn".
+
+ * Switched to ArInputStream/ArOutputStream.
 
 
 * Version 0.4, 20.09.2007
@@ -15,15 +29,15 @@ Downloads
 
  CHANGES
 
- * Fixed mapper support
+ * Fixed mapper support.
  
- * Added support for multiple mappers
+ * Added support for multiple mappers.
  
- * Added more fields to the package descriptor
+ * Added more fields to the package descriptor.
  
- * Changed lookup from environment (DEBEMAIL, DEBFULLNAME) to overrule the descriptor
+ * Changed lookup from environment (DEBEMAIL, DEBFULLNAME) to overrule the descriptor.
  
- * Removed deprecated prefix/strip syntax
+ * Removed deprecated prefix/strip syntax.
 
 
 * Version 0.3, 15.09.2007
@@ -34,11 +48,11 @@ Downloads
 
  CHANGES
 
- * Added plugin implementation for maven
+ * Added plugin implementation for maven.
  
- * Added stricter descriptor validation
+ * Added stricter descriptor validation.
  
- * Added maintainer lookup from environment (DEBEMAIL, DEBFULLNAME)
+ * Added maintainer lookup from environment (DEBEMAIL, DEBFULLNAME).
 
 
 * Version 0.2, 21.08.2007
@@ -49,11 +63,11 @@ Downloads
 
  CHANGES
 
- * Added support for signed changes files
+ * Added support for signed changes files.
  
- * Added support for mapping ownerships and rights
+ * Added support for mapping ownerships and rights.
  
- * Fixed the delete of the temporary files
+ * Fixed the delete of the temporary files.
 
 * Version 0.1, 19.02.2007 
 

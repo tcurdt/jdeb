@@ -8,7 +8,7 @@ Howto use "jdeb" with maven
             <plugin>
                 <artifactId>jdeb</artifactId>
                 <groupId>org.vafer</groupId>
-                <version>0.3</version>
+                <version>0.5</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -112,7 +112,15 @@ release distribution=staging, date=20:13 17.08.2007,version=1.4+r89114,urgency=l
     </deb>
 +--------------------
 
- If you want the changes to be signed, make sure you have the {{{http://www.bouncycastle.org/java.html}bouncycastle jar}} in your classpath (just copy it into the $ANT_HOME/lib folder - next to jdeb). Then you can sign your changes file with
+ If you also provide a "changesSave" attribute the jdeb will add release information to the original input and write out the new file.
+ 
++--------------------        
+    <deb destfile="jdeb.deb" control="${deb}/control" changesIn="changes.txt" changesOut="jdeb.changes" changesSave="changes.txt">
+      <data src="some/dir"/>
+    </deb>
++--------------------
+ 
+ To have the changes be signed, make sure you have the {{{http://www.bouncycastle.org/java.html}bouncycastle jar}} in your classpath (just copy it into the $ANT_HOME/lib folder - next to jdeb). Then you can sign your changes file with
 
 +--------------------        
     <deb destfile="jdeb.deb" control="${deb}/control" changesIn="changes.txt" changesOut="jdeb.changes"
