@@ -35,7 +35,6 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarOutputStream;
-import org.codehaus.plexus.util.IOUtil;
 import org.vafer.jdeb.ar.ArEntry;
 import org.vafer.jdeb.ar.ArOutputStream;
 import org.vafer.jdeb.changes.ChangeSet;
@@ -91,7 +90,7 @@ public class Processor {
 		
 		final InputStream input = new FileInputStream(pContent);
 		try {
-			IOUtil.copy(input, pOutput);
+			Utils.copy(input, pOutput);
 		} finally {
 			input.close();
 		}
