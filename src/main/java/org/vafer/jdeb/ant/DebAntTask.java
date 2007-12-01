@@ -104,7 +104,7 @@ public class DebAntTask extends MatchingTask {
 		if (changesIn != null) {
 			
 			if (!changesIn.isFile() || !changesIn.canRead()) {
-				throw new BuildException("The 'changesIn' attribute needs to point to a readable file.");				
+				throw new BuildException("The 'changesIn' attribute needs to point to a readable file. " + changesIn + " was not found/readable.");				
 			}
 
 			if (changesOut == null) {
