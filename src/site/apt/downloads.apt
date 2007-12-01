@@ -20,6 +20,7 @@ Downloads
 
  * Switched to ArInputStream/ArOutputStream.
 
+ * Fixed the 'ls' parsing.
 
 * Version 0.4, 20.09.2007
 
