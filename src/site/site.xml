@@ -15,9 +15,9 @@
   <publishDate format="dd MMM yyyy" />
 
   <skin>
-    <groupId>org.apache.maven.skins</groupId>
-    <artifactId>maven-vafer-skin</artifactId>
-    <version>1.0</version>
+    <groupId>org.vafer</groupId>
+    <artifactId>maven-skin</artifactId>
+    <version>1.1</version>
   </skin>
 
   <body>

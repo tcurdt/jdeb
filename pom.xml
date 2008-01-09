@@ -188,15 +188,15 @@
     <distributionManagement>
         <repository>
             <id>releases</id>
-            <url>scpexe://vafer.org/home/tcurdt/apache2/vafer.org/root/repository/releases</url>
+            <url>scpexe://vafer.org/home/tcurdt/apache2/vafer.org/www/repository/releases</url>
         </repository>
         <snapshotRepository>
             <id>snaphots</id>
-            <url>scpexe://vafer.org/home/tcurdt/apache2/vafer.org/root/repository/snapshots</url>
+            <url>scpexe://vafer.org/home/tcurdt/apache2/vafer.org/www/repository/snapshots</url>
         </snapshotRepository>
         <site>
             <id>website</id>
-            <url>scpexe://vafer.org/home/tcurdt/apache2/vafer.org/root/projects/jdeb</url>
+            <url>scpexe://vafer.org/home/tcurdt/apache2/vafer.org/www/projects/jdeb</url>
         </site>
     </distributionManagement>
 </project>
