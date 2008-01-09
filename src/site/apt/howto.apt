@@ -8,7 +8,7 @@ Howto use "jdeb" with maven
             <plugin>
                 <artifactId>jdeb</artifactId>
                 <groupId>org.vafer</groupId>
-                <version>0.5</version>
+                <version>0.6</version>
                 <executions>
                     <execution>
                         <phase>package</phase>

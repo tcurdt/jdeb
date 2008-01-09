@@ -2,9 +2,19 @@ Downloads
 
  The official releases are available through the maven2 repository on repo1.maven.org.
 
-* Version 0.6
+* Version 0.7
 
   The current trunk and not yet released.
+
+* Version 0.6, 11.01.2008
+
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.6/jdeb-0.6.jar}jdeb-0.6 jar (binaries)}} \
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.6/jdeb-0.6-sources.jar}jdeb-0.6 jar (sources)}} \
+ {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.6/jdeb-0.6.pom}jdeb-0.6 pom}}
+
+ CHANGES
+ 
+ * Fixed the trailing linefeed in the 'changes' section of the changes file
 
 * Version 0.5, 26.11.2007
 
