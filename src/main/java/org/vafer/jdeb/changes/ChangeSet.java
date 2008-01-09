@@ -90,14 +90,12 @@ public final class ChangeSet {
 	public String toString() {
 		final StringBuffer sb = new StringBuffer();
 
-		//final DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
-		
 		sb.append(" ").append(getPackage()).append(" (").append(getVersion()).append(") ");
-		sb.append(getDistribution()).append("; urgency=").append(getUrgency()).append("\n");
+		sb.append(getDistribution()).append("; urgency=").append(getUrgency());
 		for (int i = 0; i < changes.length; i++) {
-			sb.append(" * ").append(changes[i]).append("\n");
+			sb.append('\n').append(" * ").append(changes[i]);
 		}
-		// sb.append("-- ").append(getChangedBy()).append("  ").append(df.format(getDate())).append("\n");
+
 		return sb.toString();
 	}
 }
