@@ -5,7 +5,7 @@
     <artifactId>jdeb</artifactId>
     <packaging>maven-plugin</packaging>
     <name>jdeb</name>
-    <version>0.6</version>
+    <version>0.7-SNAPSHOT</version>
     <description>This library provides an ant task and a maven plugin to create Debian packages from you java builds. The API underneath is well abstracted can easily be adopted for other areas as well.</description>
     <url>http://vafer.org/projects/jdeb</url>
     <developers>
@@ -27,9 +27,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:svn:http://vafer.org/svn/projects/jdeb/tags/jdeb-0.6</connection>
-        <developerConnection>scm:svn:https://vafer.org/svn/projects/jdeb/tags/jdeb-0.6</developerConnection>
-        <url>http://vafer.org/svn/projects/jdeb/tags/jdeb-0.6</url>
+        <connection>scm:svn:http://vafer.org/svn/projects/jdeb/trunk/</connection>
+        <developerConnection>scm:svn:https://vafer.org/svn/projects/jdeb/trunk/</developerConnection>
+        <url>http://vafer.org/svn/projects/jdeb/trunk/</url>
     </scm>
     <build>
         <plugins>
