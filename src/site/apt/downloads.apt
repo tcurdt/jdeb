@@ -6,6 +6,10 @@ Downloads
 
   The current trunk and not yet released.
 
+  FIXES
+  
+  * Fixed the "Installed-Size" to list kbytes instead of bytes
+
 * Version 0.6, 11.01.2008
 
  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.6/jdeb-0.6.jar}jdeb-0.6 jar (binaries)}} \

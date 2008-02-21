@@ -14,7 +14,7 @@ From the tag
 
   3) put the bundle online
 
-      scp target/*bundle* tcurdt@vafer.org:apache2/vafer.org/root/repository/releases/org/vafer/jdeb/{VERSION}
+      scp target/*bundle* tcurdt@vafer.org:apache2/vafer.org/www/repository/releases/org/vafer/jdeb/{VERSION}
  
   4) submit the bundle
 
