@@ -299,7 +299,7 @@ public class Processor {
 			throw new FileNotFoundException("No control file in " + Arrays.toString(pControlFiles));
 		}
 
-		packageDescriptor.set("Installed-Size", pDataSize.divide(new BigInteger("1024)").toString());
+		packageDescriptor.set("Installed-Size", pDataSize.divide(new BigInteger("1024")).toString());
 
 		addEntry("control", packageDescriptor.toString(), outputStream);
 
