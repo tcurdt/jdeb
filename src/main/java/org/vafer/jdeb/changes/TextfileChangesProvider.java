@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Locale;
 
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 
@@ -50,7 +51,7 @@ public final class TextfileChangesProvider implements ChangesProvider {
 				
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
 
-		final DateFormat tdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+		final DateFormat tdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // RFC 2822 format
 		final DateFormat sdf = ChangeSet.createDateForma();
 
 		String packageName = pDescriptor.get("Package");

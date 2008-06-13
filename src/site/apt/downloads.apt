@@ -12,6 +12,8 @@ Downloads
   
   * bzip2 compressed archives are now accepted by the <data> element of the Ant task
 
+  * TextfileChangesProvider no longer fails to parse the date from the package descriptor on non english systems
+
 * Version 0.6, 11.01.2008
 
  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.6/jdeb-0.6.jar}jdeb-0.6 jar (binaries)}} \
