@@ -1,5 +1,6 @@
 o verbose switch
 o break on error
 o improve maven integration
+
 o subversion log ChangesProvider
 o jira release notes ChangesProvider
