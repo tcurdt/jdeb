@@ -6,9 +6,11 @@ Downloads
 
   The current trunk and not yet released.
 
-  FIXES
+  CHANGES
   
   * Fixed the "Installed-Size" to list kbytes instead of bytes
+  
+  * bzip2 compressed archives are now accepted by the <data> element of the Ant task
 
 * Version 0.6, 11.01.2008
 

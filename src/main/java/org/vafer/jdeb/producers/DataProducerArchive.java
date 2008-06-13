@@ -18,8 +18,11 @@ package org.vafer.jdeb.producers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.tools.bzip2.CBZip2InputStream;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
 import org.vafer.jdeb.DataConsumer;
@@ -44,7 +47,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 
 		TarInputStream archiveInputStream = null;
 		try {
-			archiveInputStream = new TarInputStream(new GZIPInputStream(new FileInputStream(archive)));
+			archiveInputStream = new TarInputStream(getCompressedInputStream(new FileInputStream(archive)));
 
 			while(true) {
 				
@@ -78,8 +81,25 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 				}
 			}
 		}		
-	}			
+	}
 
-	
+
+	/**
+	 * Guess the compression used by looking at the first bytes of the stream.
+	 */
+	private InputStream getCompressedInputStream(InputStream in) throws IOException {
+		PushbackInputStream pin = new PushbackInputStream(in, 2);
+		byte[] header = new byte[2];
+		pin.read(header);
+
+		if (header[0] == (byte) 0x1f && header[1] == (byte) 0x8b) {
+			pin.unread(header);
+			return new GZIPInputStream(pin);
+		} else if (header[0] == 'B' && header[1] == 'Z') {
+			return new CBZip2InputStream(pin);
+		} else {
+			throw new IOException("Unsupported archive format : " + archive);
+		}
+	}
 	
 }
