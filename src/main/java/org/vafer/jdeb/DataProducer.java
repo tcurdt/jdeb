@@ -15,6 +15,8 @@
  */
 package org.vafer.jdeb;
 
+import java.io.IOException;
+
 /**
  * Provides Data to a DataConsumer.
  * 
@@ -22,6 +24,6 @@ package org.vafer.jdeb;
  */
 public interface DataProducer {
 
-	void produce( DataConsumer receiver );
+	void produce( DataConsumer receiver ) throws IOException;
 
 }

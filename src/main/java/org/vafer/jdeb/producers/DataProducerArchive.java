@@ -43,7 +43,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 		archive = pArchive;
 	}
 		
-	public void produce( final DataConsumer receiver ) {
+	public void produce( final DataConsumer receiver ) throws IOException {
 
 		TarInputStream archiveInputStream = null;
 		try {
@@ -70,15 +70,10 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 				
 				receiver.onEachFile(archiveInputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());						
 			}
-			
-		} catch (IOException e) {
-			e.printStackTrace();
+
 		} finally {
 			if (archiveInputStream != null) {
-				try {
-					archiveInputStream.close();
-				} catch (IOException e) {
-				}
+				archiveInputStream.close();
 			}
 		}		
 	}

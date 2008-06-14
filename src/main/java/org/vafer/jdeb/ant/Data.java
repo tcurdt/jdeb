@@ -16,6 +16,7 @@
 package org.vafer.jdeb.ant;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -47,7 +48,7 @@ public final class Data extends PatternSet implements DataProducer {
 		mapperWrapper.add(pMapper);
 	}
 	
-	public void produce( final DataConsumer pReceiver ) {
+	public void produce( final DataConsumer pReceiver ) throws IOException {
 		
 		if (!src.exists()) {
 			System.err.println("ATTENTION: \"" + src + " \" is not existing. Ignoring unexisting data providers is deprecated. This will fail your build in later releases.");

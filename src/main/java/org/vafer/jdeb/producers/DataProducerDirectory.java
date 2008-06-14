@@ -45,78 +45,72 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
 		scanner.setFollowSymlinks(true);
 	}
 	
-	public void produce( final DataConsumer receiver ) {
-		
-		try {
+	public void produce( final DataConsumer receiver ) throws IOException {
 
-			scanner.scan();
-			
-	    	final File baseDir = scanner.getBasedir();
+		scanner.scan();
 
-			final String[] dirs = scanner.getIncludedDirectories();
-	        for (int i = 0; i < dirs.length; i++) {
-	        	final File file = new File(baseDir, dirs[i]);
-				String dirname = getFilename(baseDir, file);	
-				
-				if ("".equals(dirname)) {
-					continue;
-				}
+		final File baseDir = scanner.getBasedir();
 
-				if (!isIncluded(dirname)) {
-					continue;					
-				}
-				
-				if ('/' != File.separatorChar) {
-					dirname = dirname.replace(File.separatorChar, '/');
-				}
-				
-				TarEntry entry = new TarEntry(dirname);
-				entry.setUserId(0);
-				entry.setUserName("root");
-				entry.setGroupId(0);
-				entry.setGroupName("root");
-				entry.setMode(TarEntry.DEFAULT_DIR_MODE);
+		final String[] dirs = scanner.getIncludedDirectories();
+		for (int i = 0; i < dirs.length; i++) {
+			final File file = new File(baseDir, dirs[i]);
+			String dirname = getFilename(baseDir, file);
 
-				entry = map(entry);
+			if ("".equals(dirname)) {
+				continue;
+			}
 
-				entry.setSize(0);
-				
-				receiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
-	        }
+			if (!isIncluded(dirname)) {
+				continue;
+			}
 
-	        	        
-			final String[] files = scanner.getIncludedFiles();
+			if ('/' != File.separatorChar) {
+				dirname = dirname.replace(File.separatorChar, '/');
+			}
 
-			for (int i = 0; i < files.length; i++) {
-	        	final File file = new File(baseDir, files[i]);
-				String filename = getFilename(baseDir, file);
+			TarEntry entry = new TarEntry(dirname);
+			entry.setUserId(0);
+			entry.setUserName("root");
+			entry.setGroupId(0);
+			entry.setGroupName("root");
+			entry.setMode(TarEntry.DEFAULT_DIR_MODE);
 
-				if (!isIncluded(filename)) {
-					continue;					
-				}
+			entry = map(entry);
 
-				if ('/' != File.separatorChar) {
-					filename = filename.replace(File.separatorChar, '/');
-				}
-				
-				TarEntry entry = new TarEntry(filename);
-				entry.setUserId(0);
-				entry.setUserName("root");
-				entry.setGroupId(0);
-				entry.setGroupName("root");
-				entry.setMode(TarEntry.DEFAULT_FILE_MODE);
+			entry.setSize(0);
 
-				entry = map(entry);
-
-				entry.setSize(file.length());
-
-				receiver.onEachFile(new FileInputStream(file), entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());						
-	        }
-		} catch (IOException e) {
-			e.printStackTrace();
+			receiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
 		}
-		
-	}			
+
+
+		final String[] files = scanner.getIncludedFiles();
+
+		for (int i = 0; i < files.length; i++) {
+			final File file = new File(baseDir, files[i]);
+			String filename = getFilename(baseDir, file);
+
+			if (!isIncluded(filename)) {
+				continue;
+			}
+
+			if ('/' != File.separatorChar) {
+				filename = filename.replace(File.separatorChar, '/');
+			}
+
+			TarEntry entry = new TarEntry(filename);
+			entry.setUserId(0);
+			entry.setUserName("root");
+			entry.setGroupId(0);
+			entry.setGroupName("root");
+			entry.setMode(TarEntry.DEFAULT_FILE_MODE);
+
+			entry = map(entry);
+
+			entry.setSize(file.length());
+
+			receiver.onEachFile(new FileInputStream(file), entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+		}
+	}
 
 	private String getFilename( File root, File file ) {
 		
