@@ -30,19 +30,25 @@ public final class PackageDescriptor extends AbstractDescriptor {
 
 	private final static String[] keys = {
 		"Package",
+		"Source",
 		"Version",
 		"Section",
 		"Priority",
 		"Architecture",
-		"Maintainer",
-		"Description",
 		"Essential",
 		"Depends",
+		"Pre-Depends",
+		"Recommends",
+		"Suggests",
+		"Breaks",
+		"Enhances",
 		"Conflicts",
 		"Provides",
 		"Replaces",
 		"Installed-Size",
-		"Source"
+		"Maintainer",
+		"Description",
+		"Homepage",
 	};
 
 	private final static String[] mandatoryKeys = {
