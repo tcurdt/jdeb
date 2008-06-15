@@ -31,6 +31,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.tools.tar.TarEntry;
@@ -237,7 +238,7 @@ public class Processor {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuffer pChecksums, final File pOutput ) throws FileNotFoundException, IOException, ParseException {
+	private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuffer pChecksums, final File pOutput ) throws IOException, ParseException {
 
 		PackageDescriptor packageDescriptor = null;
 
@@ -261,7 +262,8 @@ public class Processor {
 				packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
 
 				if (packageDescriptor.get("Date") == null) {
-					packageDescriptor.set("Date", new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(new Date())); // Mon, 26 Mar 2007 11:44:04 +0200
+					SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
+					packageDescriptor.set("Date", fmt.format(new Date()));
 				}
 
 				if (packageDescriptor.get("Distribution") == null) {
