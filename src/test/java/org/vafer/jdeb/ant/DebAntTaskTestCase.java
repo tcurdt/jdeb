@@ -15,10 +15,14 @@
  */
 package org.vafer.jdeb.ant;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 import junit.framework.TestCase;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
 
@@ -110,6 +114,34 @@ public class DebAntTaskTestCase extends TestCase {
 		} catch (BuildException e) {
 			// expected
 		}
+	}
+
+	/**
+	 * Redirects the Ant output to the specified stream.
+	 */
+	private void redirectOutput(OutputStream out) {
+		DefaultLogger logger = new DefaultLogger();
+		logger.setOutputPrintStream(new PrintStream(out));
+		logger.setMessageOutputLevel(Project.MSG_INFO);
+		project.addBuildListener(logger);
+	}
+
+	public void testVerboseEnabled() {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		redirectOutput(out);
+
+		project.executeTarget("verbose-enabled");
+
+		assertTrue(out.toString().indexOf("Total size") != -1);
+	}
+
+	public void testVerboseDisabled() {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		redirectOutput(out);
+
+		project.executeTarget("verbose-disabled");
+
+		assertTrue(out.toString().indexOf("Total size") == -1);
 	}
 
 }

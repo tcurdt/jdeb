@@ -1,4 +1,3 @@
-o verbose switch
 o improve maven integration
 o descriptor fields shouldn't be case sensitive
 

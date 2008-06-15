@@ -50,6 +50,7 @@ public class DebAntTask extends MatchingTask {
 	private File changesSave;
 	private String key;
 	private String passphrase;
+	private boolean verbose;
 
 	private Collection dataProducers = new ArrayList();
 
@@ -85,8 +86,12 @@ public class DebAntTask extends MatchingTask {
     public void setPassphrase( String passphrase ) {
     	this.passphrase = passphrase;
     }
-    
-    public void addData( Data data ) {
+
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
+	}
+
+	public void addData( Data data ) {
     	dataProducers.add(data);
     }
     
@@ -144,7 +149,9 @@ public class DebAntTask extends MatchingTask {
 		
 		final Processor processor = new Processor(new Console() {
 			public void println(String s) {
-				log(s);
+				if (verbose) {
+					log(s);
+				}
 			}
 		}, null);
 		
