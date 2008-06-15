@@ -38,18 +38,22 @@ import org.vafer.jdeb.descriptors.PackageDescriptor;
 		
 public class DebAntTask extends MatchingTask {
 
-    private File deb;
-    private File control;
-    private File keyring;
-    private File changesIn;
-    private File changesOut;
-    private File changesSave;
-    private String key;
-    private String passphrase;
-    
-    private Collection dataProducers = new ArrayList();
-    
-    
+	/** The Debian package produced */
+	private File deb;
+
+	/** The directory containing the control files to build the package */
+	private File control;
+
+	private File keyring;
+	private File changesIn;
+	private File changesOut;
+	private File changesSave;
+	private String key;
+	private String passphrase;
+
+	private Collection dataProducers = new ArrayList();
+
+
     public void setDestfile( File deb ) {
     	this.deb = deb;
     }
@@ -57,7 +61,7 @@ public class DebAntTask extends MatchingTask {
     public void setControl( File control ) {
     	this.control = control;
     }
-    
+
     public void setChangesIn( File changes ) {
     	this.changesIn = changes;
     }
@@ -65,15 +69,15 @@ public class DebAntTask extends MatchingTask {
     public void setChangesOut( File changes ) {
     	this.changesOut = changes;
     }
-	
+
     public void setChangesSave( File changes ) {
     	this.changesSave = changes;
     }
-    
+
     public void setKeyring( File keyring ) {
     	this.keyring = keyring;
     }
-    
+
     public void setKey( String key ) {
     	this.key = key;
     }
@@ -152,9 +156,7 @@ public class DebAntTask extends MatchingTask {
 			log("Created " + deb);
 
 		} catch (Exception e) {
-			log("Failed to create debian package " + deb + e);
-			e.printStackTrace();
-			return;
+			throw new BuildException("Failed to create debian package " + deb, e);
 		}
 
 		final TextfileChangesProvider changesProvider;
@@ -172,9 +174,7 @@ public class DebAntTask extends MatchingTask {
 			log("Created changes file " + changesOut);
 						
 		} catch (Exception e) {
-			log("Failed to create debian changes file " + changesOut);
-			e.printStackTrace();
-			return;
+			throw new BuildException("Failed to create debian changes file " + changesOut, e);
 		}
 
 		try {
@@ -187,9 +187,7 @@ public class DebAntTask extends MatchingTask {
 			log("Saved changes to file " + changesSave);
 			
 		} catch (Exception e) {
-			log("Failed to save debian changes file " + changesSave);
-			e.printStackTrace();
-			return;
+			throw new BuildException("Failed to save debian changes file " + changesSave, e);
 		}
 				
 	}

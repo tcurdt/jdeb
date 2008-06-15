@@ -16,9 +16,9 @@ Downloads
 
   * The package description can now span multiple lines in the control file
 
-  * The Date field is now automatically added to the control file
-
   * Added more field to the package descriptor (Pre-Depends, Recommends, Suggests, Breaks, Enhances, Homepage)
+
+  * The Ant task now breaks on errors
 
 * Version 0.6, 11.01.2008
 

@@ -16,6 +16,7 @@
 package org.vafer.jdeb.ant;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,8 +52,7 @@ public final class Data extends PatternSet implements DataProducer {
 	public void produce( final DataConsumer pReceiver ) throws IOException {
 		
 		if (!src.exists()) {
-			System.err.println("ATTENTION: \"" + src + " \" is not existing. Ignoring unexisting data providers is deprecated. This will fail your build in later releases.");
-			return;
+			throw new FileNotFoundException("Data source not found : " + src);
 		}
 
 		org.vafer.jdeb.mapping.Mapper[] mappers = new org.vafer.jdeb.mapping.Mapper[mapperWrapper.size()];
