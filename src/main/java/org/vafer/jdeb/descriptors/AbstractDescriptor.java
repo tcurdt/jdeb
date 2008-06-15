@@ -19,6 +19,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.StringReader;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -140,7 +142,22 @@ public abstract class AbstractDescriptor {
 			final String key = pKeys[i];
 			final String value = (String) values.get(key);
 			if (value != null) {
-				s.append(key).append(": ").append(value).append('\n');
+				s.append(key).append(": ");
+
+				try {
+					LineNumberReader reader = new LineNumberReader(new StringReader(value));
+					String line;
+					while ((line = reader.readLine()) != null) {
+						if (reader.getLineNumber() > 0 && line.length() != 0 && !Character.isWhitespace(line.charAt(0))) {
+							// indent the line with a white space
+							s.append(' ');
+						}
+
+						s.append(line).append('\n');
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}			
 		}
 		return s.toString();
