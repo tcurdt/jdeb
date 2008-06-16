@@ -119,6 +119,13 @@ Howto use "jdeb" with ant
  drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 +--------------------        
 
+ It's also possible to use a <<<fileset>>> or even a <<<tarfileset>>> to specify the set of files to include with their permissions :
+
++--------------------
+    <deb destfile="jdeb.deb" control="${deb}/control">
+      <tarfileset dir="src/main/resources/deb/data" prefix="/somewhere/else" filemode="600" username="tcurdt" group="tcurdt"/>
+    </deb>
++-------------------- 
 
 * Changes file
 
