@@ -56,4 +56,16 @@
     </deb>
   </target>
 
+  <target name="fileset">
+    <deb destfile="test.deb" control="org/vafer/jdeb/deb/control">
+      <fileset dir="org/vafer/jdeb/deb/data"/>
+    </deb>
+  </target>
+
+  <target name="tarfileset">
+    <deb destfile="test.deb" control="org/vafer/jdeb/deb/control">
+      <tarfileset dir="org/vafer/jdeb/deb/data" prefix="foo" dirmode="700" filemode="600" username="ebourg" group="ebourg"/>
+    </deb>
+  </target>
+
 </project>

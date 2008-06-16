@@ -22,6 +22,8 @@ Downloads
 
   * The Ant task has a new 'verbose' attribute to control the amount of details displayed
 
+  * The Ant task now accepts <tarfileset>s
+
 * Version 0.6, 11.01.2008
 
  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.6/jdeb-0.6.jar}jdeb-0.6 jar (binaries)}} \

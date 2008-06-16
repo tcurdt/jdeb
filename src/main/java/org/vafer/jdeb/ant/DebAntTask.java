@@ -23,6 +23,8 @@ import java.util.Collection;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.MatchingTask;
+import org.apache.tools.ant.taskdefs.Tar;
+import org.apache.tools.ant.types.FileSet;
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Processor;
@@ -89,6 +91,14 @@ public class DebAntTask extends MatchingTask {
 
 	public void setVerbose(boolean verbose) {
 		this.verbose = verbose;
+	}
+
+	public void addFileSet(FileSet fileset) {
+		dataProducers.add(new FileSetDataProducer(fileset));
+	}
+
+	public void addTarFileSet(Tar.TarFileSet fileset) {
+		dataProducers.add(new FileSetDataProducer(fileset));
 	}
 
 	public void addData( Data data ) {
