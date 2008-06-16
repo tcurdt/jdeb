@@ -8,7 +8,7 @@ Howto use "jdeb" with maven
             <plugin>
                 <artifactId>jdeb</artifactId>
                 <groupId>org.vafer</groupId>
-                <version>0.6</version>
+                <version>0.7</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -22,7 +22,7 @@ Howto use "jdeb" with maven
             </plugin>
 +--------------------
 
- At least the one main control file is required to be present at "src/deb/control/control". In contains the information for the Debian package descriptor. Usually it will look something along the lines of
+ At least the one main control file is required to be present at <<<src/deb/control/control>>>. In contains the information for the Debian package descriptor. Usually it will look something along the lines of
 
 +--------------------
 Package: [[name]]
@@ -36,12 +36,34 @@ Description: jetty java servlet container
 Distribution: development
 +--------------------
  
- If the enviroment variables DEBEMAIL and DEBFULLNAME are both set this will overrule the "Maintainer" set in there. The "Installed-Size" will also be injected. If a changes file is used, the "Distribution" usually comes from that file. The default changes file is called "CHANGES.txt". See below for the syntax of the content. Now if you do a "mvn clean install" the attached "deb" goal is getting called and the artifacts -the deb and potentially the changes file- will automatically get attached to the project.
+ If the enviroment variables <<<DEBEMAIL>>> and <<<DEBFULLNAME>>> are both set this will overrule the <<<Maintainer>>> field set in there. The <<<Installed-Size>>> will also be injected. If a changes file is used, the <<<Distribution>>> usually comes from that file. The default changes file is called <<<CHANGES.txt>>>. See below for the syntax of the content. Now if you do a <<<mvn clean install>>> the attached <<<deb>>> goal is getting called and the artifacts -the deb and potentially the changes file- will automatically get attached to the project.
 
 
 Howto use "jdeb" with ant
 
- The jdeb ant task can package up a directory as Debian package. You have to provide the control files defining meta information about the package (except the md5sums which gets created automatically). It creates the archive and if you want even a signed changes file.
+*---------------+---------------------------------------------------+-----------------------+
+| <<Attribute>> | <<Description>>                                   | <<Required>>          |
+*---------------+---------------------------------------------------+-----------------------+
+| destfile      | The debian package to be generated                | Yes                   |
+*---------------+---------------------------------------------------+-----------------------+
+| control       | The directory containing the control files        | Yes                   |
+*---------------+---------------------------------------------------+-----------------------+
+| verbose       | Print detailed info during the package generation | No; defaults to false |
+*---------------+---------------------------------------------------+-----------------------+
+| keyring       | The file containing the PGP keys                  | No                    |
+*---------------+---------------------------------------------------+-----------------------+
+| key           | The name of the key to be used in the keyring     | No                    |
+*---------------+---------------------------------------------------+-----------------------+
+| passphrase    | The passphrase to use the key                     | No                    |
+*---------------+---------------------------------------------------+-----------------------+
+| changesIn     | The changes to add                                | No                    |
+*---------------+---------------------------------------------------+-----------------------+
+| changesOut    | The changes file generated                        | No                    |
+*---------------+---------------------------------------------------+-----------------------+
+| changesSave   | The merged changes file                           | No                    |
+*---------------+---------------------------------------------------+-----------------------+
+
+ The jdeb ant task can package up a directory as Debian package. You have to provide the control files defining meta information about the package (except the <<<md5sums>>> which gets created automatically). It creates the archive and if you want even a signed changes file.
 
 +--------------------
   <target name="package">
@@ -74,7 +96,7 @@ Howto use "jdeb" with ant
     </deb>
 +--------------------
 
- For more complex permission and ownership adjustments you can use a "ls" mapper. It allows you to define permissions and ownerships in a text file and even under windows you will be able to build your debian package.
+ For more complex permission and ownership adjustments you can use a "ls" mapper. It allows you to define permissions and ownerships in a text file and even under Windows you will be able to build your debian package.
 
 +--------------------        
     <deb destfile="jdeb.deb" control="${deb}/control">
@@ -84,7 +106,7 @@ Howto use "jdeb" with ant
     </deb>
 +--------------------
 
- The mapper will apply the output of an "ls -laR > mapping.txt" command that should look like this
+ The mapper will apply the output of an "<<<ls -laR > mapping.txt>>>" command that should look like this
 
 +--------------------        
  ./trunk/target/test-classes/org/vafer/dependency:
@@ -97,6 +119,9 @@ Howto use "jdeb" with ant
  drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 +--------------------        
 
+
+* Changes file
+
  In order to also create a changes file you will need to provide the input and output of the changes. The input file is a much simpler file where you should list your changes. Every change should be starting with the " * " and one line only.
 
 +--------------------
@@ -104,7 +129,8 @@ Howto use "jdeb" with ant
 release distribution=staging, date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
  * debian changes support
 +--------------------
- When you do a release jdeb will add (or complete!) the release line and create a debian format standard changes file for you. (Don't forget to commit changes jdeb did to the file.) From ant you have to call jdeb like this
+
+ When you do a release jdeb will add (or complete!) the release line and create a debian format standard changes file for you. (Don't forget to commit changes jdeb did to the file.) From Ant you have to call jdeb like this
 
 +--------------------        
     <deb destfile="jdeb.deb" control="${deb}/control" changesIn="changes.txt" changesOut="jdeb.changes">
@@ -112,15 +138,18 @@ release distribution=staging, date=20:13 17.08.2007,version=1.4+r89114,urgency=l
     </deb>
 +--------------------
 
- If you also provide a "changesSave" attribute the jdeb will add release information to the original input and write out the new file.
+ If you also provide a <<<changesSave>>> attribute the jdeb will add release information to the original input and write out the new file.
  
 +--------------------        
     <deb destfile="jdeb.deb" control="${deb}/control" changesIn="changes.txt" changesOut="jdeb.changes" changesSave="changes.txt">
       <data src="some/dir"/>
     </deb>
 +--------------------
- 
- To have the changes be signed, make sure you have the {{{http://www.bouncycastle.org/java.html}bouncycastle jar}} in your classpath (just copy it into the $ANT_HOME/lib folder - next to jdeb). Then you can sign your changes file with
+
+
+* Signing changes
+
+ To have the changes be signed, make sure you have the <<<{{{http://www.bouncycastle.org/java.html}bouncycastle jar}}>>> in your classpath (just copy it into the <<<$ANT_HOME/lib>>> folder - next to jdeb). Then you can sign your changes file with
 
 +--------------------        
     <deb destfile="jdeb.deb" control="${deb}/control" changesIn="changes.txt" changesOut="jdeb.changes"
