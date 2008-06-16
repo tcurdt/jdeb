@@ -19,7 +19,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -31,7 +30,9 @@ import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
 /**
- * A descriptor holds the usual key value pairs
+ * A descriptor holds the usual key value pairs.
+ *
+ * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html">Debian Policy Manual - Control files and their fields</a>
  * 
  * @author tcurdt
  */
@@ -142,14 +143,13 @@ public abstract class AbstractDescriptor {
 			final String key = pKeys[i];
 			final String value = (String) values.get(key);
 			if (value != null) {
-				s.append(key).append(": ");
+				s.append(key).append(":");
 
 				try {
-					LineNumberReader reader = new LineNumberReader(new StringReader(value));
+					BufferedReader reader = new BufferedReader(new StringReader(value));
 					String line;
 					while ((line = reader.readLine()) != null) {
-						if (reader.getLineNumber() > 0 && line.length() != 0 && !Character.isWhitespace(line.charAt(0))) {
-							// indent the line with a white space
+						if (line.length() != 0 && !Character.isWhitespace(line.charAt(0))) {
 							s.append(' ');
 						}
 
