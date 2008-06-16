@@ -167,10 +167,10 @@ public class DebAntTask extends MatchingTask {
 		
 		final PackageDescriptor packageDescriptor;
 		try {
-
+			
+			log("Creating debian package: " + deb);
+			
 			packageDescriptor = processor.createDeb(controlFiles, data, deb);
-
-			log("Created " + deb);
 
 		} catch (Exception e) {
 			throw new BuildException("Failed to create debian package " + deb, e);
@@ -183,12 +183,12 @@ public class DebAntTask extends MatchingTask {
 				return;
 			}
 
+			log("Creating changes file: " + changesOut);
+
 			// for now only support reading the changes form a textfile provider
 			changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
 			
 			processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
-
-			log("Created changes file " + changesOut);
 						
 		} catch (Exception e) {
 			throw new BuildException("Failed to create debian changes file " + changesOut, e);
@@ -199,9 +199,9 @@ public class DebAntTask extends MatchingTask {
 				return;
 			}
 
-			changesProvider.save(new FileOutputStream(changesSave));
+			log("Saving changes to file: " + changesSave);
 
-			log("Saved changes to file " + changesSave);
+			changesProvider.save(new FileOutputStream(changesSave));
 			
 		} catch (Exception e) {
 			throw new BuildException("Failed to save debian changes file " + changesSave, e);
