@@ -6,7 +6,12 @@
     <packaging>maven-plugin</packaging>
     <name>jdeb</name>
     <version>0.7-SNAPSHOT</version>
-    <description>This library provides an ant task and a maven plugin to create Debian packages from you java builds. The API underneath is well abstracted can easily be adopted for other areas as well.</description>
+    <description>
+      This library provides an Ant task and a Maven plugin to create Debian packages from Java builds in a truly cross
+      platform manner. Build your Debian packages on any platform that has Java support. Windows, Linux - it does not
+      require additional native tools installed. The API underneath is well abstracted can easily be adopted for other
+      areas as well.
+    </description>
     <url>http://vafer.org/projects/jdeb</url>
     <developers>
         <developer>
@@ -16,6 +21,12 @@
             <roles>
                 <role>Lead Developer</role>
             </roles>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <id>ebourg</id>
+            <name>Emmanuel Bourg</name>
+            <email>ebourg at apache.org</email>
             <timezone>+1</timezone>
         </developer>
     </developers>
