@@ -3,6 +3,4 @@ o descriptor fields shouldn't be case sensitive
 
 o subversion log ChangesProvider
 o jira release notes ChangesProvider
-
-o advertise the project on the Ant website (http://ant.apache.org/external.html)
  
