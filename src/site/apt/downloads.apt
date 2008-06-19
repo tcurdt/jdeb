@@ -8,21 +8,21 @@ Downloads
 
   CHANGES
   
-  * Fixed the "Installed-Size" to list kbytes instead of bytes
+  * Fixed the <<<Installed-Size>>> to list kbytes instead of bytes
   
-  * bzip2 compressed archives are now accepted by the <data> element of the Ant task
+  * bzip2 compressed archives are now accepted by the <<<<data>>>> element of the Ant task
 
-  * TextfileChangesProvider no longer fails to parse the date from the package descriptor on non english systems
+  * <<<TextfileChangesProvider>>> no longer fails to parse the date from the package descriptor on non english systems
 
   * The package description can now span multiple lines in the control file
 
-  * Added more field to the package descriptor (Pre-Depends, Recommends, Suggests, Breaks, Enhances, Homepage)
+  * Added more field to the package descriptor (<<<Pre-Depends>>>, <<<Recommends>>>, <<<Suggests>>>, <<<Breaks>>>, <<<Enhances>>>, <<<Homepage>>>)
 
   * The Ant task now breaks on errors
 
-  * The Ant task has a new 'verbose' attribute to control the amount of details displayed
+  * The Ant task has a new '<<<verbose>>>' attribute to control the amount of details displayed
 
-  * The Ant task now accepts <tarfileset>s
+  * The Ant task now accepts <<<<tarfileset>>>> elements
 
 * Version 0.6, 11.01.2008
 
@@ -44,11 +44,11 @@ Downloads
 
  * Removed deprecated ant task delegate.
  
- * Added "changesSave" attribute to save release information to. No longer saving those information to "changesIn".
+ * Added "<<<changesSave>>>" attribute to save release information to. No longer saving those information to "<<<changesIn>>>".
 
- * Switched to ArInputStream/ArOutputStream.
+ * Switched to <<<ArInputStream/ArOutputStream>>>.
 
- * Fixed the 'ls' parsing.
+ * Fixed the '<<<ls>>>' parsing.
 
 * Version 0.4, 20.09.2007
 
@@ -64,7 +64,7 @@ Downloads
  
  * Added more fields to the package descriptor.
  
- * Changed lookup from environment (DEBEMAIL, DEBFULLNAME) to overrule the descriptor.
+ * Changed lookup from environment (<<<DEBEMAIL>>>, <<<DEBFULLNAME>>>) to overrule the descriptor.
  
  * Removed deprecated prefix/strip syntax.
 
@@ -81,7 +81,7 @@ Downloads
  
  * Added stricter descriptor validation.
  
- * Added maintainer lookup from environment (DEBEMAIL, DEBFULLNAME).
+ * Added maintainer lookup from environment (<<<DEBEMAIL>>>, <<<DEBFULLNAME>>>).
 
 
 * Version 0.2, 21.08.2007
