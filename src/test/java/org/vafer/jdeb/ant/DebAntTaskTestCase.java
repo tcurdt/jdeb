@@ -206,7 +206,6 @@ public class DebAntTaskTestCase extends TestCase {
 		ArInputStream in = new ArInputStream(new FileInputStream(deb));
 		ArEntry entry;
 		while ((entry = in.getNextEntry()) != null) {
-			System.out.println("entry: " + entry.getName());
 			if (entry.getName().equals("data.tar.bz2")) {
 				found = true;
 

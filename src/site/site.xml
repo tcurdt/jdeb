@@ -29,6 +29,7 @@
       <item name="About" href="index.html"/>
       <item name="How to use" href="howto.html"/>
       <item name="Downloads" href="downloads.html"/>
+      <item name="Links" href="links.html"/>
     </menu>
 
     ${reports}
