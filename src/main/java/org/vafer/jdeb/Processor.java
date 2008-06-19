@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.zip.GZIPOutputStream;
 
+import org.apache.tools.bzip2.CBZip2OutputStream;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarOutputStream;
 import org.vafer.jdeb.ar.ArEntry;
@@ -103,10 +104,11 @@ public class Processor {
 	 * @param pControlFiles
 	 * @param pData
 	 * @param pOutput
+	 * @param compression the compression method used for the data file (gzip, bzip2 or anything else for no compression)
 	 * @return PackageDescriptor
 	 * @throws PackagingException
 	 */
-	public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput ) throws PackagingException, InvalidDescriptorException {
+	public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput, String compression ) throws PackagingException, InvalidDescriptorException {
 
 		File tempData = null;
 		File tempControl = null;
@@ -117,7 +119,7 @@ public class Processor {
 
 			console.println("Building data");
 			final StringBuffer md5s = new StringBuffer();
-			final BigInteger size = buildData(pData, tempData, md5s);
+			final BigInteger size = buildData(pData, tempData, md5s, compression);
 
 			console.println("Building control");
 			final PackageDescriptor packageDescriptor = buildControl(pControlFiles, size, md5s, tempControl);
@@ -132,7 +134,7 @@ public class Processor {
 
 			addTo(ar, "debian-binary", "2.0\n");
 			addTo(ar, "control.tar.gz", tempControl);
-			addTo(ar, "data.tar.gz", tempData);
+			addTo(ar, "data.tar" + getExtension(compression), tempData);
 			
 			ar.close();
 
@@ -158,11 +160,27 @@ public class Processor {
 	}
 
 	/**
+	 * Return the extension of a file compressed with the specified method.
+	 *
+	 * @param compression the compression method used
+	 * @return
+	 */
+	private String getExtension(String compression) {
+		if ("gzip".equals(compression)) {
+			return ".gz";
+		} else if ("bzip2".equals(compression)) {
+			return ".bz2";
+		} else {
+			return "";
+		}
+	}
+
+	/**
 	 * Create changes file based on the provided PackageDescriptor.
 	 * If pRing, pKey and pPassphrase are provided the changes file will also be signed.
 	 * It returns a ChangesDescriptor reflecting the changes  
 	 * @param pPackageDescriptor
-	 * @param pChangeSets
+	 * @param pChangesProvider
 	 * @param pRing
 	 * @param pKey
 	 * @param pPassphrase
@@ -263,7 +281,7 @@ public class Processor {
 
 				if (packageDescriptor.get("Date") == null) {
 					SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
-					packageDescriptor.set("Date", fmt.format(new Date()));
+					packageDescriptor.set("Date", fmt.format(new Date())); // FIXME Is this field allowed in package descriptors ?
 				}
 
 				if (packageDescriptor.get("Distribution") == null) {
@@ -317,13 +335,22 @@ public class Processor {
 	 * @param pData
 	 * @param pOutput
 	 * @param pChecksums
+	 * @param compression the compression method used for the data file (gzip, bzip2 or anything else for no compression)
 	 * @return
 	 * @throws NoSuchAlgorithmException
 	 * @throws IOException
 	 */
-	private BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums ) throws NoSuchAlgorithmException, IOException {
+	private BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums, String compression ) throws NoSuchAlgorithmException, IOException {
 
-		final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
+		OutputStream out = new FileOutputStream(pOutput);
+		if ("gzip".equals(compression)) {
+			out = new GZIPOutputStream(out);
+		} else if ("bzip2".equals(compression)) {
+			out.write("BZ".getBytes());
+			out = new CBZip2OutputStream(out);
+		}
+		
+		final TarOutputStream outputStream = new TarOutputStream(out);
 		outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
 		final MessageDigest digest = MessageDigest.getInstance("MD5");

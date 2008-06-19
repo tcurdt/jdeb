@@ -27,6 +27,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
+import org.apache.tools.bzip2.CBZip2InputStream;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
 import org.vafer.jdeb.ar.ArEntry;
@@ -183,7 +184,69 @@ public class DebAntTaskTestCase extends TestCase {
 				in.skip(entry.getLength());
 			}
 		}
-		
 	}
 
+	public void testUnkownCompression() throws Exception {
+		try {
+			project.executeTarget("unknown-compression");
+			fail("No exception thrown");
+		} catch (BuildException e) {
+			// expected
+		}
+	}
+
+	public void testBZip2Compression() throws Exception {
+		project.executeTarget("bzip2-compression");
+
+		File deb = new File("target/test-classes/test.deb");
+		assertTrue("package not build", deb.exists());
+
+		boolean found = false;
+
+		ArInputStream in = new ArInputStream(new FileInputStream(deb));
+		ArEntry entry;
+		while ((entry = in.getNextEntry()) != null) {
+			System.out.println("entry: " + entry.getName());
+			if (entry.getName().equals("data.tar.bz2")) {
+				found = true;
+
+				assertEquals("header 0", (byte) 'B', in.read());
+				assertEquals("header 1", (byte) 'Z', in.read());
+
+				TarInputStream tar = new TarInputStream(new CBZip2InputStream(in));
+				while ((tar.getNextEntry()) != null);
+				break;
+			} else {
+				// skip to the next entry
+				in.skip(entry.getLength());
+			}
+		}
+
+		assertTrue("bz2 file not found", found);
+	}
+
+	public void testNoCompression() throws Exception {
+		project.executeTarget("no-compression");
+
+		File deb = new File("target/test-classes/test.deb");
+		assertTrue("package not build", deb.exists());
+
+		boolean found = false;
+
+		ArInputStream in = new ArInputStream(new FileInputStream(deb));
+		ArEntry entry;
+		while ((entry = in.getNextEntry()) != null) {
+			if (entry.getName().equals("data.tar")) {
+				found = true;
+
+				TarInputStream tar = new TarInputStream(in);
+				while ((tar.getNextEntry()) != null);
+			} else {
+				// skip to the next entry
+				in.skip(entry.getLength());
+			}
+		}
+
+		assertTrue("tar file not found", found);
+	}
 }

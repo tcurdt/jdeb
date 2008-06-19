@@ -24,6 +24,8 @@ Downloads
 
   * The Ant task now accepts <<<<tarfileset>>>> elements
 
+  * The <<<compression>>> attribute can be specified to set the compression method used for the data file in the package (<<<bzip2>>>, <<<gzip>>> or <<<none>>>)
+
 * Version 0.6, 11.01.2008
 
  {{{http://repo1.maven.org/maven2/org/vafer/jdeb/0.6/jdeb-0.6.jar}jdeb-0.6 jar (binaries)}} \

@@ -68,4 +68,22 @@
     </deb>
   </target>
 
+  <target name="unknown-compression">
+    <deb destfile="test.deb" control="org/vafer/jdeb/deb/control" compression="rar">
+      <fileset dir="org/vafer/jdeb/deb/data"/>
+    </deb>
+  </target>
+
+  <target name="bzip2-compression">
+    <deb destfile="test.deb" control="org/vafer/jdeb/deb/control" compression="bzip2">
+      <fileset dir="org/vafer/jdeb/deb/data"/>
+    </deb>
+  </target>
+
+  <target name="no-compression">
+    <deb destfile="test.deb" control="org/vafer/jdeb/deb/control" compression="none">
+      <fileset dir="org/vafer/jdeb/deb/data"/>
+    </deb>
+  </target>
+
 </project>

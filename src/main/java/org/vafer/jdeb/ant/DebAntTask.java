@@ -46,18 +46,34 @@ public class DebAntTask extends MatchingTask {
 	/** The directory containing the control files to build the package */
 	private File control;
 
+	/** The file containing the PGP keys */
 	private File keyring;
-	private File changesIn;
-	private File changesOut;
-	private File changesSave;
+
+	/** The key to use in the keyring */
 	private String key;
+
+	/** The passphrase for the key to sign the changes file */
 	private String passphrase;
+
+	/** The file to read the changes from */
+	private File changesIn;
+
+	/** The file where to write the changes to */
+	private File changesOut;
+
+	/** The file where to write the changes of the changes input to */
+	private File changesSave;
+
+	/** The compression method used for the data file (none, gzip or bzip2) */
+	private String compression = "gzip";
+
+	/** Trigger the verbose mode detailing all operations */
 	private boolean verbose;
 
 	private Collection dataProducers = new ArrayList();
 
 
-    public void setDestfile( File deb ) {
+	public void setDestfile( File deb ) {
     	this.deb = deb;
     }
     
@@ -89,6 +105,10 @@ public class DebAntTask extends MatchingTask {
     	this.passphrase = passphrase;
     }
 
+	public void setCompression(String compression) {
+		this.compression = compression;
+	}
+
 	public void setVerbose(boolean verbose) {
 		this.verbose = verbose;
 	}
@@ -106,11 +126,11 @@ public class DebAntTask extends MatchingTask {
     }
     
     private boolean isPossibleOutput( File file ) {
-    	
-    	if (file.exists()) {    		
+
+    	if (file.exists()) {
     		return file.isFile() && file.canWrite();
     	}
-    	
+
     	return true;
     }
     
@@ -143,6 +163,10 @@ public class DebAntTask extends MatchingTask {
 				throw new BuildException("The 'changesOut' or 'changesSave' attributes may only be used when there is a 'changesIn' specified.");							
 			}
 		}
+
+		if (!"gzip".equals(compression) && !"bzip2".equals(compression) && !"none".equals(compression)) {
+			throw new BuildException("The compression method '" + compression + "' is not supported");
+		}
 				
 		if (dataProducers.size() == 0) {
 			throw new BuildException("You need to provide at least one reference to a tgz or directory with data.");
@@ -170,7 +194,7 @@ public class DebAntTask extends MatchingTask {
 			
 			log("Creating debian package: " + deb);
 			
-			packageDescriptor = processor.createDeb(controlFiles, data, deb);
+			packageDescriptor = processor.createDeb(controlFiles, data, deb, compression);
 
 		} catch (Exception e) {
 			throw new BuildException("Failed to create debian package " + deb, e);

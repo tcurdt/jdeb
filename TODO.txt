@@ -1,7 +1,6 @@
 o improve maven integration
 o descriptor fields shouldn't be case sensitive
 o add a <link> element to declare symlinks ? (see jRPM and https://issues.apache.org/bugzilla/show_bug.cgi?id=40059)
-o support bzip2 and uncompressed data (supported by dpkg since 2004 : http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=34727)
 
 o subversion log ChangesProvider
 o jira release notes ChangesProvider

@@ -232,7 +232,7 @@ public final class DebMojo extends AbstractPluginMojo {
 		try
 		{
 
-			packageDescriptor = processor.createDeb(controlFiles, dataProducers, deb);
+			packageDescriptor = processor.createDeb(controlFiles, dataProducers, deb, "gzip");
 
 			getLog().info("Attaching created debian archive " + deb);
 			projectHelper.attachArtifact( getProject(), "deb-archive", deb.getName(), deb );
