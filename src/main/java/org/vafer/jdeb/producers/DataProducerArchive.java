@@ -85,7 +85,9 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 	private InputStream getCompressedInputStream(InputStream in) throws IOException {
 		PushbackInputStream pin = new PushbackInputStream(in, 2);
 		byte[] header = new byte[2];
-		pin.read(header);
+		if (pin.read(header) != header.length) {
+			throw new IOException("Could not read header");
+		}
 
 		if (header[0] == (byte) 0x1f && header[1] == (byte) 0x8b) {
 			pin.unread(header);

@@ -18,11 +18,13 @@ package org.vafer.jdeb.ant;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.zip.GZIPInputStream;
 
 import junit.framework.TestCase;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
@@ -179,9 +181,17 @@ public class DebAntTaskTestCase extends TestCase {
 					assertEquals("user", "ebourg", tarentry.getUserName());
 					assertEquals("group", "ebourg", tarentry.getGroupName());
 				}
+				tar.close();
 			} else {
 				// skip to the next entry
-				in.skip(entry.getLength());
+				long skip = entry.getLength(); 
+				while(skip > 0) {
+					long skipped = in.skip(skip); 
+					if (skipped == -1) {
+						throw new IOException("Failed to skip");
+					}
+					skip -= skipped;
+				}
 			}
 		}
 	}
@@ -214,10 +224,18 @@ public class DebAntTaskTestCase extends TestCase {
 
 				TarInputStream tar = new TarInputStream(new CBZip2InputStream(in));
 				while ((tar.getNextEntry()) != null);
+				tar.close();
 				break;
 			} else {
 				// skip to the next entry
-				in.skip(entry.getLength());
+				long skip = entry.getLength(); 
+				while(skip > 0) {
+					long skipped = in.skip(skip); 
+					if (skipped == -1) {
+						throw new IOException("Failed to skip");
+					}
+					skip -= skipped;
+				}
 			}
 		}
 
@@ -240,9 +258,17 @@ public class DebAntTaskTestCase extends TestCase {
 
 				TarInputStream tar = new TarInputStream(in);
 				while ((tar.getNextEntry()) != null);
+				tar.close();
 			} else {
 				// skip to the next entry
-				in.skip(entry.getLength());
+				long skip = entry.getLength(); 
+				while(skip > 0) {
+					long skipped = in.skip(skip); 
+					if (skipped == -1) {
+						throw new IOException("Failed to skip");
+					}
+					skip -= skipped;
+				}
 			}
 		}
 

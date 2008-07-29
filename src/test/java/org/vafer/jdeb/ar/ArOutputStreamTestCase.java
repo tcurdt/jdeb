@@ -30,6 +30,6 @@ public final class ArOutputStreamTestCase extends TestCase {
 		os.write("data".getBytes());		
 		os.close();
 		
-		out1.delete();
+		assertTrue(out1.delete());
 	}
 }

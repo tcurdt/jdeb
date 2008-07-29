@@ -79,6 +79,7 @@ public final class DataProducerTestCase extends TestCase {
 					filesInDeb.add(tarEntry.getName());
 				}
 				
+				tar.close();
 				break;
 			}
 			for (int i = 0; i < arEntry.getLength(); i++) {
@@ -90,6 +91,6 @@ public final class DataProducerTestCase extends TestCase {
 		assertTrue("" + filesInDeb, filesInDeb.contains("/test/testfile2"));
 		assertTrue("" + filesInDeb, filesInDeb.contains("/test/testfile3"));
 
-		deb.delete();
+		assertTrue(deb.delete());
 	}
 }

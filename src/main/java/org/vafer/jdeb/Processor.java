@@ -151,10 +151,14 @@ public class Processor {
 			throw new PackagingException("Could not create deb package", e);
 		} finally {
 			if (tempData != null) {
-				tempData.delete();
+				if (!tempData.delete()) {
+					throw new PackagingException("Could not delete " + tempData);					
+				}
 			}
 			if (tempControl != null) {
-				tempControl.delete();
+				if (!tempControl.delete()) {
+					throw new PackagingException("Could not delete " + tempControl);					
+				}
 			}
 		}
 	}

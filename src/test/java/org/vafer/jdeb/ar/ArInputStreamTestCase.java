@@ -37,6 +37,8 @@ public final class ArInputStreamTestCase extends TestCase {
 		
 		final ArEntry entry2 = ar.getNextEntry();
 		
-		assertNull(entry2);		
+		assertNull(entry2);
+		
+		ar.close();
 	}
 }
