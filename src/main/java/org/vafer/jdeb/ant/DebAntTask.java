@@ -30,12 +30,13 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Processor;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
+import org.vafer.jdeb.producers.FileSetDataProducer;
 
 /**
  * AntTask for creating debian archives.
  * Even supports signed changes files.
  * 
- * @author tcurdt
+ * @author Torsten Curdt <tcurdt@vafer.org>
  */
 		
 public class DebAntTask extends MatchingTask {

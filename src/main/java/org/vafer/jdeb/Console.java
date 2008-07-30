@@ -18,7 +18,7 @@ package org.vafer.jdeb;
 /**
  * Plug in your favorite log implementation.
  * 
- * @author tcurdt
+ * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public interface Console {
 

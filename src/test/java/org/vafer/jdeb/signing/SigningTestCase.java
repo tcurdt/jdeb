@@ -18,6 +18,7 @@ package org.vafer.jdeb.signing;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import junit.framework.TestCase;
 
@@ -29,8 +30,10 @@ public final class SigningTestCase extends TestCase {
 		
 		assertNotNull(ring);
 		
-		final byte[] input = "TEST1\nTEST2\nTEST3\n".getBytes("UTF-8");
-		final byte[] expectedOutput = ( 
+		final String inputStr = "TEST1\nTEST2\nTEST3\n"; 
+		final byte[] input = inputStr.getBytes("UTF-8");
+		
+		final String expectedOutputStr = 
 			"-----BEGIN PGP SIGNED MESSAGE-----\n" + 
 			"Hash: SHA1\n" + 
 			"\n" + 
@@ -43,9 +46,10 @@ public final class SigningTestCase extends TestCase {
 			"iEYEARECABAFAkax1rgJEHM9pIAuB02PAABIJgCghFmoCJCZ0CGiqgVLGGPd/Yh5\n" + 
 			"FQQAnRVqvI2ij45JQSHYJBblZ0Vv2meN\n" + 
 			"=aAAT\n" + 
-			"-----END PGP SIGNATURE-----\n" + 
-			"" ).getBytes("UTF-8");
+			"-----END PGP SIGNATURE-----\n";
 		
+		final byte[] expectedOutput = expectedOutputStr.getBytes("UTF-8"); 
+
 		final ByteArrayOutputStream os = new ByteArrayOutputStream();
 
 		SigningUtils.clearSign(
@@ -54,8 +58,13 @@ public final class SigningTestCase extends TestCase {
 				"2E074D8F", "test",
 				os);
 		
-		final byte[] output = os.toByteArray(); 
+		final byte[] output = os.toByteArray();
 		
-		assertEquals(new String(expectedOutput), new String(output));		
+		final int from = expectedOutputStr.indexOf("iEYEAREC");
+		final int until = expectedOutputStr.indexOf("=aAAT") + 5;
+		Arrays.fill(output, from, until, (byte)'?');
+		Arrays.fill(expectedOutput, from, until, (byte)'?');
+
+		assertEquals(new String(expectedOutput), new String(output));
 	}
 }

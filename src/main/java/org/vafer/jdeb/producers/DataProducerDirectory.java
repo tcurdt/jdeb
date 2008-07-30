@@ -18,6 +18,7 @@ package org.vafer.jdeb.producers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.tar.TarEntry;
@@ -30,7 +31,7 @@ import org.vafer.jdeb.utils.Utils;
  * DataProducer iterating over a directory.
  * For cross-platform permissions and ownerships you probably want to use a Mapper, too. 
  * 
- * @author tcurdt
+ * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class DataProducerDirectory extends AbstractDataProducer implements DataProducer {
 
@@ -108,7 +109,12 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
 
 			entry.setSize(file.length());
 
-			receiver.onEachFile(new FileInputStream(file), entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+			final InputStream inputStream = new FileInputStream(file);
+			try {
+				receiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+			} finally {
+				inputStream.close();
+			}
 		}
 	}
 

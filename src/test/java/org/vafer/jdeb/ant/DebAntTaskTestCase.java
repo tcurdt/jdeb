@@ -37,9 +37,8 @@ import org.vafer.jdeb.ar.ArInputStream;
 
 /**
  * @author Emmanuel Bourg
- * @version $Revision$, $Date$
  */
-public class DebAntTaskTestCase extends TestCase {
+public final class DebAntTaskTestCase extends TestCase {
 
 	private Project project;
 

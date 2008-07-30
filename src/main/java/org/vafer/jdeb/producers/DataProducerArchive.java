@@ -32,7 +32,7 @@ import org.vafer.jdeb.mapping.Mapper;
 /**
  * Providing data from an archive keeping permissions and ownerships.
  * 
- * @author tcurdt
+ * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class DataProducerArchive extends AbstractDataProducer implements DataProducer {
 
@@ -67,7 +67,6 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 					receiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
 					continue;
 				}
-				
 				receiver.onEachFile(archiveInputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());						
 			}
 

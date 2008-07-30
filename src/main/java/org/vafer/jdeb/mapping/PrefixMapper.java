@@ -21,7 +21,7 @@ import org.vafer.jdeb.utils.Utils;
 /**
  * Just adds a prefix to the entry coming in
  *  
- * @author tcurdt
+ * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class PrefixMapper implements Mapper {
 

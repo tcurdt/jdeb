@@ -41,7 +41,7 @@ release date=22:13 19.08.2007,version=1.5+r90114,urgency=low,by=Torsten Curdt <t
 release date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
   * debian changes support
 
- * @author tcurdt
+ * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class TextfileChangesProvider implements ChangesProvider {
 

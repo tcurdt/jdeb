@@ -26,7 +26,7 @@ import org.vafer.jdeb.mapping.PrefixMapper;
  * Ant "mapper" element acting as factory for the entry mapper.
  * So far type "ls" and "prefix" are supported.
  * 
- * @author tcurdt
+ * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class Mapper {
 

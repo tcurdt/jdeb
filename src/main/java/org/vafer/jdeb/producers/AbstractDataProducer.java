@@ -23,7 +23,7 @@ import org.vafer.jdeb.mapping.Mapper;
 /**
  * Base Producer class providing including/excluding.
  * 
- * @author tcurdt
+ * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public abstract class AbstractDataProducer implements DataProducer {
 

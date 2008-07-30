@@ -53,7 +53,7 @@ import org.vafer.jdeb.utils.VariableResolver;
  * The processor does the actual work of building the deb related files.
  * It is been used by the ant task and (later) the maven plugin.
  * 
- * @author tcurdt
+ * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public class Processor {
 
@@ -166,13 +166,13 @@ public class Processor {
 	/**
 	 * Return the extension of a file compressed with the specified method.
 	 *
-	 * @param compression the compression method used
+	 * @param pCompression the compression method used
 	 * @return
 	 */
-	private String getExtension(String compression) {
-		if ("gzip".equals(compression)) {
+	private String getExtension( final String pCompression ) {
+		if ("gzip".equals(pCompression)) {
 			return ".gz";
-		} else if ("bzip2".equals(compression)) {
+		} else if ("bzip2".equals(pCompression)) {
 			return ".bz2";
 		} else {
 			return "";
@@ -285,7 +285,8 @@ public class Processor {
 
 				if (packageDescriptor.get("Date") == null) {
 					SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
-					packageDescriptor.set("Date", fmt.format(new Date())); // FIXME Is this field allowed in package descriptors ?
+					// FIXME Is this field allowed in package descriptors ?
+					packageDescriptor.set("Date", fmt.format(new Date()));
 				}
 
 				if (packageDescriptor.get("Distribution") == null) {
@@ -339,17 +340,17 @@ public class Processor {
 	 * @param pData
 	 * @param pOutput
 	 * @param pChecksums
-	 * @param compression the compression method used for the data file (gzip, bzip2 or anything else for no compression)
+	 * @param pCompression the compression method used for the data file (gzip, bzip2 or anything else for no compression)
 	 * @return
 	 * @throws NoSuchAlgorithmException
 	 * @throws IOException
 	 */
-	private BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums, String compression ) throws NoSuchAlgorithmException, IOException {
+	private BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums, String pCompression ) throws NoSuchAlgorithmException, IOException {
 
 		OutputStream out = new FileOutputStream(pOutput);
-		if ("gzip".equals(compression)) {
+		if ("gzip".equals(pCompression)) {
 			out = new GZIPOutputStream(out);
-		} else if ("bzip2".equals(compression)) {
+		} else if ("bzip2".equals(pCompression)) {
 			out.write("BZ".getBytes());
 			out = new CBZip2OutputStream(out);
 		}
@@ -412,7 +413,7 @@ public class Processor {
 				digest.reset();
 
 				Utils.copy(inputStream, new DigestOutputStream(outputStream, digest));
-
+				
 				final String md5 = Utils.toHex(digest.digest());
 
 				outputStream.closeEntry();

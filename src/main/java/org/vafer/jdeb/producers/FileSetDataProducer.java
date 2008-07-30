@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.vafer.jdeb.ant;
+package org.vafer.jdeb.producers;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.taskdefs.Tar;
@@ -31,17 +32,16 @@ import org.vafer.jdeb.DataProducer;
  * supported with their permissions.
  *
  * @author Emmanuel Bourg
- * @version $Revision$, $Date$
  */
-public class FileSetDataProducer implements DataProducer {
+public final class FileSetDataProducer implements DataProducer {
 
-	private FileSet fileset;
+	private final FileSet fileset;
 
-	public FileSetDataProducer(FileSet fileset) {
-		this.fileset = fileset;
+	public FileSetDataProducer( final FileSet pFileset ) {
+		fileset = pFileset;
 	}
 
-	public void produce(DataConsumer receiver) throws IOException {
+	public void produce( final DataConsumer pReceiver ) throws IOException {
 		String user = "root";
 		int uid = 0;
 		String group = "root";
@@ -61,24 +61,30 @@ public class FileSetDataProducer implements DataProducer {
 			prefix = tarfileset.getPrefix();
 		}
 
-		DirectoryScanner scanner = fileset.getDirectoryScanner(fileset.getProject());
+		final DirectoryScanner scanner = fileset.getDirectoryScanner(fileset.getProject());
 		scanner.scan();
 
-		File basedir = scanner.getBasedir();
+		final File basedir = scanner.getBasedir();
 
-		String[] directories = scanner.getIncludedDirectories();
+		final String[] directories = scanner.getIncludedDirectories();
 		for (int i = 0; i < directories.length; i++) {
-			String name = directories[i];
+			final String name = directories[i];
 
-			receiver.onEachDir(prefix + "/" + name, null, user, uid, group, gid, dirmode, 0);
+			pReceiver.onEachDir(prefix + "/" + name, null, user, uid, group, gid, dirmode, 0);
 		}
 
-		String[] files = scanner.getIncludedFiles();
+		final String[] files = scanner.getIncludedFiles();
 		for (int i = 0; i < files.length; i++) {
-			String name = files[i];
-			File file = new File(basedir, name);
+			final String name = files[i];
+			final File file = new File(basedir, name);
 
-			receiver.onEachFile(new FileInputStream(file), prefix + "/" + name, null, user, uid, group, gid,filemode, file.length());
+			final InputStream inputStream = new FileInputStream(file);
+			try {
+				pReceiver.onEachFile(inputStream, prefix + "/" + name, null, user, uid, group, gid,filemode, file.length());
+			} finally {
+				inputStream.close();
+			}
+
 		}
 	}
 }

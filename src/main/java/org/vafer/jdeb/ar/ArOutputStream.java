@@ -18,6 +18,11 @@ package org.vafer.jdeb.ar;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * To be replace by commons compress once released
+ * 
+ * @author Torsten Curdt <tcurdt@vafer.org>
+ */
 public class ArOutputStream extends OutputStream {
 
 	private final OutputStream out;

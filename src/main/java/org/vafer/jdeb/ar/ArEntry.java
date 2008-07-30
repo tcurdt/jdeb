@@ -15,6 +15,11 @@
  */
 package org.vafer.jdeb.ar;
 
+/**
+ * To be replace by commons compress once released
+ * 
+ * @author Torsten Curdt <tcurdt@vafer.org>
+ */
 public final class ArEntry {
 
 	private final String name;

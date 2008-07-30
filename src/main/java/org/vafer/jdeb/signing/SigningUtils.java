@@ -38,6 +38,12 @@ import org.bouncycastle.openpgp.PGPSignature;
 import org.bouncycastle.openpgp.PGPSignatureGenerator;
 import org.bouncycastle.openpgp.PGPUtil;
 
+/**
+ * Utils to do the signing with OpenPGP
+ * 
+ * @author Torsten Curdt <tcurdt@vafer.org>
+ */
+
 public final class SigningUtils {
 
     private static PGPSecretKey getSecretKey( final InputStream pInput, final String pKey ) throws IOException, PGPException {

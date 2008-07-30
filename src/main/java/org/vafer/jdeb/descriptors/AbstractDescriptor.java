@@ -34,7 +34,7 @@ import org.vafer.jdeb.utils.VariableResolver;
  *
  * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html">Debian Policy Manual - Control files and their fields</a>
  * 
- * @author tcurdt
+ * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public abstract class AbstractDescriptor {
 	

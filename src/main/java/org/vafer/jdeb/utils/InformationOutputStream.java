@@ -23,7 +23,7 @@ import java.security.MessageDigest;
 /**
  * Convinience class to provide MD5 and length of a stream.
  *  
- * @author tcurdt
+ * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public class InformationOutputStream extends DigestOutputStream {
 

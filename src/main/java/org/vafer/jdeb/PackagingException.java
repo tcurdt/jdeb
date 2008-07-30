@@ -18,7 +18,7 @@ package org.vafer.jdeb;
 /**
  * Something went wrong while building the package
  * 
- * @author tcurdt
+ * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class PackagingException extends Exception {
 

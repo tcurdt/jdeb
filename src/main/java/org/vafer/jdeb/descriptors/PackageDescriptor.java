@@ -24,7 +24,7 @@ import org.vafer.jdeb.utils.VariableResolver;
 /**
  * Reflecting the package control file
  * 
- * @author tcurdt
+ * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class PackageDescriptor extends AbstractDescriptor {
 

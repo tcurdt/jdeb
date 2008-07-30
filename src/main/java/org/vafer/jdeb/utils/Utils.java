@@ -26,7 +26,7 @@ import java.text.ParseException;
  * 
  * ATTENTION: don't use outside of jdeb
  * 
- * @author tcurdt
+ * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class Utils {
 

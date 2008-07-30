@@ -23,7 +23,7 @@ import java.util.Date;
 /**
  * A ChangeSet basically reflect a release as defined in the changes file.
  *  
- * @author tcurdt
+ * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class ChangeSet {
 
