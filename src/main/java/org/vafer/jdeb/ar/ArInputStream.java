@@ -23,7 +23,7 @@ import java.io.InputStream;
  * 
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
-public class ArInputStream extends InputStream {
+public class ArInputStream extends InputStream implements ArConstants {
 
 	private final InputStream input;
 	private long offset = 0;
@@ -35,7 +35,7 @@ public class ArInputStream extends InputStream {
 	public ArEntry getNextEntry() throws IOException {
 		
 		if (offset == 0) {
-			final byte[] expected = "!<arch>\n".getBytes();			
+			final byte[] expected = HEADER;
 			final byte[] realized = new byte[expected.length]; 
 			final int read = input.read(realized);
 			if (read != expected.length) {
@@ -56,12 +56,12 @@ public class ArInputStream extends InputStream {
 			read();
 		}
 
-		final byte[] name = new byte[16];
-		final byte[] lastmodified = new byte[12];
-		final byte[] userid = new byte[6];
-		final byte[] groupid = new byte[6];
-		final byte[] filemode = new byte[8];
-		final byte[] length = new byte[10];
+		final byte[] name = new byte[FIELD_SIZE_NAME];
+		final byte[] lastmodified = new byte[FIELD_SIZE_LASTMODIFIED];
+		final byte[] userid = new byte[FIELD_SIZE_UID];
+		final byte[] groupid = new byte[FIELD_SIZE_GID];
+		final byte[] filemode = new byte[FIELD_SIZE_MODE];
+		final byte[] length = new byte[FIELD_SIZE_LENGTH];
 		
 		read(name);
 		read(lastmodified);
@@ -70,22 +70,19 @@ public class ArInputStream extends InputStream {
 		read(filemode);
 		read(length);
 
-		{
-			final byte[] expected = "`\012".getBytes();			
-			final byte[] realized = new byte[expected.length]; 
-			final int read = input.read(realized);
-			if (read != expected.length) {
-				throw new IOException("failed to read entry header");
-			}
-			for (int i = 0; i < expected.length; i++) {
-				if (expected[i] != realized[i]) {
-					throw new IOException("invalid entry header. not read the content?");
-				}
+		final byte[] expected = ENTRY_TERMINATOR;
+		final byte[] realized = new byte[expected.length];
+		final int read = input.read(realized);
+		if (read != expected.length) {
+			throw new IOException("failed to read entry header");
+		}
+		for (int i = 0; i < expected.length; i++) {
+			if (expected[i] != realized[i]) {
+				throw new IOException("invalid entry header. not read the content?");
 			}
 		}
 		
 		return new ArEntry(new String(name).trim(), Long.parseLong(new String(length).trim()));
-	
 	}
 	
 	

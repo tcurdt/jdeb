@@ -23,7 +23,7 @@ import java.io.OutputStream;
  * 
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
-public class ArOutputStream extends OutputStream {
+public class ArOutputStream extends OutputStream implements ArConstants {
 
 	private final OutputStream out;
 	private long archiveOffset = 0;
@@ -32,13 +32,11 @@ public class ArOutputStream extends OutputStream {
 
 	public ArOutputStream( final OutputStream pOut ) {
 		out = pOut;
-		
 	}
 
 	private long writeArchiveHeader() throws IOException {		
-		final String header = "!<arch>\n";
-		out.write(header.getBytes());
-		return header.length();
+		out.write(HEADER);
+		return HEADER.length;
 	}
 
 	private void closeEntry() throws IOException {
@@ -67,74 +65,54 @@ public class ArOutputStream extends OutputStream {
 		entryOffset = 0;
 	}
 
-	private long fill( final long pOffset, final long pNewOffset, final char pFill ) throws IOException { 
-		final long diff = pNewOffset - pOffset;
-	
-		if (diff > 0) {
-			for (int i = 0; i < diff; i++) {
-				write(pFill);
-			}
+	/**
+	 * Write the data to the stream and pad the output
+	 * with white spaces up to the specified size.
+	 *
+	 * @param data	  the value to be written
+	 * @param size	  the total size of the output
+	 * @param fieldname the name of the field
+	 */
+	private void write(String data, int size, String fieldname) throws IOException {
+		if (data.length() > size) {
+			throw new IOException(fieldname + " too long");
 		}
 
-		return pNewOffset;
+		long length = size - write(data);
+		for (int i = 0; i < length; i++) {
+			write(' ');
+		}
 	}
-	
+
 	private long write( final String data ) throws IOException {
 		final byte[] bytes = data.getBytes("ascii");
 		write(bytes);
 		return bytes.length;
 	}
 	
-	private long writeEntryHeader( final ArEntry pEntry ) throws IOException {
+	private long writeEntryHeader( final ArEntry entry ) throws IOException {
+
+		String n = entry.getName();
+		write(n, FIELD_SIZE_NAME, "filename");
+
+		String m = "" + (entry.getLastModified() / 1000);
+		write(m, FIELD_SIZE_LASTMODIFIED, "lastmodified");
+
+		String u = "" + entry.getUserId();
+		write(u, FIELD_SIZE_UID, "userid");
+
+		String g = "" + entry.getGroupId();
+		write(g, FIELD_SIZE_GID, "groupid");
+
+		String fm = Integer.toString(entry.getMode(), 8);
+		write(fm, FIELD_SIZE_MODE, "filemode");
+
+		String s = "" + entry.getLength();
+		write(s, FIELD_SIZE_LENGTH, "size");
+
+		write(ENTRY_TERMINATOR);
 		
-		long offset = 0;
-		
-		final String n = pEntry.getName();
-		if (n.length() > 16) {
-			throw new IOException("filename too long");
-		}		
-		offset += write(n);
-		
-		offset = fill(offset, 16, ' ');
-		final String m = "" + (pEntry.getLastModified() / 1000);
-		if (m.length() > 12) {
-			throw new IOException("modified too long");
-		}		
-		offset += write(m);		
-
-		offset = fill(offset, 28, ' ');
-		final String u = "" + pEntry.getUserId();
-		if (u.length() > 6) {
-			throw new IOException("userid too long");
-		}		
-		offset += write(u);
-
-		offset = fill(offset, 34, ' ');
-		final String g = "" + pEntry.getGroupId();
-		if (g.length() > 6) {
-			throw new IOException("groupid too long");
-		}		
-		offset += write(g);
-
-		offset = fill(offset, 40, ' ');
-		final String fm = "" + Integer.toString(pEntry.getMode(), 8);
-		if (fm.length() > 8) {
-			throw new IOException("filemode too long");
-		}		
-		offset += write(fm);
-
-		offset = fill(offset, 48, ' ');
-		final String s = "" + pEntry.getLength();
-		if (s.length() > 10) {
-			throw new IOException("size too long");
-		}		
-		offset += write(s);
-
-		offset = fill(offset, 58, ' ');
-
-		offset += write("`\012");
-		
-		return offset;
+		return HEADER_SIZE;
 	}		
 	
 	public void write(int b) throws IOException {

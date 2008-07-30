@@ -32,6 +32,7 @@ public final class ArEntry {
 	public ArEntry(String name, long length) {
 		this(name, length, 0, 0, 33188, System.currentTimeMillis());
 	}
+
 	public ArEntry(String name, long length, int userId, int groupId, int mode, long lastModified) {
 		this.name = name;
 		this.length = length;
@@ -44,21 +45,24 @@ public final class ArEntry {
 	public String getName() {
 		return name;
 	}
+
 	public int getUserId() {
 		return userId;
 	}
+
 	public int getGroupId() {
 		return groupId;
 	}
+
 	public int getMode() {
 		return mode;
 	}
+
 	public long getLastModified() {
 		return lastModified;
 	}
+
 	public long getLength() {
 		return length;
 	}
-	
-	
 }
