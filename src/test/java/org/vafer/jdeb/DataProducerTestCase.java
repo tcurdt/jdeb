@@ -58,8 +58,9 @@ public final class DataProducerTestCase extends TestCase {
 		assertTrue(packageDescriptor.isValid());
 		
 		final Set filesInDeb = new HashSet();
-		
-		final ArInputStream ar = new ArInputStream(new FileInputStream(deb));
+
+		FileInputStream in = new FileInputStream(deb);
+		final ArInputStream ar = new ArInputStream(in);
 		while(true) {
 			final ArEntry arEntry = ar.getNextEntry();
 			if (arEntry == null) {
@@ -86,11 +87,13 @@ public final class DataProducerTestCase extends TestCase {
 				ar.read();
 			}
 		}
+
+		in.close();
 		
 		assertTrue("" + filesInDeb, filesInDeb.contains("/test/testfile"));
 		assertTrue("" + filesInDeb, filesInDeb.contains("/test/testfile2"));
 		assertTrue("" + filesInDeb, filesInDeb.contains("/test/testfile3"));
 
-		assertTrue(deb.delete());
+		assertTrue("Cannot delete the file " + deb, deb.delete());
 	}
 }
