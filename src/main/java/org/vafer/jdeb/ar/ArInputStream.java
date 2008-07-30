@@ -92,4 +92,9 @@ public class ArInputStream extends InputStream implements ArConstants {
 		return ret;
 	}
 
+	public void close() throws IOException {
+		input.close();
+		super.close();
+	}
+
 }

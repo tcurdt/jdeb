@@ -27,6 +27,7 @@ import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
 import org.vafer.jdeb.ar.ArEntry;
 import org.vafer.jdeb.ar.ArInputStream;
+import org.vafer.jdeb.ar.NonClosingInputStream;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
@@ -59,8 +60,7 @@ public final class DataProducerTestCase extends TestCase {
 		
 		final Set filesInDeb = new HashSet();
 
-		FileInputStream in = new FileInputStream(deb);
-		final ArInputStream ar = new ArInputStream(in);
+		final ArInputStream ar = new ArInputStream(new FileInputStream(deb));
 		while(true) {
 			final ArEntry arEntry = ar.getNextEntry();
 			if (arEntry == null) {
@@ -69,7 +69,7 @@ public final class DataProducerTestCase extends TestCase {
 			
 			if ("data.tar.gz".equals(arEntry.getName())) {
 				
-				final TarInputStream tar = new TarInputStream(new GZIPInputStream(ar));
+				final TarInputStream tar = new TarInputStream(new GZIPInputStream(new NonClosingInputStream(ar)));
 				
 				while(true) {
 					final TarEntry tarEntry = tar.getNextEntry();
@@ -88,7 +88,7 @@ public final class DataProducerTestCase extends TestCase {
 			}
 		}
 
-		in.close();
+		ar.close();
 		
 		assertTrue("" + filesInDeb, filesInDeb.contains("/test/testfile"));
 		assertTrue("" + filesInDeb, filesInDeb.contains("/test/testfile2"));

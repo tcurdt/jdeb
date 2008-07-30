@@ -18,6 +18,8 @@ package org.vafer.jdeb.utils;
 /**
  * Interface for resolving variables.
  * See Utils.replaceVariables()
+ * 
+ * ATTENTION: don't use outside of jdeb
  *  
  * @author Torsten Curdt <tcurdt@vafer.org>
  */

@@ -22,6 +22,8 @@ import java.security.MessageDigest;
 
 /**
  * Convinience class to provide MD5 and length of a stream.
+ * 
+ * ATTENTION: don't use outside of jdeb
  *  
  * @author Torsten Curdt <tcurdt@vafer.org>
  */

@@ -138,7 +138,12 @@ public final class SigningUtils {
 
 
 	private static void processLine( final String pLine, final ArmoredOutputStream pArmoredOutput, final PGPSignatureGenerator pSignatureGenerator ) throws IOException, SignatureException {
-    	final char[] chars = pLine.toCharArray();
+
+		if (pLine == null) {
+			return;
+		}
+		
+		final char[] chars = pLine.toCharArray();
     	int len = chars.length;
 
     	while(len > 0) {

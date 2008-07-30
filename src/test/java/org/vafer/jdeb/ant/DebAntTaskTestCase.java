@@ -34,6 +34,7 @@ import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
 import org.vafer.jdeb.ar.ArEntry;
 import org.vafer.jdeb.ar.ArInputStream;
+import org.vafer.jdeb.ar.NonClosingInputStream;
 
 /**
  * @author Emmanuel Bourg
@@ -168,7 +169,7 @@ public final class DebAntTaskTestCase extends TestCase {
 		ArEntry entry;
 		while ((entry = in.getNextEntry()) != null) {
 			if (entry.getName().equals("data.tar.gz")) {
-				TarInputStream tar = new TarInputStream(new GZIPInputStream(in));
+				TarInputStream tar = new TarInputStream(new GZIPInputStream(new NonClosingInputStream(in)));
 				TarEntry tarentry;
 				while ((tarentry = tar.getNextEntry()) != null) {
 					assertTrue("prefix", tarentry.getName().startsWith("/foo/"));
@@ -193,6 +194,7 @@ public final class DebAntTaskTestCase extends TestCase {
 				}
 			}
 		}
+		in.close();
 	}
 
 	public void testUnkownCompression() throws Exception {
@@ -237,6 +239,7 @@ public final class DebAntTaskTestCase extends TestCase {
 				}
 			}
 		}
+		in.close();
 
 		assertTrue("bz2 file not found", found);
 	}
@@ -255,7 +258,7 @@ public final class DebAntTaskTestCase extends TestCase {
 			if (entry.getName().equals("data.tar")) {
 				found = true;
 
-				TarInputStream tar = new TarInputStream(in);
+				TarInputStream tar = new TarInputStream(new NonClosingInputStream(in));
 				while ((tar.getNextEntry()) != null);
 				tar.close();
 			} else {
@@ -270,6 +273,7 @@ public final class DebAntTaskTestCase extends TestCase {
 				}
 			}
 		}
+		in.close();
 
 		assertTrue("tar file not found", found);
 	}
