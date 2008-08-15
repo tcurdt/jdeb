@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.vafer</groupId>
+        <artifactId>maven-pom</artifactId>
+        <version>1.0</version>
+    </parent>
     <groupId>org.vafer</groupId>
     <artifactId>jdeb</artifactId>
     <packaging>maven-plugin</packaging>
@@ -44,53 +49,6 @@
     </scm>
     <build>
         <plugins>
-            <!--
-            <plugin>
-                <artifactId>shade-maven-plugin</artifactId>
-                <groupId>org.codehaus.mojo</groupId>
-                <version>1.0-alpha-10</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <relocations>
-                                <relocation>
-                                    <pattern>org.bouncycastle</pattern>
-                                </relocation>                                    
-                            </relocations>
-                            <artifactSet>
-                                <excludes>
-                                    <exclude>junit:junit</exclude>
-                                    <exclude>org.apache.ant:ant</exclude>
-                                    <exclude>org.apache.ant:ant-launcher</exclude>
-                                </excludes>
-                            </artifactSet>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
-            <!--
-            <plugin>
-                <artifactId>jdeb</artifactId>
-                <groupId>org.vafer</groupId>
-                <version>0.3-SNAPSHOT</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>deb</goal>
-                        </goals>
-                        <configuration>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
-
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
@@ -145,76 +103,11 @@
             <scope>tests</scope>
         </dependency>
     </dependencies>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <linksource>true</linksource>
-                    <links>
-                        <link>http://java.sun.com/javase/6/docs/api</link>
-                    </links>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-pmd-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>project-team</report>
-                            <report>dependencies</report>
-                            <report>license</report>
-                            <report>scm</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.0</version>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jxr-maven-plugin</artifactId>
-            </plugin>
-            <!--
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>1.2</version>
-            </plugin>
-            -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>taglist-maven-plugin</artifactId>
-                <version>2.0</version>
-                <configuration>
-                    <tags>
-                        <tag>TODO</tag>
-                        <tag>@todo</tag>
-                        <tag>FIXME</tag>
-                        <tag>@deprecated</tag>
-                    </tags>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
-    <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <url>scpexe://vafer.org/home/tcurdt/apache2/vafer.org/www/repository/releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>snaphots</id>
-            <url>scpexe://vafer.org/home/tcurdt/apache2/vafer.org/www/repository/snapshots</url>
-        </snapshotRepository>
+
+   <distributionManagement>
         <site>
             <id>website</id>
-            <url>scpexe://vafer.org/home/tcurdt/apache2/vafer.org/www/projects/jdeb</url>
+            <url>scpexe://vafer.org/home/tcurdt/apache2/vafer.org/www/projects/test</url>
         </site>
     </distributionManagement>
 </project>

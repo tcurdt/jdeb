@@ -1,38 +1,28 @@
 <?xml version="1.0"?>
 <project name="jdeb - Building Debian packages in Java">
 
-<!--
-  <bannerLeft>
-    <name>JDeb</name>
-    <src>http://maven.apache.org/images/apache-maven-project.png</src>
-    <href>http://vafer.org/projects/jdeb</href>
-  </bannerLeft>
-
-  <bannerRight>
-    <src>http://maven.apache.org/images/maven-small.gif</src>
-  </bannerRight>
--->
-  <publishDate format="dd MMM yyyy" />
-
   <skin>
     <groupId>org.vafer</groupId>
     <artifactId>maven-skin</artifactId>
-    <version>1.1</version>
+    <version>1.2-SNAPSHOT</version>
   </skin>
 
   <body>
-    <links>
-      <item name="Blog" href="http://vafer.org/blog/"/>
-    </links>
 
-    <menu name="Project">
-      <item name="About" href="index.html"/>
-      <item name="How to use" href="howto.html"/>
-      <item name="Downloads" href="downloads.html"/>
-      <item name="Links" href="links.html"/>
+    <!--
+    <menu name="index.html">
+      <item name="License" href="index.html"/>
+      <item name="Team" href="links.html"/>
+      <item name="Repository" href="links.html"/>
+      <item name="Dependencies" href="links.html"/>
     </menu>
 
-    ${reports}
+    <menu name="docs.html">
+      <item name="Javadocs" href="index.html"/>
+      <item name="Source Xref" href="links.html"/>
+      <item name="Taglist" href="links.html"/>
+    </menu>
+    -->
 
   </body>
 </project>
