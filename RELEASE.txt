@@ -2,21 +2,27 @@ On trunk
 
   1) perform the release
 
+	  PROJECT=jdeb
+	  VERSION=0.7
+	  PROJECT_DIR=apache2/vafer.org/www/projects/${PROJECT}
+	  DEPLOYMENT_DIR=${PROJECT_DIR}/versions/${VERSION}
+	  DEPLOYMENT_SERVER=tcurdt@vafer.org
 	  mvn clean install
 	  mvn release:clean release:prepare 
 	  mvn release:perform
 
-From the tag
+  2) create the bundle/release zip
 
-  2) build the bundle
+	  cd target/checkout
+      mvn source:jar javadoc:jar repository:bundle-create
+	  scp target/${PROJECT}-${VERSION}-bundle.jar $DEPLOYMENT_SERVER:$DEPLOYMENT_DIR
+	  ssh $DEPLOYMENT_SERVER "mkdir $DEPLOYMENT_DIR"
+	  ssh $DEPLOYMENT_SERVER "cp apache2/vafer.org/www/repository/releases/org/vafer/${PROJECT}/${VERSION}/${PROJECT}-${VERSION}-bundle.jar $DEPLOYMENT_DIR/${PROJECT}_${VERSION}.zip"
+	  scp RELEASENOTES.html $DEPLOYMENT_SERVER:$DEPLOYMENT_DIR
+      ssh $DEPLOYMENT_SERVER "~/bin/appcast xml $PROJECT > $PROJECT_DIR/appcast.xml"
+      ssh $DEPLOYMENT_SERVER "~/bin/appcast php $PROJECT > $PROJECT_DIR/appcast.php"
 
-      mvn clean source:jar repository:bundle-create 
-
-  3) put the bundle online
-
-      scp target/*bundle* tcurdt@vafer.org:apache2/vafer.org/www/repository/releases/org/vafer/jdeb/{VERSION}
- 
-  4) submit the bundle
+  2) submit the bundle
 
       open http://jira.codehaus.org/secure/CreateIssue.jspa?pid=10367&issuetype=3
 
