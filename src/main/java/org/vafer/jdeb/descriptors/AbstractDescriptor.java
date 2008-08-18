@@ -68,6 +68,10 @@ public abstract class AbstractDescriptor {
 			}
 
 			linenr++;
+
+			if (line.length() == 0) {
+				throw new ParseException("Empty line", linenr);
+			}
 			
 			final char first = line.charAt(0); 
 			if (Character.isLetter(first)) {

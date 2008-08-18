@@ -17,6 +17,7 @@ package org.vafer.jdeb.descriptors;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,5 +74,18 @@ public final class PackageDescriptorTestCase extends TestCase {
 		assertEquals("Torsten Curdt <tcurdt@vafer.org>", d.get("Maintainer"));
 		assertEquals("test[[test", d.get("NoResolve1"));
 		assertEquals("[[test]]", d.get("NoResolve2"));
+	}
+	
+	public void testEmptyLines() throws Exception {
+		final InputStream is = new ByteArrayInputStream(
+				("Key1: Value1\n" +
+				 "Key2: Value2\n" +
+				 "\n").getBytes());
+		try {
+			new PackageDescriptor(is, null);
+			fail("Should throw a ParseException");
+		} catch(ParseException e) {
+			
+		}		
 	}
 }
