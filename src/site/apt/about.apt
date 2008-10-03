@@ -2,7 +2,7 @@ Debian packages in java
 
  This library provides an Ant task and a Maven plugin to create Debian packages from Java builds in a truly cross platform manner. Build your Debian packages on any platform that has Java support. Windows, Linux - it does not require additional native tools installed. The API underneath is well abstracted can easily be adopted for other areas as well.
 
- The source code is included in the {{{./history.php}releases}}. If you want to help out feel free to get the latest code {{{http://github.com/tcurdt/jdeb/tree/master}via git}}</a>.
+ The source code is included in the {{{./history.php}releases}}. If you want to help out feel free to get the latest code {{{http://github.com/tcurdt/jdeb/tree/master}via git}}.
 
 +--------------------
 git clone git://github.com/tcurdt/jdeb.git
