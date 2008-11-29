@@ -1,6 +1,6 @@
 Documentation
 
- See below for instruction on how to use jdeb with maven or ant. For developer information please see the {{{./apidocs/}javadocs}} and the source {{{./xref/}xref}}. For FAQs and other problems please check {{{http://getsatisfaction.com/vaferorg/products/vaferorg_jdeb}}the support website}.
+ See below for instruction on how to use jdeb with maven or ant. For developer information please see the {{{./apidocs/}javadocs}} and the source {{{./xref/}xref}}. For FAQs and other problems please check {{{http://getsatisfaction.com/vaferorg/products/vaferorg_jdeb}the support website}}.
 
 * Howto use "jdeb" with maven
 
