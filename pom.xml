@@ -44,7 +44,7 @@
     </licenses>
     <scm>
         <connection>scm:git:git://github.com:tcurdt/jdeb.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:tcurdt/jdeb.git</developerConnection>
+        <developerConnection>scm:git:git://github.com:tcurdt/jdeb.git</developerConnection>
         <url>http://github.com/tcurdt/jdeb/tree/master</url>
     </scm>
     <build>
@@ -100,7 +100,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.2</version>
-            <scope>tests</scope>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
