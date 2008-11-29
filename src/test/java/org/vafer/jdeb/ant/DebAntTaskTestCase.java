@@ -50,7 +50,9 @@ public final class DebAntTaskTestCase extends TestCase {
 
 		File buildFile = new File("target/test-classes/testbuild.xml");
 		project.setBaseDir(buildFile.getParentFile());
-		ProjectHelper.configureProject(project, buildFile);
+
+		final ProjectHelper helper = ProjectHelper.getProjectHelper();
+		helper.parse(project, buildFile);
 
 		// remove the package previously build
 		File deb = new File("target/test.deb");
