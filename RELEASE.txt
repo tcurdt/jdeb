@@ -3,8 +3,8 @@ On trunk
   1) perform the release
 
 	  PROJECT=jdeb
-	  VERSION=0.7
-	  PROJECT_DIR=apache2/vafer.org/www/projects/${PROJECT}
+	  VERSION=0.8
+	  PROJECT_DIR=/var/www/vafer.org/www/projects/${PROJECT}
 	  DEPLOYMENT_DIR=${PROJECT_DIR}/versions/${VERSION}
 	  DEPLOYMENT_SERVER=tcurdt@vafer.org
 	  mvn clean install
@@ -17,7 +17,7 @@ On trunk
       mvn source:jar javadoc:jar repository:bundle-create
 	  scp target/${PROJECT}-${VERSION}-bundle.jar $DEPLOYMENT_SERVER:$DEPLOYMENT_DIR
 	  ssh $DEPLOYMENT_SERVER "mkdir $DEPLOYMENT_DIR"
-	  ssh $DEPLOYMENT_SERVER "cp apache2/vafer.org/www/repository/releases/org/vafer/${PROJECT}/${VERSION}/${PROJECT}-${VERSION}-bundle.jar $DEPLOYMENT_DIR/${PROJECT}_${VERSION}.zip"
+	  ssh $DEPLOYMENT_SERVER "cp /var/www/vafer.org/www/repository/releases/org/vafer/${PROJECT}/${VERSION}/${PROJECT}-${VERSION}-bundle.jar $DEPLOYMENT_DIR/${PROJECT}_${VERSION}.zip"
 	  scp RELEASENOTES.html $DEPLOYMENT_SERVER:$DEPLOYMENT_DIR
       ssh $DEPLOYMENT_SERVER "~/bin/appcast xml $PROJECT > $PROJECT_DIR/appcast.xml"
       ssh $DEPLOYMENT_SERVER "~/bin/appcast php $PROJECT > $PROJECT_DIR/appcast.php"
@@ -26,7 +26,7 @@ On trunk
 
       open http://jira.codehaus.org/secure/CreateIssue.jspa?pid=10367&issuetype=3
 
-      summary: please upload the new jdeb 0.4 release
+      summary: please upload the new jdeb 0.8 release
       bundle: http://vafer.org/repository/releases/org/vafer/jdeb/{VERSION}/jdeb-{VERSION}-bundle.jar
       project: http://vafer.org/projects/jdeb/index.html
       contributor: http://vafer.org/projects/jdeb/team-list.html
