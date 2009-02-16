@@ -3,4 +3,5 @@ o descriptor fields shouldn't be case sensitive
 o add a <link> element to declare symlinks ? (see jRPM and https://issues.apache.org/bugzilla/show_bug.cgi?id=40059)
 o subversion log ChangesProvider
 o jira release notes ChangesProvider
+o fix the CRLF in the maintainer scripts, or break with a warning to have the user fix it
  

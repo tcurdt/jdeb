@@ -68,15 +68,17 @@ public final class FileSetDataProducer implements DataProducer {
 
 		final String[] directories = scanner.getIncludedDirectories();
 		for (int i = 0; i < directories.length; i++) {
-			final String name = directories[i];
+			String name = directories[i];
+            name = name.replace('\\', '/');
 
-			pReceiver.onEachDir(prefix + "/" + name, null, user, uid, group, gid, dirmode, 0);
+            pReceiver.onEachDir(prefix + "/" + name, null, user, uid, group, gid, dirmode, 0);
 		}
 
 		final String[] files = scanner.getIncludedFiles();
 		for (int i = 0; i < files.length; i++) {
-			final String name = files[i];
-			final File file = new File(basedir, name);
+			String name = files[i];
+            name = name.replace('\\', '/');
+            File file = new File(basedir, name);
 
 			final InputStream inputStream = new FileInputStream(file);
 			try {
@@ -84,7 +86,6 @@ public final class FileSetDataProducer implements DataProducer {
 			} finally {
 				inputStream.close();
 			}
-
 		}
 	}
 }

@@ -345,7 +345,7 @@ public class Processor {
 	 * @throws NoSuchAlgorithmException
 	 * @throws IOException
 	 */
-	private BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums, String pCompression ) throws NoSuchAlgorithmException, IOException {
+	BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums, String pCompression ) throws NoSuchAlgorithmException, IOException {
 
 		OutputStream out = new FileOutputStream(pOutput);
 		if ("gzip".equals(pCompression)) {
