@@ -4,4 +4,5 @@ o add a <link> element to declare symlinks ? (see jRPM and https://issues.apache
 o subversion log ChangesProvider
 o jira release notes ChangesProvider
 o fix the CRLF in the maintainer scripts, or break with a warning to have the user fix it
+o create the parent directories when a prefix is specified on a <data> or a <tarfileset> element
  

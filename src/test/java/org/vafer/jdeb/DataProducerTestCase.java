@@ -90,9 +90,9 @@ public final class DataProducerTestCase extends TestCase {
 
 		ar.close();
 		
-		assertTrue("" + filesInDeb, filesInDeb.contains("/test/testfile"));
-		assertTrue("" + filesInDeb, filesInDeb.contains("/test/testfile2"));
-		assertTrue("" + filesInDeb, filesInDeb.contains("/test/testfile3"));
+		assertTrue("testfile wasn't found in the package", filesInDeb.contains("./test/testfile"));
+		assertTrue("testfile2 wasn't found in the package", filesInDeb.contains("./test/testfile2"));
+		assertTrue("testfile3 wasn't found in the package", filesInDeb.contains("./test/testfile3"));
 
 		assertTrue("Cannot delete the file " + deb, deb.delete());
 	}

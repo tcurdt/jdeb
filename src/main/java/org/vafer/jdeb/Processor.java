@@ -369,11 +369,14 @@ public class Processor {
 					dirname = dirname + "/";
 				}
 
-				if (!dirname.startsWith("/")) {
-					dirname = "/" + dirname;
-				}
+                // ensure the path is like : ./foo/bar
+                if (dirname.startsWith("/")) {
+					dirname = "." + dirname;
+				} else if (!dirname.startsWith("./")) {
+                    dirname = "./" + dirname;
+                }
 
-				TarEntry entry = new TarEntry(dirname);
+                TarEntry entry = new TarEntry(dirname);
 
 				// FIXME: link is in the constructor
 				entry.setUserName(user);
@@ -392,9 +395,12 @@ public class Processor {
 
 			public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
 
-				if (!filename.startsWith("/")) {
-					filename = "/" + filename;
-				}
+                // ensure the path is like : ./foo/bar
+                if (filename.startsWith("/")) {
+					filename = "." + filename;
+				} else if (!filename.startsWith("./")) {
+                    filename = "./" + filename;
+                }
 
 				TarEntry entry = new TarEntry(filename);
 

@@ -174,7 +174,7 @@ public final class DebAntTaskTestCase extends TestCase {
 				TarInputStream tar = new TarInputStream(new GZIPInputStream(new NonClosingInputStream(in)));
 				TarEntry tarentry;
 				while ((tarentry = tar.getNextEntry()) != null) {
-					assertTrue("prefix", tarentry.getName().startsWith("/foo/"));
+					assertTrue("prefix", tarentry.getName().startsWith("./foo/"));
 					if (tarentry.isDirectory()) {
 						assertEquals("directory mode (" + tarentry.getName() + ")", 040700, tarentry.getMode());
 					} else {
