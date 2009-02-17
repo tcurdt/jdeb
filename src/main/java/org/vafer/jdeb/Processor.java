@@ -57,413 +57,413 @@ import org.vafer.jdeb.utils.VariableResolver;
  */
 public class Processor {
 
-	private final Console console;
-	private final VariableResolver resolver;
-
-	private static final class Total {
-		private BigInteger count = BigInteger.valueOf(0);
-
-		public void add(long size) {
-			count = count.add(BigInteger.valueOf(size));
-		}
-
-		public String toString() {
-			return "" + count;
-		}
-
-		public BigInteger toBigInteger() {
-			return count;
-		}
-	}
-
-	public Processor( final Console pConsole, final VariableResolver pResolver ) {
-		console = pConsole;
-		resolver = pResolver;
-	}
-
-	private void addTo( final ArOutputStream pOutput, final String pName, final String pContent ) throws IOException {
-		final byte[] content = pContent.getBytes(); 
-		pOutput.putNextEntry(new ArEntry(pName, content.length));
-		pOutput.write(content);
-	}
-
-	private void addTo( final ArOutputStream pOutput, final String pName, final File pContent ) throws IOException {
-		pOutput.putNextEntry(new ArEntry(pName, pContent.length()));
-		
-		final InputStream input = new FileInputStream(pContent);
-		try {
-			Utils.copy(input, pOutput);
-		} finally {
-			input.close();
-		}
-	}
-	
-	/**
-	 * Create the debian archive with from the provided control files and data producers.
-	 * 
-	 * @param pControlFiles
-	 * @param pData
-	 * @param pOutput
-	 * @param compression the compression method used for the data file (gzip, bzip2 or anything else for no compression)
-	 * @return PackageDescriptor
-	 * @throws PackagingException
-	 */
-	public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput, String compression ) throws PackagingException, InvalidDescriptorException {
-
-		File tempData = null;
-		File tempControl = null;
-
-		try {
-			tempData = File.createTempFile("deb", "data");			
-			tempControl = File.createTempFile("deb", "control");			
-
-			console.println("Building data");
-			final StringBuffer md5s = new StringBuffer();
-			final BigInteger size = buildData(pData, tempData, md5s, compression);
-
-			console.println("Building control");
-			final PackageDescriptor packageDescriptor = buildControl(pControlFiles, size, md5s, tempControl);
-
-			if (!packageDescriptor.isValid()) {
-				throw new InvalidDescriptorException(packageDescriptor);
-			}
-
-			final InformationOutputStream output = new InformationOutputStream(new FileOutputStream(pOutput), MessageDigest.getInstance("MD5"));
-
-			final ArOutputStream ar = new ArOutputStream(output);
-
-			addTo(ar, "debian-binary", "2.0\n");
-			addTo(ar, "control.tar.gz", tempControl);
-			addTo(ar, "data.tar" + getExtension(compression), tempData);
-			
-			ar.close();
-
-			// intermediate values
-			packageDescriptor.set("MD5", output.getMd5());
-			packageDescriptor.set("Size", "" + output.getSize());
-			packageDescriptor.set("File", pOutput.getName());
-
-			return packageDescriptor;
-
-		} catch(InvalidDescriptorException e) {
-			throw e;
-		} catch(Exception e) {
-			throw new PackagingException("Could not create deb package", e);
-		} finally {
-			if (tempData != null) {
-				if (!tempData.delete()) {
-					throw new PackagingException("Could not delete " + tempData);					
-				}
-			}
-			if (tempControl != null) {
-				if (!tempControl.delete()) {
-					throw new PackagingException("Could not delete " + tempControl);					
-				}
-			}
-		}
-	}
-
-	/**
-	 * Return the extension of a file compressed with the specified method.
-	 *
-	 * @param pCompression the compression method used
-	 * @return
-	 */
-	private String getExtension( final String pCompression ) {
-		if ("gzip".equals(pCompression)) {
-			return ".gz";
-		} else if ("bzip2".equals(pCompression)) {
-			return ".bz2";
-		} else {
-			return "";
-		}
-	}
-
-	/**
-	 * Create changes file based on the provided PackageDescriptor.
-	 * If pRing, pKey and pPassphrase are provided the changes file will also be signed.
-	 * It returns a ChangesDescriptor reflecting the changes  
-	 * @param pPackageDescriptor
-	 * @param pChangesProvider
-	 * @param pRing
-	 * @param pKey
-	 * @param pPassphrase
-	 * @param pOutput
-	 * @return ChangesDescriptor
-	 * @throws IOException
-	 */
-	public ChangesDescriptor createChanges( final PackageDescriptor pPackageDescriptor, final ChangesProvider pChangesProvider, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException, InvalidDescriptorException {
-
-		final ChangeSet[] changeSets = pChangesProvider.getChangesSets();
-		final ChangesDescriptor changesDescriptor = new ChangesDescriptor(pPackageDescriptor, changeSets);
-
-		changesDescriptor.set("Format", "1.7");
-
-		if (changesDescriptor.get("Binary") == null) {
-			changesDescriptor.set("Binary", changesDescriptor.get("Package"));
-		}
-
-		if (changesDescriptor.get("Source") == null) {
-			changesDescriptor.set("Source", changesDescriptor.get("Package"));
-		}
-
-		if (changesDescriptor.get("Description") == null) {
-			changesDescriptor.set("Description", "update to " + changesDescriptor.get("Version"));
-		}
-
-		final StringBuffer files = new StringBuffer("\n");
-		files.append(' ').append(changesDescriptor.get("MD5"));
-		files.append(' ').append(changesDescriptor.get("Size"));
-		files.append(' ').append(changesDescriptor.get("Section"));
-		files.append(' ').append(changesDescriptor.get("Priority"));
-		files.append(' ').append(changesDescriptor.get("File"));			
-		changesDescriptor.set("Files", files.toString());
-
-		if (!changesDescriptor.isValid()) {
-			throw new InvalidDescriptorException(changesDescriptor);
-		}
-		
-		final String changes = changesDescriptor.toString();
-		//console.println(changes);
-
-		final byte[] changesBytes = changes.getBytes("UTF-8");
-
-		if (pRing == null || pKey == null || pPassphrase == null) {			
-			pOutput.write(changesBytes);
-			pOutput.close();			
-			return changesDescriptor;
-		}
-
-		console.println("Signing changes with key " + pKey);
-
-		final InputStream input = new ByteArrayInputStream(changesBytes);
-
-		try {
-			SigningUtils.clearSign(input, pRing, pKey, pPassphrase, pOutput);		
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		pOutput.close();
-
-		return changesDescriptor;
-	}
-
-	/**
-	 * Build control archive of the deb
-	 * @param pControlFiles
-	 * @param pDataSize
-	 * @param pChecksums
-	 * @param pOutput
-	 * @return
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 * @throws ParseException
-	 */
-	private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuffer pChecksums, final File pOutput ) throws IOException, ParseException {
-
-		PackageDescriptor packageDescriptor = null;
-
-		final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
-		outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
-
-		for (int i = 0; i < pControlFiles.length; i++) {
-			final File file = pControlFiles[i];
-
-			if (file.isDirectory()) {
-				continue;
-			}
-
-			final TarEntry entry = new TarEntry(file);
-
-			final String name = file.getName();
-
-			entry.setName(name);
-
-			if ("control".equals(name)) {
-				packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
-
-				if (packageDescriptor.get("Date") == null) {
-					SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
-					// FIXME Is this field allowed in package descriptors ?
-					packageDescriptor.set("Date", fmt.format(new Date()));
-				}
-
-				if (packageDescriptor.get("Distribution") == null) {
-					packageDescriptor.set("Distribution", "unknown");
-				}
-
-				if (packageDescriptor.get("Urgency") == null) {
-					packageDescriptor.set("Urgency", "low");
-				}
-
-				final String debFullName = System.getenv("DEBFULLNAME");
-				final String debEmail = System.getenv("DEBEMAIL");
-
-				if (debFullName != null && debEmail != null) {
-					packageDescriptor.set("Maintainer", debFullName + " <" + debEmail + ">");
-					console.println("Using maintainer from the environment variables.");
-				}
-
-				continue;
-			}			
-
-			final InputStream inputStream = new FileInputStream(file);
-
-			outputStream.putNextEntry(entry);
-
-			Utils.copy(inputStream, outputStream);								
-
-			outputStream.closeEntry();
-
-			inputStream.close();
-
-		}
-
-		if (packageDescriptor == null) {
-			throw new FileNotFoundException("No control file in " + Arrays.toString(pControlFiles));
-		}
-
-		packageDescriptor.set("Installed-Size", pDataSize.divide(BigInteger.valueOf(1024)).toString());
-
-		addEntry("control", packageDescriptor.toString(), outputStream);
-
-		addEntry("md5sums", pChecksums.toString(), outputStream);
-
-		outputStream.close();
-
-		return packageDescriptor;
-	}
-
-	/**
-	 * Build the data archive of the deb from the provided DataProducers
-	 * @param pData
-	 * @param pOutput
-	 * @param pChecksums
-	 * @param pCompression the compression method used for the data file (gzip, bzip2 or anything else for no compression)
-	 * @return
-	 * @throws NoSuchAlgorithmException
-	 * @throws IOException
-	 */
-	BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums, String pCompression ) throws NoSuchAlgorithmException, IOException {
-
-		OutputStream out = new FileOutputStream(pOutput);
-		if ("gzip".equals(pCompression)) {
-			out = new GZIPOutputStream(out);
-		} else if ("bzip2".equals(pCompression)) {
-			out.write("BZ".getBytes());
-			out = new CBZip2OutputStream(out);
-		}
-		
-		final TarOutputStream outputStream = new TarOutputStream(out);
-		outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
-
-		final MessageDigest digest = MessageDigest.getInstance("MD5");
-
-		final Total dataSize = new Total();
-
-		final DataConsumer receiver = new DataConsumer() {
-			public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
-
-				if (!dirname.endsWith("/")) {
-					dirname = dirname + "/";
-				}
+    private final Console console;
+    private final VariableResolver resolver;
+
+    private static final class Total {
+        private BigInteger count = BigInteger.valueOf(0);
+
+        public void add(long size) {
+            count = count.add(BigInteger.valueOf(size));
+        }
+
+        public String toString() {
+            return "" + count;
+        }
+
+        public BigInteger toBigInteger() {
+            return count;
+        }
+    }
+
+    public Processor( final Console pConsole, final VariableResolver pResolver ) {
+        console = pConsole;
+        resolver = pResolver;
+    }
+
+    private void addTo( final ArOutputStream pOutput, final String pName, final String pContent ) throws IOException {
+        final byte[] content = pContent.getBytes(); 
+        pOutput.putNextEntry(new ArEntry(pName, content.length));
+        pOutput.write(content);
+    }
+
+    private void addTo( final ArOutputStream pOutput, final String pName, final File pContent ) throws IOException {
+        pOutput.putNextEntry(new ArEntry(pName, pContent.length()));
+        
+        final InputStream input = new FileInputStream(pContent);
+        try {
+            Utils.copy(input, pOutput);
+        } finally {
+            input.close();
+        }
+    }
+    
+    /**
+     * Create the debian archive with from the provided control files and data producers.
+     * 
+     * @param pControlFiles
+     * @param pData
+     * @param pOutput
+     * @param compression the compression method used for the data file (gzip, bzip2 or anything else for no compression)
+     * @return PackageDescriptor
+     * @throws PackagingException
+     */
+    public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput, String compression ) throws PackagingException, InvalidDescriptorException {
+
+        File tempData = null;
+        File tempControl = null;
+
+        try {
+            tempData = File.createTempFile("deb", "data");          
+            tempControl = File.createTempFile("deb", "control");            
+
+            console.println("Building data");
+            final StringBuffer md5s = new StringBuffer();
+            final BigInteger size = buildData(pData, tempData, md5s, compression);
+
+            console.println("Building control");
+            final PackageDescriptor packageDescriptor = buildControl(pControlFiles, size, md5s, tempControl);
+
+            if (!packageDescriptor.isValid()) {
+                throw new InvalidDescriptorException(packageDescriptor);
+            }
+
+            final InformationOutputStream output = new InformationOutputStream(new FileOutputStream(pOutput), MessageDigest.getInstance("MD5"));
+
+            final ArOutputStream ar = new ArOutputStream(output);
+
+            addTo(ar, "debian-binary", "2.0\n");
+            addTo(ar, "control.tar.gz", tempControl);
+            addTo(ar, "data.tar" + getExtension(compression), tempData);
+            
+            ar.close();
+
+            // intermediate values
+            packageDescriptor.set("MD5", output.getMd5());
+            packageDescriptor.set("Size", "" + output.getSize());
+            packageDescriptor.set("File", pOutput.getName());
+
+            return packageDescriptor;
+
+        } catch(InvalidDescriptorException e) {
+            throw e;
+        } catch(Exception e) {
+            throw new PackagingException("Could not create deb package", e);
+        } finally {
+            if (tempData != null) {
+                if (!tempData.delete()) {
+                    throw new PackagingException("Could not delete " + tempData);                   
+                }
+            }
+            if (tempControl != null) {
+                if (!tempControl.delete()) {
+                    throw new PackagingException("Could not delete " + tempControl);                    
+                }
+            }
+        }
+    }
+
+    /**
+     * Return the extension of a file compressed with the specified method.
+     *
+     * @param pCompression the compression method used
+     * @return
+     */
+    private String getExtension( final String pCompression ) {
+        if ("gzip".equals(pCompression)) {
+            return ".gz";
+        } else if ("bzip2".equals(pCompression)) {
+            return ".bz2";
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Create changes file based on the provided PackageDescriptor.
+     * If pRing, pKey and pPassphrase are provided the changes file will also be signed.
+     * It returns a ChangesDescriptor reflecting the changes  
+     * @param pPackageDescriptor
+     * @param pChangesProvider
+     * @param pRing
+     * @param pKey
+     * @param pPassphrase
+     * @param pOutput
+     * @return ChangesDescriptor
+     * @throws IOException
+     */
+    public ChangesDescriptor createChanges( final PackageDescriptor pPackageDescriptor, final ChangesProvider pChangesProvider, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException, InvalidDescriptorException {
+
+        final ChangeSet[] changeSets = pChangesProvider.getChangesSets();
+        final ChangesDescriptor changesDescriptor = new ChangesDescriptor(pPackageDescriptor, changeSets);
+
+        changesDescriptor.set("Format", "1.7");
+
+        if (changesDescriptor.get("Binary") == null) {
+            changesDescriptor.set("Binary", changesDescriptor.get("Package"));
+        }
+
+        if (changesDescriptor.get("Source") == null) {
+            changesDescriptor.set("Source", changesDescriptor.get("Package"));
+        }
+
+        if (changesDescriptor.get("Description") == null) {
+            changesDescriptor.set("Description", "update to " + changesDescriptor.get("Version"));
+        }
+
+        final StringBuffer files = new StringBuffer("\n");
+        files.append(' ').append(changesDescriptor.get("MD5"));
+        files.append(' ').append(changesDescriptor.get("Size"));
+        files.append(' ').append(changesDescriptor.get("Section"));
+        files.append(' ').append(changesDescriptor.get("Priority"));
+        files.append(' ').append(changesDescriptor.get("File"));            
+        changesDescriptor.set("Files", files.toString());
+
+        if (!changesDescriptor.isValid()) {
+            throw new InvalidDescriptorException(changesDescriptor);
+        }
+        
+        final String changes = changesDescriptor.toString();
+        //console.println(changes);
+
+        final byte[] changesBytes = changes.getBytes("UTF-8");
+
+        if (pRing == null || pKey == null || pPassphrase == null) {         
+            pOutput.write(changesBytes);
+            pOutput.close();            
+            return changesDescriptor;
+        }
+
+        console.println("Signing changes with key " + pKey);
+
+        final InputStream input = new ByteArrayInputStream(changesBytes);
+
+        try {
+            SigningUtils.clearSign(input, pRing, pKey, pPassphrase, pOutput);       
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        pOutput.close();
+
+        return changesDescriptor;
+    }
+
+    /**
+     * Build control archive of the deb
+     * @param pControlFiles
+     * @param pDataSize
+     * @param pChecksums
+     * @param pOutput
+     * @return
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws ParseException
+     */
+    private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuffer pChecksums, final File pOutput ) throws IOException, ParseException {
+
+        PackageDescriptor packageDescriptor = null;
+
+        final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
+        outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
+
+        for (int i = 0; i < pControlFiles.length; i++) {
+            final File file = pControlFiles[i];
+
+            if (file.isDirectory()) {
+                continue;
+            }
+
+            final TarEntry entry = new TarEntry(file);
+
+            final String name = file.getName();
+
+            entry.setName(name);
+
+            if ("control".equals(name)) {
+                packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
+
+                if (packageDescriptor.get("Date") == null) {
+                    SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
+                    // FIXME Is this field allowed in package descriptors ?
+                    packageDescriptor.set("Date", fmt.format(new Date()));
+                }
+
+                if (packageDescriptor.get("Distribution") == null) {
+                    packageDescriptor.set("Distribution", "unknown");
+                }
+
+                if (packageDescriptor.get("Urgency") == null) {
+                    packageDescriptor.set("Urgency", "low");
+                }
+
+                final String debFullName = System.getenv("DEBFULLNAME");
+                final String debEmail = System.getenv("DEBEMAIL");
+
+                if (debFullName != null && debEmail != null) {
+                    packageDescriptor.set("Maintainer", debFullName + " <" + debEmail + ">");
+                    console.println("Using maintainer from the environment variables.");
+                }
+
+                continue;
+            }           
+
+            final InputStream inputStream = new FileInputStream(file);
+
+            outputStream.putNextEntry(entry);
+
+            Utils.copy(inputStream, outputStream);                              
+
+            outputStream.closeEntry();
+
+            inputStream.close();
+
+        }
+
+        if (packageDescriptor == null) {
+            throw new FileNotFoundException("No control file in " + Arrays.toString(pControlFiles));
+        }
+
+        packageDescriptor.set("Installed-Size", pDataSize.divide(BigInteger.valueOf(1024)).toString());
+
+        addEntry("control", packageDescriptor.toString(), outputStream);
+
+        addEntry("md5sums", pChecksums.toString(), outputStream);
+
+        outputStream.close();
+
+        return packageDescriptor;
+    }
+
+    /**
+     * Build the data archive of the deb from the provided DataProducers
+     * @param pData
+     * @param pOutput
+     * @param pChecksums
+     * @param pCompression the compression method used for the data file (gzip, bzip2 or anything else for no compression)
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws IOException
+     */
+    BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums, String pCompression ) throws NoSuchAlgorithmException, IOException {
+
+        OutputStream out = new FileOutputStream(pOutput);
+        if ("gzip".equals(pCompression)) {
+            out = new GZIPOutputStream(out);
+        } else if ("bzip2".equals(pCompression)) {
+            out.write("BZ".getBytes());
+            out = new CBZip2OutputStream(out);
+        }
+        
+        final TarOutputStream outputStream = new TarOutputStream(out);
+        outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
+
+        final MessageDigest digest = MessageDigest.getInstance("MD5");
+
+        final Total dataSize = new Total();
+
+        final DataConsumer receiver = new DataConsumer() {
+            public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+
+                if (!dirname.endsWith("/")) {
+                    dirname = dirname + "/";
+                }
 
                 // ensure the path is like : ./foo/bar
                 if (dirname.startsWith("/")) {
-					dirname = "." + dirname;
-				} else if (!dirname.startsWith("./")) {
+                    dirname = "." + dirname;
+                } else if (!dirname.startsWith("./")) {
                     dirname = "./" + dirname;
                 }
 
                 TarEntry entry = new TarEntry(dirname);
 
-				// FIXME: link is in the constructor
-				entry.setUserName(user);
-				entry.setUserId(uid);
-				entry.setGroupName(group);
-				entry.setGroupId(gid);
-				entry.setMode(mode);
-				entry.setSize(0);
+                // FIXME: link is in the constructor
+                entry.setUserName(user);
+                entry.setUserId(uid);
+                entry.setGroupName(group);
+                entry.setGroupId(gid);
+                entry.setMode(mode);
+                entry.setSize(0);
 
-				outputStream.putNextEntry(entry);
+                outputStream.putNextEntry(entry);
 
-				console.println("dir: " + dirname);
+                console.println("dir: " + dirname);
 
-				outputStream.closeEntry();
-			}
+                outputStream.closeEntry();
+            }
 
-			public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+            public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
 
                 // ensure the path is like : ./foo/bar
                 if (filename.startsWith("/")) {
-					filename = "." + filename;
-				} else if (!filename.startsWith("./")) {
+                    filename = "." + filename;
+                } else if (!filename.startsWith("./")) {
                     filename = "./" + filename;
                 }
 
-				TarEntry entry = new TarEntry(filename);
+                TarEntry entry = new TarEntry(filename);
 
-				// FIXME: link is in the constructor
-				entry.setUserName(user);
-				entry.setUserId(uid);
-				entry.setGroupName(group);
-				entry.setGroupId(gid);
-				entry.setMode(mode);
-				entry.setSize(size);
+                // FIXME: link is in the constructor
+                entry.setUserName(user);
+                entry.setUserId(uid);
+                entry.setGroupName(group);
+                entry.setGroupId(gid);
+                entry.setMode(mode);
+                entry.setSize(size);
 
-				outputStream.putNextEntry(entry);
+                outputStream.putNextEntry(entry);
 
-				dataSize.add(size);
+                dataSize.add(size);
 
-				digest.reset();
+                digest.reset();
 
-				Utils.copy(inputStream, new DigestOutputStream(outputStream, digest));
-				
-				final String md5 = Utils.toHex(digest.digest());
+                Utils.copy(inputStream, new DigestOutputStream(outputStream, digest));
+                
+                final String md5 = Utils.toHex(digest.digest());
 
-				outputStream.closeEntry();
+                outputStream.closeEntry();
 
-				console.println(
-						"file:" + entry.getName() +
-						" size:" + entry.getSize() +
-						" mode:" + entry.getMode() +
-						" linkname:" + entry.getLinkName() +
-						" username:" + entry.getUserName() +
-						" userid:" + entry.getUserId() +
-						" groupname:" + entry.getGroupName() +
-						" groupid:" + entry.getGroupId() +
-						" modtime:" + entry.getModTime() +
-						" md5: " + md5
-				);
+                console.println(
+                        "file:" + entry.getName() +
+                        " size:" + entry.getSize() +
+                        " mode:" + entry.getMode() +
+                        " linkname:" + entry.getLinkName() +
+                        " username:" + entry.getUserName() +
+                        " userid:" + entry.getUserId() +
+                        " groupname:" + entry.getGroupName() +
+                        " groupid:" + entry.getGroupId() +
+                        " modtime:" + entry.getModTime() +
+                        " md5: " + md5
+                );
 
-				pChecksums.append(md5).append(" ").append(entry.getName()).append('\n');
+                pChecksums.append(md5).append(" ").append(entry.getName()).append('\n');
 
-			}					
-		};
+            }                   
+        };
 
-		for (int i = 0; i < pData.length; i++) {
-			final DataProducer data = pData[i];
-			data.produce(receiver);
-		}
+        for (int i = 0; i < pData.length; i++) {
+            final DataProducer data = pData[i];
+            data.produce(receiver);
+        }
 
-		outputStream.close();
+        outputStream.close();
 
-		console.println("Total size: " + dataSize);
+        console.println("Total size: " + dataSize);
 
-		return dataSize.count;
-	}
+        return dataSize.count;
+    }
 
-	private static void addEntry( final String pName, final String pContent, final TarOutputStream pOutput ) throws IOException {
-		final byte[] data = pContent.getBytes("UTF-8");
+    private static void addEntry( final String pName, final String pContent, final TarOutputStream pOutput ) throws IOException {
+        final byte[] data = pContent.getBytes("UTF-8");
 
-		final TarEntry entry = new TarEntry(pName);
-		entry.setSize(data.length);
+        final TarEntry entry = new TarEntry(pName);
+        entry.setSize(data.length);
 
-		pOutput.putNextEntry(entry);
-		pOutput.write(data);
-		pOutput.closeEntry();		
-	}
+        pOutput.putNextEntry(entry);
+        pOutput.write(data);
+        pOutput.closeEntry();       
+    }
 
 
 }

@@ -22,23 +22,23 @@ import junit.framework.TestCase;
 
 public final class ArInputStreamTestCase extends TestCase {
 
-	public void testRead() throws Exception {
-		final File archive = new File(getClass().getResource("data.ar").toURI());
+    public void testRead() throws Exception {
+        final File archive = new File(getClass().getResource("data.ar").toURI());
 
-		final ArInputStream ar = new ArInputStream(new FileInputStream(archive));
-		final ArEntry entry1 = ar.getNextEntry();
+        final ArInputStream ar = new ArInputStream(new FileInputStream(archive));
+        final ArEntry entry1 = ar.getNextEntry();
 
-		assertEquals("data.tgz", entry1.getName());
-		assertEquals(148, entry1.getLength());
+        assertEquals("data.tgz", entry1.getName());
+        assertEquals(148, entry1.getLength());
 
-		for (int i = 0; i < entry1.getLength(); i++) {
-			ar.read();			
-		}
-		
-		final ArEntry entry2 = ar.getNextEntry();
-		
-		assertNull(entry2);
-		
-		ar.close();
-	}
+        for (int i = 0; i < entry1.getLength(); i++) {
+            ar.read();          
+        }
+        
+        final ArEntry entry2 = ar.getNextEntry();
+        
+        assertNull(entry2);
+        
+        ar.close();
+    }
 }

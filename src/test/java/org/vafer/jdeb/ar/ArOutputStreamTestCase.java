@@ -22,14 +22,14 @@ import junit.framework.TestCase;
 
 public final class ArOutputStreamTestCase extends TestCase {
 
-	public void testWrite() throws Exception {
-		final File out1 = File.createTempFile("jdeb", ".ar");
+    public void testWrite() throws Exception {
+        final File out1 = File.createTempFile("jdeb", ".ar");
 
-		final ArOutputStream os = new ArOutputStream(new FileOutputStream(out1));
-		os.putNextEntry(new ArEntry("data", 4));
-		os.write("data".getBytes());		
-		os.close();
-		
-		assertTrue(out1.delete());
-	}
+        final ArOutputStream os = new ArOutputStream(new FileOutputStream(out1));
+        os.putNextEntry(new ArEntry("data", 4));
+        os.write("data".getBytes());        
+        os.close();
+        
+        assertTrue(out1.delete());
+    }
 }

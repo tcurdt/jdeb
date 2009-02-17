@@ -24,6 +24,6 @@ import org.apache.tools.tar.TarEntry;
  */
 public interface Mapper {
 
-	public TarEntry map( final TarEntry entry );
-	
+    public TarEntry map( final TarEntry entry );
+    
 }

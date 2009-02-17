@@ -28,58 +28,58 @@ import org.vafer.jdeb.utils.VariableResolver;
  */
 public final class PackageDescriptor extends AbstractDescriptor {
 
-	private final static String[] keys = {
-		"Package",
-		"Source",
-		"Version",
-		"Section",
-		"Priority",
-		"Architecture",
-		"Essential",
-		"Depends",
-		"Pre-Depends",
-		"Recommends",
-		"Suggests",
-		"Breaks",
-		"Enhances",
-		"Conflicts",
-		"Provides",
-		"Replaces",
-		"Installed-Size",
-		"Maintainer",
-		"Description",
-		"Homepage",
-	};
+    private final static String[] keys = {
+        "Package",
+        "Source",
+        "Version",
+        "Section",
+        "Priority",
+        "Architecture",
+        "Essential",
+        "Depends",
+        "Pre-Depends",
+        "Recommends",
+        "Suggests",
+        "Breaks",
+        "Enhances",
+        "Conflicts",
+        "Provides",
+        "Replaces",
+        "Installed-Size",
+        "Maintainer",
+        "Description",
+        "Homepage",
+    };
 
-	private final static String[] mandatoryKeys = {
-		"Package",
-		"Version",
-		"Section",
-		"Priority",
-		"Architecture",
-		"Maintainer",
-		"Description"
-	};
-	
-	public PackageDescriptor() {
-		this(null);
-	}
+    private final static String[] mandatoryKeys = {
+        "Package",
+        "Version",
+        "Section",
+        "Priority",
+        "Architecture",
+        "Maintainer",
+        "Description"
+    };
+    
+    public PackageDescriptor() {
+        this(null);
+    }
 
-	public PackageDescriptor( final VariableResolver pResolver ) {
-		super(pResolver);
-	}
+    public PackageDescriptor( final VariableResolver pResolver ) {
+        super(pResolver);
+    }
 
-	public PackageDescriptor( final InputStream pInput, final VariableResolver pResolver )  throws IOException, ParseException {	
-		this(pResolver);
-		parse(pInput);
-	}
+    public PackageDescriptor( final InputStream pInput, final VariableResolver pResolver )  throws IOException, ParseException {    
+        this(pResolver);
+        parse(pInput);
+    }
 
-	public String[] getMandatoryKeys() {
-		return mandatoryKeys;
-	}
+    public String[] getMandatoryKeys() {
+        return mandatoryKeys;
+    }
 
-	public String toString() {
-		return toString(keys);
-	}
+    public String toString() {
+        return toString(keys);
+    }
 
 }

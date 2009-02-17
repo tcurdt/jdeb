@@ -25,76 +25,76 @@ import java.io.InputStream;
  */
 public class ArInputStream extends InputStream implements ArConstants {
 
-	private final InputStream input;
-	private long offset = 0;
-	
-	public ArInputStream( final InputStream pInput ) {
-		input = pInput;
-	}
-	
-	public ArEntry getNextEntry() throws IOException {
-		
-		if (offset == 0) {
-			final byte[] expected = HEADER;
-			final byte[] realized = new byte[expected.length]; 
-			final int read = input.read(realized);
-			if (read != expected.length) {
-				throw new IOException("failed to read header");
-			}
-			for (int i = 0; i < expected.length; i++) {
-				if (expected[i] != realized[i]) {
-					throw new IOException("invalid header " + new String(realized));
-				}
-			}
-		}
+    private final InputStream input;
+    private long offset = 0;
+    
+    public ArInputStream( final InputStream pInput ) {
+        input = pInput;
+    }
+    
+    public ArEntry getNextEntry() throws IOException {
+        
+        if (offset == 0) {
+            final byte[] expected = HEADER;
+            final byte[] realized = new byte[expected.length]; 
+            final int read = input.read(realized);
+            if (read != expected.length) {
+                throw new IOException("failed to read header");
+            }
+            for (int i = 0; i < expected.length; i++) {
+                if (expected[i] != realized[i]) {
+                    throw new IOException("invalid header " + new String(realized));
+                }
+            }
+        }
 
-		if (input.available() == 0) {
-			return null;
-		}
-				
-		if (offset % 2 != 0) {
-			read();
-		}
+        if (input.available() == 0) {
+            return null;
+        }
+                
+        if (offset % 2 != 0) {
+            read();
+        }
 
-		final byte[] name = new byte[FIELD_SIZE_NAME];
-		final byte[] lastmodified = new byte[FIELD_SIZE_LASTMODIFIED];
-		final byte[] userid = new byte[FIELD_SIZE_UID];
-		final byte[] groupid = new byte[FIELD_SIZE_GID];
-		final byte[] filemode = new byte[FIELD_SIZE_MODE];
-		final byte[] length = new byte[FIELD_SIZE_LENGTH];
-		
-		read(name);
-		read(lastmodified);
-		read(userid);
-		read(groupid);
-		read(filemode);
-		read(length);
+        final byte[] name = new byte[FIELD_SIZE_NAME];
+        final byte[] lastmodified = new byte[FIELD_SIZE_LASTMODIFIED];
+        final byte[] userid = new byte[FIELD_SIZE_UID];
+        final byte[] groupid = new byte[FIELD_SIZE_GID];
+        final byte[] filemode = new byte[FIELD_SIZE_MODE];
+        final byte[] length = new byte[FIELD_SIZE_LENGTH];
+        
+        read(name);
+        read(lastmodified);
+        read(userid);
+        read(groupid);
+        read(filemode);
+        read(length);
 
-		final byte[] expected = ENTRY_TERMINATOR;
-		final byte[] realized = new byte[expected.length];
-		final int read = input.read(realized);
-		if (read != expected.length) {
-			throw new IOException("failed to read entry header");
-		}
-		for (int i = 0; i < expected.length; i++) {
-			if (expected[i] != realized[i]) {
-				throw new IOException("invalid entry header. not read the content?");
-			}
-		}
-		
-		return new ArEntry(new String(name).trim(), Long.parseLong(new String(length).trim()));
-	}
-	
-	
-	public int read() throws IOException {
-		final int ret = input.read();
-		offset++;
-		return ret;
-	}
+        final byte[] expected = ENTRY_TERMINATOR;
+        final byte[] realized = new byte[expected.length];
+        final int read = input.read(realized);
+        if (read != expected.length) {
+            throw new IOException("failed to read entry header");
+        }
+        for (int i = 0; i < expected.length; i++) {
+            if (expected[i] != realized[i]) {
+                throw new IOException("invalid entry header. not read the content?");
+            }
+        }
+        
+        return new ArEntry(new String(name).trim(), Long.parseLong(new String(length).trim()));
+    }
+    
+    
+    public int read() throws IOException {
+        final int ret = input.read();
+        offset++;
+        return ret;
+    }
 
-	public void close() throws IOException {
-		input.close();
-		super.close();
-	}
+    public void close() throws IOException {
+        input.close();
+        super.close();
+    }
 
 }

@@ -24,64 +24,64 @@ import org.vafer.jdeb.changes.ChangeSet;
  */
 public final class ChangesDescriptor extends AbstractDescriptor {
 
-	private final static String[] keys = {
-		"Format",
-		"Date",
-		"Source",
-		"Binary",
-		"Architecture",
-		"Version",
-		"Distribution",
-		"Urgency",
-		"Maintainer",
-		"Changed-By",
-		"Description",
-		"Changes",
-		"Closes",
-		"Files"
-	};
-	
-	private final static String[] mandatoryKeys = {
-		"Format",
-		"Date",
-		"Source",
-		"Binary",
-		"Architecture",
-		"Version",
-		"Distribution",
-		"Urgency",
-		"Maintainer",
-		"Description",
-		"Changes",
-		"Files"
-	};
+    private final static String[] keys = {
+        "Format",
+        "Date",
+        "Source",
+        "Binary",
+        "Architecture",
+        "Version",
+        "Distribution",
+        "Urgency",
+        "Maintainer",
+        "Changed-By",
+        "Description",
+        "Changes",
+        "Closes",
+        "Files"
+    };
+    
+    private final static String[] mandatoryKeys = {
+        "Format",
+        "Date",
+        "Source",
+        "Binary",
+        "Architecture",
+        "Version",
+        "Distribution",
+        "Urgency",
+        "Maintainer",
+        "Description",
+        "Changes",
+        "Files"
+    };
 
-	private final ChangeSet[] changeSets;
-	
-	public ChangesDescriptor( final AbstractDescriptor pDescriptor, final ChangeSet[] pChangeSets ) {
-		super(pDescriptor);
-		changeSets = pChangeSets;
+    private final ChangeSet[] changeSets;
+    
+    public ChangesDescriptor( final AbstractDescriptor pDescriptor, final ChangeSet[] pChangeSets ) {
+        super(pDescriptor);
+        changeSets = pChangeSets;
 
-		final ChangeSet lastestChangeSet = changeSets[0];
-		
-		set("Urgency", lastestChangeSet.getUrgency());
-		set("Changed-By", lastestChangeSet.getChangedBy());
+        final ChangeSet lastestChangeSet = changeSets[0];
+        
+        set("Urgency", lastestChangeSet.getUrgency());
+        set("Changed-By", lastestChangeSet.getChangedBy());
 
-		final StringBuffer sb = new StringBuffer();
+        final StringBuffer sb = new StringBuffer();
 
-		for (int i = 0; i < 1; i++) {
-			final ChangeSet changeSet = changeSets[i];
-			sb.append(changeSet.toString());			
-		}
+        for (int i = 0; i < 1; i++) {
+            final ChangeSet changeSet = changeSets[i];
+            sb.append(changeSet.toString());            
+        }
 
-		set("Changes", sb.toString());
-	}
-	
-	public String[] getMandatoryKeys() {
-		return mandatoryKeys;
-	}
-	
-	public String toString() {
-		return toString(keys);
-	}
+        set("Changes", sb.toString());
+    }
+    
+    public String[] getMandatoryKeys() {
+        return mandatoryKeys;
+    }
+    
+    public String toString() {
+        return toString(keys);
+    }
 }

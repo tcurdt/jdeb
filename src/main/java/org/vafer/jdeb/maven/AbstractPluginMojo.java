@@ -22,7 +22,7 @@ import org.apache.maven.project.MavenProject;
 
 public abstract class AbstractPluginMojo extends AbstractMojo {
 
-	/**
+    /**
      * @parameter expression="${project}"
      * @required
      * @readonly

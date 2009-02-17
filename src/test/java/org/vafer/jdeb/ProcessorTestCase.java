@@ -30,14 +30,14 @@ public class ProcessorTestCase extends TestCase {
      * (this test can only fail on Windows)
      */
     public void testBuildDataWithFileSet() throws Exception {
-		Processor processor = new Processor(new Console() {
-			public void println(String s) {
-			}
-		}, null);
+        Processor processor = new Processor(new Console() {
+            public void println(String s) {
+            }
+        }, null);
 
         Project project = new Project();
         project.setCoreLoader(getClass().getClassLoader());
-		project.init();
+        project.init();
 
         FileSet fileset = new FileSet();
         fileset.setDir(new File(getClass().getResource("deb/data").toURI()));

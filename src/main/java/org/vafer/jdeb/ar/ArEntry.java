@@ -22,47 +22,47 @@ package org.vafer.jdeb.ar;
  */
 public final class ArEntry {
 
-	private final String name;
-	private int userId;
-	private int groupId;
-	private int mode;
-	private long lastModified;
-	private long length;
+    private final String name;
+    private int userId;
+    private int groupId;
+    private int mode;
+    private long lastModified;
+    private long length;
 
-	public ArEntry(String name, long length) {
-		this(name, length, 0, 0, 33188, System.currentTimeMillis());
-	}
+    public ArEntry(String name, long length) {
+        this(name, length, 0, 0, 33188, System.currentTimeMillis());
+    }
 
-	public ArEntry(String name, long length, int userId, int groupId, int mode, long lastModified) {
-		this.name = name;
-		this.length = length;
-		this.userId = userId;
-		this.groupId = groupId;
-		this.mode = mode;
-		this.lastModified = lastModified;
-	}
+    public ArEntry(String name, long length, int userId, int groupId, int mode, long lastModified) {
+        this.name = name;
+        this.length = length;
+        this.userId = userId;
+        this.groupId = groupId;
+        this.mode = mode;
+        this.lastModified = lastModified;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public int getUserId() {
-		return userId;
-	}
+    public int getUserId() {
+        return userId;
+    }
 
-	public int getGroupId() {
-		return groupId;
-	}
+    public int getGroupId() {
+        return groupId;
+    }
 
-	public int getMode() {
-		return mode;
-	}
+    public int getMode() {
+        return mode;
+    }
 
-	public long getLastModified() {
-		return lastModified;
-	}
+    public long getLastModified() {
+        return lastModified;
+    }
 
-	public long getLength() {
-		return length;
-	}
+    public long getLength() {
+        return length;
+    }
 }

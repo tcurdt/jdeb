@@ -22,5 +22,5 @@ package org.vafer.jdeb;
  */
 public interface Console {
 
-	void println( String s );
+    void println( String s );
 }

@@ -27,26 +27,26 @@ import org.vafer.jdeb.mapping.Mapper;
  */
 public abstract class AbstractDataProducer implements DataProducer {
 
-	private final String[] includes;
-	private final String[] excludes;
-	private final Mapper[] mappers;
-	
-	
-	public AbstractDataProducer( final String[] pIncludes, final String[] pExcludes, final Mapper[] pMapper ) {
-		excludes = (pExcludes != null) ? pExcludes : new String[0];
-		includes = (pIncludes != null) ? pIncludes : new String[] { "**" };
-		mappers = (pMapper != null) ? pMapper : new Mapper[0];
-	}
-	
-	public boolean isIncluded( final String pName ) {
-		if (!isIncluded(pName, includes)) {
-			return false;
-		}
-		if (isExcluded(pName, excludes)) {
-			return false;
-		}
-		return true;
-	}
+    private final String[] includes;
+    private final String[] excludes;
+    private final Mapper[] mappers;
+    
+    
+    public AbstractDataProducer( final String[] pIncludes, final String[] pExcludes, final Mapper[] pMapper ) {
+        excludes = (pExcludes != null) ? pExcludes : new String[0];
+        includes = (pIncludes != null) ? pIncludes : new String[] { "**" };
+        mappers = (pMapper != null) ? pMapper : new Mapper[0];
+    }
+    
+    public boolean isIncluded( final String pName ) {
+        if (!isIncluded(pName, includes)) {
+            return false;
+        }
+        if (isExcluded(pName, excludes)) {
+            return false;
+        }
+        return true;
+    }
 
     private boolean isIncluded( String name, String[] includes ) {
         for (int i = 0; i < includes.length; i++) {
@@ -66,15 +66,15 @@ public abstract class AbstractDataProducer implements DataProducer {
         }
         return false;
     }
-	
-	public TarEntry map( final TarEntry pEntry ) {
-		
-		TarEntry entry = pEntry;
+    
+    public TarEntry map( final TarEntry pEntry ) {
+        
+        TarEntry entry = pEntry;
 
-		for (int i = 0; i < mappers.length; i++) {
-			entry = mappers[i].map(entry);
-		}
-		
-		return entry;
-	}
+        for (int i = 0; i < mappers.length; i++) {
+            entry = mappers[i].map(entry);
+        }
+        
+        return entry;
+    }
 }

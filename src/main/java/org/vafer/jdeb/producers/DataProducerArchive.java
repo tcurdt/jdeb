@@ -36,66 +36,66 @@ import org.vafer.jdeb.mapping.Mapper;
  */
 public final class DataProducerArchive extends AbstractDataProducer implements DataProducer {
 
-	private final File archive;
-	
-	public DataProducerArchive( final File pArchive, final String[] pIncludes, final String[] pExcludes, final Mapper[] pMappers ) {
-		super(pIncludes, pExcludes, pMappers);
-		archive = pArchive;
-	}
-		
-	public void produce( final DataConsumer receiver ) throws IOException {
+    private final File archive;
+    
+    public DataProducerArchive( final File pArchive, final String[] pIncludes, final String[] pExcludes, final Mapper[] pMappers ) {
+        super(pIncludes, pExcludes, pMappers);
+        archive = pArchive;
+    }
+        
+    public void produce( final DataConsumer receiver ) throws IOException {
 
-		TarInputStream archiveInputStream = null;
-		try {
-			archiveInputStream = new TarInputStream(getCompressedInputStream(new FileInputStream(archive)));
+        TarInputStream archiveInputStream = null;
+        try {
+            archiveInputStream = new TarInputStream(getCompressedInputStream(new FileInputStream(archive)));
 
-			while(true) {
-				
-				TarEntry entry = archiveInputStream.getNextEntry();
+            while(true) {
+                
+                TarEntry entry = archiveInputStream.getNextEntry();
 
-				if (entry == null) {
-					break;
-				}
+                if (entry == null) {
+                    break;
+                }
 
-				if (!isIncluded(entry.getName())) {
-					continue;					
-				}				
+                if (!isIncluded(entry.getName())) {
+                    continue;                   
+                }               
 
-				entry = map(entry);
-				
-				if (entry.isDirectory()) {
-					receiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
-					continue;
-				}
-				receiver.onEachFile(archiveInputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());						
-			}
+                entry = map(entry);
+                
+                if (entry.isDirectory()) {
+                    receiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+                    continue;
+                }
+                receiver.onEachFile(archiveInputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());                      
+            }
 
-		} finally {
-			if (archiveInputStream != null) {
-				archiveInputStream.close();
-			}
-		}		
-	}
+        } finally {
+            if (archiveInputStream != null) {
+                archiveInputStream.close();
+            }
+        }       
+    }
 
 
-	/**
-	 * Guess the compression used by looking at the first bytes of the stream.
-	 */
-	private InputStream getCompressedInputStream(InputStream in) throws IOException {
-		PushbackInputStream pin = new PushbackInputStream(in, 2);
-		byte[] header = new byte[2];
-		if (pin.read(header) != header.length) {
-			throw new IOException("Could not read header");
-		}
+    /**
+     * Guess the compression used by looking at the first bytes of the stream.
+     */
+    private InputStream getCompressedInputStream(InputStream in) throws IOException {
+        PushbackInputStream pin = new PushbackInputStream(in, 2);
+        byte[] header = new byte[2];
+        if (pin.read(header) != header.length) {
+            throw new IOException("Could not read header");
+        }
 
-		if (header[0] == (byte) 0x1f && header[1] == (byte) 0x8b) {
-			pin.unread(header);
-			return new GZIPInputStream(pin);
-		} else if (header[0] == 'B' && header[1] == 'Z') {
-			return new CBZip2InputStream(pin);
-		} else {
-			throw new IOException("Unsupported archive format : " + archive);
-		}
-	}
-	
+        if (header[0] == (byte) 0x1f && header[1] == (byte) 0x8b) {
+            pin.unread(header);
+            return new GZIPInputStream(pin);
+        } else if (header[0] == 'B' && header[1] == 'Z') {
+            return new CBZip2InputStream(pin);
+        } else {
+            throw new IOException("Unsupported archive format : " + archive);
+        }
+    }
+    
 }

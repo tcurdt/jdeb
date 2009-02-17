@@ -25,47 +25,47 @@ import java.io.InputStream;
  */
 public final class NonClosingInputStream extends InputStream {
 
-	private final InputStream delegate;
-	
-	public NonClosingInputStream( final InputStream pDelegate ) {
-		delegate = pDelegate;
-	}
+    private final InputStream delegate;
+    
+    public NonClosingInputStream( final InputStream pDelegate ) {
+        delegate = pDelegate;
+    }
 
-	public int available() throws IOException {
-		return delegate.available();
-	}
+    public int available() throws IOException {
+        return delegate.available();
+    }
 
-	public void close() throws IOException {
-		// we DON'T close
-		// delegate.close();
-	}
+    public void close() throws IOException {
+        // we DON'T close
+        // delegate.close();
+    }
 
-	public void mark(int readlimit) {
-		delegate.mark(readlimit);
-	}
+    public void mark(int readlimit) {
+        delegate.mark(readlimit);
+    }
 
-	public boolean markSupported() {
-		return delegate.markSupported();
-	}
+    public boolean markSupported() {
+        return delegate.markSupported();
+    }
 
-	public int read() throws IOException {
-		return delegate.read();
-	}
+    public int read() throws IOException {
+        return delegate.read();
+    }
 
-	public int read(byte[] b, int off, int len) throws IOException {
-		return delegate.read(b, off, len);
-	}
+    public int read(byte[] b, int off, int len) throws IOException {
+        return delegate.read(b, off, len);
+    }
 
-	public int read(byte[] b) throws IOException {
-		return delegate.read(b);
-	}
+    public int read(byte[] b) throws IOException {
+        return delegate.read(b);
+    }
 
-	public void reset() throws IOException {
-		delegate.reset();
-	}
+    public void reset() throws IOException {
+        delegate.reset();
+    }
 
-	public long skip(long n) throws IOException {
-		return delegate.skip(n);
-	}
-	
+    public long skip(long n) throws IOException {
+        return delegate.skip(n);
+    }
+    
 }

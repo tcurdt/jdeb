@@ -30,7 +30,7 @@ import java.text.ParseException;
  */
 public final class Utils {
 
-	public static int copy( final InputStream pInput, final OutputStream pOutput ) throws IOException {
+    public static int copy( final InputStream pInput, final OutputStream pOutput ) throws IOException {
         final byte[] buffer = new byte[2048];
         int count = 0;
         int n = 0;
@@ -41,113 +41,113 @@ public final class Utils {
         return count;
      }
 
-	public static String toHex( final byte[] pBytes ) {
-    	final StringBuffer sb = new StringBuffer();
+    public static String toHex( final byte[] pBytes ) {
+        final StringBuffer sb = new StringBuffer();
 
-    	for (int i = 0; i < pBytes.length; ++i) {
-    		sb.append(Integer.toHexString((pBytes[i]>>4) & 0x0f));
-    		sb.append(Integer.toHexString(pBytes[i] & 0x0f));
-    	}
+        for (int i = 0; i < pBytes.length; ++i) {
+            sb.append(Integer.toHexString((pBytes[i]>>4) & 0x0f));
+            sb.append(Integer.toHexString(pBytes[i] & 0x0f));
+        }
 
-    	return sb.toString();
+        return sb.toString();
     }
 
-	public static String stripPath( final int p, final String s ) {
+    public static String stripPath( final int p, final String s ) {
 
-		if (p <= 0) {
-			return s;
-		}
+        if (p <= 0) {
+            return s;
+        }
 
-		int x = 0;
-		for (int i=0 ; i<p; i++) {
-			x = s.indexOf('/', x);
-			if (x < 0) {
-				return s;
-			}
-		}
+        int x = 0;
+        for (int i=0 ; i<p; i++) {
+            x = s.indexOf('/', x);
+            if (x < 0) {
+                return s;
+            }
+        }
 
-		return s.substring(x+1);
-	}
+        return s.substring(x+1);
+    }
 
-	public static String stripLeadingSlash( final String s ) {
-		if (s == null) {
-			return s;
-		}
-		if (s.length() == 0) {
-			return s;
-		}
-		if (s.charAt(0) == '/') {
-			return s.substring(1);
-		}
-		return s;
-	}
+    public static String stripLeadingSlash( final String s ) {
+        if (s == null) {
+            return s;
+        }
+        if (s.length() == 0) {
+            return s;
+        }
+        if (s.charAt(0) == '/') {
+            return s.substring(1);
+        }
+        return s;
+    }
 
-	
+    
     /**
-	 * Substitute the variables in the given expression with the
-	 * values from the resolver
-	 * 
-	 * @param pVariables
-	 * @param pExpression
-	 * @return
-	 */
-	public static String replaceVariables(final VariableResolver pResolver, final String pExpression, final String pOpen, final String pClose) throws ParseException {
+     * Substitute the variables in the given expression with the
+     * values from the resolver
+     * 
+     * @param pVariables
+     * @param pExpression
+     * @return
+     */
+    public static String replaceVariables(final VariableResolver pResolver, final String pExpression, final String pOpen, final String pClose) throws ParseException {
 
-		final char[] s = pExpression.toCharArray();
+        final char[] s = pExpression.toCharArray();
 
-		final char[] open = pOpen.toCharArray();
-		final char[] close = pClose.toCharArray();
+        final char[] open = pOpen.toCharArray();
+        final char[] close = pClose.toCharArray();
 
-		final StringBuffer out = new StringBuffer();
-		StringBuffer sb = new StringBuffer();
-		char[] watch = open;
-		int w = 0;
-		for (int i = 0; i < s.length; i++) {
-			char c = s[i];
+        final StringBuffer out = new StringBuffer();
+        StringBuffer sb = new StringBuffer();
+        char[] watch = open;
+        int w = 0;
+        for (int i = 0; i < s.length; i++) {
+            char c = s[i];
 
-			if (c == watch[w]) {
-				w++;
-				if (watch.length == w) {
-					// found the full token to watch for
-					
-					if (watch == open) {
-						// found open
-						out.append(sb);
-						sb = new StringBuffer();
-						// search for close
-						watch = close;
-					} else if (watch == close) {
-						// found close
-						final String variable = (String) pResolver.get(sb.toString());
-						if (variable != null) {
-							out.append(variable);
-						} else {
-							throw new ParseException("Unknown variable " + sb, i);
-						}
-						sb = new StringBuffer();
-						// search for open
-						watch = open;
-					}
-					w = 0;
-				}
-			} else {
+            if (c == watch[w]) {
+                w++;
+                if (watch.length == w) {
+                    // found the full token to watch for
+                    
+                    if (watch == open) {
+                        // found open
+                        out.append(sb);
+                        sb = new StringBuffer();
+                        // search for close
+                        watch = close;
+                    } else if (watch == close) {
+                        // found close
+                        final String variable = (String) pResolver.get(sb.toString());
+                        if (variable != null) {
+                            out.append(variable);
+                        } else {
+                            throw new ParseException("Unknown variable " + sb, i);
+                        }
+                        sb = new StringBuffer();
+                        // search for open
+                        watch = open;
+                    }
+                    w = 0;
+                }
+            } else {
 
-				if (w > 0) {
-					sb.append(watch, 0, w);
-				}
+                if (w > 0) {
+                    sb.append(watch, 0, w);
+                }
 
-				sb.append(c);
+                sb.append(c);
 
-				w = 0;
-			}
-		}
+                w = 0;
+            }
+        }
 
-		if (watch == close) {
-			out.append(open);
-		}
-		out.append(sb);
+        if (watch == close) {
+            out.append(open);
+        }
+        out.append(sb);
 
-		return out.toString();
-	}
-	
+        return out.toString();
+    }
+    
 }

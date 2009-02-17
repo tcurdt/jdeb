@@ -37,133 +37,133 @@ import org.vafer.jdeb.utils.VariableResolver;
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public abstract class AbstractDescriptor {
-	
-	private final Map values = new HashMap();
-	private final VariableResolver resolver;
-	
-	public AbstractDescriptor( final VariableResolver pResolver ) {
-		resolver = pResolver;
-	}
+    
+    private final Map values = new HashMap();
+    private final VariableResolver resolver;
+    
+    public AbstractDescriptor( final VariableResolver pResolver ) {
+        resolver = pResolver;
+    }
 
-	public AbstractDescriptor( final AbstractDescriptor pDescriptor ) {
-		values.putAll(pDescriptor.values);
-		resolver = pDescriptor.resolver;
-	}
+    public AbstractDescriptor( final AbstractDescriptor pDescriptor ) {
+        values.putAll(pDescriptor.values);
+        resolver = pDescriptor.resolver;
+    }
 
-	protected void parse( final InputStream pInput ) throws IOException, ParseException {
-		final BufferedReader br = new BufferedReader(new InputStreamReader(pInput));
-		StringBuffer buffer = new StringBuffer();
-		String key = null;
-		int linenr = 0;
-		while(true) {
-			final String line = br.readLine();
-			
-			if (line == null) {
-				if (buffer.length() > 0) {
-					// flush value of previous key
-					set(key, buffer.toString());
-					buffer = null;
-				}
-				break;
-			}
+    protected void parse( final InputStream pInput ) throws IOException, ParseException {
+        final BufferedReader br = new BufferedReader(new InputStreamReader(pInput));
+        StringBuffer buffer = new StringBuffer();
+        String key = null;
+        int linenr = 0;
+        while(true) {
+            final String line = br.readLine();
+            
+            if (line == null) {
+                if (buffer.length() > 0) {
+                    // flush value of previous key
+                    set(key, buffer.toString());
+                    buffer = null;
+                }
+                break;
+            }
 
-			linenr++;
+            linenr++;
 
-			if (line.length() == 0) {
-				throw new ParseException("Empty line", linenr);
-			}
-			
-			final char first = line.charAt(0); 
-			if (Character.isLetter(first)) {
-				
-				// new key
-				
-				if (buffer.length() > 0) {
-					// flush value of previous key
-					set(key, buffer.toString());
-					buffer = new StringBuffer();
-				}
-				
-				
-				final int i = line.indexOf(':');
-				
-				if (i < 0) {
-					throw new ParseException("Line misses ':' delimitter", linenr);
-				}
-				
-				key = line.substring(0, i);
-				buffer.append(line.substring(i+1).trim());
-				
-				continue;
-			}
-			
-			// continuing old value
-			buffer.append('\n').append(line.substring(1));
-		}
-		br.close();
-		
-	}
-	
-	public void set( final String pKey, final String pValue ) {
+            if (line.length() == 0) {
+                throw new ParseException("Empty line", linenr);
+            }
+            
+            final char first = line.charAt(0); 
+            if (Character.isLetter(first)) {
+                
+                // new key
+                
+                if (buffer.length() > 0) {
+                    // flush value of previous key
+                    set(key, buffer.toString());
+                    buffer = new StringBuffer();
+                }
+                
+                
+                final int i = line.indexOf(':');
+                
+                if (i < 0) {
+                    throw new ParseException("Line misses ':' delimitter", linenr);
+                }
+                
+                key = line.substring(0, i);
+                buffer.append(line.substring(i+1).trim());
+                
+                continue;
+            }
+            
+            // continuing old value
+            buffer.append('\n').append(line.substring(1));
+        }
+        br.close();
+        
+    }
+    
+    public void set( final String pKey, final String pValue ) {
 
-		if (resolver != null) {
-			try {
-				values.put(pKey, Utils.replaceVariables(resolver, pValue, "[[", "]]"));
-				return;
-			} catch (ParseException e) {
-				// FIXME maybe throw an Exception?
-			}
-		}
-		
-		values.put(pKey, pValue);
-	}
-	
-	public String get( final String pKey ) {
-		return (String)values.get(pKey);
-	}
+        if (resolver != null) {
+            try {
+                values.put(pKey, Utils.replaceVariables(resolver, pValue, "[[", "]]"));
+                return;
+            } catch (ParseException e) {
+                // FIXME maybe throw an Exception?
+            }
+        }
+        
+        values.put(pKey, pValue);
+    }
+    
+    public String get( final String pKey ) {
+        return (String)values.get(pKey);
+    }
 
-	public abstract String[] getMandatoryKeys();
-	
-	public boolean isValid() {
-		return invalidKeys().size() == 0;
-	}
-	
-	public Set invalidKeys() {
-		final Set invalid = new HashSet();
+    public abstract String[] getMandatoryKeys();
+    
+    public boolean isValid() {
+        return invalidKeys().size() == 0;
+    }
+    
+    public Set invalidKeys() {
+        final Set invalid = new HashSet();
 
-		final String[] mk = getMandatoryKeys();
-		for (int i = 0; i < mk.length; i++) {
-			if (get(mk[i]) == null) {
-				invalid.add(mk[i]);
-			}
-		}
-		
-		return invalid;
-	}
-	
-	String toString( final String[] pKeys ) {
-		final StringBuffer s = new StringBuffer();
-		for (int i = 0; i < pKeys.length; i++) {
-			final String key = pKeys[i];
-			final String value = (String) values.get(key);
-			if (value != null) {
-				s.append(key).append(":");
+        final String[] mk = getMandatoryKeys();
+        for (int i = 0; i < mk.length; i++) {
+            if (get(mk[i]) == null) {
+                invalid.add(mk[i]);
+            }
+        }
+        
+        return invalid;
+    }
+    
+    String toString( final String[] pKeys ) {
+        final StringBuffer s = new StringBuffer();
+        for (int i = 0; i < pKeys.length; i++) {
+            final String key = pKeys[i];
+            final String value = (String) values.get(key);
+            if (value != null) {
+                s.append(key).append(":");
 
-				try {
-					BufferedReader reader = new BufferedReader(new StringReader(value));
-					String line;
-					while ((line = reader.readLine()) != null) {
-						if (line.length() != 0 && !Character.isWhitespace(line.charAt(0))) {
-							s.append(' ');
-						}
+                try {
+                    BufferedReader reader = new BufferedReader(new StringReader(value));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if (line.length() != 0 && !Character.isWhitespace(line.charAt(0))) {
+                            s.append(' ');
+                        }
 
-						s.append(line).append('\n');
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}			
-		}
-		return s.toString();
-	}
+                        s.append(line).append('\n');
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }           
+        }
+        return s.toString();
+    }
 }

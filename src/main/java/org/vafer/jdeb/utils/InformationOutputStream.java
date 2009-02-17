@@ -29,30 +29,30 @@ import java.security.MessageDigest;
  */
 public class InformationOutputStream extends DigestOutputStream {
 
-	private final MessageDigest digest;
-	private long size;
-	
-	public InformationOutputStream(OutputStream pStream, MessageDigest pDigest) {
-		super(pStream, pDigest);
-		digest = pDigest;
-		size = 0;
-	}
-	
-	public String getMd5() {
-		return Utils.toHex(digest.digest());
-	}
-	
-	public void write(byte[] b, int off, int len) throws IOException {
-		super.write(b, off, len);
-		size += len;
-	}
+    private final MessageDigest digest;
+    private long size;
+    
+    public InformationOutputStream(OutputStream pStream, MessageDigest pDigest) {
+        super(pStream, pDigest);
+        digest = pDigest;
+        size = 0;
+    }
+    
+    public String getMd5() {
+        return Utils.toHex(digest.digest());
+    }
+    
+    public void write(byte[] b, int off, int len) throws IOException {
+        super.write(b, off, len);
+        size += len;
+    }
 
-	public void write(int b) throws IOException {
-		super.write(b);
-		size++;
-	}
+    public void write(int b) throws IOException {
+        super.write(b);
+        size++;
+    }
 
-	public long getSize() {
-		return size;
-	}
+    public long getSize() {
+        return size;
+    }
 }

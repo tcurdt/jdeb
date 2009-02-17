@@ -44,7 +44,7 @@ import org.vafer.jdeb.utils.VariableResolver;
  */
 public final class DebMojo extends AbstractPluginMojo {
 
-	/**
+    /**
      * @component
      */
     private MavenProjectHelper projectHelper;
@@ -96,192 +96,192 @@ public final class DebMojo extends AbstractPluginMojo {
      * The keyring file. Usually some/path/secring.gpg
      * 
      * @parameter expression="${keyring}"
-     */    	
+     */     
     private File keyring = null;
 
     /**
      * The hex key id to use for signing. 
      * 
      * @parameter expression="${key}"
-     */    	
-	private String key = null;
+     */     
+    private String key = null;
 
     /**
      * The passphrase for the key to sign the changes file. 
      * 
      * @parameter expression="${passhrase}"
-     */    	
-	private String passphrase = null;
+     */     
+    private String passphrase = null;
     
     /**
      * If not defaultPath is specified this  
      * 
      * @parameter expression="${defaultPath}" default-value="/srv/jetty/www"
-     */    	
-	private String defaultPath = "/srv/jetty/www";
+     */     
+    private String defaultPath = "/srv/jetty/www";
 
-	/**
-	 * TODO: make configurable
-	 */
-	private DataProducer[] dataProducers = null;
-	
-	
-	/**
+    /**
+     * TODO: make configurable
+     */
+    private DataProducer[] dataProducers = null;
+    
+    
+    /**
      * Main entry point
      * @throws MojoExecutionException on error
      */
     public void execute()
         throws MojoExecutionException
     {
-    	// expand name pattern
-    	final String debName;
-    	final String changesName;    	
+        // expand name pattern
+        final String debName;
+        final String changesName;       
 
-    	final Map variables = new HashMap();
-    	variables.put("name", getProject().getName());
-    	variables.put("artifactId", getProject().getArtifactId());
-    	variables.put("groupId", getProject().getGroupId());
-    	variables.put("version", getProject().getVersion().replace('-', '+'));
-    	variables.put("description", getProject().getDescription());
-    	variables.put("extension", "deb");    	
-    	final VariableResolver resolver = new MapVariableResolver(variables);
+        final Map variables = new HashMap();
+        variables.put("name", getProject().getName());
+        variables.put("artifactId", getProject().getArtifactId());
+        variables.put("groupId", getProject().getGroupId());
+        variables.put("version", getProject().getVersion().replace('-', '+'));
+        variables.put("description", getProject().getDescription());
+        variables.put("extension", "deb");      
+        final VariableResolver resolver = new MapVariableResolver(variables);
 
-    	try
-    	{
-        	debName = Utils.replaceVariables(resolver, namePattern, "[[", "]]"); 
-        	
-        	variables.put("extension", "changes");    	
-        	changesName = Utils.replaceVariables(resolver, namePattern, "[[", "]]"); 
-		}
-    	catch (ParseException e)
-    	{
-			throw new MojoExecutionException("Failed parsing artifact name pattern", e);
-		}
+        try
+        {
+            debName = Utils.replaceVariables(resolver, namePattern, "[[", "]]"); 
+            
+            variables.put("extension", "changes");      
+            changesName = Utils.replaceVariables(resolver, namePattern, "[[", "]]"); 
+        }
+        catch (ParseException e)
+        {
+            throw new MojoExecutionException("Failed parsing artifact name pattern", e);
+        }
 
-    	// if not specified try to the default
-    	if (deb == null)
-    	{
-			deb = new File(buildDirectory, debName);
-    	}
+        // if not specified try to the default
+        if (deb == null)
+        {
+            deb = new File(buildDirectory, debName);
+        }
 
-    	// if not specified try to the default
-    	if (changesIn == null)
-    	{
-    		final File f = new File(getProject().getBasedir(), "CHANGES.txt");
-    		if (f.exists() && f.isFile() && f.canRead())
-    		{
-    			changesIn = f;
-    		}
-    	}
-    	
-    	// if not specified try to the default
-    	if (changesOut == null)
-    	{
-			changesOut = new File(buildDirectory, changesName);
-    	}
-    	
-    	// if not specified try to the default
-    	if (controlDir == null)
-    	{
-    		controlDir = new File(getProject().getBasedir(), "src/deb/control");
-    		getLog().info("Using default path to control directory " + controlDir);
-    	}
-    	
-    	// make sure we have at least the mandatory control directory
-    	if (!controlDir.exists() || !controlDir.isDirectory())
-    	{
-    		throw new MojoExecutionException(controlDir + " needs to be a directory");
-    	}
-    	
-    	// make sure we have at least the mandatory control file
-    	final File controlFile = new File(controlDir, "control");
-    	if (!controlFile.exists() || !controlFile.isFile() || !controlFile.canRead())
-    	{
-    		throw new MojoExecutionException(controlFile + " is mandatory");
-    	}
-    	
-    	final File file = getProject().getArtifact().getFile();
-		final File[] controlFiles = controlDir.listFiles();
-		
-		
-		if (dataProducers == null)
-		{
-			dataProducers = new DataProducer[] { new DataProducer() {
-			public void produce( final DataConsumer receiver ) {
-				try {
-					receiver.onEachFile(new FileInputStream(file), new File(new File(defaultPath), file.getName()).getAbsolutePath(), "", "root", 0, "root", 0, TarEntry.DEFAULT_FILE_MODE, file.length());
-				} catch (Exception e) {
-					getLog().error(e);
-				}
-			}}};
-		}
+        // if not specified try to the default
+        if (changesIn == null)
+        {
+            final File f = new File(getProject().getBasedir(), "CHANGES.txt");
+            if (f.exists() && f.isFile() && f.canRead())
+            {
+                changesIn = f;
+            }
+        }
+        
+        // if not specified try to the default
+        if (changesOut == null)
+        {
+            changesOut = new File(buildDirectory, changesName);
+        }
+        
+        // if not specified try to the default
+        if (controlDir == null)
+        {
+            controlDir = new File(getProject().getBasedir(), "src/deb/control");
+            getLog().info("Using default path to control directory " + controlDir);
+        }
+        
+        // make sure we have at least the mandatory control directory
+        if (!controlDir.exists() || !controlDir.isDirectory())
+        {
+            throw new MojoExecutionException(controlDir + " needs to be a directory");
+        }
+        
+        // make sure we have at least the mandatory control file
+        final File controlFile = new File(controlDir, "control");
+        if (!controlFile.exists() || !controlFile.isFile() || !controlFile.canRead())
+        {
+            throw new MojoExecutionException(controlFile + " is mandatory");
+        }
+        
+        final File file = getProject().getArtifact().getFile();
+        final File[] controlFiles = controlDir.listFiles();
+        
+        
+        if (dataProducers == null)
+        {
+            dataProducers = new DataProducer[] { new DataProducer() {
+            public void produce( final DataConsumer receiver ) {
+                try {
+                    receiver.onEachFile(new FileInputStream(file), new File(new File(defaultPath), file.getName()).getAbsolutePath(), "", "root", 0, "root", 0, TarEntry.DEFAULT_FILE_MODE, file.length());
+                } catch (Exception e) {
+                    getLog().error(e);
+                }
+            }}};
+        }
 
-		
-		final Processor processor = new Processor(
-				new Console()
-				{
-					public void println( final String s )
-					{
-						getLog().info(s);
-					}			
-				},
-				resolver
-		);
-		
-		final PackageDescriptor packageDescriptor;
-		try
-		{
+        
+        final Processor processor = new Processor(
+                new Console()
+                {
+                    public void println( final String s )
+                    {
+                        getLog().info(s);
+                    }           
+                },
+                resolver
+        );
+        
+        final PackageDescriptor packageDescriptor;
+        try
+        {
 
-			packageDescriptor = processor.createDeb(controlFiles, dataProducers, deb, "gzip");
+            packageDescriptor = processor.createDeb(controlFiles, dataProducers, deb, "gzip");
 
-			getLog().info("Attaching created debian archive " + deb);
-			projectHelper.attachArtifact( getProject(), "deb-archive", deb.getName(), deb );
-		}
-		catch (Exception e)
-		{
-			getLog().error("Failed to create debian package " + deb, e);
-			throw new MojoExecutionException("Failed to create debian package " + deb, e);
-		}    	
+            getLog().info("Attaching created debian archive " + deb);
+            projectHelper.attachArtifact( getProject(), "deb-archive", deb.getName(), deb );
+        }
+        catch (Exception e)
+        {
+            getLog().error("Failed to create debian package " + deb, e);
+            throw new MojoExecutionException("Failed to create debian package " + deb, e);
+        }       
 
-		if (changesIn == null)
-		{
-			return;
-		}
-		
-		
-		final TextfileChangesProvider changesProvider;
-		
-		try
-		{
+        if (changesIn == null)
+        {
+            return;
+        }
+        
+        
+        final TextfileChangesProvider changesProvider;
+        
+        try
+        {
 
-			// for now only support reading the changes form a text file provider
-			changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
-			
-			processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
+            // for now only support reading the changes form a text file provider
+            changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
+            
+            processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
 
-			getLog().info("Attaching created debian changes file " + changesOut);
-			projectHelper.attachArtifact( getProject(), "deb-changes", changesOut.getName(), changesOut );
-		}
-		catch (Exception e)
-		{
-			getLog().error("Failed to create debian changes file " + changesOut, e);
-			throw new MojoExecutionException("Failed to create debian changes file " + changesOut, e);
-		}    	
+            getLog().info("Attaching created debian changes file " + changesOut);
+            projectHelper.attachArtifact( getProject(), "deb-changes", changesOut.getName(), changesOut );
+        }
+        catch (Exception e)
+        {
+            getLog().error("Failed to create debian changes file " + changesOut, e);
+            throw new MojoExecutionException("Failed to create debian changes file " + changesOut, e);
+        }       
 
     
-		try {
-			if (changesSave == null) {
-				return;
-			}
+        try {
+            if (changesSave == null) {
+                return;
+            }
 
-			changesProvider.save(new FileOutputStream(changesSave));
+            changesProvider.save(new FileOutputStream(changesSave));
 
-			getLog().info("Saved release information to file " + changesSave);
-			
-		} catch (Exception e) {
-			getLog().error("Failed to save release information to file " + changesSave);
-			throw new MojoExecutionException("Failed to save release information to file " + changesSave, e);
-		}    
+            getLog().info("Saved release information to file " + changesSave);
+            
+        } catch (Exception e) {
+            getLog().error("Failed to save release information to file " + changesSave);
+            throw new MojoExecutionException("Failed to save release information to file " + changesSave, e);
+        }    
     }    
 
 }

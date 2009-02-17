@@ -35,57 +35,55 @@ import org.vafer.jdeb.DataProducer;
  */
 public final class FileSetDataProducer implements DataProducer {
 
-	private final FileSet fileset;
+    private final FileSet fileset;
 
-	public FileSetDataProducer( final FileSet pFileset ) {
-		fileset = pFileset;
-	}
+    public FileSetDataProducer( final FileSet pFileset ) {
+        fileset = pFileset;
+    }
 
-	public void produce( final DataConsumer pReceiver ) throws IOException {
-		String user = "root";
-		int uid = 0;
-		String group = "root";
-		int gid = 0;
-		int filemode = TarEntry.DEFAULT_FILE_MODE;
-		int dirmode = TarEntry.DEFAULT_DIR_MODE;
-		String prefix = "";
+    public void produce( final DataConsumer pReceiver ) throws IOException {
+        String user = "root";
+        int uid = 0;
+        String group = "root";
+        int gid = 0;
+        int filemode = TarEntry.DEFAULT_FILE_MODE;
+        int dirmode = TarEntry.DEFAULT_DIR_MODE;
+        String prefix = "";
 
-		if (fileset instanceof Tar.TarFileSet) {
-			Tar.TarFileSet tarfileset = (Tar.TarFileSet) fileset;
-			user = tarfileset.getUserName();
-			uid = tarfileset.getUid();
-			group = tarfileset.getGroup();
-			gid = tarfileset.getGid();
-			filemode = tarfileset.getMode();
-			dirmode = tarfileset.getDirMode();
-			prefix = tarfileset.getPrefix();
-		}
+        if (fileset instanceof Tar.TarFileSet) {
+            Tar.TarFileSet tarfileset = (Tar.TarFileSet) fileset;
+            user = tarfileset.getUserName();
+            uid = tarfileset.getUid();
+            group = tarfileset.getGroup();
+            gid = tarfileset.getGid();
+            filemode = tarfileset.getMode();
+            dirmode = tarfileset.getDirMode();
+            prefix = tarfileset.getPrefix();
+        }
 
-		final DirectoryScanner scanner = fileset.getDirectoryScanner(fileset.getProject());
-		scanner.scan();
+        final DirectoryScanner scanner = fileset.getDirectoryScanner(fileset.getProject());
+        scanner.scan();
 
-		final File basedir = scanner.getBasedir();
+        final File basedir = scanner.getBasedir();
 
-		final String[] directories = scanner.getIncludedDirectories();
-		for (int i = 0; i < directories.length; i++) {
-			String name = directories[i];
-            name = name.replace('\\', '/');
+        final String[] directories = scanner.getIncludedDirectories();
+        for (int i = 0; i < directories.length; i++) {
+            final String name = directories[i].replace('\\', '/');
 
             pReceiver.onEachDir(prefix + "/" + name, null, user, uid, group, gid, dirmode, 0);
-		}
+        }
 
-		final String[] files = scanner.getIncludedFiles();
-		for (int i = 0; i < files.length; i++) {
-			String name = files[i];
-            name = name.replace('\\', '/');
-            File file = new File(basedir, name);
+        final String[] files = scanner.getIncludedFiles();
+        for (int i = 0; i < files.length; i++) {
+            final String name = files[i].replace('\\', '/');
+            final File file = new File(basedir, name);
 
-			final InputStream inputStream = new FileInputStream(file);
-			try {
-				pReceiver.onEachFile(inputStream, prefix + "/" + name, null, user, uid, group, gid,filemode, file.length());
-			} finally {
-				inputStream.close();
-			}
-		}
-	}
+            final InputStream inputStream = new FileInputStream(file);
+            try {
+                pReceiver.onEachFile(inputStream, prefix + "/" + name, null, user, uid, group, gid,filemode, file.length());
+            } finally {
+                inputStream.close();
+            }
+        }
+    }
 }

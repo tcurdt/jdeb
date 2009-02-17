@@ -38,44 +38,44 @@ import org.vafer.jdeb.producers.DataProducerDirectory;
  */
 public final class Data extends PatternSet implements DataProducer {
 
-	private final Collection mapperWrapper = new ArrayList();
+    private final Collection mapperWrapper = new ArrayList();
 
-	private File src;
-		
-	public void setSrc( final File pSrc ) {
-		src = pSrc;
-	}
+    private File src;
+        
+    public void setSrc( final File pSrc ) {
+        src = pSrc;
+    }
 
-	public void addMapper( final Mapper pMapper ) {
-		mapperWrapper.add(pMapper);
-	}
-	
-	public void produce( final DataConsumer pReceiver ) throws IOException {
-		
-		if (!src.exists()) {
-			throw new FileNotFoundException("Data source not found : " + src);
-		}
+    public void addMapper( final Mapper pMapper ) {
+        mapperWrapper.add(pMapper);
+    }
+    
+    public void produce( final DataConsumer pReceiver ) throws IOException {
+        
+        if (!src.exists()) {
+            throw new FileNotFoundException("Data source not found : " + src);
+        }
 
-		org.vafer.jdeb.mapping.Mapper[] mappers = new org.vafer.jdeb.mapping.Mapper[mapperWrapper.size()];
-		final Iterator it = mapperWrapper.iterator();
-		for (int i = 0; i < mappers.length; i++) {
-			mappers[i] = ((Mapper)it.next()).createMapper();
-		}
-		
-		if (src.isFile()) {
-			new DataProducerArchive(
-				src,
-				getIncludePatterns(getProject()),
-				getExcludePatterns(getProject()),
-				mappers
-				).produce(pReceiver);
-		} else {
-			new DataProducerDirectory(
-				src,
-				getIncludePatterns(getProject()),
-				getExcludePatterns(getProject()),
-				mappers
-				).produce(pReceiver);			
-		}
-	}
+        org.vafer.jdeb.mapping.Mapper[] mappers = new org.vafer.jdeb.mapping.Mapper[mapperWrapper.size()];
+        final Iterator it = mapperWrapper.iterator();
+        for (int i = 0; i < mappers.length; i++) {
+            mappers[i] = ((Mapper)it.next()).createMapper();
+        }
+        
+        if (src.isFile()) {
+            new DataProducerArchive(
+                src,
+                getIncludePatterns(getProject()),
+                getExcludePatterns(getProject()),
+                mappers
+                ).produce(pReceiver);
+        } else {
+            new DataProducerDirectory(
+                src,
+                getIncludePatterns(getProject()),
+                getExcludePatterns(getProject()),
+                mappers
+                ).produce(pReceiver);           
+        }
+    }
 }

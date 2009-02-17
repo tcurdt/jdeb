@@ -35,94 +35,94 @@ import org.vafer.jdeb.utils.Utils;
  */
 public final class DataProducerDirectory extends AbstractDataProducer implements DataProducer {
 
-	private final DirectoryScanner scanner = new DirectoryScanner();
-	
-	public DataProducerDirectory( final File pDir, final String[] pIncludes, final String[] pExcludes, final Mapper[] pMappers ) {
-		super(pIncludes, pExcludes, pMappers);
-		scanner.setBasedir(pDir);
-		scanner.setIncludes(pIncludes);
-		scanner.setExcludes(pExcludes);
-		scanner.setCaseSensitive(true);
-		scanner.setFollowSymlinks(true);
-	}
-	
-	public void produce( final DataConsumer receiver ) throws IOException {
+    private final DirectoryScanner scanner = new DirectoryScanner();
+    
+    public DataProducerDirectory( final File pDir, final String[] pIncludes, final String[] pExcludes, final Mapper[] pMappers ) {
+        super(pIncludes, pExcludes, pMappers);
+        scanner.setBasedir(pDir);
+        scanner.setIncludes(pIncludes);
+        scanner.setExcludes(pExcludes);
+        scanner.setCaseSensitive(true);
+        scanner.setFollowSymlinks(true);
+    }
+    
+    public void produce( final DataConsumer receiver ) throws IOException {
 
-		scanner.scan();
+        scanner.scan();
 
-		final File baseDir = scanner.getBasedir();
+        final File baseDir = scanner.getBasedir();
 
-		final String[] dirs = scanner.getIncludedDirectories();
-		for (int i = 0; i < dirs.length; i++) {
-			final File file = new File(baseDir, dirs[i]);
-			String dirname = getFilename(baseDir, file);
+        final String[] dirs = scanner.getIncludedDirectories();
+        for (int i = 0; i < dirs.length; i++) {
+            final File file = new File(baseDir, dirs[i]);
+            String dirname = getFilename(baseDir, file);
 
-			if ("".equals(dirname)) {
-				continue;
-			}
+            if ("".equals(dirname)) {
+                continue;
+            }
 
-			if (!isIncluded(dirname)) {
-				continue;
-			}
+            if (!isIncluded(dirname)) {
+                continue;
+            }
 
-			if ('/' != File.separatorChar) {
-				dirname = dirname.replace(File.separatorChar, '/');
-			}
+            if ('/' != File.separatorChar) {
+                dirname = dirname.replace(File.separatorChar, '/');
+            }
 
-			TarEntry entry = new TarEntry(dirname);
-			entry.setUserId(0);
-			entry.setUserName("root");
-			entry.setGroupId(0);
-			entry.setGroupName("root");
-			entry.setMode(TarEntry.DEFAULT_DIR_MODE);
+            TarEntry entry = new TarEntry(dirname);
+            entry.setUserId(0);
+            entry.setUserName("root");
+            entry.setGroupId(0);
+            entry.setGroupName("root");
+            entry.setMode(TarEntry.DEFAULT_DIR_MODE);
 
-			entry = map(entry);
+            entry = map(entry);
 
-			entry.setSize(0);
+            entry.setSize(0);
 
-			receiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
-		}
+            receiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+        }
 
 
-		final String[] files = scanner.getIncludedFiles();
+        final String[] files = scanner.getIncludedFiles();
 
-		for (int i = 0; i < files.length; i++) {
-			final File file = new File(baseDir, files[i]);
-			String filename = getFilename(baseDir, file);
+        for (int i = 0; i < files.length; i++) {
+            final File file = new File(baseDir, files[i]);
+            String filename = getFilename(baseDir, file);
 
-			if (!isIncluded(filename)) {
-				continue;
-			}
+            if (!isIncluded(filename)) {
+                continue;
+            }
 
-			if ('/' != File.separatorChar) {
-				filename = filename.replace(File.separatorChar, '/');
-			}
+            if ('/' != File.separatorChar) {
+                filename = filename.replace(File.separatorChar, '/');
+            }
 
-			TarEntry entry = new TarEntry(filename);
-			entry.setUserId(0);
-			entry.setUserName("root");
-			entry.setGroupId(0);
-			entry.setGroupName("root");
-			entry.setMode(TarEntry.DEFAULT_FILE_MODE);
+            TarEntry entry = new TarEntry(filename);
+            entry.setUserId(0);
+            entry.setUserName("root");
+            entry.setGroupId(0);
+            entry.setGroupName("root");
+            entry.setMode(TarEntry.DEFAULT_FILE_MODE);
 
-			entry = map(entry);
+            entry = map(entry);
 
-			entry.setSize(file.length());
+            entry.setSize(file.length());
 
-			final InputStream inputStream = new FileInputStream(file);
-			try {
-				receiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
-			} finally {
-				inputStream.close();
-			}
-		}
-	}
+            final InputStream inputStream = new FileInputStream(file);
+            try {
+                receiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+            } finally {
+                inputStream.close();
+            }
+        }
+    }
 
-	private String getFilename( File root, File file ) {
-		
-		final String relativeFilename = file.getAbsolutePath().substring(root.getAbsolutePath().length());		
-		
-		return Utils.stripLeadingSlash(relativeFilename);
-	}
+    private String getFilename( File root, File file ) {
+        
+        final String relativeFilename = file.getAbsolutePath().substring(root.getAbsolutePath().length());      
+        
+        return Utils.stripLeadingSlash(relativeFilename);
+    }
 
 }

@@ -17,7 +17,7 @@ git clone git://github.com/tcurdt/jdeb.git
   <repository>
     <id>vafer.org</id>
     <name>vafer.org Maven Snapshot Repository</name>
-    <url>https://vafer.org/repository/snaphots</url>
+    <url>https://vafer.org/repository/snapshots</url>
   </repository>
   ...
 +----------------------
