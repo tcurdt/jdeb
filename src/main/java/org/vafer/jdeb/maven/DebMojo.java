@@ -45,7 +45,7 @@ import org.vafer.jdeb.utils.VariableResolver;
  * @requiresDependencyResolution compile
  * @execute phase="package"
  */
-public final class DebMojo extends AbstractPluginMojo {
+public class DebMojo extends AbstractPluginMojo {
 
     /**
      * @component
