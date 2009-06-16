@@ -19,8 +19,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 
 import java.util.List;
 import java.util.StringTokenizer;
@@ -63,7 +61,7 @@ public final class Data implements DataProducer {
     /**
      * @parameter expression="${mapper}"
      */
-    private Mapper[] mapper;
+    private Mapper mapper;
 
     public String[] splitPatterns(String patterns) {
         String[] result = null;
@@ -83,9 +81,9 @@ public final class Data implements DataProducer {
             throw new FileNotFoundException("Data source not found : " + src);
         }
 
-        org.vafer.jdeb.mapping.Mapper[] mappers = new org.vafer.jdeb.mapping.Mapper[mapper.length];
-        for (int i = 0; i < mapper.length; i++) {
-            mappers[i] = mapper[i].createMapper();
+        org.vafer.jdeb.mapping.Mapper[] mappers = null;
+        if (mapper != null) {
+            mappers = new org.vafer.jdeb.mapping.Mapper[] { mapper.createMapper() };
         }
 
         if (src.isFile()) {

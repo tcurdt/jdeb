@@ -149,7 +149,14 @@ public final class DebMojo extends AbstractPluginMojo {
      *             <src>${project.basedir}/target/my_archive.tar.gz</src>
      *             <include>...</include>
      *             <exclude>...</exclude>
-     *             <mapper>...</mapper>
+     *             <mapper>
+     *               <type>perm</type>
+     *               <strip>1</strip>
+     *               <prefix>/somewhere/else</prefix>
+     *               <user>santbj</user>
+     *               <group>santbj</group>
+     *               <mode>600</mode>
+     *             </mapper>
      *           </data>
      *           <data>
      *             <src>${project.build.directory}/data</src>
@@ -162,7 +169,6 @@ public final class DebMojo extends AbstractPluginMojo {
      *           </data>
      *         <data>
      *           <src>${project.basedir}/README.txt</src>
-     *           <mapper>...</mapper>
      *         </data>
      *         </dataSet>
      *       </configuration>

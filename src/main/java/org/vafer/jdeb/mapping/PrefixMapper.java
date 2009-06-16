@@ -23,10 +23,10 @@ import org.vafer.jdeb.utils.Utils;
  *  
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
-public final class PrefixMapper implements Mapper {
+public class PrefixMapper implements Mapper {
 
-    private final int strip;
-    private final String prefix;
+    protected final int strip;
+    protected final String prefix;
     
     public PrefixMapper( final int pStrip, final String pPrefix ) {
         strip = pStrip;

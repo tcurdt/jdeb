@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 
 import org.vafer.jdeb.mapping.LsMapper;
 import org.vafer.jdeb.mapping.NullMapper;
+import org.vafer.jdeb.mapping.PermMapper;
 import org.vafer.jdeb.mapping.PrefixMapper;
 
 /**
@@ -31,46 +32,43 @@ import org.vafer.jdeb.mapping.PrefixMapper;
 public final class Mapper {
 
     /**
-     * @parameter expression="${type}" alias="pType"
+     * @parameter
+     * @required
      */
-    private String mtype;
+    private String type;
+    
+    private int uid;
+    
+    private int gid;
+
+    private String user;
+
+    private String group;
+
+    private String mode;
 
     /**
-     * @parameter expression="${prefix}" alias="pPrefix"
+     * @parameter
      */
     private String prefix;
 
     /**
-     * @parameter expression="${strip}" alias="pStrip"
+     * @parameter
      */
     private int strip;
 
     /**
-     * @parameter expression="${src}" alias="pSrc"
+     * @parameter
      */
     private File src;
 
 
-    public void setType( final String pType ) {
-        mtype = pType;
-    }
-
-    public void setPrefix( final String pPrefix ) {
-        prefix = pPrefix;
-    }
-
-    public void setStrip( final int pStrip ) {
-        strip = pStrip;
-    }
-        
-    public void setSrc( final File pSrc ) {
-        src = pSrc;
-    }
-
     public org.vafer.jdeb.mapping.Mapper createMapper() {
-        if ("prefix".equalsIgnoreCase(mtype)) {
+        if ("perm".equalsIgnoreCase(type)) {
+            return new PermMapper(uid, gid, user, group, mode, strip, prefix);
+        } else if ("prefix".equalsIgnoreCase(type)) {
             return new PrefixMapper(strip, prefix);
-        } else if ("ls".equalsIgnoreCase(mtype)) {
+        } else if ("ls".equalsIgnoreCase(type)) {
             try {
                 return new LsMapper(new FileInputStream(src));
             } catch (Exception e) {
