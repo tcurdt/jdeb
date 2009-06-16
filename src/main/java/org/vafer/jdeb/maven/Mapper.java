@@ -37,15 +37,35 @@ public final class Mapper {
      */
     private String type;
     
-    private int uid;
+    /**
+     * @parameter
+     */
+    private int uid = -1;
     
-    private int gid;
+    /**
+     * @parameter
+     */
+    private int gid = -1;
 
+    /**
+     * @parameter
+     */
     private String user;
 
+    /**
+     * @parameter
+     */
     private String group;
 
-    private String mode;
+    /**
+     * @parameter
+     */
+    private String filemode = "600";
+
+    /**
+     * @parameter
+     */
+    private String dirmode = "700";
 
     /**
      * @parameter
@@ -65,7 +85,7 @@ public final class Mapper {
 
     public org.vafer.jdeb.mapping.Mapper createMapper() {
         if ("perm".equalsIgnoreCase(type)) {
-            return new PermMapper(uid, gid, user, group, mode, strip, prefix);
+            return new PermMapper(uid, gid, user, group, filemode, dirmode, strip, prefix);
         } else if ("prefix".equalsIgnoreCase(type)) {
             return new PrefixMapper(strip, prefix);
         } else if ("ls".equalsIgnoreCase(type)) {

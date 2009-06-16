@@ -29,7 +29,8 @@ public final class PermMapper extends PrefixMapper {
     private int gid = -1;
     private String user;
     private String group;
-    private int mode;
+    private int fileMode;
+    private int dirMode;
 
     public static int toMode(String modeString) {
         int mode = -1;
@@ -39,21 +40,22 @@ public final class PermMapper extends PrefixMapper {
         return mode;
     }
 
-    public PermMapper(int uid, int gid, String user, String group, int mode, int strip, String prefix) {
+    public PermMapper(int uid, int gid, String user, String group, int fileMode, int dirMode, int strip, String prefix) {
         super(strip, prefix);
         this.uid = uid;
         this.gid = gid;
         this.user = user;
         this.group = group;
-        this.mode = mode;
+        this.fileMode = fileMode;
+        this.dirMode = dirMode;
     }
 
-    public PermMapper(int uid, int gid, String user, String group, String mode, int strip, String prefix) {
-        this(uid, gid, user, group, toMode(mode), strip, prefix);
+    public PermMapper(int uid, int gid, String user, String group, String fileMode, String dirMode, int strip, String prefix) {
+        this(uid, gid, user, group, toMode(fileMode), toMode(dirMode), strip, prefix);
     }
 
-    public PermMapper(String user, String group, String mode, int strip, String prefix) {
-        this(-1, -1, user, group, toMode(mode), strip, prefix);
+    public PermMapper(String user, String group, String fileMode, String dirMode, int strip, String prefix) {
+        this(-1, -1, user, group, toMode(fileMode), toMode(dirMode), strip, prefix);
     }
 
     public TarEntry map(final TarEntry entry) {
@@ -61,6 +63,7 @@ public final class PermMapper extends PrefixMapper {
 
         final TarEntry newEntry = new TarEntry(prefix + '/' + Utils.stripPath(strip, name));
 
+        // Set ownership
         if (uid > -1) {
             newEntry.setUserId(uid);
         } else {
@@ -81,11 +84,23 @@ public final class PermMapper extends PrefixMapper {
         } else {
             newEntry.setGroupName(entry.getGroupName());
         }
-        if (mode > -1) {
-            newEntry.setMode(mode);
+
+        // Set permissions
+        if (entry.isDirectory()) {
+            if (dirMode > -1) {
+                newEntry.setMode(dirMode);
+            } else {
+                newEntry.setMode(entry.getMode());
+            }
         } else {
-            newEntry.setMode(entry.getMode());
+            if (fileMode > -1) {
+                newEntry.setMode(fileMode);
+            } else {
+                newEntry.setMode(entry.getMode());
+
+            }
         }
+
         newEntry.setSize(entry.getSize());
 
         return newEntry;
