@@ -61,7 +61,7 @@ public final class PermMapper extends PrefixMapper {
     public TarEntry map(final TarEntry entry) {
         final String name = entry.getName();
 
-        final TarEntry newEntry = new TarEntry(prefix + '/' + Utils.stripPath(strip, name));
+        TarEntry newEntry = newEntry = new TarEntry(prefix + '/' + Utils.stripPath(strip, name));
 
         // Set ownership
         if (uid > -1) {
@@ -86,7 +86,8 @@ public final class PermMapper extends PrefixMapper {
         }
 
         // Set permissions
-        if (entry.isDirectory()) {
+        if (newEntry.isDirectory()) {
+            System.out.println("---> Is DIR!!");
             if (dirMode > -1) {
                 newEntry.setMode(dirMode);
             } else {

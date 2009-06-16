@@ -30,7 +30,7 @@ public class PrefixMapper implements Mapper {
     
     public PrefixMapper( final int pStrip, final String pPrefix ) {
         strip = pStrip;
-        prefix = pPrefix;
+        prefix = (pPrefix == null) ? "" : pPrefix;
     }
         
     public TarEntry map( final TarEntry pEntry ) {

@@ -69,6 +69,10 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
                 dirname = dirname.replace(File.separatorChar, '/');
             }
 
+            if (!dirname.endsWith("/")) {
+                dirname += "/";
+            }
+
             TarEntry entry = new TarEntry(dirname);
             entry.setUserId(0);
             entry.setUserName("root");
