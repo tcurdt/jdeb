@@ -189,6 +189,8 @@ public final class DebMojo extends AbstractPluginMojo {
     private Collection dataProducers = new ArrayList();
 
     public void setData(Data[] pData) {
+        dataSet = pData;
+        dataProducers.clear();
         if (pData != null) {
             for (int i = 0; i < pData.length; i++) {
                 dataProducers.add(pData[i]);
@@ -316,6 +318,8 @@ public final class DebMojo extends AbstractPluginMojo {
 
         setData(dataSet);
 
+        // If there are no dataProducers, then we'll add a single producer that processes the
+        // maven artifact file (be it a jar, war, etc.)
         if (dataProducers.isEmpty())
         {
             dataProducers.add( new DataProducer() {
