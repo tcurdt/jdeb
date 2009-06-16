@@ -87,7 +87,6 @@ public final class PermMapper extends PrefixMapper {
 
         // Set permissions
         if (newEntry.isDirectory()) {
-            System.out.println("---> Is DIR!!");
             if (dirMode > -1) {
                 newEntry.setMode(dirMode);
             } else {
