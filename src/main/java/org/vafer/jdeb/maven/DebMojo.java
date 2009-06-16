@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -112,20 +114,75 @@ public final class DebMojo extends AbstractPluginMojo {
      * @parameter expression="${passhrase}"
      */     
     private String passphrase = null;
-    
-    /**
-     * If not defaultPath is specified this  
-     * 
-     * @parameter expression="${defaultPath}" default-value="/srv/jetty/www"
-     */     
-    private String defaultPath = "/srv/jetty/www";
 
     /**
-     * TODO: make configurable
+     * The compression method used for the data file (none, gzip or bzip2)
+     *
+     * @parameter expression="${compression}" default-value="gzip"
      */
-    private DataProducer[] dataProducers = null;
+    private String compression;
     
-    
+    /**
+     * The location where all package files will be installed.
+     * By default, all packages are installed in /opt
+     * (see the FHS here: http://www.pathname.com/fhs/pub/fhs-2.3.html#OPTADDONAPPLICATIONSOFTWAREPACKAGES)
+     * 
+     * @parameter expression="${installDir}" default-value="/opt/${project.artifactId}"
+     */     
+    private String installDir;
+
+    /**
+     * "data" entries used to determine which files should be added to this deb.
+     * The "data" entries may specify a tarball (tar.gz, tar.bz2, tgz), a directory, or a normal file.
+     * An entry would look something like this in your pom.xml:
+     * <pre>
+     *   <build>
+     *     <plugins>
+     *       <plugin>
+     *       <artifactId>jdeb</artifactId>
+     *       <groupId>org.vafer</groupId>
+     *       ...
+     *       <configuration>
+     *         ...
+     *         <dataSet>
+     *           <data>
+     *             <src>${project.basedir}/target/my_archive.tar.gz</src>
+     *             <include>...</include>
+     *             <exclude>...</exclude>
+     *             <mapper>...</mapper>
+     *           </data>
+     *           <data>
+     *             <src>${project.build.directory}/data</src>
+     *             <include></include>
+     *             <exclude>**&#47;.svn</exclude>
+     *             <mapper>
+     *               <type>ls</type>
+     *               <src>mapping.txt</src>
+     *             </mapper>
+     *           </data>
+     *         <data>
+     *           <src>${project.basedir}/README.txt</src>
+     *           <mapper>...</mapper>
+     *         </data>
+     *         </dataSet>
+     *       </configuration>
+     *     </plugins>
+     *   </build>
+     * </pre>
+     *
+     * @parameter expression="${dataSet}"
+     */
+    private Data[] dataSet;
+    private Collection dataProducers = new ArrayList();
+
+    public void setData(Data[] pData) {
+        if (pData != null) {
+            for (int i = 0; i < pData.length; i++) {
+                dataProducers.add(pData[i]);
+            }
+        }
+    }
+
     /**
      * Main entry point
      * @throws MojoExecutionException on error
@@ -202,20 +259,20 @@ public final class DebMojo extends AbstractPluginMojo {
         
         final File file = getProject().getArtifact().getFile();
         final File[] controlFiles = controlDir.listFiles();
-        
-        
-        if (dataProducers == null)
+
+        setData(dataSet);
+
+        if (dataProducers.isEmpty())
         {
-            dataProducers = new DataProducer[] { new DataProducer() {
+            dataProducers.add( new DataProducer() {
             public void produce( final DataConsumer receiver ) {
                 try {
-                    receiver.onEachFile(new FileInputStream(file), new File(new File(defaultPath), file.getName()).getAbsolutePath(), "", "root", 0, "root", 0, TarEntry.DEFAULT_FILE_MODE, file.length());
+                    receiver.onEachFile(new FileInputStream(file), new File(new File(installDir), file.getName()).getAbsolutePath(), "", "root", 0, "root", 0, TarEntry.DEFAULT_FILE_MODE, file.length());
                 } catch (Exception e) {
                     getLog().error(e);
                 }
-            }}};
+            }});
         }
-
         
         final Processor processor = new Processor(
                 new Console()
@@ -232,7 +289,10 @@ public final class DebMojo extends AbstractPluginMojo {
         try
         {
 
-            packageDescriptor = processor.createDeb(controlFiles, dataProducers, deb, "gzip");
+            DataProducer[] data = new DataProducer[dataProducers.size()];
+            dataProducers.toArray(data);
+
+            packageDescriptor = processor.createDeb(controlFiles, data, deb, compression);
 
             getLog().info("Attaching created debian archive " + deb);
             projectHelper.attachArtifact( getProject(), "deb-archive", deb.getName(), deb );
