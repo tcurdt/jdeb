@@ -40,6 +40,8 @@ public abstract class AbstractDescriptor {
     
     private final Map values = new HashMap();
     private final VariableResolver resolver;
+    private static String openToken = "[[";
+    private static String closeToken = "]]";
     
     public AbstractDescriptor( final VariableResolver pResolver ) {
         resolver = pResolver;
@@ -48,6 +50,14 @@ public abstract class AbstractDescriptor {
     public AbstractDescriptor( final AbstractDescriptor pDescriptor ) {
         values.putAll(pDescriptor.values);
         resolver = pDescriptor.resolver;
+    }
+
+    public static void setOpenToken( String token ) {
+        openToken = token;
+    }
+
+    public static void setCloseToken( String token ) {
+        closeToken = token;
     }
 
     protected void parse( final InputStream pInput ) throws IOException, ParseException {
@@ -108,7 +118,7 @@ public abstract class AbstractDescriptor {
 
         if (resolver != null) {
             try {
-                values.put(pKey, Utils.replaceVariables(resolver, pValue, "[[", "]]"));
+                values.put(pKey, Utils.replaceVariables(resolver, pValue, openToken, closeToken));
                 return;
             } catch (ParseException e) {
                 // FIXME maybe throw an Exception?

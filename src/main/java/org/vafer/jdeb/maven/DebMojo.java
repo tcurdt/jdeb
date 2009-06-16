@@ -32,6 +32,7 @@ import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Processor;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
+import org.vafer.jdeb.descriptors.AbstractDescriptor;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 import org.vafer.jdeb.utils.MapVariableResolver;
 import org.vafer.jdeb.utils.Utils;
@@ -65,6 +66,7 @@ public final class DebMojo extends AbstractPluginMojo {
      * @parameter expression="${deb}"
      */    
     private File deb;
+    private String debName;
     
     /**
      * Explicitly defines the path to the control directory. At least the control file is mandatory. 
@@ -79,6 +81,7 @@ public final class DebMojo extends AbstractPluginMojo {
      * @parameter expression="${changesIn}"
      */    
     private File changesIn = null;
+    private String changesName;
 
     /**
      * Explicitly define the file where to write the changes to. 
@@ -130,6 +133,10 @@ public final class DebMojo extends AbstractPluginMojo {
      * @parameter expression="${installDir}" default-value="/opt/${project.artifactId}"
      */     
     private String installDir;
+
+    private String openReplaceToken = "[[";
+
+    private String closeReplaceToken = "]]";
 
     /**
      * "data" entries used to determine which files should be added to this deb.
@@ -189,44 +196,56 @@ public final class DebMojo extends AbstractPluginMojo {
         }
     }
 
-    /**
-     * Main entry point
-     * @throws MojoExecutionException on error
-     */
-    public void execute()
-        throws MojoExecutionException
+    public void setOpenReplaceToken(String openReplaceToken)
     {
-        // expand name pattern
-        final String debName;
-        final String changesName;       
+        this.openReplaceToken = openReplaceToken;
+        AbstractDescriptor.setOpenToken(openReplaceToken);
+    }
 
-        final Map variables = new HashMap();
+    public void setCloseReplaceToken(String closeReplaceToken)
+    {
+        this.closeReplaceToken = closeReplaceToken;
+        AbstractDescriptor.setCloseToken(closeReplaceToken);
+    }
+
+    protected VariableResolver initializeVariableResolver(Map variables)
+    {
         variables.put("name", getProject().getName());
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
         variables.put("version", getProject().getVersion().replace('-', '+'));
         variables.put("description", getProject().getDescription());
-        variables.put("extension", "deb");      
-        final VariableResolver resolver = new MapVariableResolver(variables);
-
-        try
-        {
-            debName = Utils.replaceVariables(resolver, namePattern, "[[", "]]"); 
-            
-            variables.put("extension", "changes");      
-            changesName = Utils.replaceVariables(resolver, namePattern, "[[", "]]"); 
-        }
-        catch (ParseException e)
-        {
-            throw new MojoExecutionException("Failed parsing artifact name pattern", e);
-        }
-
+        variables.put("extension", "deb");
+        return new MapVariableResolver(variables);
+    }
+    
+    protected File getDebFile()
+    {
         // if not specified try to the default
         if (deb == null)
         {
             deb = new File(buildDirectory, debName);
         }
+        return deb;
+    }
 
+    protected File getControlDir()
+    {
+        // if not specified try to the default
+        if (controlDir == null)
+        {
+            controlDir = new File(getProject().getBasedir(), "src/deb/control");
+            getLog().info("Using default path to control directory " + controlDir);
+        }
+        return controlDir;
+    }
+
+    protected File getControlFile()
+    {
+        return new File(controlDir, "control");
+    }
+
+    protected File getChangesInFile()    {
         // if not specified try to the default
         if (changesIn == null)
         {
@@ -236,19 +255,48 @@ public final class DebMojo extends AbstractPluginMojo {
                 changesIn = f;
             }
         }
-        
+        return changesIn;
+    }
+
+    protected File getChangesOutFile()
+    {
         // if not specified try to the default
         if (changesOut == null)
         {
             changesOut = new File(buildDirectory, changesName);
         }
-        
-        // if not specified try to the default
-        if (controlDir == null)
+        return changesOut;
+    }
+
+    /**
+     * Main entry point
+     * @throws MojoExecutionException on error
+     */
+    public void execute()
+        throws MojoExecutionException
+    {
+        Map variables = new HashMap();
+        final VariableResolver resolver = initializeVariableResolver(variables);
+
+        try
         {
-            controlDir = new File(getProject().getBasedir(), "src/deb/control");
-            getLog().info("Using default path to control directory " + controlDir);
+            // expand name pattern
+            debName = Utils.replaceVariables(resolver, namePattern, openReplaceToken, closeReplaceToken);
+            variables.put("extension", "changes");      
+            changesName = Utils.replaceVariables(resolver, namePattern, openReplaceToken, closeReplaceToken);
         }
+        catch (ParseException e)
+        {
+            throw new MojoExecutionException("Failed parsing artifact name pattern", e);
+        }
+
+        deb = getDebFile();
+
+        changesIn = getChangesInFile();
+
+        changesOut = getChangesOutFile();
+
+        controlDir = getControlDir();        
         
         // make sure we have at least the mandatory control directory
         if (!controlDir.exists() || !controlDir.isDirectory())
@@ -257,7 +305,7 @@ public final class DebMojo extends AbstractPluginMojo {
         }
         
         // make sure we have at least the mandatory control file
-        final File controlFile = new File(controlDir, "control");
+        final File controlFile = getControlFile();
         if (!controlFile.exists() || !controlFile.isFile() || !controlFile.canRead())
         {
             throw new MojoExecutionException(controlFile + " is mandatory");
