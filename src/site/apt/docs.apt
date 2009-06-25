@@ -42,6 +42,101 @@ Distribution: development
  
  If the enviroment variables <<<DEBEMAIL>>> and <<<DEBFULLNAME>>> are both set this will overrule the <<<Maintainer>>> field set in there. The <<<Installed-Size>>> will also be injected. If a changes file is used, the <<<Distribution>>> usually comes from that file. The default changes file is called <<<CHANGES.txt>>>. See below for the syntax of the content. Now if you do a <<<mvn clean install>>> the attached <<<deb>>> goal is getting called and the artifacts -the deb and potentially the changes file- will automatically get attached to the project.
 
+ The jdeb maven plugin also supports a variety of configuration options.  These configuration options provide the same features available in the jdeb ant task.  To configure the jdeb maven plugin, populate the jdeb configuraiton section with any of the following options:
+
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+||   Element    || Description                                                                 || Required                                          ||
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| deb           | The debian package to be generated                                           | No; defaults to <<<artifactId>>>_<<<version>>>.deb  |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| controlDir    | The directory containing the control files                                   | No; defaults to src/deb/control                     |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| installDir    | The directory where your file(s) will be place when your deb is installed    | No; defaults to /opt/<<<artifactId>>>               |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| compression   | Compression method for the data file (<<<gzip>>>, <<<bzip2>>> or <<<none>>>) | No; defaults to <<<gzip>>>                          |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| keyring       | The file containing the PGP keys                                             | No                                                  |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| key           | The name of the key to be used in the keyring                                | No                                                  |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| passphrase    | The passphrase to use the key                                                | No                                                  |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| changesIn     | The changes to add                                                           | No                                                  |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| changesOut    | The changes file generated                                                   | No                                                  |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| changesSave   | The merged changes file                                                      | No                                                  |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| dataSet       | A list of directories, tarballs, or files to include in the deb package      | No; defaults to include your maven artifact         |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+
+ If you use the <<<dataSet>>> element, you'll need to populate it with a one or more <<<data>>> elements.  A <<<data>>> element is used to specify a <<<directory>>>, a <<<tarball>>> archive, or a <<<file>>>.  You can add as many <<<data>>> elements to your <<<dataSet>>> as you'd like.  The <<<data>>> element has the following options:
+
+*---------------+------------------------------------------------------------------------------+---------------------------------------------+
+||   Element    || Description                                                                 || Required                                  ||
+*---------------+------------------------------------------------------------------------------+---------------------------------------------+
+| src           | The directory, tarball, or file to include in the package                    | Yes                                         |
+*---------------+------------------------------------------------------------------------------+---------------------------------------------+
+| include       | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files                   |
+*---------------+------------------------------------------------------------------------------+---------------------------------------------+
+| exclude       | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions               |
+*---------------+------------------------------------------------------------------------------+---------------------------------------------+
+| mapper        | The files to exclude from the directory or tarball                           | No                                          |
+*---------------+------------------------------------------------------------------------------+---------------------------------------------+
+
+ Below is an example of how you could configure your jdeb maven plugin to include a directory, a tarball, and a file in your deb package:
+
++--------------------
+...
+<build>
+    <plugins>
+        <plugin>
+            <artifactId>jdeb</artifactId>
+            <groupId>org.vafer</groupId>
+            <version>0.7</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>deb</goal>
+                    </goals>
+                    <configuration>
+                      <dataSet>
+                        <!-- Tarball example -->
+                        <data>
+                          <src>${project.basedir}/target/my_archive.tar.gz</src>
+                          <include>foo.txt,bar.txt</include>
+                          <exclude>baz.txt</exclude>
+                          <mapper>
+                            <type>perm</type>
+                            <strip>1</strip>
+                            <prefix>/somewhere/else</prefix>
+                            <user>santbj</user>
+                            <group>santbj</group>
+                            <mode>600</mode>
+                          </mapper>
+                        </data>
+                        <!-- Directory example -->
+                        <data>
+                          <src>${project.build.directory}/data</src>
+                          <exclude>**/.svn</exclude>
+                          <mapper>
+                            <type>ls</type>
+                            <src>mapping.txt</src>
+                          </mapper>
+                        </data>
+                        <!-- File example -->
+                        <data>
+                          <src>${project.basedir}/README.txt</src>
+                        </data>
+                      </dataSet>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+...
++--------------------
+
 
 * Howto use "jdeb" with ant
 
