@@ -32,6 +32,11 @@ import org.vafer.jdeb.descriptors.PackageDescriptor;
  * A generic class for creating debian archives.
  * Even supports signed changes files.
  *
+ * This class is largely based on the DebAntTask class, and
+ * provides the same featues to maven developers that the
+ * ant task provides to ant developers.
+ *
+ * @see org.vafer.jdeb.ant.DebAntTask
  * @author Bryan Sant <bryan.sant@gmail.com>
  */
 public class DebMaker {

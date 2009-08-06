@@ -43,10 +43,12 @@ import org.vafer.jdeb.utils.VariableResolver;
  * @execute phase="package"
  */
 public class DebMojo extends AbstractPluginMojo {
+
   /**
    * @component
    */
   private MavenProjectHelper projectHelper;
+
   /**
    * Defines the pattern of the name of final artifacts.
    * Possible substitutions are [[artifactId]] [[version]] [[extension]] and [[groupId]].
@@ -54,6 +56,7 @@ public class DebMojo extends AbstractPluginMojo {
    * @parameter expression="${namePattern}" default-value="[[artifactId]]_[[version]].[[extension]]"
    */
   private String namePattern;
+
   /**
    * Explicitly defines the final artifact name (without using the pattern)
    *
@@ -61,12 +64,14 @@ public class DebMojo extends AbstractPluginMojo {
    */
   private File deb;
   private String debName;
+
   /**
    * Explicitly defines the path to the control directory. At least the control file is mandatory.
    *
    * @parameter expression="${controlDir}"
    */
   private File controlDir;
+
   /**
    * Explicitly define the file to read the changes from.
    *
@@ -74,42 +79,49 @@ public class DebMojo extends AbstractPluginMojo {
    */
   private File changesIn = null;
   private String changesName;
+
   /**
    * Explicitly define the file where to write the changes to.
    *
    * @parameter expression="${changesIn}"
    */
   private File changesOut = null;
+
   /**
    * Explicitly define the file where to write the changes of the changes input to.
    *
    * @parameter expression="${changesSave}"
    */
   private File changesSave = null;
+
   /**
    * The keyring file. Usually some/path/secring.gpg
    *
    * @parameter expression="${keyring}"
    */
   private File keyring = null;
+
   /**
    * The hex key id to use for signing.
    *
    * @parameter expression="${key}"
    */
   private String key = null;
+
   /**
    * The passphrase for the key to sign the changes file.
    *
    * @parameter expression="${passhrase}"
    */
   private String passphrase = null;
+
   /**
    * The compression method used for the data file (none, gzip or bzip2)
    *
    * @parameter expression="${compression}" default-value="gzip"
    */
   private String compression;
+
   /**
    * The location where all package files will be installed.
    * By default, all packages are installed in /opt
@@ -120,6 +132,7 @@ public class DebMojo extends AbstractPluginMojo {
   private String installDir;
   private String openReplaceToken = "[[";
   private String closeReplaceToken = "]]";
+
   /**
    * "data" entries used to determine which files should be added to this deb.
    * The "data" entries may specify a tarball (tar.gz, tar.bz2, tgz), a directory, or a normal file.
@@ -254,12 +267,6 @@ public class DebMojo extends AbstractPluginMojo {
    * @throws MojoExecutionException on error
    */
   public void execute() throws MojoExecutionException {
-    Console infoConsole = new Console() {
-      public void println(String s) {
-        getLog().info(s);
-      }
-    };
-
     Map variables = new HashMap();
     final VariableResolver resolver = initializeVariableResolver(variables);
     try {
@@ -295,6 +302,11 @@ public class DebMojo extends AbstractPluginMojo {
       });
     }
 
+    Console infoConsole = new Console() {
+      public void println(String s) {
+        getLog().info(s);
+      }
+    };
     try {
       DebMaker debMaker = new DebMaker(infoConsole, deb, controlDir, dataProducers);
       debMaker.makeDeb();
