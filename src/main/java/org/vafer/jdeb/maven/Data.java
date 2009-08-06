@@ -35,69 +35,78 @@ import org.vafer.jdeb.producers.DataProducerDirectory;
  * @author Bryan Sant <bryan.sant@gmail.com>
  */
 public final class Data implements DataProducer {
+  public Data() {
+  }
 
-    /**
-     * @parameter expression="${src}"
-     * @required
-     */
-    private File src;
+  public Data(File src) {
+    this.src = src;
+  }
 
-    /**
-     * @parameter expression="${includes}" alias="includes"
-     */
-    public void setIncludes(String includes) {
-        includePatterns = splitPatterns(includes);
+  /**
+   * @parameter expression="${src}"
+   * @required
+   */
+  public void setSrc(File src) {
+    this.src = src;
+  }
+  private File src;
+
+  /**
+   * @parameter expression="${includes}" alias="includes"
+   */
+  public void setIncludes(String includes) {
+    includePatterns = splitPatterns(includes);
+  }
+  private String[] includePatterns;
+
+  /**
+   * @parameter expression="${excludes}" alias="excludes"
+   */
+  public void setExcludes(String excludes) {
+    excludePatterns = splitPatterns(excludes);
+  }
+  private String[] excludePatterns;
+  /**
+   * @parameter expression="${mapper}"
+   */
+  private Mapper mapper;
+
+  public String[] splitPatterns(String patterns) {
+    String[] result = null;
+    if (patterns != null && patterns.length() > 0) {
+      List tokens = new ArrayList();
+      StringTokenizer tok = new StringTokenizer(patterns, ", ", false);
+      while (tok.hasMoreTokens()) {
+        tokens.add(tok.nextToken());
+      }
+      result = (String[]) tokens.toArray(new String[tokens.size()]);
     }
-    private String[] includePatterns;
+    return result;
+  }
 
-    /**
-     * @parameter expression="${excludes}" alias="excludes"
-     */
-    public void setExcludes(String excludes) {
-        excludePatterns = splitPatterns(excludes);
-    }
-    private String[] excludePatterns;
-
-    /**
-     * @parameter expression="${mapper}"
-     */
-    private Mapper mapper;
-
-    public String[] splitPatterns(String patterns) {
-        String[] result = null;
-        if (patterns != null && patterns.length() > 0) {
-            List tokens = new ArrayList();
-            StringTokenizer tok = new StringTokenizer(patterns, ", ", false);
-            while (tok.hasMoreTokens()) {
-                tokens.add(tok.nextToken());
-            }
-            result = (String[]) tokens.toArray(new String[tokens.size()]);
-        }
-        return result;
+  public void produce(final DataConsumer pReceiver) throws IOException {
+    if (!src.exists()) {
+      throw new FileNotFoundException("Data source not found : " + src);
     }
 
-    public void produce(final DataConsumer pReceiver) throws IOException {
-        if (!src.exists()) {
-            throw new FileNotFoundException("Data source not found : " + src);
-        }
-
-        org.vafer.jdeb.mapping.Mapper[] mappers = null;
-        if (mapper != null) {
-            mappers = new org.vafer.jdeb.mapping.Mapper[] { mapper.createMapper() };
-        }
-
-        if (src.isFile()) {
-            new DataProducerArchive(
-                    src,
-                    includePatterns,
-                    excludePatterns,
-                    mappers).produce(pReceiver);
-        } else {
-            new DataProducerDirectory(
-                    src,
-                    includePatterns,
-                    excludePatterns,
-                    mappers).produce(pReceiver);
-        }
+    org.vafer.jdeb.mapping.Mapper[] mappers = null;
+    if (mapper != null) {
+      mappers = new org.vafer.jdeb.mapping.Mapper[]{mapper.createMapper()};
     }
+
+    if (src.isFile()) {
+      new DataProducerArchive(
+          src,
+          includePatterns,
+          excludePatterns,
+          mappers).produce(pReceiver);
+    }
+    else {
+      new DataProducerDirectory(
+          src,
+          includePatterns,
+          excludePatterns,
+          mappers).produce(pReceiver);
+    }
+  }
 }
