@@ -29,8 +29,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.zip.GZIPOutputStream;
 
@@ -362,11 +364,13 @@ public class Processor {
 
         final Total dataSize = new Total();
 
+        final List parentDirs = new ArrayList();
         final DataConsumer receiver = new DataConsumer() {
             public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
-
-                if (!dirname.endsWith("/")) {
-                    dirname = dirname + "/";
+                // If we're receiving directory names from Windows, then we'll convert to use slash
+                // This does eliminate the ability to use of a backslash in a directory name on *NIX, but in practice, this is a non-issue
+                if (dirname.indexOf('\\') > -1) {
+                    dirname = dirname.replace('\\', '/');
                 }
 
                 // ensure the path is like : ./foo/bar
@@ -376,21 +380,35 @@ public class Processor {
                     dirname = "./" + dirname;
                 }
 
-                TarEntry entry = new TarEntry(dirname);
-
-                // FIXME: link is in the constructor
-                entry.setUserName(user);
-                entry.setUserId(uid);
-                entry.setGroupName(group);
-                entry.setGroupId(gid);
-                entry.setMode(mode);
-                entry.setSize(0);
-
-                outputStream.putNextEntry(entry);
-
+                // Debian packages must have parent directories created
+                // before sub-directories or files can be installed.
+                // For example, if an entry of ./usr/lib/foo/bar existed
+                // in a .deb package, but the ./usr/lib/foo directory didn't
+                // exist, the package installation would fail.  The .deb must
+                // then have an entry for ./usr/lib/foo and then ./usr/lib/foo/bar
+                //
+                // The loop below will create entries for all parent directories
+                // to ensure that .deb packages will install correctly.
+                String[] pathParts = dirname.split("\\/");
+                String parentDir = "./";
+                for (int i = 1; i < pathParts.length; i++) {
+                    parentDir += pathParts[i] + "/";
+                    if (!parentDirs.contains(parentDir)) {
+                        TarEntry entry = new TarEntry(parentDir);
+                        // FIXME: link is in the constructor
+                        entry.setUserName(user);
+                        entry.setUserId(uid);
+                        entry.setGroupName(group);
+                        entry.setGroupId(gid);
+                        entry.setMode(mode);
+                        entry.setSize(0);
+                        outputStream.putNextEntry(entry);
+                        outputStream.closeEntry();
+                        parentDirs.add(parentDir);
+                    }
+                }
+    
                 console.println("dir: " + dirname);
-
-                outputStream.closeEntry();
             }
 
             public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
