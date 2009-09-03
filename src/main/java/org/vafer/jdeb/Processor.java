@@ -281,7 +281,7 @@ public class Processor {
 
             final String name = file.getName();
 
-            entry.setName(name);
+            entry.setName("./" + name);
             entry.setNames("root", "root");
             entry.setMode(PermMapper.toMode("755"));
 
@@ -519,7 +519,7 @@ public class Processor {
     private static void addEntry( final String pName, final String pContent, final TarOutputStream pOutput ) throws IOException {
         final byte[] data = pContent.getBytes("UTF-8");
 
-        final TarEntry entry = new TarEntry(pName);
+        final TarEntry entry = new TarEntry("./" + pName);
         entry.setSize(data.length);
         entry.setNames("root", "root");
 
