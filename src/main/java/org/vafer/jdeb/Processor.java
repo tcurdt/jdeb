@@ -29,8 +29,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.zip.GZIPOutputStream;
 
@@ -44,6 +46,7 @@ import org.vafer.jdeb.changes.ChangesProvider;
 import org.vafer.jdeb.descriptors.ChangesDescriptor;
 import org.vafer.jdeb.descriptors.InvalidDescriptorException;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
+import org.vafer.jdeb.mapping.PermMapper;
 import org.vafer.jdeb.signing.SigningUtils;
 import org.vafer.jdeb.utils.InformationOutputStream;
 import org.vafer.jdeb.utils.Utils;
@@ -278,7 +281,9 @@ public class Processor {
 
             final String name = file.getName();
 
-            entry.setName(name);
+            entry.setName("./" + name);
+            entry.setNames("root", "root");
+            entry.setMode(PermMapper.toMode("755"));
 
             if ("control".equals(name)) {
                 packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
@@ -362,45 +367,25 @@ public class Processor {
 
         final Total dataSize = new Total();
 
+        final List addedDirectories = new ArrayList();
         final DataConsumer receiver = new DataConsumer() {
             public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
-
-                if (!dirname.endsWith("/")) {
-                    dirname = dirname + "/";
-                }
-
-                // ensure the path is like : ./foo/bar
-                if (dirname.startsWith("/")) {
-                    dirname = "." + dirname;
-                } else if (!dirname.startsWith("./")) {
-                    dirname = "./" + dirname;
-                }
-
-                TarEntry entry = new TarEntry(dirname);
-
-                // FIXME: link is in the constructor
-                entry.setUserName(user);
-                entry.setUserId(uid);
-                entry.setGroupName(group);
-                entry.setGroupId(gid);
-                entry.setMode(mode);
-                entry.setSize(0);
-
-                outputStream.putNextEntry(entry);
+                dirname = fixPath(dirname);
+                
+                createParentDirectories((new File(dirname)).getParent(), user, uid, group, gid);
+                
+                // The directory passed in explicitly by the caller also gets the passed-in mode.  (Unlike
+                // the parent directories for now.  See related comments at "int mode =" in 
+                // createParentDirectories, including about a possible bug.)
+                createDirectory(dirname, user, uid, group, gid, mode, 0);
 
                 console.println("dir: " + dirname);
-
-                outputStream.closeEntry();
             }
 
             public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+                filename = fixPath(filename);
 
-                // ensure the path is like : ./foo/bar
-                if (filename.startsWith("/")) {
-                    filename = "." + filename;
-                } else if (!filename.startsWith("./")) {
-                    filename = "./" + filename;
-                }
+                createParentDirectories((new File(filename)).getParent(), user, uid, group, gid);
 
                 TarEntry entry = new TarEntry(filename);
 
@@ -439,7 +424,84 @@ public class Processor {
 
                 pChecksums.append(md5).append(" ").append(entry.getName()).append('\n');
 
-            }                   
+            }
+            
+            private String fixPath(String path) {
+                // If we're receiving directory names from Windows, then we'll convert to use slash
+                // This does eliminate the ability to use of a backslash in a directory name on *NIX, but in practice, this is a non-issue
+                if (path.indexOf('\\') > -1) {
+                    path = path.replace('\\', '/');
+                }
+                // ensure the path is like : ./foo/bar
+                if (path.startsWith("/")) {
+                    path = "." + path;
+                } else if (!path.startsWith("./")) {
+                    path = "./" + path;
+                }
+                return path;
+            }
+            
+            private void createDirectory(String directory, String user, int uid, String group, int gid, int mode, long size) throws IOException {
+                // All dirs should end with "/" when created, or the test DebAndTaskTestCase.testTarFileSet() thinks its a file
+                // and so thinks it has the wrong permission.
+                // This consistency also helps when checking if a directory already exists in addedDirectories.
+              
+                directory += (directory.endsWith("/") ? "" : "/"); 
+                
+                if (!addedDirectories.contains(directory)) {
+                    TarEntry entry = new TarEntry(directory);
+                    // FIXME: link is in the constructor
+                    entry.setUserName(user);
+                    entry.setUserId(uid);
+                    entry.setGroupName(group);
+                    entry.setGroupId(gid);
+                    entry.setMode(mode);
+                    entry.setSize(size);
+
+                    outputStream.putNextEntry(entry);
+                    outputStream.closeEntry();
+                    addedDirectories.add(directory); // so addedDirectories consistently have "/" for finding duplicates.
+                }
+            }
+
+            private void createParentDirectories(String dirname, String user, int uid, String group, int gid) throws IOException {
+                // Debian packages must have parent directories created
+                // before sub-directories or files can be installed.
+                // For example, if an entry of ./usr/lib/foo/bar existed
+                // in a .deb package, but the ./usr/lib/foo directory didn't
+                // exist, the package installation would fail.  The .deb must
+                // then have an entry for ./usr/lib/foo and then ./usr/lib/foo/bar
+
+                if (dirname == null) {
+                  return;
+                }
+                
+                // The loop below will create entries for all parent directories
+                // to ensure that .deb packages will install correctly.
+                String[] pathParts = dirname.split("\\/");
+                String parentDir = "./";
+                for (int i = 1; i < pathParts.length; i++) {
+                    parentDir += pathParts[i] + "/";
+                    // Make it so the dirs can be traversed by users.
+                    // We could instead try something more granular, like setting the directory 
+                    // permission to 'rx' for each of the 3 user/group/other read permissions 
+                    // found on the file being added (ie, only if "other" has read
+                    // permission on the main node, then add o+rx permission on all the containing
+                    // directories, same w/ user & group), and then also we'd have to 
+                    // check the parentDirs collection of those already added to 
+                    // see if those permissions need to be similarly updated.  (Note, it hasn't
+                    // been demonstrated, but there might be a bug if a user specifically
+                    // requests a directory with certain permissions,
+                    // that has already been auto-created because it was a parent, and if so, go set
+                    // the user-requested mode on that directory instead of this automatic one.)
+                    // But for now, keeping it simple by making every dir a+rx.   Examples are:
+                    // drw-r----- fs/fs   # what you get with setMode(mode)
+                    // drwxr-xr-x fs/fs   # Usable. Too loose?
+                    int mode = TarEntry.DEFAULT_DIR_MODE;
+
+                    createDirectory(parentDir, user, uid, group, gid, mode, 0);
+                }
+            }
         };
 
         for (int i = 0; i < pData.length; i++) {
@@ -457,8 +519,9 @@ public class Processor {
     private static void addEntry( final String pName, final String pContent, final TarOutputStream pOutput ) throws IOException {
         final byte[] data = pContent.getBytes("UTF-8");
 
-        final TarEntry entry = new TarEntry(pName);
+        final TarEntry entry = new TarEntry("./" + pName);
         entry.setSize(data.length);
+        entry.setNames("root", "root");
 
         pOutput.putNextEntry(entry);
         pOutput.write(data);
