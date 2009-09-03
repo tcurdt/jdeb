@@ -372,7 +372,7 @@ public class Processor {
             public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 dirname = fixPath(dirname);
                 
-                createParentDirectories((new File(dirname)).getParent(), user, uid, group, gid, 0);
+                createParentDirectories((new File(dirname)).getParent(), user, uid, group, gid);
                 
                 // The directory passed in explicitly by the caller also gets the passed-in mode.  (Unlike
                 // the parent directories for now.  See related comments at "int mode =" in 
@@ -385,7 +385,7 @@ public class Processor {
             public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 filename = fixPath(filename);
 
-                createParentDirectories((new File(filename)).getParent(), user, uid, group, gid, size);
+                createParentDirectories((new File(filename)).getParent(), user, uid, group, gid);
 
                 TarEntry entry = new TarEntry(filename);
 
@@ -464,7 +464,7 @@ public class Processor {
                 }
             }
 
-            private void createParentDirectories(String dirname, String user, int uid, String group, int gid, long size) throws IOException {
+            private void createParentDirectories(String dirname, String user, int uid, String group, int gid) throws IOException {
                 // Debian packages must have parent directories created
                 // before sub-directories or files can be installed.
                 // For example, if an entry of ./usr/lib/foo/bar existed
@@ -499,7 +499,7 @@ public class Processor {
                     // drwxr-xr-x fs/fs   # Usable. Too loose?
                     int mode = TarEntry.DEFAULT_DIR_MODE;
 
-                    createDirectory(parentDir, user, uid, group, gid, mode, size);
+                    createDirectory(parentDir, user, uid, group, gid, mode, 0);
                 }
             }
         };
