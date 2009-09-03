@@ -487,12 +487,12 @@ public class Processor {
                     // permission on the main node, then add o+rx permission on all the containing
                     // directories, same w/ user & group), and then also we'd have to 
                     // check the parentDirs collection of those already added to 
-                    // see if those permissions need to be similarly updated.  AND, ideally
-                    // we would avoid a bug by adding logic to see if a user requests a directory
+                    // see if those permissions need to be similarly updated.  (Note, it hasn't
+                    // been demonstrated, but there might be a bug if a user specifically
+                    // requests a directory with certain permissions,
                     // that has already been auto-created because it was a parent, and if so, go set
-                    // the user-requested mode on that directory instead of this automatic one.  (I plan
-                    // to either fix it or create a jira...will be updated here.)  But for now, 
-                    // keeping it simple by making every dir a+rx.   Examples are:
+                    // the user-requested mode on that directory instead of this automatic one.)
+                    // But for now, keeping it simple by making every dir a+rx.   Examples are:
                     // drw-r----- fs/fs   # what you get with setMode(mode)
                     // drwxr-xr-x fs/fs   # Usable. Too loose?
                     int mode = PermMapper.toMode("755");
