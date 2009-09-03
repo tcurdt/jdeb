@@ -367,51 +367,15 @@ public class Processor {
         final List parentDirs = new ArrayList();
         final DataConsumer receiver = new DataConsumer() {
             public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
-                // If we're receiving directory names from Windows, then we'll convert to use slash
-                // This does eliminate the ability to use of a backslash in a directory name on *NIX, but in practice, this is a non-issue
-                if (dirname.indexOf('\\') > -1) {
-                    dirname = dirname.replace('\\', '/');
-                }
+                dirname = fixPath(dirname);
+                
+                createDirectories(dirname, user, uid, group, gid, mode, 0);
 
-                // ensure the path is like : ./foo/bar
-                if (dirname.startsWith("/")) {
-                    dirname = "." + dirname;
-                } else if (!dirname.startsWith("./")) {
-                    dirname = "./" + dirname;
-                }
-
-                // Debian packages must have parent directories created
-                // before sub-directories or files can be installed.
-                // For example, if an entry of ./usr/lib/foo/bar existed
-                // in a .deb package, but the ./usr/lib/foo directory didn't
-                // exist, the package installation would fail.  The .deb must
-                // then have an entry for ./usr/lib/foo and then ./usr/lib/foo/bar
-                //
-                // The loop below will create entries for all parent directories
-                // to ensure that .deb packages will install correctly.
-                String[] pathParts = dirname.split("\\/");
-                String parentDir = "./";
-                for (int i = 1; i < pathParts.length; i++) {
-                    parentDir += pathParts[i] + "/";
-                    if (!parentDirs.contains(parentDir)) {
-                        TarEntry entry = new TarEntry(parentDir);
-                        // FIXME: link is in the constructor
-                        entry.setUserName(user);
-                        entry.setUserId(uid);
-                        entry.setGroupName(group);
-                        entry.setGroupId(gid);
-                        entry.setMode(mode);
-                        entry.setSize(0);
-                        outputStream.putNextEntry(entry);
-                        outputStream.closeEntry();
-                        parentDirs.add(parentDir);
-                    }
-                }
-    
                 console.println("dir: " + dirname);
             }
 
             public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+                filename = fixPath(filename);
 
                 // ensure the path is like : ./foo/bar
                 if (filename.startsWith("/")) {
@@ -419,6 +383,8 @@ public class Processor {
                 } else if (!filename.startsWith("./")) {
                     filename = "./" + filename;
                 }
+                
+                createDirectories((new File(filename)).getParent(), user, uid, group, gid, mode, size);
 
                 TarEntry entry = new TarEntry(filename);
 
@@ -457,7 +423,53 @@ public class Processor {
 
                 pChecksums.append(md5).append(" ").append(entry.getName()).append('\n');
 
-            }                   
+            }
+            
+            private String fixPath(String path) {
+                // If we're receiving directory names from Windows, then we'll convert to use slash
+                // This does eliminate the ability to use of a backslash in a directory name on *NIX, but in practice, this is a non-issue
+                if (path.indexOf('\\') > -1) {
+                    path = path.replace('\\', '/');
+                }
+                // ensure the path is like : ./foo/bar
+                if (path.startsWith("/")) {
+                    path = "." + path;
+                } else if (!path.startsWith("./")) {
+                    path = "./" + path;
+                }
+                return path;
+            }
+
+            private void createDirectories(String dirname, String user, int uid, String group, int gid, int mode, long size) throws IOException {
+                // Debian packages must have parent directories created
+                // before sub-directories or files can be installed.
+                // For example, if an entry of ./usr/lib/foo/bar existed
+                // in a .deb package, but the ./usr/lib/foo directory didn't
+                // exist, the package installation would fail.  The .deb must
+                // then have an entry for ./usr/lib/foo and then ./usr/lib/foo/bar
+                //
+                // The loop below will create entries for all parent directories
+                // to ensure that .deb packages will install correctly.
+                String[] pathParts = dirname.split("\\/");
+                String parentDir = "./";
+                for (int i = 1; i < pathParts.length; i++) {
+                    parentDir += pathParts[i] + "/";
+                    if (!parentDirs.contains(parentDir)) {
+                        TarEntry entry = new TarEntry(parentDir);
+                        // FIXME: link is in the constructor
+                        entry.setUserName(user);
+                        entry.setUserId(uid);
+                        entry.setGroupName(group);
+                        entry.setGroupId(gid);
+                        entry.setMode(mode);
+                        entry.setSize(size);
+                        
+                        outputStream.putNextEntry(entry);
+                        outputStream.closeEntry();
+                        parentDirs.add(parentDir);
+                    }
+                }
+            }
         };
 
         for (int i = 0; i < pData.length; i++) {
