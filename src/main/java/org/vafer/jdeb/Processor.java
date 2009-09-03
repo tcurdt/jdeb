@@ -282,6 +282,8 @@ public class Processor {
             final String name = file.getName();
 
             entry.setName(name);
+            entry.setNames("root", "root");
+            entry.setMode(PermMapper.toMode("755"));
 
             if ("control".equals(name)) {
                 packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
@@ -495,7 +497,7 @@ public class Processor {
                     // But for now, keeping it simple by making every dir a+rx.   Examples are:
                     // drw-r----- fs/fs   # what you get with setMode(mode)
                     // drwxr-xr-x fs/fs   # Usable. Too loose?
-                    int mode = PermMapper.toMode("755");
+                    int mode = TarEntry.DEFAULT_DIR_MODE;
 
                     createDirectory(parentDir, user, uid, group, gid, mode, size);
                 }
