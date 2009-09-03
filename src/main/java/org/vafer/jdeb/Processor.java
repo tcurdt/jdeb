@@ -521,6 +521,7 @@ public class Processor {
 
         final TarEntry entry = new TarEntry(pName);
         entry.setSize(data.length);
+        entry.setNames("root", "root");
 
         pOutput.putNextEntry(entry);
         pOutput.write(data);
