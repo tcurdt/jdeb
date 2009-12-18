@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 The Apache Software Foundation.
+ * Copyright 2010 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
         archive = pArchive;
     }
         
-    public void produce( final DataConsumer receiver ) throws IOException {
+    public void produce( final DataConsumer pReceiver ) throws IOException {
 
         TarInputStream archiveInputStream = null;
         try {
@@ -64,10 +64,10 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
                 entry = map(entry);
                 
                 if (entry.isDirectory()) {
-                    receiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+                    pReceiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
                     continue;
                 }
-                receiver.onEachFile(archiveInputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());                      
+                pReceiver.onEachFile(archiveInputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());                      
             }
 
         } finally {
@@ -79,6 +79,8 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 
 
     /**
+     * TODO: replace by commons compress
+     * 
      * Guess the compression used by looking at the first bytes of the stream.
      */
     private InputStream getCompressedInputStream(InputStream in) throws IOException {

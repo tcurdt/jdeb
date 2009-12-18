@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 The Apache Software Foundation.
+ * Copyright 2010 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,8 @@ public final class FileSetDataProducer implements DataProducer {
             group = tarfileset.getGroup();
             gid = tarfileset.getGid();
             filemode = tarfileset.getMode();
+            // TODO check on the ant list
+            // it's deprecated but WTF is one supposed to use instead?
             dirmode = tarfileset.getDirMode();
             prefix = tarfileset.getPrefix();
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 The Apache Software Foundation.
+ * Copyright 2010 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ import org.vafer.jdeb.descriptors.PackageDescriptor;
 import org.vafer.jdeb.producers.FileSetDataProducer;
 
 /**
+ * TODO generalize with DebMaker
+ * 
  * AntTask for creating debian archives.
  * Even supports signed changes files.
  * 
@@ -106,19 +108,19 @@ public class DebAntTask extends MatchingTask {
         this.passphrase = passphrase;
     }
 
-    public void setCompression(String compression) {
+    public void setCompression( String compression ) {
         this.compression = compression;
     }
 
-    public void setVerbose(boolean verbose) {
+    public void setVerbose( boolean verbose ) {
         this.verbose = verbose;
     }
 
-    public void addFileSet(FileSet fileset) {
+    public void addFileSet( FileSet fileset ) {
         dataProducers.add(new FileSetDataProducer(fileset));
     }
 
-    public void addTarFileSet(Tar.TarFileSet fileset) {
+    public void addTarFileSet( Tar.TarFileSet fileset ) {
         dataProducers.add(new FileSetDataProducer(fileset));
     }
 

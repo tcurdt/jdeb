@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 The Apache Software Foundation.
+ * Copyright 2010 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,12 +52,12 @@ public abstract class AbstractDescriptor {
         resolver = pDescriptor.resolver;
     }
 
-    public static void setOpenToken( String token ) {
-        openToken = token;
+    public static void setOpenToken( final String pToken ) {
+        openToken = pToken;
     }
 
-    public static void setCloseToken( String token ) {
-        closeToken = token;
+    public static void setCloseToken( final String pToken ) {
+        closeToken = pToken;
     }
 
     protected void parse( final InputStream pInput ) throws IOException, ParseException {
@@ -151,7 +151,7 @@ public abstract class AbstractDescriptor {
         return invalid;
     }
     
-    String toString( final String[] pKeys ) {
+    public String toString( final String[] pKeys ) {
         final StringBuffer s = new StringBuffer();
         for (int i = 0; i < pKeys.length; i++) {
             final String key = pKeys[i];

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 The Apache Software Foundation.
+ * Copyright 2010 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,17 +84,23 @@ public final class Mapper {
 
 
     public org.vafer.jdeb.mapping.Mapper createMapper() {
+        
         if ("perm".equalsIgnoreCase(type)) {
             return new PermMapper(uid, gid, user, group, filemode, dirmode, strip, prefix);
-        } else if ("prefix".equalsIgnoreCase(type)) {
+        }
+
+        if ("prefix".equalsIgnoreCase(type)) {
             return new PrefixMapper(strip, prefix);
-        } else if ("ls".equalsIgnoreCase(type)) {
+        }
+        
+        if ("ls".equalsIgnoreCase(type)) {
             try {
                 return new LsMapper(new FileInputStream(src));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        
         return new NullMapper();
     }
     

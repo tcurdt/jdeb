@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 The Apache Software Foundation.
+ * Copyright 2010 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,16 +36,12 @@ public abstract class AbstractPluginMojo extends AbstractMojo {
      */
     protected File buildDirectory;
 
-    protected MavenProject getProject()
-    {
-        if ( project.getExecutionProject() != null )
-        {
+    protected MavenProject getProject() {
+        if ( project.getExecutionProject() != null ) {
             return project.getExecutionProject();
         }
-        else
-        {
-            return project;
-        }
+        
+        return project;
     }
     
 }

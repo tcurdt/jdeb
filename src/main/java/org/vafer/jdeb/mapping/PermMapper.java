@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 The Apache Software Foundation.
+ * Copyright 2010 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public final class PermMapper extends PrefixMapper {
     public TarEntry map(final TarEntry entry) {
         final String name = entry.getName();
 
-        TarEntry newEntry = newEntry = new TarEntry(prefix + '/' + Utils.stripPath(strip, name));
+        final TarEntry newEntry = new TarEntry(prefix + '/' + Utils.stripPath(strip, name));
 
         // Set ownership
         if (uid > -1) {

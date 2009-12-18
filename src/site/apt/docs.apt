@@ -13,16 +13,38 @@ Documentation
             <artifactId>jdeb</artifactId>
             <groupId>org.vafer</groupId>
             <version>0.7</version>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>deb</goal>
-                    </goals>
-                    <configuration>                        
-                    </configuration>
-                </execution>
-            </executions>
+            <configuration>
+                ...
+                <dataSet>
+                    <data>
+                      <src>${project.basedir}/target/my_archive.tar.gz</src>
+                      <include>...</include>
+                      <exclude>...</exclude>
+                      <mapper>
+                        <type>perm</type>
+                        <strip>1</strip>
+                        <prefix>/somewhere/else</prefix>
+                        <user>tcurdt</user>
+                        <group>tcurdt</group>
+                        <mode>600</mode>
+                      </mapper>
+                    </data>
+                    ...
+                    <data>
+                      <src>${project.build.directory}/data</src>
+                      <include></include>
+                      <exclude>**&#47;.svn</exclude>
+                      <mapper>
+                        <type>ls</type>
+                        <src>mapping.txt</src>
+                      </mapper>
+                    </data>
+                    <data>
+                    <src>${project.basedir}/README.txt</src>
+                    </data>
+                </dataSet>
+                ...
+            </configuration>
         </plugin>
 +--------------------
 
