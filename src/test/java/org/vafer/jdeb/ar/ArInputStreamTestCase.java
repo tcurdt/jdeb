@@ -20,13 +20,16 @@ import java.io.FileInputStream;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
+import org.apache.commons.compress.archivers.ar.ArArchiveInputStream;
+
 public final class ArInputStreamTestCase extends TestCase {
 
     public void testRead() throws Exception {
         final File archive = new File(getClass().getResource("data.ar").toURI());
 
-        final ArInputStream ar = new ArInputStream(new FileInputStream(archive));
-        final ArEntry entry1 = ar.getNextEntry();
+        final ArArchiveInputStream ar = new ArArchiveInputStream(new FileInputStream(archive));
+        final ArArchiveEntry entry1 = ar.getNextArEntry();
 
         assertEquals("data.tgz", entry1.getName());
         assertEquals(148, entry1.getLength());
@@ -35,7 +38,7 @@ public final class ArInputStreamTestCase extends TestCase {
             ar.read();          
         }
         
-        final ArEntry entry2 = ar.getNextEntry();
+        final ArArchiveEntry entry2 = ar.getNextArEntry();
         
         assertNull(entry2);
         

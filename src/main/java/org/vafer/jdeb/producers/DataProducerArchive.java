@@ -84,6 +84,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
      * Guess the compression used by looking at the first bytes of the stream.
      */
     private InputStream getCompressedInputStream(InputStream in) throws IOException {
+    	
         PushbackInputStream pin = new PushbackInputStream(in, 2);
         byte[] header = new byte[2];
         if (pin.read(header) != header.length) {

@@ -20,14 +20,18 @@ import java.io.FileOutputStream;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
+import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
+
 public final class ArOutputStreamTestCase extends TestCase {
 
     public void testWrite() throws Exception {
         final File out1 = File.createTempFile("jdeb", ".ar");
 
-        final ArOutputStream os = new ArOutputStream(new FileOutputStream(out1));
-        os.putNextEntry(new ArEntry("data", 4));
-        os.write("data".getBytes());        
+        final ArArchiveOutputStream os = new ArArchiveOutputStream(new FileOutputStream(out1));
+        os.putArchiveEntry(new ArArchiveEntry("data", 4));
+        os.write("data".getBytes());
+        os.closeArchiveEntry();
         os.close();
         
         assertTrue(out1.delete());

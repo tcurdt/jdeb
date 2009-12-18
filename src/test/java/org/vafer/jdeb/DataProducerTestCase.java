@@ -23,10 +23,10 @@ import java.util.zip.GZIPInputStream;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
+import org.apache.commons.compress.archivers.ar.ArArchiveInputStream;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
-import org.vafer.jdeb.ar.ArEntry;
-import org.vafer.jdeb.ar.ArInputStream;
 import org.vafer.jdeb.ar.NonClosingInputStream;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 import org.vafer.jdeb.producers.DataProducerArchive;
@@ -60,9 +60,9 @@ public final class DataProducerTestCase extends TestCase {
         
         final Set filesInDeb = new HashSet();
 
-        final ArInputStream ar = new ArInputStream(new FileInputStream(deb));
+        final ArArchiveInputStream ar = new ArArchiveInputStream(new FileInputStream(deb));
         while(true) {
-            final ArEntry arEntry = ar.getNextEntry();
+            final ArArchiveEntry arEntry = ar.getNextArEntry();
             if (arEntry == null) {
                 break;
             }

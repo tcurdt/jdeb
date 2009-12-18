@@ -25,6 +25,8 @@ import java.util.zip.GZIPInputStream;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
+import org.apache.commons.compress.archivers.ar.ArArchiveInputStream;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
@@ -32,8 +34,6 @@ import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.bzip2.CBZip2InputStream;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
-import org.vafer.jdeb.ar.ArEntry;
-import org.vafer.jdeb.ar.ArInputStream;
 import org.vafer.jdeb.ar.NonClosingInputStream;
 
 /**
@@ -167,9 +167,9 @@ public final class DebAntTaskTestCase extends TestCase {
         File deb = new File("target/test-classes/test.deb");
         assertTrue("package not build", deb.exists());
 
-        ArInputStream in = new ArInputStream(new FileInputStream(deb));
-        ArEntry entry;
-        while ((entry = in.getNextEntry()) != null) {
+        ArArchiveInputStream in = new ArArchiveInputStream(new FileInputStream(deb));
+        ArArchiveEntry entry;
+        while ((entry = in.getNextArEntry()) != null) {
             if (entry.getName().equals("data.tar.gz")) {
                 TarInputStream tar = new TarInputStream(new GZIPInputStream(new NonClosingInputStream(in)));
                 TarEntry tarentry;
@@ -216,9 +216,9 @@ public final class DebAntTaskTestCase extends TestCase {
 
         boolean found = false;
 
-        ArInputStream in = new ArInputStream(new FileInputStream(deb));
-        ArEntry entry;
-        while ((entry = in.getNextEntry()) != null) {
+        ArArchiveInputStream in = new ArArchiveInputStream(new FileInputStream(deb));
+        ArArchiveEntry entry;
+        while ((entry = in.getNextArEntry()) != null) {
             if (entry.getName().equals("data.tar.bz2")) {
                 found = true;
 
@@ -254,9 +254,9 @@ public final class DebAntTaskTestCase extends TestCase {
 
         boolean found = false;
 
-        ArInputStream in = new ArInputStream(new FileInputStream(deb));
-        ArEntry entry;
-        while ((entry = in.getNextEntry()) != null) {
+        ArArchiveInputStream in = new ArArchiveInputStream(new FileInputStream(deb));
+        ArArchiveEntry entry;
+        while ((entry = in.getNextArEntry()) != null) {
             if (entry.getName().equals("data.tar")) {
                 found = true;
 
