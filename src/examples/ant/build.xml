@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<project name="jdeb-ant-example" default="package">
+
+  <property name="version" value="1.0"/>
+  <property name="description" value="Some description"/>
+  <property name="src.dir" value="${basedir}/src"/>
+  <property name="build.dir" value="${basedir}/build"/>
+
+
+  <target name="package">
+    <taskdef name="deb" classname="org.vafer.jdeb.ant.DebAntTask"/>
+
+    <copy todir="${build.dir}/deb/control">
+      <fileset dir="src/deb/control"/>
+      <filterset begintoken="[[" endtoken="]]">
+        <filter token="version" value="${version}"/>
+        <filter token="description" value="${description}"/>
+        <filter token="name" value="${ant.project.name}"/>
+      </filterset>
+    </copy>
+  
+    <deb destfile="${build.dir}/${ant.project.name}.deb" control="${build.dir}/deb/control">
+      <data src="src/deb/data">
+        <exclude name="**/.svn"/>
+      </data>
+      <data src="src/deb/data.tgz"/>
+      <data src="src/deb/data.tar.bz2"/>
+    </deb>
+
+  </target>
+
+</project>
