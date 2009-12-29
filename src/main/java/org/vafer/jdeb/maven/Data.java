@@ -26,6 +26,7 @@ import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
+import org.vafer.jdeb.producers.DataProducerFile;
 
 /**
  * Maven "data" elment acting as a factory for DataProducers. So far Archive and
@@ -46,6 +47,17 @@ public final class Data implements DataProducer {
         this.src = src;
     }
 
+    
+    private String type;
+
+    /**
+     * @parameter expression="${type}"
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    
     /**
      * @parameter expression="${includes}" alias="includes"
      */
@@ -88,16 +100,30 @@ public final class Data implements DataProducer {
 
         org.vafer.jdeb.mapping.Mapper[] mappers = null;
         if (mapper != null) {
-            mappers = new org.vafer.jdeb.mapping.Mapper[] { mapper
-                    .createMapper() };
+            mappers = new org.vafer.jdeb.mapping.Mapper[] { mapper.createMapper() };
+        }
+        
+        if ("file".equalsIgnoreCase(type)) {
+            new DataProducerFile(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            return;
         }
 
+        if ("archive".equalsIgnoreCase(type)) {
+            new DataProducerArchive(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            return;
+        }
+        
+        if ("directory".equalsIgnoreCase(type)) {
+            new DataProducerDirectory(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            return;
+        }
+
+        // @deprecated
+        
         if (src.isFile()) {
-            new DataProducerArchive(src, includePatterns, excludePatterns,
-                    mappers).produce(pReceiver);
+            new DataProducerArchive(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
         } else {
-            new DataProducerDirectory(src, includePatterns, excludePatterns,
-                    mappers).produce(pReceiver);
+            new DataProducerDirectory(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
         }
     }
 }

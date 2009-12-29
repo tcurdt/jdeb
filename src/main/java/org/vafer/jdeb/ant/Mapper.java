@@ -20,24 +20,37 @@ import java.io.FileInputStream;
 
 import org.vafer.jdeb.mapping.LsMapper;
 import org.vafer.jdeb.mapping.NullMapper;
+import org.vafer.jdeb.mapping.PermMapper;
 import org.vafer.jdeb.mapping.PrefixMapper;
 
 /**
  * Ant "mapper" element acting as factory for the entry mapper.
- * So far type "ls" and "prefix" are supported.
+ * Supported types: ls, prefix, perm
  * 
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class Mapper {
 
-    private String mtype;
-    private String prefix;
-    private int strip;
+    private String mapperType;
     private File src;
     
+    private String prefix;
+    private int strip;
+    private int uid = -1;
+    private int gid = -1;
+    private String user;
+    private String group;
+    private int fileMode = -1;
+    private int dirMode = -1;
+    
     public void setType( final String pType ) {
-        mtype = pType;
+        mapperType = pType;
     }
+
+    public void setSrc( final File pSrc ) {
+        src = pSrc;
+    }
+
     
     public void setPrefix( final String pPrefix ) {
         prefix = pPrefix;
@@ -47,16 +60,42 @@ public final class Mapper {
         strip = pStrip;
     }
         
-    public void setSrc( final File pSrc ) {
-        src = pSrc;
-    }
 
-    public org.vafer.jdeb.mapping.Mapper createMapper() {
-        if ("prefix".equalsIgnoreCase(mtype)) {
+    public void setUid( final int pUid ) {
+		uid = pUid;
+	}
+
+	public void setGid( final int pGid ) {
+		gid = pGid;
+	}
+
+	public void setUser( final String pUser ) {
+		user = pUser;
+	}
+
+	public void setGroup( final String pGroup ) {
+		group = pGroup;
+	}
+
+	public void setFileMode( final int pFileMode ) {
+		fileMode = pFileMode;
+	}
+
+	public void setDirMode(int pDirMode) {
+		dirMode = pDirMode;
+	}
+
+	public org.vafer.jdeb.mapping.Mapper createMapper() {
+
+		if ("perm".equalsIgnoreCase(mapperType)) {
+            return new PermMapper(uid, gid, user, group, fileMode, dirMode, strip, prefix);
+        }
+
+        if ("prefix".equalsIgnoreCase(mapperType)) {
             return new PrefixMapper(strip, prefix);
         }
         
-        if ("ls".equalsIgnoreCase(mtype)) {
+        if ("ls".equalsIgnoreCase(mapperType)) {
             try {
                 return new LsMapper(new FileInputStream(src));
             } catch (Exception e) {

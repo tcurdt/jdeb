@@ -29,8 +29,8 @@ public final class PermMapper extends PrefixMapper {
     private int gid = -1;
     private String user;
     private String group;
-    private int fileMode;
-    private int dirMode;
+    private int fileMode = -1;
+    private int dirMode = -1;
 
     public static int toMode(String modeString) {
         int mode = -1;

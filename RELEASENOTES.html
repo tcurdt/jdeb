@@ -1,12 +1,17 @@
 <html>
 <body>
     <p>
+			Lot of refactoring and support for configuration on the maven plugin. Easier permission mapping.
     </p>
 
     <ul>
-	    <li>[ADD] Lot of refactoring and support for configuration on the maven plugin.</li>
-	    <li>[ADD] Examples for ant and maven.</li>
+	    <li>[ADD] Added Examples for ant and maven.</li>
+	    <li>[ADD] New "file" data source.</li>
+	    <li>[ADD] Added a "type" attribute to the "data" elements.</li>
 	    <li>[CHG] Switched to commons compress for archive building.</li>
+	    <li>[CHG] Renamed the maven goal from "deb" to "jdeb" to be more consistent.</li>
+	    <li>[CHG] Maven goal no longer attached to execution phase by default. (see examples)</li>
+	    <li>[CHG] Deprecated "FileSetDataProducer" in favor of "DataProducerFileSet"</li>
     </ul>
     
 </body>

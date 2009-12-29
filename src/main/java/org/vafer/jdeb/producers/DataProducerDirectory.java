@@ -46,7 +46,7 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
         scanner.setFollowSymlinks(true);
     }
     
-    public void produce( final DataConsumer receiver ) throws IOException {
+    public void produce( final DataConsumer pReceiver ) throws IOException {
 
         scanner.scan();
 
@@ -84,7 +84,7 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
 
             entry.setSize(0);
 
-            receiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+            pReceiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
         }
 
 
@@ -115,7 +115,7 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
 
             final InputStream inputStream = new FileInputStream(file);
             try {
-                receiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+                pReceiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
             } finally {
                 inputStream.close();
             }

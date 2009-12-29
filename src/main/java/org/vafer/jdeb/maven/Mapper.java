@@ -25,7 +25,7 @@ import org.vafer.jdeb.mapping.PrefixMapper;
 
 /**
  * Maven "mapper" element acting as factory for the entry mapper.
- * So far type "ls" and "prefix" are supported.
+ * Supported types: ls, prefix, perm
  * 
  * @author Bryan Sant <bryan.sant@gmail.com>
  */
@@ -60,12 +60,12 @@ public final class Mapper {
     /**
      * @parameter
      */
-    private String filemode = "600";
+    private String filemode;
 
     /**
      * @parameter
      */
-    private String dirmode = "700";
+    private String dirmode;
 
     /**
      * @parameter

@@ -2,7 +2,7 @@ FIX:
 o make descriptor fields case insensitive
 o provide a way to declare symbolic links (see jRPM and https://issues.apache.org/bugzilla/show_bug.cgi?id=40059)
 o make sure the maintainer scripts use proper line endings
-o manage the archive index and create missing parent directories (e.g. when a prefix is specified on a <data> or a <tarfileset> element)
+o manage the archive index and be smart about creating missing parent directories
 
 ADD:
 o subversion log ChangesProvider

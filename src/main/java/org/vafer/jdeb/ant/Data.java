@@ -27,6 +27,7 @@ import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
+import org.vafer.jdeb.producers.DataProducerFile;
 
 /**
  * Ant "data" element acting as a factory for DataProducers.
@@ -40,9 +41,15 @@ public final class Data extends PatternSet implements DataProducer {
     private final Collection mapperWrapper = new ArrayList();
 
     private File src;
+    
+    private String type;
         
     public void setSrc( final File pSrc ) {
         src = pSrc;
+    }
+    
+    public void setType( final String pType ) {
+    	type = pType;
     }
 
     public void addMapper( final Mapper pMapper ) {
@@ -60,6 +67,38 @@ public final class Data extends PatternSet implements DataProducer {
         for (int i = 0; i < mappers.length; i++) {
             mappers[i] = ((Mapper)it.next()).createMapper();
         }
+
+        if ("file".equalsIgnoreCase(type)) {
+            new DataProducerFile(
+                    src,
+                    getIncludePatterns(getProject()),
+                    getExcludePatterns(getProject()),
+                    mappers
+                    ).produce(pReceiver);
+            return;
+        }
+
+        if ("archive".equalsIgnoreCase(type)) {
+            new DataProducerArchive(
+                    src,
+                    getIncludePatterns(getProject()),
+                    getExcludePatterns(getProject()),
+                    mappers
+                    ).produce(pReceiver);
+            return;
+        }
+        
+        if ("directory".equalsIgnoreCase(type)) {
+            new DataProducerDirectory(
+                    src,
+                    getIncludePatterns(getProject()),
+                    getExcludePatterns(getProject()),
+                    mappers
+                    ).produce(pReceiver);           
+            return;
+        }
+
+        // @deprecated
         
         if (src.isFile()) {
             new DataProducerArchive(

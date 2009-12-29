@@ -38,7 +38,7 @@ import org.vafer.jdeb.utils.VariableResolver;
 /**
  * Creates deb archive
  * 
- * @goal deb
+ * @goal jdeb
  */
 public class DebMojo extends AbstractPluginMojo {
 
