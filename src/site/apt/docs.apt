@@ -8,44 +8,34 @@ Documentation
  
 +--------------------
 <build>
-    <plugins>
-        <plugin>
-            <artifactId>jdeb</artifactId>
-            <groupId>org.vafer</groupId>
-            <version>0.7</version>
-            <configuration>
-                ...
-                <dataSet>
-                    <data>
-                      <src>${project.basedir}/target/my_archive.tar.gz</src>
-                      <include>...</include>
-                      <exclude>...</exclude>
-                      <mapper>
-                        <type>perm</type>
-                        <strip>1</strip>
-                        <prefix>/somewhere/else</prefix>
-                        <user>tcurdt</user>
-                        <group>tcurdt</group>
-                        <mode>600</mode>
-                      </mapper>
-                    </data>
-                    ...
-                    <data>
-                      <src>${project.build.directory}/data</src>
-                      <include></include>
-                      <exclude>**&#47;.svn</exclude>
-                      <mapper>
-                        <type>ls</type>
-                        <src>mapping.txt</src>
-                      </mapper>
-                    </data>
-                    <data>
-                    <src>${project.basedir}/README.txt</src>
-                    </data>
-                </dataSet>
-                ...
-            </configuration>
-        </plugin>
+	<plugins>
+		<plugin>
+			<artifactId>jdeb</artifactId>
+			<groupId>org.vafer</groupId>
+			<version>0.7</version>
+			<executions>
+				<execution>
+					<phase>package</phase>
+					<goals>
+						<goal>jdeb</goal>
+					</goals>
+					<configuration>
+						<dataSet>
+              <data>
+                <src>${project.build.directory}/${project.build.finalName}.jar</src>
+                <type>file</type>
+                <mapper>
+                  <type>perm</type>
+                  <prefix>/usr/share/jdeb/lib</prefix>
+                </mapper>
+              </data>
+						</dataSet>
+					</configuration>
+				</execution>
+			</executions>
+		</plugin>
+	</plugins>
+</build>
 +--------------------
 
  At least the one main control file is required to be present at <<<src/deb/control/control>>>. In contains the information for the Debian package descriptor. Usually it will look something along the lines of
@@ -99,6 +89,8 @@ Distribution: development
 *---------------+------------------------------------------------------------------------------+---------------------------------------------+
 | src           | The directory, tarball, or file to include in the package                    | Yes                                         |
 *---------------+------------------------------------------------------------------------------+---------------------------------------------+
+| type          | Type of the data source. (archive|directory|file)                            | No; but will be Yes in the future           |
+*---------------+------------------------------------------------------------------------------+---------------------------------------------+
 | include       | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files                   |
 *---------------+------------------------------------------------------------------------------+---------------------------------------------+
 | exclude       | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions               |
@@ -109,54 +101,63 @@ Distribution: development
  Below is an example of how you could configure your jdeb maven plugin to include a directory, a tarball, and a file in your deb package:
 
 +--------------------
-...
+<?xml version="1.0"?>
 <build>
-    <plugins>
-        <plugin>
-            <artifactId>jdeb</artifactId>
-            <groupId>org.vafer</groupId>
-            <version>0.7</version>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>deb</goal>
-                    </goals>
-                    <configuration>
-                      <dataSet>
-                        <!-- Tarball example -->
-                        <data>
-                          <src>${project.basedir}/target/my_archive.tar.gz</src>
-                          <include>foo.txt,bar.txt</include>
-                          <exclude>baz.txt</exclude>
-                          <mapper>
-                            <type>perm</type>
-                            <strip>1</strip>
-                            <prefix>/somewhere/else</prefix>
-                            <user>santbj</user>
-                            <group>santbj</group>
-                            <mode>600</mode>
-                          </mapper>
-                        </data>
-                        <!-- Directory example -->
-                        <data>
-                          <src>${project.build.directory}/data</src>
-                          <exclude>**/.svn</exclude>
-                          <mapper>
-                            <type>ls</type>
-                            <src>mapping.txt</src>
-                          </mapper>
-                        </data>
-                        <!-- File example -->
-                        <data>
-                          <src>${project.basedir}/README.txt</src>
-                        </data>
-                      </dataSet>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-...
+	<plugins>
+		<plugin>
+			<artifactId>jdeb</artifactId>
+			<groupId>org.vafer</groupId>
+			<version>0.7</version>
+			<executions>
+				<execution>
+					<phase>package</phase>
+					<goals>
+						<goal>jdeb</goal>
+					</goals>
+					<configuration>
+						...
+						<dataSet>
+              <!-- Tarball example -->
+						  <data>
+						    <src>${project.basedir}/target/my_archive.tar.gz</src>
+								<type>archive</type>
+								<include>...</include>
+								<exclude>...</exclude>
+								<mapper>
+									<type>perm</type>
+									<strip>1</strip>
+									<prefix>/somewhere/else</prefix>
+									<user>tcurdt</user>
+									<group>tcurdt</group>
+									<mode>600</mode>
+								</mapper>
+						  </data>
+							...
+              <!-- Directory example -->
+							<data>
+								<src>${project.build.directory}/data</src>
+								<type>directory</type>
+								<include/>
+								<exclude>**/.svn</exclude>
+								<mapper>
+									<type>ls</type>
+									<src>mapping.txt</src>
+								</mapper>
+							</data>
+							...
+              <!-- File example -->
+							<data>
+								<src>${project.basedir}/README.txt</src>
+								<type>file</type>
+							</data>
+						</dataSet>
+						...
+					</configuration>
+				</execution>
+			</executions>
+		</plugin>
+	</plugins>
+</build>
 +--------------------
 
 
@@ -201,7 +202,7 @@ Distribution: development
   </copy>
       
   <deb destfile="jdeb.deb" control="${deb}/control">
-    <data src="src/main/resources/deb/data">
+    <data src="src/main/resources/deb/data" type="directory">
       <exclude name="**/.svn"/>
     </data>
   </deb>
@@ -212,7 +213,7 @@ Distribution: development
 
 +--------------------        
 <deb destfile="jdeb.deb" control="${deb}/control">
-  <data src="src/release.tgz">
+  <data src="src/release.tgz" type="archive">
     <mapper type="prefix" strip="1" prefix="/somewhere/else"/>
     <exclude name="**/.svn"/>
   </data>
@@ -223,7 +224,7 @@ Distribution: development
 
 +--------------------        
 <deb destfile="jdeb.deb" control="${deb}/control">
-  <data src="src/release.tgz">
+  <data src="src/release.tgz" type="archive">
     <mapper type="ls" src="mapping.txt" />
   </data>
 </deb>
