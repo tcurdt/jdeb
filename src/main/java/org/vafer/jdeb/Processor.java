@@ -134,6 +134,7 @@ public class Processor {
                 throw new InvalidDescriptorException(packageDescriptor);
             }
 
+            pOutput.getParentFile().mkdirs();
             final InformationOutputStream output = new InformationOutputStream(new FileOutputStream(pOutput), MessageDigest.getInstance("MD5"));
 
             final ArArchiveOutputStream ar = new ArArchiveOutputStream(output);
