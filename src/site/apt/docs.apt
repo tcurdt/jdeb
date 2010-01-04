@@ -12,7 +12,7 @@ Documentation
 		<plugin>
 			<artifactId>jdeb</artifactId>
 			<groupId>org.vafer</groupId>
-			<version>0.7</version>
+			<version>0.8</version>
 			<executions>
 				<execution>
 					<phase>package</phase>
@@ -38,7 +38,7 @@ Documentation
 </build>
 +--------------------
 
- At least the one main control file is required to be present at <<<src/deb/control/control>>>. In contains the information for the Debian package descriptor. Usually it will look something along the lines of
+ At least the one main control file is required to be present at <<<src/deb/control/control>>>. It contains the information for the Debian package descriptor. Usually it will look something along the lines of
 
 +--------------------
 Package: [[name]]
@@ -107,7 +107,7 @@ Distribution: development
 		<plugin>
 			<artifactId>jdeb</artifactId>
 			<groupId>org.vafer</groupId>
-			<version>0.7</version>
+			<version>0.8</version>
 			<executions>
 				<execution>
 					<phase>package</phase>
