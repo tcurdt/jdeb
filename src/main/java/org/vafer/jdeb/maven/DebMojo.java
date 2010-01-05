@@ -138,6 +138,20 @@ public class DebMojo extends AbstractPluginMojo {
     private String closeReplaceToken = "]]";
 
     /**
+     * The type of attached artifact
+     *
+     * @parameter default-value="deb"
+     */
+    private String type;
+
+    /**
+     * The classifier of attached artifact
+     *
+     * @parameter
+     */
+    private String classifier;
+
+    /**
      * "data" entries used to determine which files should be added to this deb.
      * The "data" entries may specify a tarball (tar.gz, tar.bz2, tgz), a
      * directory, or a normal file. An entry would look something like this in
@@ -321,7 +335,7 @@ public class DebMojo extends AbstractPluginMojo {
             DebMaker debMaker = new DebMaker(infoConsole, deb, controlDir, dataProducers, resolver);
             debMaker.makeDeb();
             getLog().info("Attaching created debian archive " + deb);
-            projectHelper.attachArtifact(getProject(), "deb-archive", deb.getName(), deb);
+            projectHelper.attachArtifact(getProject(), type, classifier, deb);
         } catch (PackagingException e) {
             getLog().error("Failed to create debian package " + deb, e);
             throw new MojoExecutionException("Failed to create debian package " + deb, e);
