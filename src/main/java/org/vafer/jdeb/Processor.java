@@ -450,7 +450,9 @@ public class Processor {
                 // and so thinks it has the wrong permission.
                 // This consistency also helps when checking if a directory already exists in addedDirectories.
               
-                directory += (directory.endsWith("/") ? "" : "/"); 
+                if (!directory.endsWith("/")) {
+                    directory += "/";
+                }
                 
                 if (!addedDirectories.contains(directory)) {
                     TarEntry entry = new TarEntry(directory);

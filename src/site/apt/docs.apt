@@ -8,33 +8,33 @@ Documentation
  
 +--------------------
 <build>
-	<plugins>
-		<plugin>
-			<artifactId>jdeb</artifactId>
-			<groupId>org.vafer</groupId>
-			<version>0.8</version>
-			<executions>
-				<execution>
-					<phase>package</phase>
-					<goals>
-						<goal>jdeb</goal>
-					</goals>
-					<configuration>
-						<dataSet>
-              <data>
-                <src>${project.build.directory}/${project.build.finalName}.jar</src>
-                <type>file</type>
-                <mapper>
-                  <type>perm</type>
-                  <prefix>/usr/share/jdeb/lib</prefix>
-                </mapper>
-              </data>
-						</dataSet>
-					</configuration>
-				</execution>
-			</executions>
-		</plugin>
-	</plugins>
+    <plugins>
+        <plugin>
+            <artifactId>jdeb</artifactId>
+            <groupId>org.vafer</groupId>
+            <version>0.8</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>jdeb</goal>
+                    </goals>
+                    <configuration>
+                        <dataSet>
+                            <data>
+                                <src>${project.build.directory}/${project.build.finalName}.jar</src>
+                                <type>file</type>
+                                <mapper>
+                                  <type>perm</type>
+                                  <prefix>/usr/share/jdeb/lib</prefix>
+                                </mapper>
+                            </data>
+                        </dataSet>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
 </build>
 +--------------------
 
@@ -61,25 +61,29 @@ Distribution: development
 *---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
 | deb           | The debian package to be generated                                           | No; defaults to <<<artifactId>>>_<<<version>>>.deb  |
 *---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| type          | Artifact type                                                                | No; <<<deb>>>                                       |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| classifier    | Artifact classifier                                                          | No; "<<<>>>"                                        |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
 | controlDir    | The directory containing the control files                                   | No; defaults to src/deb/control                     |
 *---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
 | installDir    | The directory where your file(s) will be place when your deb is installed    | No; defaults to /opt/<<<artifactId>>>               |
 *---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
-| compression   | Compression method for the data file (<<<gzip>>>, <<<bzip2>>> or <<<none>>>) | No; defaults to <<<gzip>>>                          |
-*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
-| keyring       | The file containing the PGP keys                                             | No                                                  |
-*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
-| key           | The name of the key to be used in the keyring                                | No                                                  |
-*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
-| passphrase    | The passphrase to use the key                                                | No                                                  |
+| dataSet       | A list of directories, tarballs, or files to include in the deb package      | No; defaults to include your maven artifact         |
 *---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
 | changesIn     | The changes to add                                                           | No                                                  |
 *---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
 | changesOut    | The changes file generated                                                   | No                                                  |
 *---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
-| changesSave   | The merged changes file                                                      | No                                                  |
+| changesSave   | (NYI) The merged changes file                                                | No                                                  |
 *---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
-| dataSet       | A list of directories, tarballs, or files to include in the deb package      | No; defaults to include your maven artifact         |
+| compression   | (NYI) Compression method for the data file (<<<gzip>>>, <<<bzip2>>> or <<<none>>>) | No; defaults to <<<gzip>>>                    |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| keyring       | (NYI) The file containing the PGP keys                                       | No                                                  |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| key           | (NYI) The name of the key to be used in the keyring                          | No                                                  |
+*---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+| passphrase    | (NYI) The passphrase to use the key                                          | No                                                  |
 *---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
 
  If you use the <<<dataSet>>> element, you'll need to populate it with a one or more <<<data>>> elements.  A <<<data>>> element is used to specify a <<<directory>>>, a <<<tarball>>> archive, or a <<<file>>>.  You can add as many <<<data>>> elements to your <<<dataSet>>> as you'd like.  The <<<data>>> element has the following options:
@@ -103,60 +107,60 @@ Distribution: development
 +--------------------
 <?xml version="1.0"?>
 <build>
-	<plugins>
-		<plugin>
-			<artifactId>jdeb</artifactId>
-			<groupId>org.vafer</groupId>
-			<version>0.8</version>
-			<executions>
-				<execution>
-					<phase>package</phase>
-					<goals>
-						<goal>jdeb</goal>
-					</goals>
-					<configuration>
-						...
-						<dataSet>
-              <!-- Tarball example -->
-						  <data>
-						    <src>${project.basedir}/target/my_archive.tar.gz</src>
-								<type>archive</type>
-								<include>...</include>
-								<exclude>...</exclude>
-								<mapper>
-									<type>perm</type>
-									<strip>1</strip>
-									<prefix>/somewhere/else</prefix>
-									<user>tcurdt</user>
-									<group>tcurdt</group>
-									<mode>600</mode>
-								</mapper>
-						  </data>
-							...
-              <!-- Directory example -->
-							<data>
-								<src>${project.build.directory}/data</src>
-								<type>directory</type>
-								<include/>
-								<exclude>**/.svn</exclude>
-								<mapper>
-									<type>ls</type>
-									<src>mapping.txt</src>
-								</mapper>
-							</data>
-							...
-              <!-- File example -->
-							<data>
-								<src>${project.basedir}/README.txt</src>
-								<type>file</type>
-							</data>
-						</dataSet>
-						...
-					</configuration>
-				</execution>
-			</executions>
-		</plugin>
-	</plugins>
+    <plugins>
+        <plugin>
+            <artifactId>jdeb</artifactId>
+            <groupId>org.vafer</groupId>
+            <version>0.8</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>jdeb</goal>
+                    </goals>
+                    <configuration>
+                        ...
+                        <dataSet>
+                            <!-- Tarball example -->
+                            <data>
+                                <src>${project.basedir}/target/my_archive.tar.gz</src>
+                                <type>archive</type>
+                                <include>...</include>
+                                <exclude>...</exclude>
+                                <mapper>
+                                    <type>perm</type>
+                                    <strip>1</strip>
+                                    <prefix>/somewhere/else</prefix>
+                                    <user>tcurdt</user>
+                                    <group>tcurdt</group>
+                                    <mode>600</mode>
+                                </mapper>
+                            </data>
+                            ...
+                            <!-- Directory example -->
+                            <data>
+                                <src>${project.build.directory}/data</src>
+                                <type>directory</type>
+                                <include/>
+                                <exclude>**/.svn</exclude>
+                                <mapper>
+                                    <type>ls</type>
+                                    <src>mapping.txt</src>
+                                </mapper>
+                            </data>
+                            ...
+                            <!-- File example -->
+                            <data>
+                                <src>${project.basedir}/README.txt</src>
+                                <type>file</type>
+                            </data>
+                        </dataSet>
+                        ...
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
 </build>
 +--------------------
 
