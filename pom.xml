@@ -138,7 +138,15 @@
    <distributionManagement>
         <site>
             <id>website</id>
-            <url>scpexe://vafer.org/var/www/vafer.org/www/projects/jdeb</url>
+            <url>scpexe://vafer.org/home/tcurdt/www/projects/jdeb</url>
         </site>
+        <repository>
+            <id>releases</id>
+            <url>scpexe://vafer.org/home/tcurdt/www/repository/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>snaphots</id>
+            <url>scpexe://vafer.org/home/tcurdt/www/repository/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
 </project>
