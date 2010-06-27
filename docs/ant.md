@@ -1,29 +1,29 @@
 # Howto use "jdeb" with ant
 
 <pre>
-  *---------------+------------------------------------------------------------------------------+-----------------------------+
-  || Attribute    || Description                                                                 || Required                  ||
-  *---------------+------------------------------------------------------------------------------+-----------------------------+
-  | destfile      | The debian package to be generated                                           | Yes                         |
-  *---------------+------------------------------------------------------------------------------+-----------------------------+
-  | control       | The directory containing the control files                                   | Yes                         |
-  *---------------+------------------------------------------------------------------------------+-----------------------------+
-  | compression   | Compression method for the data file ('gzip', 'bzip2' or 'none')             | No; defaults to 'gzip'      |
-  *---------------+------------------------------------------------------------------------------+-----------------------------+
-  | verbose       | Print detailed info during the package generation                            | No; defaults to 'false'>    |
-  *---------------+------------------------------------------------------------------------------+-----------------------------+
-  | keyring       | The file containing the PGP keys                                             | No                          |
-  *---------------+------------------------------------------------------------------------------+-----------------------------+
-  | key           | The name of the key to be used in the keyring                                | No                          |
-  *---------------+------------------------------------------------------------------------------+-----------------------------+
-  | passphrase    | The passphrase to use the key                                                | No                          |
-  *---------------+------------------------------------------------------------------------------+-----------------------------+
-  | changesIn     | The changes to add                                                           | No                          |
-  *---------------+------------------------------------------------------------------------------+-----------------------------+
-  | changesOut    | The changes file generated                                                   | No                          |
-  *---------------+------------------------------------------------------------------------------+-----------------------------+
-  | changesSave   | The merged changes file                                                      | No                          |
-  *---------------+------------------------------------------------------------------------------+-----------------------------+
+*---------------+------------------------------------------------------------------------------+-----------------------------+
+|| Attribute    || Description                                                                 || Required                  ||
+*---------------+------------------------------------------------------------------------------+-----------------------------+
+| destfile      | The debian package to be generated                                           | Yes                         |
+*---------------+------------------------------------------------------------------------------+-----------------------------+
+| control       | The directory containing the control files                                   | Yes                         |
+*---------------+------------------------------------------------------------------------------+-----------------------------+
+| compression   | Compression method for the data file ('gzip', 'bzip2' or 'none')             | No; defaults to 'gzip'      |
+*---------------+------------------------------------------------------------------------------+-----------------------------+
+| verbose       | Print detailed info during the package generation                            | No; defaults to 'false'>    |
+*---------------+------------------------------------------------------------------------------+-----------------------------+
+| keyring       | The file containing the PGP keys                                             | No                          |
+*---------------+------------------------------------------------------------------------------+-----------------------------+
+| key           | The name of the key to be used in the keyring                                | No                          |
+*---------------+------------------------------------------------------------------------------+-----------------------------+
+| passphrase    | The passphrase to use the key                                                | No                          |
+*---------------+------------------------------------------------------------------------------+-----------------------------+
+| changesIn     | The changes to add                                                           | No                          |
+*---------------+------------------------------------------------------------------------------+-----------------------------+
+| changesOut    | The changes file generated                                                   | No                          |
+*---------------+------------------------------------------------------------------------------+-----------------------------+
+| changesSave   | The merged changes file                                                      | No                          |
+*---------------+------------------------------------------------------------------------------+-----------------------------+
 </pre>
 
 The jdeb Ant task can package up a directory as Debian package. You have to
@@ -72,6 +72,7 @@ even under Windows you will be able to build your debian package.
 The mapper will apply the output of an "ls -laR > mapping.txt" command
 that should look like this
 
+<pre>
   ./trunk/target/test-classes/org/vafer/dependency:
   total 176
   drwxr-xr-x   23 tcurdt  tcurdt   782 Jun 25 03:48 .
@@ -79,6 +80,7 @@ that should look like this
   -rw-r--r--    1 tcurdt  tcurdt  2934 Jun 25 03:48 DependenciesTestCase.class
   -rw-r--r--    1 tcurdt  tcurdt  2176 Jun 25 03:48 WarTestCase.class
   drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
+</pre>
 
 It's also possible to use a 'fileset' or even a 'tarfileset' to
 specify the set of files to include with their permissions :
@@ -98,9 +100,11 @@ output of the changes. The input file is a much simpler file where you should
 list your changes. Every change should be starting with the " * " and one line
 only.
 
+<pre>
   * changes for the next release
   release distribution=staging, date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
   * debian changes support
+</pre>
 
 When you do a release jdeb will add (or complete!) the release line and create
 a debian format standard changes file for you. (Don't forget to commit changes
@@ -121,7 +125,6 @@ information to the original input and write out the new file.
     changesSave="changes.txt">
     <data src="some/dir"/>
   </deb>
-
 
 ** Signing changes
 
