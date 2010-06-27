@@ -24,7 +24,7 @@ Current [javadocs](http://) and a source [xref](http://) is also available.
 
 Some links to other cross platform tools to package Linux applications:
 
-* {{{http://code.google.com/p/ant-deb-task}ant-deb-task}}
-* {{{http://jrpm.sourceforge.net}jRPM}}
-* {{{http://www.freecompany.org/redline}RedLine}}
-* {{{http://install-toolkit.sourceforge.net}Install-Toolkit}}
+* [ant-deb-task](http://code.google.com/p/ant-deb-task)
+* [jRPM](http://jrpm.sourceforge.net)
+* [RedLine](http://www.freecompany.org/redline)
+* [Install-Toolkit](http://install-toolkit.sourceforge.net)

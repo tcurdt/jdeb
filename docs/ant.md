@@ -1,5 +1,6 @@
 # Howto use "jdeb" with ant
 
+<pre>
   *---------------+------------------------------------------------------------------------------+-----------------------------+
   || Attribute    || Description                                                                 || Required                  ||
   *---------------+------------------------------------------------------------------------------+-----------------------------+
@@ -23,6 +24,7 @@
   *---------------+------------------------------------------------------------------------------+-----------------------------+
   | changesSave   | The merged changes file                                                      | No                          |
   *---------------+------------------------------------------------------------------------------+-----------------------------+
+</pre>
 
 The jdeb Ant task can package up a directory as Debian package. You have to
 provide the control files defining meta information about the package (except
@@ -31,7 +33,6 @@ and if you want even a signed changes file.
 
   <target name="package">
     <taskdef name="deb" classname="org.vafer.jdeb.ant.DebAntTask"/>
-
     <copy todir="${deb}/control">
       <fileset dir="src/main/resources/deb/control"/>
       <filterset begintoken="[[" endtoken="]]">
@@ -39,7 +40,6 @@ and if you want even a signed changes file.
         <filter token="name" value="${ant.project.name}"/>
       </filterset>
     </copy>
-      
     <deb destfile="jdeb.deb" control="${deb}/control">
       <data src="src/main/resources/deb/data" type="directory">
         <exclude name="**/.svn"/>
