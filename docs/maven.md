@@ -37,6 +37,7 @@ At least the one main control file is required to be present at
 'src/deb/control/control'. It contains the information for the Debian package
 descriptor. Usually it will look something along the lines of
 
+<pre>
   Package: [[name]]
   Version: [[version]]
   Section: misc
@@ -46,7 +47,8 @@ descriptor. Usually it will look something along the lines of
   Maintainer: Torsten Curdt <torsten@something.com>
   Description: jetty java servlet container
   Distribution: development
- 
+</pre>
+
 If the enviroment variables 'DEBEMAIL' and 'DEBFULLNAME' are both set this
 will overrule the 'Maintainer' field set in there. The 'Installed-Size' will
 also be injected. If a changes file is used, the 'Distribution' usually comes
@@ -117,7 +119,6 @@ following options:
 Below is an example of how you could configure your jdeb maven plugin to
 include a directory, a tarball, and a file in your deb package:
 
-  <?xml version="1.0"?>
   <build>
       <plugins>
           <plugin>

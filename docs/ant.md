@@ -85,6 +85,7 @@ that should look like this
 It's also possible to use a 'fileset' or even a 'tarfileset' to
 specify the set of files to include with their permissions :
 
+<pre>
   <deb destfile="jdeb.deb" control="${deb}/control">
     <tarfileset dir="src/main/resources/deb/data"
              prefix="/somewhere/else"
@@ -92,6 +93,7 @@ specify the set of files to include with their permissions :
            username="tcurdt"
               group="tcurdt"/>
   </deb>
+</pre>
 
 ## Changes file
 
@@ -110,30 +112,38 @@ When you do a release jdeb will add (or complete!) the release line and create
 a debian format standard changes file for you. (Don't forget to commit changes
 jdeb did to the file.) From Ant you have to call jdeb like this
 
-  <deb destfile="jdeb.deb" control="${deb}/control"
+<pre>
+  <deb destfile="jdeb.deb"
+        control="${deb}/control"
       changesIn="changes.txt"
      changesOut="jdeb.changes">
     <data src="some/dir"/>
   </deb>
+</pre>
 
 If you also provide a 'changesSave' attribute the jdeb will add release
 information to the original input and write out the new file.
  
-  <deb destfile="jdeb.deb" control="${deb}/control"
+<pre>
+  <deb destfile="jdeb.deb"
+        control="${deb}/control"
       changesIn="changes.txt"
      changesOut="jdeb.changes"
     changesSave="changes.txt">
     <data src="some/dir"/>
   </deb>
+</pre>
 
-** Signing changes
+## Signing changes
 
 To have the changes be signed, make sure you have the
 [bouncycastle jar](http://www.bouncycastle.org/java.html) in your
 classpath (just copy it into the '$ANT_HOME/lib' folder - next to jdeb).
 Then you can sign your changes file with
 
-  <deb destfile="jdeb.deb" control="${deb}/control"
+<pre>
+  <deb destfile="jdeb.deb"
+        control="${deb}/control"
       changesIn="changes.txt"
      changesOut="jdeb.changes"
             key="2E074D8F"
@@ -141,3 +151,4 @@ Then you can sign your changes file with
         keyring="/Users/tcurdt/.gnupg/secring.gpg">
     <data src="some/dir"/>
   </deb>
+</pre>
