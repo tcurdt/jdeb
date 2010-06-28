@@ -1,0 +1,245 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    /*<a name="line.1"></a>
+<FONT color="green">002</FONT>     * Copyright 2010 The Apache Software Foundation.<a name="line.2"></a>
+<FONT color="green">003</FONT>     * <a name="line.3"></a>
+<FONT color="green">004</FONT>     * Licensed under the Apache License, Version 2.0 (the "License");<a name="line.4"></a>
+<FONT color="green">005</FONT>     * you may not use this file except in compliance with the License.<a name="line.5"></a>
+<FONT color="green">006</FONT>     * You may obtain a copy of the License at<a name="line.6"></a>
+<FONT color="green">007</FONT>     * <a name="line.7"></a>
+<FONT color="green">008</FONT>     *      http://www.apache.org/licenses/LICENSE-2.0<a name="line.8"></a>
+<FONT color="green">009</FONT>     * <a name="line.9"></a>
+<FONT color="green">010</FONT>     * Unless required by applicable law or agreed to in writing, software<a name="line.10"></a>
+<FONT color="green">011</FONT>     * distributed under the License is distributed on an "AS IS" BASIS,<a name="line.11"></a>
+<FONT color="green">012</FONT>     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<a name="line.12"></a>
+<FONT color="green">013</FONT>     * See the License for the specific language governing permissions and<a name="line.13"></a>
+<FONT color="green">014</FONT>     * limitations under the License.<a name="line.14"></a>
+<FONT color="green">015</FONT>     */<a name="line.15"></a>
+<FONT color="green">016</FONT>    package org.vafer.jdeb.descriptors;<a name="line.16"></a>
+<FONT color="green">017</FONT>    <a name="line.17"></a>
+<FONT color="green">018</FONT>    import java.io.BufferedReader;<a name="line.18"></a>
+<FONT color="green">019</FONT>    import java.io.IOException;<a name="line.19"></a>
+<FONT color="green">020</FONT>    import java.io.InputStream;<a name="line.20"></a>
+<FONT color="green">021</FONT>    import java.io.InputStreamReader;<a name="line.21"></a>
+<FONT color="green">022</FONT>    import java.io.StringReader;<a name="line.22"></a>
+<FONT color="green">023</FONT>    import java.text.ParseException;<a name="line.23"></a>
+<FONT color="green">024</FONT>    import java.util.HashMap;<a name="line.24"></a>
+<FONT color="green">025</FONT>    import java.util.HashSet;<a name="line.25"></a>
+<FONT color="green">026</FONT>    import java.util.Map;<a name="line.26"></a>
+<FONT color="green">027</FONT>    import java.util.Set;<a name="line.27"></a>
+<FONT color="green">028</FONT>    <a name="line.28"></a>
+<FONT color="green">029</FONT>    import org.vafer.jdeb.utils.Utils;<a name="line.29"></a>
+<FONT color="green">030</FONT>    import org.vafer.jdeb.utils.VariableResolver;<a name="line.30"></a>
+<FONT color="green">031</FONT>    <a name="line.31"></a>
+<FONT color="green">032</FONT>    /**<a name="line.32"></a>
+<FONT color="green">033</FONT>     * A descriptor holds the usual key value pairs.<a name="line.33"></a>
+<FONT color="green">034</FONT>     *<a name="line.34"></a>
+<FONT color="green">035</FONT>     * @see &lt;a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html"&gt;Debian Policy Manual - Control files and their fields&lt;/a&gt;<a name="line.35"></a>
+<FONT color="green">036</FONT>     * <a name="line.36"></a>
+<FONT color="green">037</FONT>     * @author Torsten Curdt &lt;tcurdt@vafer.org&gt;<a name="line.37"></a>
+<FONT color="green">038</FONT>     */<a name="line.38"></a>
+<FONT color="green">039</FONT>    public abstract class AbstractDescriptor {<a name="line.39"></a>
+<FONT color="green">040</FONT>        <a name="line.40"></a>
+<FONT color="green">041</FONT>        private final Map values = new HashMap();<a name="line.41"></a>
+<FONT color="green">042</FONT>        private final VariableResolver resolver;<a name="line.42"></a>
+<FONT color="green">043</FONT>        private static String openToken = "[[";<a name="line.43"></a>
+<FONT color="green">044</FONT>        private static String closeToken = "]]";<a name="line.44"></a>
+<FONT color="green">045</FONT>        <a name="line.45"></a>
+<FONT color="green">046</FONT>        public AbstractDescriptor( final VariableResolver pResolver ) {<a name="line.46"></a>
+<FONT color="green">047</FONT>            resolver = pResolver;<a name="line.47"></a>
+<FONT color="green">048</FONT>        }<a name="line.48"></a>
+<FONT color="green">049</FONT>    <a name="line.49"></a>
+<FONT color="green">050</FONT>        public AbstractDescriptor( final AbstractDescriptor pDescriptor ) {<a name="line.50"></a>
+<FONT color="green">051</FONT>            values.putAll(pDescriptor.values);<a name="line.51"></a>
+<FONT color="green">052</FONT>            resolver = pDescriptor.resolver;<a name="line.52"></a>
+<FONT color="green">053</FONT>        }<a name="line.53"></a>
+<FONT color="green">054</FONT>    <a name="line.54"></a>
+<FONT color="green">055</FONT>        public static void setOpenToken( final String pToken ) {<a name="line.55"></a>
+<FONT color="green">056</FONT>            openToken = pToken;<a name="line.56"></a>
+<FONT color="green">057</FONT>        }<a name="line.57"></a>
+<FONT color="green">058</FONT>    <a name="line.58"></a>
+<FONT color="green">059</FONT>        public static void setCloseToken( final String pToken ) {<a name="line.59"></a>
+<FONT color="green">060</FONT>            closeToken = pToken;<a name="line.60"></a>
+<FONT color="green">061</FONT>        }<a name="line.61"></a>
+<FONT color="green">062</FONT>    <a name="line.62"></a>
+<FONT color="green">063</FONT>        protected void parse( final InputStream pInput ) throws IOException, ParseException {<a name="line.63"></a>
+<FONT color="green">064</FONT>            final BufferedReader br = new BufferedReader(new InputStreamReader(pInput));<a name="line.64"></a>
+<FONT color="green">065</FONT>            StringBuffer buffer = new StringBuffer();<a name="line.65"></a>
+<FONT color="green">066</FONT>            String key = null;<a name="line.66"></a>
+<FONT color="green">067</FONT>            int linenr = 0;<a name="line.67"></a>
+<FONT color="green">068</FONT>            while(true) {<a name="line.68"></a>
+<FONT color="green">069</FONT>                final String line = br.readLine();<a name="line.69"></a>
+<FONT color="green">070</FONT>                <a name="line.70"></a>
+<FONT color="green">071</FONT>                if (line == null) {<a name="line.71"></a>
+<FONT color="green">072</FONT>                    if (buffer.length() &gt; 0) {<a name="line.72"></a>
+<FONT color="green">073</FONT>                        // flush value of previous key<a name="line.73"></a>
+<FONT color="green">074</FONT>                        set(key, buffer.toString());<a name="line.74"></a>
+<FONT color="green">075</FONT>                        buffer = null;<a name="line.75"></a>
+<FONT color="green">076</FONT>                    }<a name="line.76"></a>
+<FONT color="green">077</FONT>                    break;<a name="line.77"></a>
+<FONT color="green">078</FONT>                }<a name="line.78"></a>
+<FONT color="green">079</FONT>    <a name="line.79"></a>
+<FONT color="green">080</FONT>                linenr++;<a name="line.80"></a>
+<FONT color="green">081</FONT>    <a name="line.81"></a>
+<FONT color="green">082</FONT>                if (line.length() == 0) {<a name="line.82"></a>
+<FONT color="green">083</FONT>                    throw new ParseException("Empty line", linenr);<a name="line.83"></a>
+<FONT color="green">084</FONT>                }<a name="line.84"></a>
+<FONT color="green">085</FONT>                <a name="line.85"></a>
+<FONT color="green">086</FONT>                final char first = line.charAt(0); <a name="line.86"></a>
+<FONT color="green">087</FONT>                if (Character.isLetter(first)) {<a name="line.87"></a>
+<FONT color="green">088</FONT>                    <a name="line.88"></a>
+<FONT color="green">089</FONT>                    // new key<a name="line.89"></a>
+<FONT color="green">090</FONT>                    <a name="line.90"></a>
+<FONT color="green">091</FONT>                    if (buffer.length() &gt; 0) {<a name="line.91"></a>
+<FONT color="green">092</FONT>                        // flush value of previous key<a name="line.92"></a>
+<FONT color="green">093</FONT>                        set(key, buffer.toString());<a name="line.93"></a>
+<FONT color="green">094</FONT>                        buffer = new StringBuffer();<a name="line.94"></a>
+<FONT color="green">095</FONT>                    }<a name="line.95"></a>
+<FONT color="green">096</FONT>                    <a name="line.96"></a>
+<FONT color="green">097</FONT>                    <a name="line.97"></a>
+<FONT color="green">098</FONT>                    final int i = line.indexOf(':');<a name="line.98"></a>
+<FONT color="green">099</FONT>                    <a name="line.99"></a>
+<FONT color="green">100</FONT>                    if (i &lt; 0) {<a name="line.100"></a>
+<FONT color="green">101</FONT>                        throw new ParseException("Line misses ':' delimitter", linenr);<a name="line.101"></a>
+<FONT color="green">102</FONT>                    }<a name="line.102"></a>
+<FONT color="green">103</FONT>                    <a name="line.103"></a>
+<FONT color="green">104</FONT>                    key = line.substring(0, i);<a name="line.104"></a>
+<FONT color="green">105</FONT>                    buffer.append(line.substring(i+1).trim());<a name="line.105"></a>
+<FONT color="green">106</FONT>                    <a name="line.106"></a>
+<FONT color="green">107</FONT>                    continue;<a name="line.107"></a>
+<FONT color="green">108</FONT>                }<a name="line.108"></a>
+<FONT color="green">109</FONT>                <a name="line.109"></a>
+<FONT color="green">110</FONT>                // continuing old value<a name="line.110"></a>
+<FONT color="green">111</FONT>                buffer.append('\n').append(line.substring(1));<a name="line.111"></a>
+<FONT color="green">112</FONT>            }<a name="line.112"></a>
+<FONT color="green">113</FONT>            br.close();<a name="line.113"></a>
+<FONT color="green">114</FONT>            <a name="line.114"></a>
+<FONT color="green">115</FONT>        }<a name="line.115"></a>
+<FONT color="green">116</FONT>        <a name="line.116"></a>
+<FONT color="green">117</FONT>        public void set( final String pKey, final String pValue ) {<a name="line.117"></a>
+<FONT color="green">118</FONT>    <a name="line.118"></a>
+<FONT color="green">119</FONT>            if (resolver != null) {<a name="line.119"></a>
+<FONT color="green">120</FONT>                try {<a name="line.120"></a>
+<FONT color="green">121</FONT>                    values.put(pKey, Utils.replaceVariables(resolver, pValue, openToken, closeToken));<a name="line.121"></a>
+<FONT color="green">122</FONT>                    return;<a name="line.122"></a>
+<FONT color="green">123</FONT>                } catch (ParseException e) {<a name="line.123"></a>
+<FONT color="green">124</FONT>                    // FIXME maybe throw an Exception?<a name="line.124"></a>
+<FONT color="green">125</FONT>                }<a name="line.125"></a>
+<FONT color="green">126</FONT>            }<a name="line.126"></a>
+<FONT color="green">127</FONT>            <a name="line.127"></a>
+<FONT color="green">128</FONT>            values.put(pKey, pValue);<a name="line.128"></a>
+<FONT color="green">129</FONT>        }<a name="line.129"></a>
+<FONT color="green">130</FONT>        <a name="line.130"></a>
+<FONT color="green">131</FONT>        public String get( final String pKey ) {<a name="line.131"></a>
+<FONT color="green">132</FONT>            return (String)values.get(pKey);<a name="line.132"></a>
+<FONT color="green">133</FONT>        }<a name="line.133"></a>
+<FONT color="green">134</FONT>    <a name="line.134"></a>
+<FONT color="green">135</FONT>        public abstract String[] getMandatoryKeys();<a name="line.135"></a>
+<FONT color="green">136</FONT>        <a name="line.136"></a>
+<FONT color="green">137</FONT>        public boolean isValid() {<a name="line.137"></a>
+<FONT color="green">138</FONT>            return invalidKeys().size() == 0;<a name="line.138"></a>
+<FONT color="green">139</FONT>        }<a name="line.139"></a>
+<FONT color="green">140</FONT>        <a name="line.140"></a>
+<FONT color="green">141</FONT>        public Set invalidKeys() {<a name="line.141"></a>
+<FONT color="green">142</FONT>            final Set invalid = new HashSet();<a name="line.142"></a>
+<FONT color="green">143</FONT>    <a name="line.143"></a>
+<FONT color="green">144</FONT>            final String[] mk = getMandatoryKeys();<a name="line.144"></a>
+<FONT color="green">145</FONT>            for (int i = 0; i &lt; mk.length; i++) {<a name="line.145"></a>
+<FONT color="green">146</FONT>                if (get(mk[i]) == null) {<a name="line.146"></a>
+<FONT color="green">147</FONT>                    invalid.add(mk[i]);<a name="line.147"></a>
+<FONT color="green">148</FONT>                }<a name="line.148"></a>
+<FONT color="green">149</FONT>            }<a name="line.149"></a>
+<FONT color="green">150</FONT>            <a name="line.150"></a>
+<FONT color="green">151</FONT>            return invalid;<a name="line.151"></a>
+<FONT color="green">152</FONT>        }<a name="line.152"></a>
+<FONT color="green">153</FONT>        <a name="line.153"></a>
+<FONT color="green">154</FONT>        public String toString( final String[] pKeys ) {<a name="line.154"></a>
+<FONT color="green">155</FONT>            final StringBuffer s = new StringBuffer();<a name="line.155"></a>
+<FONT color="green">156</FONT>            for (int i = 0; i &lt; pKeys.length; i++) {<a name="line.156"></a>
+<FONT color="green">157</FONT>                final String key = pKeys[i];<a name="line.157"></a>
+<FONT color="green">158</FONT>                final String value = (String) values.get(key);<a name="line.158"></a>
+<FONT color="green">159</FONT>                if (value != null) {<a name="line.159"></a>
+<FONT color="green">160</FONT>                    s.append(key).append(":");<a name="line.160"></a>
+<FONT color="green">161</FONT>    <a name="line.161"></a>
+<FONT color="green">162</FONT>                    try {<a name="line.162"></a>
+<FONT color="green">163</FONT>                        BufferedReader reader = new BufferedReader(new StringReader(value));<a name="line.163"></a>
+<FONT color="green">164</FONT>                        String line;<a name="line.164"></a>
+<FONT color="green">165</FONT>                        while ((line = reader.readLine()) != null) {<a name="line.165"></a>
+<FONT color="green">166</FONT>                            if (line.length() != 0 &amp;&amp; !Character.isWhitespace(line.charAt(0))) {<a name="line.166"></a>
+<FONT color="green">167</FONT>                                s.append(' ');<a name="line.167"></a>
+<FONT color="green">168</FONT>                            }<a name="line.168"></a>
+<FONT color="green">169</FONT>    <a name="line.169"></a>
+<FONT color="green">170</FONT>                            s.append(line).append('\n');<a name="line.170"></a>
+<FONT color="green">171</FONT>                        }<a name="line.171"></a>
+<FONT color="green">172</FONT>                    } catch (IOException e) {<a name="line.172"></a>
+<FONT color="green">173</FONT>                        e.printStackTrace();<a name="line.173"></a>
+<FONT color="green">174</FONT>                    }<a name="line.174"></a>
+<FONT color="green">175</FONT>                }           <a name="line.175"></a>
+<FONT color="green">176</FONT>            }<a name="line.176"></a>
+<FONT color="green">177</FONT>            return s.toString();<a name="line.177"></a>
+<FONT color="green">178</FONT>        }<a name="line.178"></a>
+<FONT color="green">179</FONT>    }<a name="line.179"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>
