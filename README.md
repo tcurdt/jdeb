@@ -20,7 +20,7 @@ The source releases you can get in the [download section](http://github.com/tcur
 If feel adventures or want to help out feel free to get the latest code
 [via git](http://github.com/tcurdt/jdeb/tree/master).
 
-  git clone git://github.com/tcurdt/jdeb.git
+    git clone git://github.com/tcurdt/jdeb.git
 
 
 ## Related projects
