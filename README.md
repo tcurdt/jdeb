@@ -6,7 +6,7 @@ on any platform that has Java support. Windows, Linux - it does not require
 additional native tools installed. The API underneath is well abstracted can
 easily be adopted for other areas as well.
 
-Check the documentation on how to use it with [maven](http://) or [ant](http://).
+Check the documentation on how to use it with [maven](http://github.com/tcurdt/jdeb/blob/master/docs/maven.md) or [ant](http://github.com/tcurdt/jdeb/blob/master/docs/ant.md).
 
 
 ## Where to get it
@@ -17,7 +17,7 @@ If you want to help out feel free to get the latest code
 
   git clone git://github.com/tcurdt/jdeb.git
 
-Current [javadocs](http://) and a source [xref](http://) is also available.
+Current [javadocs](http://tcurdt.github.com/jdeb/release/0.8/apidocs/) and a source [xref](http://tcurdt.github.com/jdeb/release/0.8/xref/) is also available.
 
 
 ## Related projects
