@@ -57,10 +57,8 @@ public final class DataProducerFileSet implements DataProducer {
             group = tarfileset.getGroup();
             gid = tarfileset.getGid();
             filemode = tarfileset.getMode();
-            // TODO check on the ant list
-            // it's deprecated but WTF is one supposed to use instead?
-            dirmode = tarfileset.getDirMode();
-            prefix = tarfileset.getPrefix();
+            dirmode = tarfileset.getDirMode(tarfileset.getProject());
+            prefix = tarfileset.getPrefix(tarfileset.getProject());
         }
 
         final DirectoryScanner scanner = fileset.getDirectoryScanner(fileset.getProject());
