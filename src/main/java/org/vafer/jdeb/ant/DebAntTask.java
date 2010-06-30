@@ -30,7 +30,7 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Processor;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
-import org.vafer.jdeb.producers.FileSetDataProducer;
+import org.vafer.jdeb.producers.DataProducerFileSet;
 
 /**
  * TODO generalize with DebMaker
@@ -117,11 +117,11 @@ public class DebAntTask extends MatchingTask {
     }
 
     public void addFileSet( FileSet fileset ) {
-        dataProducers.add(new FileSetDataProducer(fileset));
+        dataProducers.add(new DataProducerFileSet(fileset));
     }
 
     public void addTarFileSet( Tar.TarFileSet fileset ) {
-        dataProducers.add(new FileSetDataProducer(fileset));
+        dataProducers.add(new DataProducerFileSet(fileset));
     }
 
     public void addData( Data data ) {

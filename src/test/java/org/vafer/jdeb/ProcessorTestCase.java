@@ -21,7 +21,7 @@ import java.io.File;
 import junit.framework.TestCase;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileSet;
-import org.vafer.jdeb.producers.FileSetDataProducer;
+import org.vafer.jdeb.producers.DataProducerFileSet;
 
 public class ProcessorTestCase extends TestCase {
 
@@ -45,7 +45,7 @@ public class ProcessorTestCase extends TestCase {
         fileset.setProject(project);
 
         StringBuffer md5s = new StringBuffer();
-        processor.buildData(new DataProducer[] { new FileSetDataProducer(fileset) }, new File("target/data.tar"), md5s, "tar");
+        processor.buildData(new DataProducer[] { new DataProducerFileSet(fileset) }, new File("target/data.tar"), md5s, "tar");
 
         assertTrue("empty md5 file", md5s.length() > 0);
         assertFalse("windows path separator found", md5s.indexOf("\\") != -1);
