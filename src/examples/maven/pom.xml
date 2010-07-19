@@ -23,12 +23,18 @@
                                   <src>${project.build.directory}/${project.build.finalName}.jar</src>
                                   <type>file</type>
                                   <mapper>
-                                    <type>perm</type>
+                                    <type>file</type>
                                     <prefix>/usr/share/jdeb/lib</prefix>
                                   </mapper>
+                                  <mapper>
+                                    <type>perm</type>
+                                    <prefix>/usr/share/jdeb/lib</prefix>
+                                    <user>loader</user>
+                                    <group>loader</group>
+                                  </mapper>
                                 </data>
+                            </dataSet>                
 
-                            </dataSet>
                         </configuration>
                     </execution>
                 </executions>

@@ -12,7 +12,7 @@
       require additional native tools installed. The API underneath is well abstracted can easily be adopted for other
       areas as well.
     </description>
-    <url>http://vafer.org/projects/jdeb</url>
+    <url>http://github.com/tcurdt/jdeb</url>
     <developers>
         <developer>
             <id>tcurdt</id>
@@ -44,11 +44,6 @@
     </scm>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>  
-                <artifactId>maven-release-plugin</artifactId>       
-                <version>2.0</version>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>  
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -137,10 +132,6 @@
         </dependency>
     </dependencies>
     <distributionManagement>
-        <site>
-            <id>website</id>
-            <url>scpexe://vafer.org/var/www/vafer.org/www/projects/jdeb</url>
-        </site>
         <repository>
             <id>releases</id>
             <url>scpexe://vafer.org/var/www/vafer.org/www/repository/releases</url>
