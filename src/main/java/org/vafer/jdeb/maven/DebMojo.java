@@ -84,7 +84,7 @@ public class DebMojo extends AbstractPluginMojo {
     /**
      * Explicitly define the file where to write the changes to.
      * 
-     * @parameter expression="${changesIn}"
+     * @parameter expression="${changesOut}"
      */
     private File changesOut = null;
 
