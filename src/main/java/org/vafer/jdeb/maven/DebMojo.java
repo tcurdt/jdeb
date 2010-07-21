@@ -79,6 +79,12 @@ public class DebMojo extends AbstractPluginMojo {
      * @parameter expression="${changesIn}"
      */
     private File changesIn = null;
+
+    /**
+     * Explicitly define the file to read the changes from.
+     * 
+     * @parameter expression="${changesName}"
+     */
     private String changesName;
 
     /**
@@ -88,41 +94,20 @@ public class DebMojo extends AbstractPluginMojo {
      */
     private File changesOut = null;
 
-//  /**
-//   * Explicitly define the file where to write the changes of the changes
-//   * input to.
-//   * 
-//   * @parameter expression="${changesSave}"
-//   */
-//  private File changesSave = null;
+    /**
+     * Explicitly define the file where to write the changes of the changes
+     * input to.
+     * 
+     * @parameter expression="${changesSave}"
+     */
+    private File changesSave = null;
 
-//  /**
-//   * The keyring file. Usually some/path/secring.gpg
-//   * 
-//   * @parameter expression="${keyring}"
-//   */
-//  private File keyring = null;
-
-//  /**
-//   * The hex key id to use for signing.
-//   * 
-//   * @parameter expression="${key}"
-//   */
-//  private String key = null;
-
-//  /**
-//   * The passphrase for the key to sign the changes file.
-//   * 
-//   * @parameter expression="${passhrase}"
-//   */
-//  private String passphrase = null;
-
-//  /**
-//   * The compression method used for the data file (none, gzip or bzip2)
-//   * 
-//   * @parameter expression="${compression}" default-value="gzip"
-//   */
-//  private String compression;
+    /**
+     * The compression method used for the data file (none, gzip or bzip2)
+     * 
+     * @parameter expression="${compression}" default-value="gzip"
+     */
+    private String compression;
 
     /**
      * The location where all package files will be installed. By default, all
@@ -333,6 +318,10 @@ public class DebMojo extends AbstractPluginMojo {
         };
         try {
             DebMaker debMaker = new DebMaker(infoConsole, deb, controlDir, dataProducers, resolver);
+            debMaker.setChangesIn(changesIn);
+            debMaker.setChangesOut(changesOut);
+            debMaker.setChangesSave(changesSave);
+            debMaker.setCompression(compression);
             debMaker.makeDeb();
             getLog().info("Attaching created debian archive " + deb);
             projectHelper.attachArtifact(getProject(), type, classifier, deb);
