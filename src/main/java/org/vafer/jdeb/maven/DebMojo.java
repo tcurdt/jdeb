@@ -49,63 +49,47 @@ public class DebMojo extends AbstractPluginMojo {
 
     /**
      * Defines the pattern of the name of final artifacts. Possible
-     * substitutions are [[artifactId]] [[version]] [[extension]] and
-     * [[groupId]].
+     * substitutions are [[baseDir]] [[buildDir]] [[artifactId]] [[version]]
+     * [[extension]] and [[groupId]].
      * 
-     * @parameter expression="${namePattern}"
-     *            default-value="[[artifactId]]_[[version]].[[extension]]"
+     * @parameter default-value="[[buildDir]]/[[artifactId]]_[[version]].[[extension]]"
      */
-    private String namePattern;
-
-    /**
-     * Explicitly defines the final artifact name (without using the pattern)
-     * 
-     * @parameter expression="${deb}"
-     */
-    private File deb;
-    private String debName;
+    private String deb;
 
     /**
      * Explicitly defines the path to the control directory. At least the
      * control file is mandatory.
      * 
-     * @parameter expression="${controlDir}"
+     * @parameter default-value="[[baseDir]]/src/deb/control"
      */
-    private File controlDir;
+    private String controlDir;
 
     /**
      * Explicitly define the file to read the changes from.
      * 
-     * @parameter expression="${changesIn}"
+     * @parameter default-value="[[baseDir]]/CHANGES.txt"
      */
-    private File changesIn = null;
-
-    /**
-     * Explicitly define the file to read the changes from.
-     * 
-     * @parameter expression="${changesName}"
-     */
-    private String changesName;
+    private String changesIn;
 
     /**
      * Explicitly define the file where to write the changes to.
      * 
-     * @parameter expression="${changesOut}"
+     * @parameter default-value="[[baseDir]]/CHANGES.txt"
      */
-    private File changesOut = null;
+    private String changesOut;
 
     /**
      * Explicitly define the file where to write the changes of the changes
      * input to.
      * 
-     * @parameter expression="${changesSave}"
+     * @parameter default-value="[[baseDir]]/CHANGES.txt"
      */
-    private File changesSave = null;
+    private String changesSave;
 
     /**
      * The compression method used for the data file (none, gzip or bzip2)
      * 
-     * @parameter expression="${compression}" default-value="gzip"
+     * @parameter default-value="gzip"
      */
     private String compression;
 
@@ -115,13 +99,11 @@ public class DebMojo extends AbstractPluginMojo {
      * http://www.pathname.com/
      * fhs/pub/fhs-2.3.html#OPTADDONAPPLICATIONSOFTWAREPACKAGES)
      * 
-     * @parameter expression="${installDir}"
-     *            default-value="/opt/${project.artifactId}"
+     * @parameter default-value="/opt/[[artifactId]]"
      */
     private String installDir;
-    private String openReplaceToken = "[[";
-    private String closeReplaceToken = "]]";
 
+    
     /**
      * The type of attached artifact
      *
@@ -186,17 +168,12 @@ public class DebMojo extends AbstractPluginMojo {
      * @parameter expression="${dataSet}"
      */
     private Data[] dataSet;
+    
+    /* end of parameters */
+    
+    private String openReplaceToken = "[[";
+    private String closeReplaceToken = "]]";
     private Collection dataProducers = new ArrayList();
-
-    public void setData(Data[] pData) {
-        dataSet = pData;
-        dataProducers.clear();
-        if (pData != null) {
-            for (int i = 0; i < pData.length; i++) {
-                dataProducers.add(pData[i]);
-            }
-        }
-    }
 
     public void setOpenReplaceToken(String openReplaceToken) {
         this.openReplaceToken = openReplaceToken;
@@ -208,6 +185,16 @@ public class DebMojo extends AbstractPluginMojo {
         AbstractDescriptor.setCloseToken(closeReplaceToken);
     }
 
+    protected void setData(Data[] pData) {
+        dataSet = pData;
+        dataProducers.clear();
+        if (pData != null) {
+            for (int i = 0; i < pData.length; i++) {
+                dataProducers.add(pData[i]);
+            }
+        }
+    }
+
     protected VariableResolver initializeVariableResolver(Map variables) {
         variables.put("name", getProject().getName());
         variables.put("artifactId", getProject().getArtifactId());
@@ -215,57 +202,9 @@ public class DebMojo extends AbstractPluginMojo {
         variables.put("version", getProject().getVersion().replace('-', '+'));
         variables.put("description", getProject().getDescription());
         variables.put("extension", "deb");
+        variables.put("baseDir", getProject().getBasedir().getAbsolutePath());
+        variables.put("buildDir", buildDirectory.getAbsolutePath());
         return new MapVariableResolver(variables);
-    }
-
-    protected File getDebFile() {
-        // if not specified try to the default
-        if (deb == null) {
-            deb = new File(buildDirectory, debName);
-        }
-        return deb;
-    }
-
-    protected File getControlDir() {
-        // if not specified try to the default
-        if (controlDir == null) {
-            controlDir = new File(getProject().getBasedir(), "src/deb/control");
-            getLog().info(
-                    "Using default path to control directory " + controlDir);
-        }
-        return controlDir;
-    }
-
-    protected File getControlFile() {
-        return new File(controlDir, "control");
-    }
-
-    protected String getInstallDir() {
-        // if not specified try to the default
-        if (installDir == null) {
-            installDir = "/opt/" + getProject().getArtifactId();
-            getLog().info("Using default path to install directory " + installDir);
-        }
-        return installDir;
-    }
-
-    protected File getChangesInFile() {
-        // if not specified try to the default
-        if (changesIn == null) {
-            final File f = new File(getProject().getBasedir(), "CHANGES.txt");
-            if (f.exists() && f.isFile() && f.canRead()) {
-                changesIn = f;
-            }
-        }
-        return changesIn;
-    }
-
-    protected File getChangesOutFile() {
-        // if not specified try to the default
-        if (changesOut == null) {
-            changesOut = new File(buildDirectory, changesName);
-        }
-        return changesOut;
     }
 
     /**
@@ -274,60 +213,68 @@ public class DebMojo extends AbstractPluginMojo {
      * @throws MojoExecutionException on error
      */
     public void execute() throws MojoExecutionException {
-        Map variables = new HashMap();
-        final VariableResolver resolver = initializeVariableResolver(variables);
-        try {
-            // expand name pattern
-            debName = Utils.replaceVariables(resolver, namePattern, openReplaceToken, closeReplaceToken);
-            variables.put("extension", "changes");
-            changesName = Utils.replaceVariables(resolver, namePattern, openReplaceToken, closeReplaceToken);
-        } catch (ParseException e) {
-            throw new MojoExecutionException("Failed parsing artifact name pattern", e);
-        }
-
-        deb = getDebFile();
-        changesIn = getChangesInFile();
-        changesOut = getChangesOutFile();
-        controlDir = getControlDir();
 
         setData(dataSet);
 
-        // If there are no dataProducers, then we'll add a single producer that
-        // processes the
-        // maven artifact file (be it a jar, war, etc.)
-        if (dataProducers.isEmpty()) {
-            final File file = getProject().getArtifact().getFile();
-            dataProducers.add(new DataProducer() {
-                public void produce(final DataConsumer receiver) {
-                    try {
-                        receiver.onEachFile(new FileInputStream(file),
-                                new File(new File(getInstallDir()), file.getName()).getAbsolutePath(), "",
-                                "root", 0, "root", 0,
-                                TarEntry.DEFAULT_FILE_MODE, file.length());
-                    } catch (Exception e) {
-                        getLog().error(e);
-                    }
-                }
-            });
-        }
-
-        Console infoConsole = new Console() {
-            public void println(String s) {
-                getLog().info(s);
-            }
-        };
         try {
-            DebMaker debMaker = new DebMaker(infoConsole, deb, controlDir, dataProducers, resolver);
-            debMaker.setChangesIn(changesIn);
-            debMaker.setChangesOut(changesOut);
-            debMaker.setChangesSave(changesSave);
-            debMaker.setCompression(compression);
-            debMaker.makeDeb();
-            getLog().info("Attaching created debian archive " + deb);
-            projectHelper.attachArtifact(getProject(), type, classifier, deb);
-        } catch (PackagingException e) {
-            getLog().error("Failed to create debian package " + deb, e);
-            throw new MojoExecutionException("Failed to create debian package " + deb, e);
+
+        	final VariableResolver resolver = initializeVariableResolver(new HashMap());
+        	
+        	final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken)); 
+        	final File controlDirFile = new File(Utils.replaceVariables(resolver, controlDir, openReplaceToken, closeReplaceToken)); 
+        	final File installDirFile = new File(Utils.replaceVariables(resolver, installDir, openReplaceToken, closeReplaceToken));         	
+        	final File changesInFile = new File(Utils.replaceVariables(resolver, changesIn, openReplaceToken, closeReplaceToken));
+        	final File changesOutFile = new File(Utils.replaceVariables(resolver, changesOut, openReplaceToken, closeReplaceToken));
+        	final File changesSaveFile = new File(Utils.replaceVariables(resolver, changesSave, openReplaceToken, closeReplaceToken));
+        	
+	        // If there are no dataProducers, then we'll add a single producer that
+	        // processes the
+	        // maven artifact file (be it a jar, war, etc.)
+	        if (dataProducers.isEmpty()) {
+	            final File file = getProject().getArtifact().getFile();
+	            dataProducers.add(new DataProducer() {
+	                public void produce(final DataConsumer receiver) {
+	                    try {
+	                        receiver.onEachFile(new FileInputStream(file),
+	                                new File(installDirFile, file.getName()).getAbsolutePath(), "",
+	                                "root", 0, "root", 0,
+	                                TarEntry.DEFAULT_FILE_MODE, file.length());
+	                    } catch (Exception e) {
+	                        getLog().error(e);
+	                    }
+	                }
+	            });
+	        }
+
+	        Console infoConsole = new Console() {
+	            public void println(String s) {
+	                getLog().info(s);
+	            }
+	        };
+
+	        try {
+
+	        	DebMaker debMaker = new DebMaker(infoConsole, debFile, controlDirFile, dataProducers, resolver);
+	            
+	            if (changesInFile.exists() && changesInFile.canRead()) {
+	                debMaker.setChangesIn(changesInFile);
+	                debMaker.setChangesOut(changesOutFile);
+	                debMaker.setChangesSave(changesSaveFile);            	
+	            }
+	            
+	            debMaker.setCompression(compression);
+	            debMaker.makeDeb();
+	
+	            getLog().info("Attaching created debian archive " + debFile);
+	            projectHelper.attachArtifact(getProject(), type, classifier, debFile);
+
+	        } catch (PackagingException e) {
+	            getLog().error("Failed to create debian package " + debFile, e);
+	            throw new MojoExecutionException("Failed to create debian package " + debFile, e);
+	        }
+
+        } catch (ParseException e) {
+            throw new MojoExecutionException("Failed parsing pattern", e);
         }
     }
 }

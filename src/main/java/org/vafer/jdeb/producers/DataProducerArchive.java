@@ -15,16 +15,22 @@
  */
 package org.vafer.jdeb.producers;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackInputStream;
-import java.util.zip.GZIPInputStream;
 
-import org.apache.tools.bzip2.CBZip2InputStream;
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.ArchiveStreamFactory;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorInputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.tools.tar.TarEntry;
-import org.apache.tools.tar.TarInputStream;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
@@ -45,22 +51,77 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
         
     public void produce( final DataConsumer pReceiver ) throws IOException {
 
-        TarInputStream archiveInputStream = null;
-        try {
-            archiveInputStream = new TarInputStream(getCompressedInputStream(new FileInputStream(archive)));
+    	InputStream is = new BufferedInputStream(new FileInputStream(archive));
+    	
+    	CompressorInputStream compressorInputStream = null; 
+    		
+    	try {
+    		// FIXME remove once commons 1.1 is out
+    		
+    		final String fn = archive.getName();
+    		if (fn.endsWith("gz")) {
+    			compressorInputStream = new CompressorStreamFactory().createCompressorInputStream("gz", is);
+    		} else if (fn.endsWith("bz2")){
+    			compressorInputStream = new CompressorStreamFactory().createCompressorInputStream("bzip2", is);
+    		}
 
+    		// compressorInputStream = new CompressorStreamFactory().createCompressorInputStream(is);    		
+    	
+    	} catch(CompressorException e) {
+    	}
+    	
+    	if (compressorInputStream != null) {
+    		is = new BufferedInputStream(compressorInputStream);
+    	}
+    	
+    	ArchiveInputStream archiveInputStream = null;
+    	
+    	try {
+    		archiveInputStream = new ArchiveStreamFactory().createArchiveInputStream(is);
+    	} catch(ArchiveException e) {
+            throw new IOException("Unsupported archive format : " + archive, e);    		
+    	}
+
+    	EntryConverter converter = null;
+    	
+    	if (archiveInputStream instanceof TarArchiveInputStream) {
+
+    		converter = new EntryConverter() {
+    	        public TarEntry convert(ArchiveEntry entry) {
+    	        	TarArchiveEntry src = (TarArchiveEntry)entry;
+	        		TarEntry dst = new TarEntry(entry.getName());
+
+	        		dst.setSize(src.getSize());
+	        		dst.setGroupName(src.getGroupName());
+	        		dst.setGroupId(src.getGroupId());
+	        		dst.setUserId(src.getUserId());
+	        		dst.setMode(src.getMode());
+	        		dst.setModTime(src.getModTime());
+
+	        		return dst;
+    	        }
+            };    	
+    	
+    	} else {
+            throw new IOException("Unsupported archive format : " + archive);    		
+    	}
+    	
+    	
+        try {
             while(true) {
                 
-                TarEntry entry = archiveInputStream.getNextEntry();
+            	ArchiveEntry archiveEntry = archiveInputStream.getNextEntry();
 
-                if (entry == null) {
+                if (archiveEntry == null) {
                     break;
                 }
 
-                if (!isIncluded(entry.getName())) {
+                if (!isIncluded(archiveEntry.getName())) {
                     continue;                   
                 }               
 
+                TarEntry entry = converter.convert(archiveEntry);
+                
                 entry = map(entry);
                 
                 if (entry.isDirectory()) {
@@ -76,29 +137,8 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
             }
         }       
     }
-
-
-    /**
-     * TODO: replace by commons compress
-     * 
-     * Guess the compression used by looking at the first bytes of the stream.
-     */
-    private InputStream getCompressedInputStream(InputStream in) throws IOException {
-    	
-        PushbackInputStream pin = new PushbackInputStream(in, 2);
-        byte[] header = new byte[2];
-        if (pin.read(header) != header.length) {
-            throw new IOException("Could not read header");
-        }
-
-        if (header[0] == (byte) 0x1f && header[1] == (byte) 0x8b) {
-            pin.unread(header);
-            return new GZIPInputStream(pin);
-        } else if (header[0] == 'B' && header[1] == 'Z') {
-            return new CBZip2InputStream(pin);
-        } else {
-            throw new IOException("Unsupported archive format : " + archive);
-        }
-    }
     
+    private interface EntryConverter {
+        public TarEntry convert(ArchiveEntry entry);    	
+    }    
 }
