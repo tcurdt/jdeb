@@ -27,6 +27,8 @@ import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
@@ -89,7 +91,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
     		converter = new EntryConverter() {
     	        public TarEntry convert(ArchiveEntry entry) {
     	        	TarArchiveEntry src = (TarArchiveEntry)entry;
-	        		TarEntry dst = new TarEntry(entry.getName());
+	        		TarEntry dst = new TarEntry(src.getName());
 
 	        		dst.setSize(src.getSize());
 	        		dst.setGroupName(src.getGroupName());
@@ -102,6 +104,21 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
     	        }
             };    	
     	
+    	} else if (archiveInputStream instanceof ZipArchiveInputStream) {
+
+    		converter = new EntryConverter() {
+    	        public TarEntry convert(ArchiveEntry entry) {
+    	        	ZipArchiveEntry src = (ZipArchiveEntry)entry;
+	        		TarEntry dst = new TarEntry(src.getName());
+
+	        		dst.setSize(src.getSize());
+	        		dst.setMode(src.getUnixMode());
+	        		dst.setModTime(src.getTime());
+
+	        		return dst;
+    	        }
+            };    	
+    		
     	} else {
             throw new IOException("Unsupported archive format : " + archive);    		
     	}
