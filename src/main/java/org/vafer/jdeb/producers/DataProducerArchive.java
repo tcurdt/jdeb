@@ -58,18 +58,9 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
     	CompressorInputStream compressorInputStream = null; 
     		
     	try {
-    		// FIXME remove once commons 1.1 is out
-    		
-    		final String fn = archive.getName();
-    		if (fn.endsWith("gz")) {
-    			compressorInputStream = new CompressorStreamFactory().createCompressorInputStream("gz", is);
-    		} else if (fn.endsWith("bz2")){
-    			compressorInputStream = new CompressorStreamFactory().createCompressorInputStream("bzip2", is);
-    		}
-
-    		// compressorInputStream = new CompressorStreamFactory().createCompressorInputStream(is);    		
-    	
+    		compressorInputStream = new CompressorStreamFactory().createCompressorInputStream(is);    		    	
     	} catch(CompressorException e) {
+    	    // not compressed or unknown compressor
     	}
     	
     	if (compressorInputStream != null) {
