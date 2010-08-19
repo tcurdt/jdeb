@@ -35,7 +35,7 @@ import org.vafer.jdeb.DataProducer;
  */
 public final class DataProducerFileSet implements DataProducer {
     
-	private final FileSet fileset;
+    private final FileSet fileset;
 
     public DataProducerFileSet( final FileSet pFileset ) {
         fileset = pFileset;

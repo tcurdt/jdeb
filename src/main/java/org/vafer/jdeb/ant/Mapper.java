@@ -62,32 +62,32 @@ public final class Mapper {
         
 
     public void setUid( final int pUid ) {
-		uid = pUid;
-	}
+        uid = pUid;
+    }
 
-	public void setGid( final int pGid ) {
-		gid = pGid;
-	}
+    public void setGid( final int pGid ) {
+        gid = pGid;
+    }
 
-	public void setUser( final String pUser ) {
-		user = pUser;
-	}
+    public void setUser( final String pUser ) {
+        user = pUser;
+    }
 
-	public void setGroup( final String pGroup ) {
-		group = pGroup;
-	}
+    public void setGroup( final String pGroup ) {
+        group = pGroup;
+    }
 
-	public void setFileMode( final int pFileMode ) {
-		fileMode = pFileMode;
-	}
+    public void setFileMode( final int pFileMode ) {
+        fileMode = pFileMode;
+    }
 
-	public void setDirMode(int pDirMode) {
-		dirMode = pDirMode;
-	}
+    public void setDirMode(int pDirMode) {
+        dirMode = pDirMode;
+    }
 
-	public org.vafer.jdeb.mapping.Mapper createMapper() {
+    public org.vafer.jdeb.mapping.Mapper createMapper() {
 
-		if ("perm".equalsIgnoreCase(mapperType)) {
+        if ("perm".equalsIgnoreCase(mapperType)) {
             return new PermMapper(uid, gid, user, group, fileMode, dirMode, strip, prefix);
         }
 

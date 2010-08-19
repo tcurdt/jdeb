@@ -218,60 +218,60 @@ public class DebMojo extends AbstractPluginMojo {
 
         try {
 
-        	final VariableResolver resolver = initializeVariableResolver(new HashMap());
-        	
-        	final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken)); 
-        	final File controlDirFile = new File(Utils.replaceVariables(resolver, controlDir, openReplaceToken, closeReplaceToken)); 
-        	final File installDirFile = new File(Utils.replaceVariables(resolver, installDir, openReplaceToken, closeReplaceToken));         	
-        	final File changesInFile = new File(Utils.replaceVariables(resolver, changesIn, openReplaceToken, closeReplaceToken));
-        	final File changesOutFile = new File(Utils.replaceVariables(resolver, changesOut, openReplaceToken, closeReplaceToken));
-        	final File changesSaveFile = new File(Utils.replaceVariables(resolver, changesSave, openReplaceToken, closeReplaceToken));
-        	
-	        // If there are no dataProducers, then we'll add a single producer that
-	        // processes the
-	        // maven artifact file (be it a jar, war, etc.)
-	        if (dataProducers.isEmpty()) {
-	            final File file = getProject().getArtifact().getFile();
-	            dataProducers.add(new DataProducer() {
-	                public void produce(final DataConsumer receiver) {
-	                    try {
-	                        receiver.onEachFile(new FileInputStream(file),
-	                                new File(installDirFile, file.getName()).getAbsolutePath(), "",
-	                                "root", 0, "root", 0,
-	                                TarEntry.DEFAULT_FILE_MODE, file.length());
-	                    } catch (Exception e) {
-	                        getLog().error(e);
-	                    }
-	                }
-	            });
-	        }
+            final VariableResolver resolver = initializeVariableResolver(new HashMap());
+            
+            final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken)); 
+            final File controlDirFile = new File(Utils.replaceVariables(resolver, controlDir, openReplaceToken, closeReplaceToken)); 
+            final File installDirFile = new File(Utils.replaceVariables(resolver, installDir, openReplaceToken, closeReplaceToken));            
+            final File changesInFile = new File(Utils.replaceVariables(resolver, changesIn, openReplaceToken, closeReplaceToken));
+            final File changesOutFile = new File(Utils.replaceVariables(resolver, changesOut, openReplaceToken, closeReplaceToken));
+            final File changesSaveFile = new File(Utils.replaceVariables(resolver, changesSave, openReplaceToken, closeReplaceToken));
+            
+            // If there are no dataProducers, then we'll add a single producer that
+            // processes the
+            // maven artifact file (be it a jar, war, etc.)
+            if (dataProducers.isEmpty()) {
+                final File file = getProject().getArtifact().getFile();
+                dataProducers.add(new DataProducer() {
+                    public void produce(final DataConsumer receiver) {
+                        try {
+                            receiver.onEachFile(new FileInputStream(file),
+                                    new File(installDirFile, file.getName()).getAbsolutePath(), "",
+                                    "root", 0, "root", 0,
+                                    TarEntry.DEFAULT_FILE_MODE, file.length());
+                        } catch (Exception e) {
+                            getLog().error(e);
+                        }
+                    }
+                });
+            }
 
-	        Console infoConsole = new Console() {
-	            public void println(String s) {
-	                getLog().info(s);
-	            }
-	        };
+            Console infoConsole = new Console() {
+                public void println(String s) {
+                    getLog().info(s);
+                }
+            };
 
-	        try {
+            try {
 
-	        	DebMaker debMaker = new DebMaker(infoConsole, debFile, controlDirFile, dataProducers, resolver);
-	            
-	            if (changesInFile.exists() && changesInFile.canRead()) {
-	                debMaker.setChangesIn(changesInFile);
-	                debMaker.setChangesOut(changesOutFile);
-	                debMaker.setChangesSave(changesSaveFile);            	
-	            }
-	            
-	            debMaker.setCompression(compression);
-	            debMaker.makeDeb();
-	
-	            getLog().info("Attaching created debian archive " + debFile);
-	            projectHelper.attachArtifact(getProject(), type, classifier, debFile);
+                DebMaker debMaker = new DebMaker(infoConsole, debFile, controlDirFile, dataProducers, resolver);
+                
+                if (changesInFile.exists() && changesInFile.canRead()) {
+                    debMaker.setChangesIn(changesInFile);
+                    debMaker.setChangesOut(changesOutFile);
+                    debMaker.setChangesSave(changesSaveFile);               
+                }
+                
+                debMaker.setCompression(compression);
+                debMaker.makeDeb();
+    
+                getLog().info("Attaching created debian archive " + debFile);
+                projectHelper.attachArtifact(getProject(), type, classifier, debFile);
 
-	        } catch (PackagingException e) {
-	            getLog().error("Failed to create debian package " + debFile, e);
-	            throw new MojoExecutionException("Failed to create debian package " + debFile, e);
-	        }
+            } catch (PackagingException e) {
+                getLog().error("Failed to create debian package " + debFile, e);
+                throw new MojoExecutionException("Failed to create debian package " + debFile, e);
+            }
 
         } catch (ParseException e) {
             throw new MojoExecutionException("Failed parsing pattern", e);

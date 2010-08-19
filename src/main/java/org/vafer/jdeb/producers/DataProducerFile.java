@@ -33,14 +33,14 @@ import org.vafer.jdeb.mapping.Mapper;
  */
 public final class DataProducerFile extends AbstractDataProducer implements DataProducer {
 
-	private final File file;
-	
-	public DataProducerFile(final File pFile, String[] pIncludes, String[] pExcludes, Mapper[] pMapper) {
-		super(pIncludes, pExcludes, pMapper);		
-		file = pFile;
-	}
+    private final File file;
+    
+    public DataProducerFile(final File pFile, String[] pIncludes, String[] pExcludes, Mapper[] pMapper) {
+        super(pIncludes, pExcludes, pMapper);       
+        file = pFile;
+    }
 
-	public void produce( final DataConsumer pReceiver ) throws IOException {
+    public void produce( final DataConsumer pReceiver ) throws IOException {
 
         TarEntry entry = new TarEntry(file.getName());
         entry.setUserId(0);
@@ -59,7 +59,7 @@ public final class DataProducerFile extends AbstractDataProducer implements Data
         } finally {
             inputStream.close();
         }
-	
-	}
+    
+    }
 
 }

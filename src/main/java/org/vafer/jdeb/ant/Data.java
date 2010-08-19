@@ -49,7 +49,7 @@ public final class Data extends PatternSet implements DataProducer {
     }
     
     public void setType( final String pType ) {
-    	type = pType;
+        type = pType;
     }
 
     public void addMapper( final Mapper pMapper ) {
