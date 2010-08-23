@@ -1,3 +1,6 @@
+## Version 0.9, unreleased
+
+
 ## Version 0.8, released 27.06.2010
 
 Lot of refactoring and support for configuration on the maven plugin. Easier permission mapping.
