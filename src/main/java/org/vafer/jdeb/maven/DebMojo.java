@@ -200,10 +200,12 @@ public class DebMojo extends AbstractPluginMojo {
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
         variables.put("version", getProject().getVersion().replace('-', '+'));
+
         variables.put("description", getProject().getDescription());
         variables.put("extension", "deb");
         variables.put("baseDir", getProject().getBasedir().getAbsolutePath());
         variables.put("buildDir", buildDirectory.getAbsolutePath());
+        variables.put("project.version", getProject().getVersion());
         return new MapVariableResolver(variables);
     }
 

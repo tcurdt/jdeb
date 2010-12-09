@@ -38,7 +38,7 @@ public class InformationOutputStream extends DigestOutputStream {
         size = 0;
     }
     
-    public String getMd5() {
+    public String getHexDigest() {
         return Utils.toHex(digest.digest());
     }
     

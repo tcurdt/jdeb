@@ -103,9 +103,9 @@ following options:
     *---------------+------------------------------------------------------------------------------+---------------------------------------------+
     | type          | Type of the data source. (archive|directory|file)                            | No; but will be Yes in the future           |
     *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | include       | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files                   |
+    | includes      | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files                   |
     *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | exclude       | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions               |
+    | excludes      | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions               |
     *---------------+------------------------------------------------------------------------------+---------------------------------------------+
     | mapper        | The files to exclude from the directory or tarball                           | No                                          |
     *---------------+------------------------------------------------------------------------------+---------------------------------------------+
@@ -132,8 +132,8 @@ include a directory, a tarball, and a file in your deb package:
                                 <data>
                                     <src>${project.basedir}/target/my_archive.tar.gz</src>
                                     <type>archive</type>
-                                    <include>...</include>
-                                    <exclude>...</exclude>
+                                    <includes>...</includes>
+                                    <excludes>...</excludes>
                                     <mapper>
                                         <type>perm</type>
                                         <strip>1</strip>
@@ -148,8 +148,8 @@ include a directory, a tarball, and a file in your deb package:
                                 <data>
                                     <src>${project.build.directory}/data</src>
                                     <type>directory</type>
-                                    <include/>
-                                    <exclude>**/.svn</exclude>
+                                    <includes />
+                                    <excludes>**/.svn</excludes>
                                     <mapper>
                                         <type>ls</type>
                                         <src>mapping.txt</src>

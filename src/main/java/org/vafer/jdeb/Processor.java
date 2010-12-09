@@ -135,9 +135,12 @@ public class Processor {
             }
 
             pOutput.getParentFile().mkdirs();
-            final InformationOutputStream output = new InformationOutputStream(new FileOutputStream(pOutput), MessageDigest.getInstance("MD5"));
+            final InformationOutputStream md5output = new InformationOutputStream(new FileOutputStream(pOutput), MessageDigest.getInstance("MD5"));
+            //Add chain of filters in order to calculate sha1 and sha256 for 1.8 format
+            final InformationOutputStream sha1output = new InformationOutputStream(md5output, MessageDigest.getInstance("SHA1"));
+            final InformationOutputStream sha256output = new InformationOutputStream(sha1output, MessageDigest.getInstance("SHA-256"));
 
-            final ArArchiveOutputStream ar = new ArArchiveOutputStream(output);
+            final ArArchiveOutputStream ar = new ArArchiveOutputStream(sha256output);
 
             addTo(ar, "debian-binary", "2.0\n");
             addTo(ar, "control.tar.gz", tempControl);
@@ -146,8 +149,10 @@ public class Processor {
             ar.close();
 
             // intermediate values
-            packageDescriptor.set("MD5", output.getMd5());
-            packageDescriptor.set("Size", "" + output.getSize());
+            packageDescriptor.set("MD5", md5output.getHexDigest());
+            packageDescriptor.set("SHA1", sha1output.getHexDigest());
+            packageDescriptor.set("SHA256", sha256output.getHexDigest());
+            packageDescriptor.set("Size", "" + md5output.getSize());
             packageDescriptor.set("File", pOutput.getName());
 
             return packageDescriptor;
@@ -204,7 +209,7 @@ public class Processor {
         final ChangeSet[] changeSets = pChangesProvider.getChangesSets();
         final ChangesDescriptor changesDescriptor = new ChangesDescriptor(pPackageDescriptor, changeSets);
 
-        changesDescriptor.set("Format", "1.7");
+        changesDescriptor.set("Format", "1.8");
 
         if (changesDescriptor.get("Binary") == null) {
             changesDescriptor.set("Binary", changesDescriptor.get("Package"));
@@ -217,6 +222,23 @@ public class Processor {
         if (changesDescriptor.get("Description") == null) {
             changesDescriptor.set("Description", "update to " + changesDescriptor.get("Version"));
         }
+
+        final StringBuilder checksumsSha1=new StringBuilder("\n");
+//        Checksums-Sha1:
+//         56ef4c6249dc3567fd2967f809c42d1f9b61adf7 45964 jdeb.deb
+        checksumsSha1.append(' ').append(changesDescriptor.get("SHA1"));
+        checksumsSha1.append(' ').append(changesDescriptor.get("Size"));
+        checksumsSha1.append(' ').append(changesDescriptor.get("File"));
+        changesDescriptor.set("Checksums-Sha1", checksumsSha1.toString());
+
+    final StringBuilder checksumsSha256=new StringBuilder("\n");
+//Checksums-Sha256:
+// 38c6fa274eb9299a69b739bcbdbd05c7ffd1d8d6472f4245ed732a25c0e5d616 45964 jdeb.deb
+        checksumsSha256.append(' ').append(changesDescriptor.get("SHA256"));
+        checksumsSha256.append(' ').append(changesDescriptor.get("Size"));
+        checksumsSha256.append(' ').append(changesDescriptor.get("File"));
+        changesDescriptor.set("Checksums-Sha256", checksumsSha256.toString());
+
 
         final StringBuffer files = new StringBuffer("\n");
         files.append(' ').append(changesDescriptor.get("MD5"));
