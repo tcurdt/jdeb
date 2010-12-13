@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,14 +26,14 @@ import org.vafer.jdeb.mapping.PrefixMapper;
 /**
  * Ant "mapper" element acting as factory for the entry mapper.
  * Supported types: ls, prefix, perm
- * 
+ *
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class Mapper {
 
     private String mapperType;
     private File src;
-    
+
     private String prefix;
     private int strip;
     private int uid = -1;
@@ -42,7 +42,7 @@ public final class Mapper {
     private String group;
     private int fileMode = -1;
     private int dirMode = -1;
-    
+
     public void setType( final String pType ) {
         mapperType = pType;
     }
@@ -51,7 +51,7 @@ public final class Mapper {
         src = pSrc;
     }
 
-    
+
     public void setPrefix( final String pPrefix ) {
         prefix = pPrefix;
     }
@@ -59,7 +59,7 @@ public final class Mapper {
     public void setStrip( final int pStrip ) {
         strip = pStrip;
     }
-        
+
 
     public void setUid( final int pUid ) {
         uid = pUid;
@@ -94,7 +94,7 @@ public final class Mapper {
         if ("prefix".equalsIgnoreCase(mapperType)) {
             return new PrefixMapper(strip, prefix);
         }
-        
+
         if ("ls".equalsIgnoreCase(mapperType)) {
             try {
                 return new LsMapper(new FileInputStream(src));
@@ -105,5 +105,5 @@ public final class Mapper {
 
         return new NullMapper();
     }
-    
+
 }

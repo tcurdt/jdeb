@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,7 +35,7 @@ import org.vafer.jdeb.descriptors.PackageDescriptor;
 /**
  * Gets the changes from a changes file. The first entry are the current changes.
  * The release line will be added. Example:
- 
+
 release date=22:13 19.08.2007,version=1.5+r90114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
   * debian changes support
 release date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
@@ -46,9 +46,9 @@ release date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt <t
 public final class TextfileChangesProvider implements ChangesProvider {
 
     private final ChangeSet[] changeSets;
-    
-    public TextfileChangesProvider( final InputStream pInput, final PackageDescriptor pDescriptor ) throws IOException, ParseException {        
-                
+
+    public TextfileChangesProvider( final InputStream pInput, final PackageDescriptor pDescriptor ) throws IOException, ParseException {
+
         final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
 
         final DateFormat tdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // RFC 2822 format
@@ -63,7 +63,7 @@ public final class TextfileChangesProvider implements ChangesProvider {
         final Collection changesColl = new ArrayList();
         final Collection changeSetColl = new ArrayList();
 
-        
+
         while(true) {
             final String line = reader.readLine();
             if (line == null) {
@@ -72,7 +72,7 @@ public final class TextfileChangesProvider implements ChangesProvider {
                 changeSetColl.add(changeSet);
                 break;
             }
-            
+
             if (line.startsWith("release ")) {
 
                 if (changesColl.size() > 0) {
@@ -81,14 +81,14 @@ public final class TextfileChangesProvider implements ChangesProvider {
                     changeSetColl.add(changeSet);
                     changesColl.clear();
                 }
-                
+
                 final String[] tokens = line.substring("release ".length()).split(",");
                 for (int i = 0; i < tokens.length; i++) {
                     final String token = tokens[i].trim();
                     final String[] lr = token.split("=");
                     final String key = lr[0];
                     final String value = lr[1];
-                    
+
                     if ("urgency".equals(key)) {
                         urgency = value;
                     } else if ("by".equals(key)) {
@@ -103,28 +103,28 @@ public final class TextfileChangesProvider implements ChangesProvider {
                 }
                 continue;
             }
-            
+
             if (line.startsWith(" * ")) {
                 changesColl.add(line.substring(" * ".length()));
                 continue;
             }
-            
+
             throw new ParseException("Unknown line syntax [" + line + "]", 0);
         }
-        
+
         reader.close();
-        
-        changeSets = (ChangeSet[]) changeSetColl.toArray(new ChangeSet[changeSetColl.size()]);      
+
+        changeSets = (ChangeSet[]) changeSetColl.toArray(new ChangeSet[changeSetColl.size()]);
     }
-    
+
     public void save( final OutputStream pOutput ) throws IOException {
         final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(pOutput));
-        
+
         final DateFormat df = ChangeSet.createDateForma();
-        
+
         for (int i = 0; i < changeSets.length; i++) {
             final ChangeSet changeSet = changeSets[i];
-            
+
             writer.write("release ");
             writer.write("date=" + df.format(changeSet.getDate()) + ",");
             writer.write("version=" + changeSet.getVersion() + ",");
@@ -140,10 +140,10 @@ public final class TextfileChangesProvider implements ChangesProvider {
                 writer.write("\n");
             }
         }
-        
+
         writer.close();
     }
-    
+
     public ChangeSet[] getChangesSets() {
         return changeSets;
     }

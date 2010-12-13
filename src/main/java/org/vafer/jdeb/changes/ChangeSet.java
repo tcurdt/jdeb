@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +22,7 @@ import java.util.Date;
 
 /**
  * A ChangeSet basically reflect a release as defined in the changes file.
- *  
+ *
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class ChangeSet {
@@ -34,7 +34,7 @@ public final class ChangeSet {
     private final String urgency;
     private final String changedBy;
     private final String[] changes;
-    
+
     public ChangeSet( String pPackageName, String pVersion, Date pDate, String pDistribution, String pUrgency, String pChangedBy, final String[] pChanges ) {
         changes = pChanges;
         packageName = pPackageName;
@@ -54,39 +54,39 @@ public final class ChangeSet {
             [optional blank line(s), stripped]
       -- maintainer name <email address>[two spaces]  date
     */
-    
+
     public static DateFormat createDateForma() {
         return new SimpleDateFormat("HH:mm dd.MM.yyyy");
     }
-    
+
     public String getPackage() {
         return packageName;
     }
-    
+
     public String getVersion() {
         return version;
     }
-    
+
     public Date getDate() {
         return date;
     }
-    
+
     public String getDistribution() {
         return distribution;
     }
-    
+
     public String getUrgency() {
         return urgency;
     }
-    
+
     public String getChangedBy() {
         return changedBy;
     }
-    
+
     public String[] getChanges() {
         return changes;
     }
-    
+
     public String toString() {
         final StringBuffer sb = new StringBuffer();
 

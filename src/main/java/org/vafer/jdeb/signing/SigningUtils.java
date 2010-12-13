@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +40,7 @@ import org.bouncycastle.openpgp.PGPUtil;
 
 /**
  * Utils to do the signing with OpenPGP
- * 
+ *
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 
@@ -70,7 +70,7 @@ public final class SigningUtils {
 
     /**
      * Create a clear sign signature over the input data. (Not detached)
-     * 
+     *
      * @param pInput
      * @param pKeyring
      * @param pKey
@@ -83,12 +83,12 @@ public final class SigningUtils {
      * @throws SignatureException
      */
     public static void clearSign( final InputStream pInput, final InputStream pKeyring, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException, PGPException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException {
-        
+
         Security.addProvider( new BouncyCastleProvider() );
-        
+
         final PGPSecretKey secretKey = getSecretKey(pKeyring, pKey);
         final PGPPrivateKey privateKey = secretKey.extractPrivateKey(pPassphrase.toCharArray(), "BC");
-                
+
         final int digest = PGPUtil.SHA1;
 
         final PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(secretKey.getPublicKey().getAlgorithm(), digest, "BC");
@@ -101,39 +101,39 @@ public final class SigningUtils {
 //            subpackageGenerator.setSignerUserID(false, (String)it.next());
 //            signatureGenerator.setHashedSubpackets(subpackageGenerator.generate());
 //        }
-    
+
         final ArmoredOutputStream armoredOutput = new ArmoredOutputStream(pOutput);
-        
+
         armoredOutput.beginClearText(digest);
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
 
         final byte[] newline = "\r\n".getBytes("UTF-8");
-        
+
         processLine(reader.readLine(), armoredOutput, signatureGenerator);
-        
+
         while(true) {
             final String line = reader.readLine();
-            
+
             if (line == null) {
                 armoredOutput.write(newline);
                 break;
             }
-                        
+
             armoredOutput.write(newline);
             signatureGenerator.update(newline);
 
-            processLine(line, armoredOutput, signatureGenerator);           
+            processLine(line, armoredOutput, signatureGenerator);
         }
-        
+
         armoredOutput.endClearText();
-        
+
         final BCPGOutputStream pgpOutput = new BCPGOutputStream(armoredOutput);
-        
+
         signatureGenerator.generate().encode(pgpOutput);
 
         armoredOutput.close();
-        
+
     }
 
 
@@ -142,7 +142,7 @@ public final class SigningUtils {
         if (pLine == null) {
             return;
         }
-        
+
         final char[] chars = pLine.toCharArray();
         int len = chars.length;
 
@@ -154,7 +154,7 @@ public final class SigningUtils {
         }
 
         final byte[] data = pLine.substring(0, len).getBytes("UTF-8");
-        
+
         pArmoredOutput.write(data);
         pSignatureGenerator.update(data);
     }

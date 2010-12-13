@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +33,7 @@ import org.vafer.jdeb.producers.DataProducerFile;
  * Ant "data" element acting as a factory for DataProducers.
  * So far Archive and Directory producers are supported.
  * Both support the usual ant pattern set matching.
- * 
+ *
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class Data extends PatternSet implements DataProducer {
@@ -41,13 +41,13 @@ public final class Data extends PatternSet implements DataProducer {
     private final Collection mapperWrapper = new ArrayList();
 
     private File src;
-    
+
     private String type;
-        
+
     public void setSrc( final File pSrc ) {
         src = pSrc;
     }
-    
+
     public void setType( final String pType ) {
         type = pType;
     }
@@ -55,9 +55,9 @@ public final class Data extends PatternSet implements DataProducer {
     public void addMapper( final Mapper pMapper ) {
         mapperWrapper.add(pMapper);
     }
-    
+
     public void produce( final DataConsumer pReceiver ) throws IOException {
-        
+
         if (!src.exists()) {
             throw new FileNotFoundException("Data source not found : " + src);
         }
@@ -87,19 +87,19 @@ public final class Data extends PatternSet implements DataProducer {
                     ).produce(pReceiver);
             return;
         }
-        
+
         if ("directory".equalsIgnoreCase(type)) {
             new DataProducerDirectory(
                     src,
                     getIncludePatterns(getProject()),
                     getExcludePatterns(getProject()),
                     mappers
-                    ).produce(pReceiver);           
+                    ).produce(pReceiver);
             return;
         }
 
         // @deprecated
-        
+
         if (src.isFile()) {
             new DataProducerArchive(
                 src,
@@ -113,7 +113,7 @@ public final class Data extends PatternSet implements DataProducer {
                 getIncludePatterns(getProject()),
                 getExcludePatterns(getProject()),
                 mappers
-                ).produce(pReceiver);           
+                ).produce(pReceiver);
         }
     }
 }

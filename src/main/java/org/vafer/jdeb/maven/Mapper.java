@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ import org.vafer.jdeb.mapping.PrefixMapper;
 /**
  * Maven "mapper" element acting as factory for the entry mapper.
  * Supported types: ls, prefix, perm
- * 
+ *
  * @author Bryan Sant <bryan.sant@gmail.com>
  */
 public final class Mapper {
@@ -36,12 +36,12 @@ public final class Mapper {
      * @required
      */
     private String type;
-    
+
     /**
      * @parameter
      */
     private int uid = -1;
-    
+
     /**
      * @parameter
      */
@@ -84,7 +84,7 @@ public final class Mapper {
 
 
     public org.vafer.jdeb.mapping.Mapper createMapper() {
-        
+
         if ("perm".equalsIgnoreCase(type)) {
             return new PermMapper(uid, gid, user, group, filemode, dirmode, strip, prefix);
         }
@@ -92,7 +92,7 @@ public final class Mapper {
         if ("prefix".equalsIgnoreCase(type)) {
             return new PrefixMapper(strip, prefix);
         }
-        
+
         if ("ls".equalsIgnoreCase(type)) {
             try {
                 return new LsMapper(new FileInputStream(src));
@@ -100,8 +100,8 @@ public final class Mapper {
                 e.printStackTrace();
             }
         }
-        
+
         return new NullMapper();
     }
-    
+
 }

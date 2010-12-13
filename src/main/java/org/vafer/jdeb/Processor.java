@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -55,7 +55,7 @@ import org.vafer.jdeb.utils.VariableResolver;
 /**
  * The processor does the actual work of building the deb related files.
  * It is been used by the ant task and (later) the maven plugin.
- * 
+ *
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public class Processor {
@@ -85,7 +85,7 @@ public class Processor {
     }
 
     private void addTo( final ArArchiveOutputStream pOutput, final String pName, final String pContent ) throws IOException {
-        final byte[] content = pContent.getBytes(); 
+        final byte[] content = pContent.getBytes();
         pOutput.putArchiveEntry(new ArArchiveEntry(pName, content.length));
         pOutput.write(content);
         pOutput.closeArchiveEntry();
@@ -93,20 +93,20 @@ public class Processor {
 
     private void addTo( final ArArchiveOutputStream pOutput, final String pName, final File pContent ) throws IOException {
         pOutput.putArchiveEntry(new ArArchiveEntry(pName, pContent.length()));
-        
+
         final InputStream input = new FileInputStream(pContent);
         try {
             Utils.copy(input, pOutput);
         } finally {
             input.close();
         }
-        
+
         pOutput.closeArchiveEntry();
     }
-    
+
     /**
      * Create the debian archive with from the provided control files and data producers.
-     * 
+     *
      * @param pControlFiles
      * @param pData
      * @param pOutput
@@ -120,8 +120,8 @@ public class Processor {
         File tempControl = null;
 
         try {
-            tempData = File.createTempFile("deb", "data");          
-            tempControl = File.createTempFile("deb", "control");            
+            tempData = File.createTempFile("deb", "data");
+            tempControl = File.createTempFile("deb", "control");
 
             console.println("Building data");
             final StringBuffer md5s = new StringBuffer();
@@ -145,7 +145,7 @@ public class Processor {
             addTo(ar, "debian-binary", "2.0\n");
             addTo(ar, "control.tar.gz", tempControl);
             addTo(ar, "data.tar" + getExtension(compression), tempData);
-            
+
             ar.close();
 
             // intermediate values
@@ -164,12 +164,12 @@ public class Processor {
         } finally {
             if (tempData != null) {
                 if (!tempData.delete()) {
-                    throw new PackagingException("Could not delete " + tempData);                   
+                    throw new PackagingException("Could not delete " + tempData);
                 }
             }
             if (tempControl != null) {
                 if (!tempControl.delete()) {
-                    throw new PackagingException("Could not delete " + tempControl);                    
+                    throw new PackagingException("Could not delete " + tempControl);
                 }
             }
         }
@@ -194,7 +194,7 @@ public class Processor {
     /**
      * Create changes file based on the provided PackageDescriptor.
      * If pRing, pKey and pPassphrase are provided the changes file will also be signed.
-     * It returns a ChangesDescriptor reflecting the changes  
+     * It returns a ChangesDescriptor reflecting the changes
      * @param pPackageDescriptor
      * @param pChangesProvider
      * @param pRing
@@ -223,17 +223,17 @@ public class Processor {
             changesDescriptor.set("Description", "update to " + changesDescriptor.get("Version"));
         }
 
-        final StringBuilder checksumsSha1=new StringBuilder("\n");
-//        Checksums-Sha1:
-//         56ef4c6249dc3567fd2967f809c42d1f9b61adf7 45964 jdeb.deb
+        final StringBuilder checksumsSha1 = new StringBuilder("\n");
+        // Checksums-Sha1:
+        // 56ef4c6249dc3567fd2967f809c42d1f9b61adf7 45964 jdeb.deb
         checksumsSha1.append(' ').append(changesDescriptor.get("SHA1"));
         checksumsSha1.append(' ').append(changesDescriptor.get("Size"));
         checksumsSha1.append(' ').append(changesDescriptor.get("File"));
         changesDescriptor.set("Checksums-Sha1", checksumsSha1.toString());
 
-    final StringBuilder checksumsSha256=new StringBuilder("\n");
-//Checksums-Sha256:
-// 38c6fa274eb9299a69b739bcbdbd05c7ffd1d8d6472f4245ed732a25c0e5d616 45964 jdeb.deb
+        final StringBuilder checksumsSha256 = new StringBuilder("\n");
+        // Checksums-Sha256:
+        // 38c6fa274eb9299a69b739bcbdbd05c7ffd1d8d6472f4245ed732a25c0e5d616 45964 jdeb.deb
         checksumsSha256.append(' ').append(changesDescriptor.get("SHA256"));
         checksumsSha256.append(' ').append(changesDescriptor.get("Size"));
         checksumsSha256.append(' ').append(changesDescriptor.get("File"));
@@ -245,21 +245,21 @@ public class Processor {
         files.append(' ').append(changesDescriptor.get("Size"));
         files.append(' ').append(changesDescriptor.get("Section"));
         files.append(' ').append(changesDescriptor.get("Priority"));
-        files.append(' ').append(changesDescriptor.get("File"));            
+        files.append(' ').append(changesDescriptor.get("File"));
         changesDescriptor.set("Files", files.toString());
 
         if (!changesDescriptor.isValid()) {
             throw new InvalidDescriptorException(changesDescriptor);
         }
-        
+
         final String changes = changesDescriptor.toString();
         //console.println(changes);
 
         final byte[] changesBytes = changes.getBytes("UTF-8");
 
-        if (pRing == null || pKey == null || pPassphrase == null) {         
+        if (pRing == null || pKey == null || pPassphrase == null) {
             pOutput.write(changesBytes);
-            pOutput.close();            
+            pOutput.close();
             return changesDescriptor;
         }
 
@@ -268,7 +268,7 @@ public class Processor {
         final InputStream input = new ByteArrayInputStream(changesBytes);
 
         try {
-            SigningUtils.clearSign(input, pRing, pKey, pPassphrase, pOutput);       
+            SigningUtils.clearSign(input, pRing, pKey, pPassphrase, pOutput);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -337,13 +337,13 @@ public class Processor {
                 }
 
                 continue;
-            }           
+            }
 
             final InputStream inputStream = new FileInputStream(file);
 
             outputStream.putNextEntry(entry);
 
-            Utils.copy(inputStream, outputStream);                              
+            Utils.copy(inputStream, outputStream);
 
             outputStream.closeEntry();
 
@@ -385,7 +385,7 @@ public class Processor {
             out.write("BZ".getBytes());
             out = new CBZip2OutputStream(out);
         }
-        
+
         final TarOutputStream outputStream = new TarOutputStream(out);
         outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
@@ -397,11 +397,11 @@ public class Processor {
         final DataConsumer receiver = new DataConsumer() {
             public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 dirname = fixPath(dirname);
-                
+
                 createParentDirectories((new File(dirname)).getParent(), user, uid, group, gid);
-                
+
                 // The directory passed in explicitly by the caller also gets the passed-in mode.  (Unlike
-                // the parent directories for now.  See related comments at "int mode =" in 
+                // the parent directories for now.  See related comments at "int mode =" in
                 // createParentDirectories, including about a possible bug.)
                 createDirectory(dirname, user, uid, group, gid, mode, 0);
 
@@ -430,7 +430,7 @@ public class Processor {
                 digest.reset();
 
                 Utils.copy(inputStream, new DigestOutputStream(outputStream, digest));
-                
+
                 final String md5 = Utils.toHex(digest.digest());
 
                 outputStream.closeEntry();
@@ -451,7 +451,7 @@ public class Processor {
                 pChecksums.append(md5).append(" ").append(entry.getName()).append('\n');
 
             }
-            
+
             private String fixPath(String path) {
                 // If we're receiving directory names from Windows, then we'll convert to use slash
                 // This does eliminate the ability to use of a backslash in a directory name on *NIX, but in practice, this is a non-issue
@@ -466,16 +466,16 @@ public class Processor {
                 }
                 return path;
             }
-            
+
             private void createDirectory(String directory, String user, int uid, String group, int gid, int mode, long size) throws IOException {
                 // All dirs should end with "/" when created, or the test DebAndTaskTestCase.testTarFileSet() thinks its a file
                 // and so thinks it has the wrong permission.
                 // This consistency also helps when checking if a directory already exists in addedDirectories.
-              
+
                 if (!directory.endsWith("/")) {
                     directory += "/";
                 }
-                
+
                 if (!addedDirectories.contains(directory)) {
                     TarEntry entry = new TarEntry(directory);
                     // FIXME: link is in the constructor
@@ -503,7 +503,7 @@ public class Processor {
                 if (dirname == null) {
                   return;
                 }
-                
+
                 // The loop below will create entries for all parent directories
                 // to ensure that .deb packages will install correctly.
                 String[] pathParts = dirname.split("\\/");
@@ -511,12 +511,12 @@ public class Processor {
                 for (int i = 1; i < pathParts.length; i++) {
                     parentDir += pathParts[i] + "/";
                     // Make it so the dirs can be traversed by users.
-                    // We could instead try something more granular, like setting the directory 
-                    // permission to 'rx' for each of the 3 user/group/other read permissions 
+                    // We could instead try something more granular, like setting the directory
+                    // permission to 'rx' for each of the 3 user/group/other read permissions
                     // found on the file being added (ie, only if "other" has read
                     // permission on the main node, then add o+rx permission on all the containing
-                    // directories, same w/ user & group), and then also we'd have to 
-                    // check the parentDirs collection of those already added to 
+                    // directories, same w/ user & group), and then also we'd have to
+                    // check the parentDirs collection of those already added to
                     // see if those permissions need to be similarly updated.  (Note, it hasn't
                     // been demonstrated, but there might be a bug if a user specifically
                     // requests a directory with certain permissions,
@@ -553,7 +553,7 @@ public class Processor {
 
         pOutput.putNextEntry(entry);
         pOutput.write(data);
-        pOutput.closeEntry();       
+        pOutput.closeEntry();
     }
 
 

@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,11 +32,11 @@ import org.vafer.jdeb.producers.DataProducerFile;
  * Maven "data" elment acting as a factory for DataProducers. So far Archive and
  * Directory producers are supported. Both support the usual ant pattern set
  * matching.
- * 
+ *
  * @author Bryan Sant <bryan.sant@gmail.com>
  */
 public final class Data implements DataProducer {
-    
+
     private File src;
 
     /**
@@ -47,7 +47,7 @@ public final class Data implements DataProducer {
         this.src = src;
     }
 
-    
+
     private String type;
 
     /**
@@ -57,7 +57,7 @@ public final class Data implements DataProducer {
         this.type = type;
     }
 
-    
+
     /**
      * @parameter expression="${includes}" alias="includes"
      */
@@ -102,7 +102,7 @@ public final class Data implements DataProducer {
         if (mapper != null) {
             mappers = new org.vafer.jdeb.mapping.Mapper[] { mapper.createMapper() };
         }
-        
+
         if ("file".equalsIgnoreCase(type)) {
             new DataProducerFile(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
@@ -112,14 +112,14 @@ public final class Data implements DataProducer {
             new DataProducerArchive(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
-        
+
         if ("directory".equalsIgnoreCase(type)) {
             new DataProducerDirectory(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 
         // @deprecated
-        
+
         if (src.isFile()) {
             new DataProducerArchive(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
         } else {

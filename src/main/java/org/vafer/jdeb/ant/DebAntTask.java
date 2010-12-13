@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,13 +34,13 @@ import org.vafer.jdeb.producers.DataProducerFileSet;
 
 /**
  * TODO generalize with DebMaker
- * 
+ *
  * AntTask for creating debian archives.
  * Even supports signed changes files.
- * 
+ *
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
-        
+
 public class DebAntTask extends MatchingTask {
 
     /** The Debian package produced */
@@ -79,7 +79,7 @@ public class DebAntTask extends MatchingTask {
     public void setDestfile( File deb ) {
         this.deb = deb;
     }
-    
+
     public void setControl( File control ) {
         this.control = control;
     }
@@ -103,7 +103,7 @@ public class DebAntTask extends MatchingTask {
     public void setKey( String key ) {
         this.key = key;
     }
-    
+
     public void setPassphrase( String passphrase ) {
         this.passphrase = passphrase;
     }
@@ -127,7 +127,7 @@ public class DebAntTask extends MatchingTask {
     public void addData( Data data ) {
         dataProducers.add(data);
     }
-    
+
     private boolean isPossibleOutput( File file ) {
 
         if (file.exists()) {
@@ -136,41 +136,41 @@ public class DebAntTask extends MatchingTask {
 
         return true;
     }
-    
+
     public void execute() {
-        
+
         if (control == null || !control.isDirectory()) {
             throw new BuildException("You need to point the 'control' attribute to the control directory.");
         }
 
         if (changesIn != null) {
-            
+
             if (!changesIn.isFile() || !changesIn.canRead()) {
-                throw new BuildException("The 'changesIn' attribute needs to point to a readable file. " + changesIn + " was not found/readable.");             
+                throw new BuildException("The 'changesIn' attribute needs to point to a readable file. " + changesIn + " was not found/readable.");
             }
 
             if (changesOut == null) {
                 throw new BuildException("A 'changesIn' without a 'changesOut' does not make much sense.");
             }
-            
+
             if (!isPossibleOutput(changesOut)) {
-                throw new BuildException("Cannot write the output for 'changesOut' to " + changesOut);              
+                throw new BuildException("Cannot write the output for 'changesOut' to " + changesOut);
             }
 
             if (changesSave != null && !isPossibleOutput(changesSave)) {
-                throw new BuildException("Cannot write the output for 'changesSave' to " + changesSave);                
+                throw new BuildException("Cannot write the output for 'changesSave' to " + changesSave);
             }
-            
+
         } else {
             if (changesOut != null || changesSave != null) {
-                throw new BuildException("The 'changesOut' or 'changesSave' attributes may only be used when there is a 'changesIn' specified.");                           
+                throw new BuildException("The 'changesOut' or 'changesSave' attributes may only be used when there is a 'changesIn' specified.");
             }
         }
 
         if (!"gzip".equals(compression) && !"bzip2".equals(compression) && !"none".equals(compression)) {
             throw new BuildException("The compression method '" + compression + "' is not supported");
         }
-                
+
         if (dataProducers.size() == 0) {
             throw new BuildException("You need to provide at least one reference to a tgz or directory with data.");
         }
@@ -178,12 +178,12 @@ public class DebAntTask extends MatchingTask {
         if (deb == null) {
             throw new BuildException("You need to point the 'destfile' attribute to where the deb is supposed to be created.");
         }
-        
+
         final File[] controlFiles = control.listFiles();
-        
+
         final DataProducer[] data = new DataProducer[dataProducers.size()];
         dataProducers.toArray(data);
-        
+
         final Processor processor = new Processor(new Console() {
             public void println(String s) {
                 if (verbose) {
@@ -191,12 +191,12 @@ public class DebAntTask extends MatchingTask {
                 }
             }
         }, null);
-        
+
         final PackageDescriptor packageDescriptor;
         try {
-            
+
             log("Creating debian package: " + deb);
-            
+
             packageDescriptor = processor.createDeb(controlFiles, data, deb, compression);
 
         } catch (Exception e) {
@@ -204,7 +204,7 @@ public class DebAntTask extends MatchingTask {
         }
 
         final TextfileChangesProvider changesProvider;
-        
+
         try {
             if (changesOut == null) {
                 return;
@@ -214,9 +214,9 @@ public class DebAntTask extends MatchingTask {
 
             // for now only support reading the changes form a textfile provider
             changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
-            
+
             processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
-                        
+
         } catch (Exception e) {
             throw new BuildException("Failed to create debian changes file " + changesOut, e);
         }
@@ -229,10 +229,10 @@ public class DebAntTask extends MatchingTask {
             log("Saving changes to file: " + changesSave);
 
             changesProvider.save(new FileOutputStream(changesSave));
-            
+
         } catch (Exception e) {
             throw new BuildException("Failed to save debian changes file " + changesSave, e);
         }
-                
+
     }
 }

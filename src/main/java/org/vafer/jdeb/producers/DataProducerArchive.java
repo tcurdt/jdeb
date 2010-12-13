@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -39,44 +39,44 @@ import org.vafer.jdeb.mapping.Mapper;
 
 /**
  * Providing data from an archive keeping permissions and ownerships.
- * 
+ *
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class DataProducerArchive extends AbstractDataProducer implements DataProducer {
 
     private final File archive;
-    
+
     public DataProducerArchive( final File pArchive, final String[] pIncludes, final String[] pExcludes, final Mapper[] pMappers ) {
         super(pIncludes, pExcludes, pMappers);
         archive = pArchive;
     }
-        
+
     public void produce( final DataConsumer pReceiver ) throws IOException {
 
         InputStream is = new BufferedInputStream(new FileInputStream(archive));
-        
-        CompressorInputStream compressorInputStream = null; 
-            
+
+        CompressorInputStream compressorInputStream = null;
+
         try {
-            compressorInputStream = new CompressorStreamFactory().createCompressorInputStream(is);                  
+            compressorInputStream = new CompressorStreamFactory().createCompressorInputStream(is);
         } catch(CompressorException e) {
             // not compressed or unknown compressor
         }
-        
+
         if (compressorInputStream != null) {
             is = new BufferedInputStream(compressorInputStream);
         }
-        
+
         ArchiveInputStream archiveInputStream = null;
-        
+
         try {
             archiveInputStream = new ArchiveStreamFactory().createArchiveInputStream(is);
         } catch(ArchiveException e) {
-            throw new IOException("Unsupported archive format : " + archive, e);            
+            throw new IOException("Unsupported archive format : " + archive, e);
         }
 
         EntryConverter converter = null;
-        
+
         if (archiveInputStream instanceof TarArchiveInputStream) {
 
             converter = new EntryConverter() {
@@ -93,8 +93,8 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 
                     return dst;
                 }
-            };      
-        
+            };
+
         } else if (archiveInputStream instanceof ZipArchiveInputStream) {
 
             converter = new EntryConverter() {
@@ -108,16 +108,16 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 
                     return dst;
                 }
-            };      
-            
+            };
+
         } else {
-            throw new IOException("Unsupported archive format : " + archive);           
+            throw new IOException("Unsupported archive format : " + archive);
         }
-        
-        
+
+
         try {
             while(true) {
-                
+
                 ArchiveEntry archiveEntry = archiveInputStream.getNextEntry();
 
                 if (archiveEntry == null) {
@@ -125,28 +125,28 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
                 }
 
                 if (!isIncluded(archiveEntry.getName())) {
-                    continue;                   
-                }               
+                    continue;
+                }
 
                 TarEntry entry = converter.convert(archiveEntry);
-                
+
                 entry = map(entry);
-                
+
                 if (entry.isDirectory()) {
                     pReceiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
                     continue;
                 }
-                pReceiver.onEachFile(archiveInputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());                      
+                pReceiver.onEachFile(archiveInputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
             }
 
         } finally {
             if (archiveInputStream != null) {
                 archiveInputStream.close();
             }
-        }       
+        }
     }
-    
+
     private interface EntryConverter {
-        public TarEntry convert(ArchiveEntry entry);        
-    }    
+        public TarEntry convert(ArchiveEntry entry);
+    }
 }

@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,7 +37,7 @@ import org.vafer.jdeb.utils.VariableResolver;
 
 /**
  * Creates deb archive
- * 
+ *
  * @goal jdeb
  */
 public class DebMojo extends AbstractPluginMojo {
@@ -51,7 +51,7 @@ public class DebMojo extends AbstractPluginMojo {
      * Defines the pattern of the name of final artifacts. Possible
      * substitutions are [[baseDir]] [[buildDir]] [[artifactId]] [[version]]
      * [[extension]] and [[groupId]].
-     * 
+     *
      * @parameter default-value="[[buildDir]]/[[artifactId]]_[[version]].[[extension]]"
      */
     private String deb;
@@ -59,21 +59,21 @@ public class DebMojo extends AbstractPluginMojo {
     /**
      * Explicitly defines the path to the control directory. At least the
      * control file is mandatory.
-     * 
+     *
      * @parameter default-value="[[baseDir]]/src/deb/control"
      */
     private String controlDir;
 
     /**
      * Explicitly define the file to read the changes from.
-     * 
+     *
      * @parameter default-value="[[baseDir]]/CHANGES.txt"
      */
     private String changesIn;
 
     /**
      * Explicitly define the file where to write the changes to.
-     * 
+     *
      * @parameter default-value="[[baseDir]]/CHANGES.txt"
      */
     private String changesOut;
@@ -81,14 +81,14 @@ public class DebMojo extends AbstractPluginMojo {
     /**
      * Explicitly define the file where to write the changes of the changes
      * input to.
-     * 
+     *
      * @parameter default-value="[[baseDir]]/CHANGES.txt"
      */
     private String changesSave;
 
     /**
      * The compression method used for the data file (none, gzip or bzip2)
-     * 
+     *
      * @parameter default-value="gzip"
      */
     private String compression;
@@ -98,12 +98,12 @@ public class DebMojo extends AbstractPluginMojo {
      * packages are installed in /opt (see the FHS here:
      * http://www.pathname.com/
      * fhs/pub/fhs-2.3.html#OPTADDONAPPLICATIONSOFTWAREPACKAGES)
-     * 
+     *
      * @parameter default-value="/opt/[[artifactId]]"
      */
     private String installDir;
 
-    
+
     /**
      * The type of attached artifact
      *
@@ -123,7 +123,7 @@ public class DebMojo extends AbstractPluginMojo {
      * The "data" entries may specify a tarball (tar.gz, tar.bz2, tgz), a
      * directory, or a normal file. An entry would look something like this in
      * your pom.xml:
-     * 
+     *
      * <pre>
      *   <build>
      *     <plugins>
@@ -164,13 +164,13 @@ public class DebMojo extends AbstractPluginMojo {
      *     </plugins>
      *   </build>
      * </pre>
-     * 
+     *
      * @parameter expression="${dataSet}"
      */
     private Data[] dataSet;
-    
+
     /* end of parameters */
-    
+
     private String openReplaceToken = "[[";
     private String closeReplaceToken = "]]";
     private Collection dataProducers = new ArrayList();
@@ -200,7 +200,6 @@ public class DebMojo extends AbstractPluginMojo {
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
         variables.put("version", getProject().getVersion().replace('-', '+'));
-
         variables.put("description", getProject().getDescription());
         variables.put("extension", "deb");
         variables.put("baseDir", getProject().getBasedir().getAbsolutePath());
@@ -211,7 +210,7 @@ public class DebMojo extends AbstractPluginMojo {
 
     /**
      * Main entry point
-     * 
+     *
      * @throws MojoExecutionException on error
      */
     public void execute() throws MojoExecutionException {
@@ -221,14 +220,14 @@ public class DebMojo extends AbstractPluginMojo {
         try {
 
             final VariableResolver resolver = initializeVariableResolver(new HashMap());
-            
-            final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken)); 
-            final File controlDirFile = new File(Utils.replaceVariables(resolver, controlDir, openReplaceToken, closeReplaceToken)); 
-            final File installDirFile = new File(Utils.replaceVariables(resolver, installDir, openReplaceToken, closeReplaceToken));            
+
+            final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken));
+            final File controlDirFile = new File(Utils.replaceVariables(resolver, controlDir, openReplaceToken, closeReplaceToken));
+            final File installDirFile = new File(Utils.replaceVariables(resolver, installDir, openReplaceToken, closeReplaceToken));
             final File changesInFile = new File(Utils.replaceVariables(resolver, changesIn, openReplaceToken, closeReplaceToken));
             final File changesOutFile = new File(Utils.replaceVariables(resolver, changesOut, openReplaceToken, closeReplaceToken));
             final File changesSaveFile = new File(Utils.replaceVariables(resolver, changesSave, openReplaceToken, closeReplaceToken));
-            
+
             // If there are no dataProducers, then we'll add a single producer that
             // processes the
             // maven artifact file (be it a jar, war, etc.)
@@ -257,16 +256,16 @@ public class DebMojo extends AbstractPluginMojo {
             try {
 
                 DebMaker debMaker = new DebMaker(infoConsole, debFile, controlDirFile, dataProducers, resolver);
-                
+
                 if (changesInFile.exists() && changesInFile.canRead()) {
                     debMaker.setChangesIn(changesInFile);
                     debMaker.setChangesOut(changesOutFile);
-                    debMaker.setChangesSave(changesSaveFile);               
+                    debMaker.setChangesSave(changesSaveFile);
                 }
-                
+
                 debMaker.setCompression(compression);
                 debMaker.makeDeb();
-    
+
                 getLog().info("Attaching created debian archive " + debFile);
                 projectHelper.attachArtifact(getProject(), type, classifier, debFile);
 

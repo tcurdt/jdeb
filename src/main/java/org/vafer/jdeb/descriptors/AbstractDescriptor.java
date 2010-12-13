@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,16 +33,16 @@ import org.vafer.jdeb.utils.VariableResolver;
  * A descriptor holds the usual key value pairs.
  *
  * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html">Debian Policy Manual - Control files and their fields</a>
- * 
+ *
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public abstract class AbstractDescriptor {
-    
+
     private final Map values = new HashMap();
     private final VariableResolver resolver;
     private static String openToken = "[[";
     private static String closeToken = "]]";
-    
+
     public AbstractDescriptor( final VariableResolver pResolver ) {
         resolver = pResolver;
     }
@@ -67,7 +67,7 @@ public abstract class AbstractDescriptor {
         int linenr = 0;
         while(true) {
             final String line = br.readLine();
-            
+
             if (line == null) {
                 if (buffer.length() > 0) {
                     // flush value of previous key
@@ -82,38 +82,38 @@ public abstract class AbstractDescriptor {
             if (line.length() == 0) {
                 throw new ParseException("Empty line", linenr);
             }
-            
-            final char first = line.charAt(0); 
+
+            final char first = line.charAt(0);
             if (Character.isLetter(first)) {
-                
+
                 // new key
-                
+
                 if (buffer.length() > 0) {
                     // flush value of previous key
                     set(key, buffer.toString());
                     buffer = new StringBuffer();
                 }
-                
-                
+
+
                 final int i = line.indexOf(':');
-                
+
                 if (i < 0) {
                     throw new ParseException("Line misses ':' delimitter", linenr);
                 }
-                
+
                 key = line.substring(0, i);
                 buffer.append(line.substring(i+1).trim());
-                
+
                 continue;
             }
-            
+
             // continuing old value
             buffer.append('\n').append(line.substring(1));
         }
         br.close();
-        
+
     }
-    
+
     public void set( final String pKey, final String pValue ) {
 
         if (resolver != null) {
@@ -124,20 +124,20 @@ public abstract class AbstractDescriptor {
                 // FIXME maybe throw an Exception?
             }
         }
-        
+
         values.put(pKey, pValue);
     }
-    
+
     public String get( final String pKey ) {
         return (String)values.get(pKey);
     }
 
     public abstract String[] getMandatoryKeys();
-    
+
     public boolean isValid() {
         return invalidKeys().size() == 0;
     }
-    
+
     public Set invalidKeys() {
         final Set invalid = new HashSet();
 
@@ -147,10 +147,10 @@ public abstract class AbstractDescriptor {
                 invalid.add(mk[i]);
             }
         }
-        
+
         return invalid;
     }
-    
+
     public String toString( final String[] pKeys ) {
         final StringBuffer s = new StringBuffer();
         for (int i = 0; i < pKeys.length; i++) {
@@ -172,7 +172,7 @@ public abstract class AbstractDescriptor {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }           
+            }
         }
         return s.toString();
     }

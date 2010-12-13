@@ -31,18 +31,18 @@ import org.vafer.jdeb.utils.VariableResolver;
 
 /**
  * TODO generalize with DebAntTask
- * 
+ *
  * A generic class for creating debian archives. Even supports signed changes
  * files.
- * 
+ *
  * This class is largely based on the DebAntTask class, and provides the same
  * featues to maven developers that the ant task provides to ant developers.
- * 
+ *
  * @see org.vafer.jdeb.ant.DebAntTask
  * @author Bryan Sant <bryan.sant@gmail.com>
  */
 public class DebMaker {
-    
+
     /** A console to output log message with */
     private Console console;
 
@@ -137,7 +137,7 @@ public class DebMaker {
     /**
      * Adds a new data source to the deb. The new data source may point to a
      * single file, a directory, or a tarball.
-     * 
+     *
      * @param file
      *            The data source to add
      */

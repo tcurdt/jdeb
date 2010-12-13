@@ -1,12 +1,12 @@
 /*
  * Copyright 2010 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,12 +18,12 @@ package org.vafer.jdeb.mapping;
 import org.apache.tools.tar.TarEntry;
 
 /**
- * Maps one entry to another. So you modify ownerships permissions etc in a Mapper. 
- * 
+ * Maps one entry to another. So you modify ownerships permissions etc in a Mapper.
+ *
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public interface Mapper {
 
     public TarEntry map( final TarEntry entry );
-    
+
 }
