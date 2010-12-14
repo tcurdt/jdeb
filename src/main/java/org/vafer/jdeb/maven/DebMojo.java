@@ -19,9 +19,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProjectHelper;
@@ -119,6 +122,31 @@ public class DebMojo extends AbstractPluginMojo {
     private String classifier;
 
     /**
+     * with the regex we'll split the version string into three:
+     * version.major version.minor version.build
+     * 
+     * @parameter default-value="[.-]"
+     */
+    private String splitVersionRegexString;
+
+    /**
+     * version mask builder
+     *
+     * @parameter default-value="[[version.major]].[[version.minor]]+[[version.build]]"
+     */
+    private String versionMask;
+
+    /**
+     * Version replacement, in case version.build have splitter elements will replace it to
+     * this char
+     * 
+     * @parameter default-value="+"
+     */
+    private String versionReplacementString;
+
+    private String generatedVersion;
+
+    /**
      * "data" entries used to determine which files should be added to this deb.
      * The "data" entries may specify a tarball (tar.gz, tar.bz2, tgz), a
      * directory, or a normal file. An entry would look something like this in
@@ -189,9 +217,7 @@ public class DebMojo extends AbstractPluginMojo {
         dataSet = pData;
         dataProducers.clear();
         if (pData != null) {
-            for (int i = 0; i < pData.length; i++) {
-                dataProducers.add(pData[i]);
-            }
+            dataProducers.addAll(Arrays.asList(pData));
         }
     }
 
@@ -199,13 +225,11 @@ public class DebMojo extends AbstractPluginMojo {
         variables.put("name", getProject().getName());
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
-        variables.put("version", getProject().getVersion().replace('-', '+'));
-
+        variables.put("version", generatedVersion);
         variables.put("description", getProject().getDescription());
         variables.put("extension", "deb");
         variables.put("baseDir", getProject().getBasedir().getAbsolutePath());
         variables.put("buildDir", buildDirectory.getAbsolutePath());
-        variables.put("project.version", getProject().getVersion());
         return new MapVariableResolver(variables);
     }
 
@@ -219,7 +243,7 @@ public class DebMojo extends AbstractPluginMojo {
         setData(dataSet);
 
         try {
-
+            initGeneratedVesion();
             final VariableResolver resolver = initializeVariableResolver(new HashMap());
             
             final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken)); 
@@ -253,7 +277,7 @@ public class DebMojo extends AbstractPluginMojo {
                     getLog().info(s);
                 }
             };
-
+            
             try {
 
                 DebMaker debMaker = new DebMaker(infoConsole, debFile, controlDirFile, dataProducers, resolver);
@@ -277,6 +301,77 @@ public class DebMojo extends AbstractPluginMojo {
 
         } catch (ParseException e) {
             throw new MojoExecutionException("Failed parsing pattern", e);
+        }
+    }
+
+    private static final String VERSION_MAJOR="version.major";
+    private static final String VERSION_MINOR="version.minor";
+    private static final String VERSION_BUILD="version.build";
+
+
+    /**
+     * Calculate current version according to version mask
+     * In case not found will replace field with zero
+     */
+    private void initGeneratedVesion() {
+        if(this.splitVersionRegexString==null || this.splitVersionRegexString.length()==0){
+            getLog().error("Cannot init mojo, please provide splitVersionRegexString!");
+            throw new IllegalStateException("Cannot init mojo, please provide splitVersionRegexString!");
+        }
+
+        if(this.versionMask==null || this.versionMask.length()==0){
+            getLog().error("Cannot init mojo, please provide versionMask!");
+            throw new IllegalStateException("Cannot init mojo, please provide versionMask!");
+        }
+
+
+
+        try {
+            Pattern pt=Pattern.compile(this.splitVersionRegexString);
+            String[] versionArray=pt.split(getProject().getVersion(),3);
+            if(getLog().isDebugEnabled()){
+                getLog().debug("Version splitted into:"+Arrays.toString(versionArray));
+            }
+            //Cannot be null we'll get at least single element array
+            String versionMajor=versionArray[0];
+            if(versionArray.length==0){
+                versionMajor="0";
+            }
+
+            String versionMinor;
+            if(versionArray.length>1){
+                versionMinor=versionArray[1];
+                if(versionArray.length==0){
+                    versionMinor="0";
+                }
+            } else {
+                versionMinor="0";
+            }
+
+            String versionBuild;
+            if(versionArray.length>2){
+                versionBuild=versionArray[2];
+                if(versionArray.length==0){
+                    versionBuild="0";
+                }
+            } else {
+                versionBuild="0";
+            }
+
+            Map<String,String> replacementMap=new HashMap();
+            replacementMap.put(VERSION_MAJOR, versionMajor);
+            replacementMap.put(VERSION_MINOR, versionMinor);
+            replacementMap.put(VERSION_BUILD, pt.matcher(versionBuild).replaceAll(versionReplacementString));
+            VariableResolver resolver=new MapVariableResolver(replacementMap);
+            this.generatedVersion=Utils.replaceVariables(resolver,
+                    this.versionMask, openReplaceToken, closeReplaceToken);
+
+        } catch (ParseException ex) {
+            getLog().error("Cannot init mojo, invalid version mask!",ex);
+            throw new IllegalStateException("Cannot init mojo, invalid version mask!",ex);
+        } catch(PatternSyntaxException e){
+            getLog().error("Cannot init mojo, invalid regex pattern in splitVersionRegexString!",e);
+            throw new IllegalStateException("Cannot init mojo, invalid pattern in splitVersionRegexString!",e);
         }
     }
 }

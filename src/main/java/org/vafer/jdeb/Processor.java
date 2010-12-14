@@ -411,7 +411,7 @@ public class Processor {
             public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 filename = fixPath(filename);
 
-                createParentDirectories((new File(filename)).getParent(), user, uid, group, gid);
+                createParentDirectories(fixPath(new File(filename).getParent()), user, uid, group, gid);
 
                 TarEntry entry = new TarEntry(filename);
 
@@ -464,6 +464,8 @@ public class Processor {
                 } else if (!path.startsWith("./")) {
                     path = "./" + path;
                 }
+                //remove double slashes in order to get unique file/folder names
+                path=path.replaceAll("\\/\\/","\\/");
                 return path;
             }
             
