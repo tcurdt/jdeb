@@ -94,11 +94,11 @@ public class DebMojo extends AbstractPluginMojo {
     private String compression;
 
 
-	/** Boolean option to attach the artifact to the project 
-	 *  
-	 *  @parameter default-value="true"
-	 */
-	private String attach;
+    /** Boolean option to attach the artifact to the project 
+     *  
+     *  @parameter default-value="true"
+     */
+    private String attach;
 	
     /**
      * The location where all package files will be installed. By default, all
