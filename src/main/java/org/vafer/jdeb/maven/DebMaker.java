@@ -75,7 +75,7 @@ public class DebMaker {
 
     private final VariableResolver variableResolver;
 
-    
+
     private final Collection dataProducers;
 
     public DebMaker(Console console, VariableResolver variableResolver) {
