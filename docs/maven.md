@@ -89,6 +89,8 @@ section with any of the following options:
     *---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
     | passphrase    | (NYI) The passphrase to use the key                                          | No                                                  |
     *---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
+    | attach        | Attach artifact to project                                                   | No; defaults to 'true'                              |
+    *---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
   
 If you use the 'dataSet' element, you'll need to populate it with a one or
 more 'data' elements. A 'data' element is used to specify a 'directory', a

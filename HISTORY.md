@@ -1,5 +1,6 @@
 ## Version 0.9, unreleased
 
+* [ADD] Added an "attach" attribute to specify whether maven artifact should be attached to project.
 * [CHG] "Changes" support version 1.8 
 * [ADD] Provide SHA1, SHA256 and not just MD5 for descriptors
 * [ADD} Provide "project.version" when using maven
