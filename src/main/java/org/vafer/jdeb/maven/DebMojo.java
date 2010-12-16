@@ -94,12 +94,13 @@ public class DebMojo extends AbstractPluginMojo {
     private String compression;
 
 
-    /** Boolean option to attach the artifact to the project 
-     *  
+    /**
+     * Boolean option whether to attach the artifact to the project
+     *
      *  @parameter default-value="true"
      */
     private String attach;
-	
+
     /**
      * The location where all package files will be installed. By default, all
      * packages are installed in /opt (see the FHS here:
@@ -274,8 +275,7 @@ public class DebMojo extends AbstractPluginMojo {
                 debMaker.makeDeb();
 
                 // Always attach unless explicitly set to false
-                if (attach == null || attach.compareToIgnoreCase("false") != 0)
-                {
+                if ("true".equalsIgnoreCase(attach)) {
                     getLog().info("Attaching created debian archive " + debFile);
                     projectHelper.attachArtifact(getProject(), type, classifier, debFile);
                 }
