@@ -213,6 +213,7 @@ public class DebMojo extends AbstractPluginMojo {
         variables.put("baseDir", getProject().getBasedir().getAbsolutePath());
         variables.put("buildDir", buildDirectory.getAbsolutePath());
         variables.put("project.version", getProject().getVersion());
+        variables.put("url", getProject().getUrl());
         return new MapVariableResolver(variables);
     }
 
