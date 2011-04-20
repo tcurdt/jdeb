@@ -4,3 +4,7 @@
 .settings
 target
 eclipse
+*.iml
+*.iws
+*.ipr
+
