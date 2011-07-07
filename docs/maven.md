@@ -111,7 +111,31 @@ following options:
     *---------------+------------------------------------------------------------------------------+---------------------------------------------+
     | mapper        | The files to exclude from the directory or tarball                           | No                                          |
     *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-  
+
+There are different kinds of mappers that can be selected via the `type` argument. The most common one is the 'perm' mapper.
+
+    *---------------+-------------------------------------------------------+------------------------+
+    ||   Element    || Description                                          || Required             ||
+    *---------------+-------------------------------------------------------+------------------------+
+    | type          | 'perm'                                                | Yes                    |
+    *---------------+-------------------------------------------------------+------------------------+
+    | prefix        | Add this prefix to the files                          | No; defaults to ''     |
+    *---------------+-------------------------------------------------------+------------------------+
+    | uid           | Numerical uid                                         | No; defaults to 0      |
+    *---------------+-------------------------------------------------------+------------------------+
+    | gid           | Numerical gid                                         | No; defaults to 0      |
+    *---------------+-------------------------------------------------------+------------------------+
+    | user          | User name                                             | No; defaults to 'root' |
+    *---------------+-------------------------------------------------------+------------------------+
+    | group         | User group                                            | No; defaults to 'root' |
+    *---------------+-------------------------------------------------------+------------------------+
+    | filemode      | File permissions as octet                             | No; deftauls to 644    |
+    *---------------+-------------------------------------------------------+------------------------+
+    | dirmode       | Dir permissions as octet                              | No; defaults to 755    |
+    *---------------+-------------------------------------------------------+------------------------+
+    | strip         | Strip n path components from the original file        | No; defaults to 0      |
+    *---------------+-------------------------------------------------------+------------------------+
+
 Below is an example of how you could configure your jdeb maven plugin to
 include a directory, a tarball, and a file in your deb package:
 
@@ -142,7 +166,7 @@ include a directory, a tarball, and a file in your deb package:
                                         <prefix>/somewhere/else</prefix>
                                         <user>tcurdt</user>
                                         <group>tcurdt</group>
-                                        <mode>600</mode>
+                                        <filemode>600</filemode>
                                     </mapper>
                                 </data>
                                 ...
