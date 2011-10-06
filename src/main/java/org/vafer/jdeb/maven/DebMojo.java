@@ -20,7 +20,6 @@ import java.io.FileInputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -180,6 +179,14 @@ public class DebMojo extends AbstractPluginMojo {
      */
     private Data[] dataSet;
 
+    /**
+     * When SNAPSHOT version replace <code>SNAPSHOT</code> with current date
+     * and time to make sure each build if unique.
+     * 
+     * @parameter expression="${resolveSNAPSHOT}" default-value="false"
+     */
+    private boolean resolveSNAPSHOT;
+
     /* end of parameters */
 
     private String openReplaceToken = "[[";
@@ -232,7 +239,7 @@ public class DebMojo extends AbstractPluginMojo {
     private String getProjectVersion() {
         String version = getProject().getVersion().replace('-', '+');
 
-        if (version.endsWith("+SNAPSHOT")) {
+        if (this.resolveSNAPSHOT && version.endsWith("+SNAPSHOT")) {
             version = version.substring(0, version.length() - "SNAPSHOT".length());
             version += new SimpleDateFormat("yyyyMMdd.HHmmss").format(new Date());
         }
