@@ -181,11 +181,11 @@ public class DebMojo extends AbstractPluginMojo {
 
     /**
      * When SNAPSHOT version replace <code>SNAPSHOT</code> with current date
-     * and time to make sure each build if unique.
+     * and time to make sure each build is unique.
      * 
-     * @parameter expression="${resolveSNAPSHOT}" default-value="false"
+     * @parameter expression="${timestamped}" default-value="false"
      */
-    private boolean resolveSNAPSHOT;
+    private boolean timestamped;
 
     /* end of parameters */
 
@@ -239,9 +239,9 @@ public class DebMojo extends AbstractPluginMojo {
     private String getProjectVersion() {
         String version = getProject().getVersion().replace('-', '+');
 
-        if (this.resolveSNAPSHOT && version.endsWith("+SNAPSHOT")) {
+        if (this.timestamped && version.endsWith("+SNAPSHOT")) {
             version = version.substring(0, version.length() - "SNAPSHOT".length());
-            version += new SimpleDateFormat("yyyyMMdd.HHmmss").format(new Date());
+            version += new SimpleDateFormat("yyyyMMdd.HHmmss.SSS").format(new Date());
         }
 
         return version;
