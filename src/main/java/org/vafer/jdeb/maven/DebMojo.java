@@ -18,8 +18,10 @@ package org.vafer.jdeb.maven;
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -177,6 +179,14 @@ public class DebMojo extends AbstractPluginMojo {
      */
     private Data[] dataSet;
 
+    /**
+     * When SNAPSHOT version replace <code>SNAPSHOT</code> with current date
+     * and time to make sure each build is unique.
+     * 
+     * @parameter expression="${timestamped}" default-value="false"
+     */
+    private boolean timestamped;
+
     /* end of parameters */
 
     private String openReplaceToken = "[[";
@@ -207,7 +217,7 @@ public class DebMojo extends AbstractPluginMojo {
         variables.put("name", getProject().getName());
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
-        variables.put("version", getProject().getVersion().replace('-', '+'));
+        variables.put("version", getProjectVersion());
         variables.put("description", getProject().getDescription());
         variables.put("extension", "deb");
         variables.put("baseDir", getProject().getBasedir().getAbsolutePath());
@@ -215,6 +225,26 @@ public class DebMojo extends AbstractPluginMojo {
         variables.put("project.version", getProject().getVersion());
         variables.put("url", getProject().getUrl());
         return new MapVariableResolver(variables);
+    }
+    
+    /**
+     * Doc some cleanup and conversion on the Maven project version.
+     * <ul>
+     * <li>-: any - is replaced by +</li>
+     * <li>SNAPSHOT: replace "SNAPSHOT" par of the version with the current time and date</li>
+     * </ul>
+     * 
+     * @return the Maven project version
+     */
+    private String getProjectVersion() {
+        String version = getProject().getVersion().replace('-', '+');
+
+        if (this.timestamped && version.endsWith("+SNAPSHOT")) {
+            version = version.substring(0, version.length() - "SNAPSHOT".length());
+            version += new SimpleDateFormat("yyyyMMdd.HHmmss.SSS").format(new Date());
+        }
+
+        return version;
     }
 
     /**
