@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.tar.TarEntry;
@@ -121,6 +122,32 @@ public class DebMojo extends AbstractPluginMojo {
      */
     private String type;
 
+    /**
+     * The project base directory
+     *
+     * @parameter default-value="${basedir}"
+     * @required
+     * @readonly
+     */
+    private File baseDir;
+    
+    /**
+     * Run the plugin on all sub-modules.
+     * If set to false, the plugin will be run in the same folder where the 
+     * mvn command was invoked
+     * @parameter expression="${submodules}" default-value="true"
+     */
+    private boolean submodules;
+    
+    /**
+     * The Maven Session Object
+     *
+     * @parameter expression="${session}"
+     * @required
+     * @readonly
+     */
+    private MavenSession session;
+    
     /**
      * The classifier of attached artifact
      *
@@ -249,6 +276,14 @@ public class DebMojo extends AbstractPluginMojo {
     }
 
     /**
+     * 
+     * @return whether or not Maven is currently operating in the execution root
+     */
+    private boolean inExecRoot() {
+       return session.getExecutionRootDirectory().equalsIgnoreCase(baseDir.toString());
+    }
+    
+    /**
      * Main entry point
      *
      * @throws MojoExecutionException on error
@@ -256,7 +291,12 @@ public class DebMojo extends AbstractPluginMojo {
     public void execute() throws MojoExecutionException {
 
         setData(dataSet);
-
+        
+        if(! inExecRoot() && !submodules) {
+        	getLog().info("skipping sub module: jdeb executing at top-level only");
+        	return;
+        }
+        
         try {
 
             final VariableResolver resolver = initializeVariableResolver(new HashMap());
