@@ -97,6 +97,8 @@ section with any of the following options:
     *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
     | attach        | Attach artifact to project                                                   | No; defaults to 'true'                                           |
     *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | submodules    | Execute the goal on all sub-modules                                          | No; defaults to 'true'                   |
+    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
 
 If you use the 'dataSet' element, you'll need to populate it with a one or
 more 'data' elements. A 'data' element is used to specify a 'directory', a
