@@ -9,7 +9,7 @@
             <plugin>
                 <artifactId>jdeb</artifactId>
                 <groupId>org.vafer</groupId>
-                <version>0.8</version>
+                <version>0.9-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -17,15 +17,11 @@
                             <goal>jdeb</goal>
                         </goals>
                         <configuration>
+                            <controlDir>${basedir}/src/deb/control</controlDir>
                             <dataSet>
-
                                 <data>
                                   <src>${project.build.directory}/${project.build.finalName}.jar</src>
                                   <type>file</type>
-                                  <mapper>
-                                    <type>file</type>
-                                    <prefix>/usr/share/jdeb/lib</prefix>
-                                  </mapper>
                                   <mapper>
                                     <type>perm</type>
                                     <prefix>/usr/share/jdeb/lib</prefix>
@@ -33,8 +29,17 @@
                                     <group>loader</group>
                                   </mapper>
                                 </data>
-                            </dataSet>                
-
+                                <data>
+                                  <src>${basedir}/src/deb/init.d</src>
+                                  <type>directory</type>
+                                  <mapper>
+                                    <type>perm</type>
+                                    <prefix>/etc/init.d</prefix>
+                                    <user>loader</user>
+                                    <group>loader</group>
+                                  </mapper>
+                                </data>
+                            </dataSet>
                         </configuration>
                     </execution>
                 </executions>

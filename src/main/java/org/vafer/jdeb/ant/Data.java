@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 The Apache Software Foundation.
+ * Copyright 2012 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,22 +98,6 @@ public final class Data extends PatternSet implements DataProducer {
             return;
         }
 
-        // @deprecated
-
-        if (src.isFile()) {
-            new DataProducerArchive(
-                src,
-                getIncludePatterns(getProject()),
-                getExcludePatterns(getProject()),
-                mappers
-                ).produce(pReceiver);
-        } else {
-            new DataProducerDirectory(
-                src,
-                getIncludePatterns(getProject()),
-                getExcludePatterns(getProject()),
-                mappers
-                ).produce(pReceiver);
-        }
+        throw new IOException("Unknown type '" + type + "' (file|directory|archive) for " + src);
     }
 }

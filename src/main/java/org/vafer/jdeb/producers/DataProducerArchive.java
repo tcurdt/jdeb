@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 The Apache Software Foundation.
+ * Copyright 2012 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
         try {
             compressorInputStream = new CompressorStreamFactory().createCompressorInputStream(is);
         } catch(CompressorException e) {
-            // not compressed or unknown compressor
+        	throw new IOException("Unsupported compression format: " + archive, e);
         }
 
         if (compressorInputStream != null) {
@@ -72,7 +72,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
         try {
             archiveInputStream = new ArchiveStreamFactory().createArchiveInputStream(is);
         } catch(ArchiveException e) {
-            throw new IOException("Unsupported archive format : " + archive, e);
+            throw new IOException("Unsupported archive format: " + archive, e);
         }
 
         EntryConverter converter = null;
@@ -111,7 +111,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
             };
 
         } else {
-            throw new IOException("Unsupported archive format : " + archive);
+            throw new IOException("Unsupported archive format: " + archive);
         }
 
 

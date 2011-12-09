@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 The Apache Software Foundation.
+ * Copyright 2012 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -313,6 +313,12 @@ public class DebMojo extends AbstractPluginMojo {
             // maven artifact file (be it a jar, war, etc.)
             if (dataProducers.isEmpty()) {
                 final File file = getProject().getArtifact().getFile();
+
+                if (file == null) {
+                	getLog().warn("There is no artifact to include if you call jdeb directly. The jdeb plugin is run during the install phase anyway.");
+                	throw new MojoExecutionException("No artifact to include into deb");
+                }
+
                 dataProducers.add(new DataProducer() {
                     public void produce(final DataConsumer receiver) {
                         try {

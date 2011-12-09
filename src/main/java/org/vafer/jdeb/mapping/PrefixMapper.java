@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 The Apache Software Foundation.
+ * Copyright 2012 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.vafer.jdeb.utils.Utils;
  * Just adds a prefix to the entry coming in
  *
  * @author Torsten Curdt <tcurdt@vafer.org>
+ * @deprecated and replaced by PermPapper which does the same thing and more
  */
 public class PrefixMapper implements Mapper {
 

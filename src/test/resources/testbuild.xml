@@ -22,37 +22,37 @@
 
   <target name="with-archive">
     <deb destfile="test.deb" control="org/vafer/jdeb/deb/control">
-      <data src="org/vafer/jdeb/deb/data.tgz"/>
+      <data src="org/vafer/jdeb/deb/data.tgz" type="archive"/>
     </deb>
   </target>
 
   <target name="with-missing-archive">
     <deb destfile="test.deb" control="org/vafer/jdeb/deb/control">
-      <data src="org/vafer/jdeb/deb/invalid.tgz"/>
+      <data src="org/vafer/jdeb/deb/invalid.tgz" type="archive"/>
     </deb>
   </target>
 
   <target name="with-directory">
     <deb destfile="test.deb" control="org/vafer/jdeb/deb/control">
-      <data src="org/vafer/jdeb/deb/data"/>
+      <data src="org/vafer/jdeb/deb/data" type="directory"/>
     </deb>
   </target>
 
   <target name="with-missing-directory">
     <deb destfile="test.deb" control="org/vafer/jdeb/deb/control">
-      <data src="org/vafer/jdeb/deb/invalid"/>
+      <data src="org/vafer/jdeb/deb/invalid" type="directory"/>
     </deb>
   </target>
 
   <target name="verbose-enabled">
     <deb destfile="test.deb" control="org/vafer/jdeb/deb/control" verbose="true">
-      <data src="org/vafer/jdeb/deb/data"/>
+      <data src="org/vafer/jdeb/deb/data" type="directory"/>
     </deb>
   </target>
 
   <target name="verbose-disabled">
     <deb destfile="test.deb" control="org/vafer/jdeb/deb/control" verbose="false">
-      <data src="org/vafer/jdeb/deb/data"/>
+      <data src="org/vafer/jdeb/deb/data" type="directory"/>
     </deb>
   </target>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 The Apache Software Foundation.
+ * Copyright 2012 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 
 /**
- * Convinience class to provide MD5 and length of a stream.
+ * Convenience class to provide digest info and length of a stream.
  *
  * ATTENTION: don't use outside of jdeb
  *

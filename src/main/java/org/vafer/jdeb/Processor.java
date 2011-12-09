@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 The Apache Software Foundation.
+ * Copyright 2012 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,13 +38,13 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
-import org.apache.tools.bzip2.CBZip2OutputStream;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarOutputStream;
 import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.ChangesProvider;
 import org.vafer.jdeb.descriptors.ChangesDescriptor;
-import org.vafer.jdeb.descriptors.InvalidDescriptorException;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 import org.vafer.jdeb.mapping.PermMapper;
 import org.vafer.jdeb.signing.SigningUtils;
@@ -73,10 +73,6 @@ public class Processor {
         public String toString() {
             return "" + count;
         }
-
-//        public BigInteger toBigInteger() {
-//            return count;
-//        }
     }
 
     public Processor( final Console pConsole, final VariableResolver pResolver ) {
@@ -114,7 +110,7 @@ public class Processor {
      * @return PackageDescriptor
      * @throws PackagingException
      */
-    public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput, String compression ) throws PackagingException, InvalidDescriptorException {
+    public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput, String compression ) throws PackagingException {
 
         File tempData = null;
         File tempControl = null;
@@ -131,15 +127,15 @@ public class Processor {
             final PackageDescriptor packageDescriptor = buildControl(pControlFiles, size, md5s, tempControl);
 
             if (!packageDescriptor.isValid()) {
-                throw new InvalidDescriptorException(packageDescriptor);
+            	throw new PackagingException("Control file descriptor keys are invalid " + packageDescriptor.invalidKeys());
             }
 
             pOutput.getParentFile().mkdirs();
+        
+            // pass through stream chain to calculate all the different digests
             final InformationOutputStream md5output = new InformationOutputStream(new FileOutputStream(pOutput), MessageDigest.getInstance("MD5"));
-            //Add chain of filters in order to calculate sha1 and sha256 for 1.8 format
             final InformationOutputStream sha1output = new InformationOutputStream(md5output, MessageDigest.getInstance("SHA1"));
             final InformationOutputStream sha256output = new InformationOutputStream(sha1output, MessageDigest.getInstance("SHA-256"));
-
             final ArArchiveOutputStream ar = new ArArchiveOutputStream(sha256output);
 
             addTo(ar, "debian-binary", "2.0\n");
@@ -157,8 +153,6 @@ public class Processor {
 
             return packageDescriptor;
 
-        } catch(InvalidDescriptorException e) {
-            throw e;
         } catch(Exception e) {
             throw new PackagingException("Could not create deb package", e);
         } finally {
@@ -203,8 +197,9 @@ public class Processor {
      * @param pOutput
      * @return ChangesDescriptor
      * @throws IOException
+     * @throws PackagingException 
      */
-    public ChangesDescriptor createChanges( final PackageDescriptor pPackageDescriptor, final ChangesProvider pChangesProvider, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException, InvalidDescriptorException {
+    public ChangesDescriptor createChanges( final PackageDescriptor pPackageDescriptor, final ChangesProvider pChangesProvider, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException, PackagingException {
 
         final ChangeSet[] changeSets = pChangesProvider.getChangesSets();
         final ChangesDescriptor changesDescriptor = new ChangesDescriptor(pPackageDescriptor, changeSets);
@@ -249,7 +244,7 @@ public class Processor {
         changesDescriptor.set("Files", files.toString());
 
         if (!changesDescriptor.isValid()) {
-            throw new InvalidDescriptorException(changesDescriptor);
+        	throw new PackagingException("Changes file descriptor keys are invalid " + changesDescriptor.invalidKeys());
         }
 
         final String changes = changesDescriptor.toString();
@@ -291,20 +286,24 @@ public class Processor {
      */
     private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuffer pChecksums, final File pOutput ) throws IOException, ParseException {
 
-        PackageDescriptor packageDescriptor = null;
+    	if (!pOutput.canWrite()) {
+    		throw new IOException("Cannot write control file at '" + pOutput + "'");
+    	}
 
         final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
         outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
+        // create a descriptor out of the "control" file, copy all other files, ignore directories
+        PackageDescriptor packageDescriptor = null;
         for (int i = 0; i < pControlFiles.length; i++) {
             final File file = pControlFiles[i];
 
             if (file.isDirectory()) {
+                console.println("Found directory '" + file + "' in the control directory. Maybe you are pointing to wrong dir?");
                 continue;
             }
 
             final TarEntry entry = new TarEntry(file);
-
             final String name = file.getName();
 
             entry.setName("./" + name);
@@ -312,11 +311,12 @@ public class Processor {
             entry.setMode(PermMapper.toMode("755"));
 
             if ("control".equals(name)) {
-                packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
+
+            	packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
 
                 if (packageDescriptor.get("Date") == null) {
-                    SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
-                    // FIXME Is this field allowed in package descriptors ?
+                    // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
+                    SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
                     packageDescriptor.set("Date", fmt.format(new Date()));
                 }
 
@@ -328,42 +328,52 @@ public class Processor {
                     packageDescriptor.set("Urgency", "low");
                 }
 
+                packageDescriptor.set("Installed-Size", pDataSize.divide(BigInteger.valueOf(1024)).toString());
+
                 final String debFullName = System.getenv("DEBFULLNAME");
                 final String debEmail = System.getenv("DEBEMAIL");
 
                 if (debFullName != null && debEmail != null) {
-                    packageDescriptor.set("Maintainer", debFullName + " <" + debEmail + ">");
-                    console.println("Using maintainer from the environment variables.");
+                	final String maintainer = debFullName + " <" + debEmail + ">";
+                    packageDescriptor.set("Maintainer", maintainer);
+                    console.println("Using maintainer '" + maintainer + "' from the environment variables.");
                 }
 
-                continue;
+            } else {
+
+	            final InputStream inputStream = new FileInputStream(file);
+
+	            // copy file as new entry into the archive stream
+	            outputStream.putNextEntry(entry);
+	            Utils.copy(inputStream, outputStream);
+	            outputStream.closeEntry();
+
+	            inputStream.close();
             }
-
-            final InputStream inputStream = new FileInputStream(file);
-
-            outputStream.putNextEntry(entry);
-
-            Utils.copy(inputStream, outputStream);
-
-            outputStream.closeEntry();
-
-            inputStream.close();
-
         }
 
         if (packageDescriptor == null) {
-            throw new FileNotFoundException("No control file in " + Arrays.toString(pControlFiles));
+            throw new FileNotFoundException("No 'control' found in " + Arrays.toString(pControlFiles));
         }
 
-        packageDescriptor.set("Installed-Size", pDataSize.divide(BigInteger.valueOf(1024)).toString());
-
         addEntry("control", packageDescriptor.toString(), outputStream);
-
         addEntry("md5sums", pChecksums.toString(), outputStream);
 
         outputStream.close();
 
         return packageDescriptor;
+    }
+
+    
+    // FIXME tempory - only until Commons Compress is fixed
+    private OutputStream compressedOutputStream( String pCompression, final OutputStream outputStream) throws CompressorException {
+    	if ("none".equalsIgnoreCase(pCompression)) {
+    		return outputStream;
+    	}
+        if ("gzip".equals(pCompression)) {
+        	pCompression = "gz";
+        }
+        return new CompressorStreamFactory().createCompressorOutputStream(pCompression, outputStream);
     }
 
     /**
@@ -375,19 +385,18 @@ public class Processor {
      * @return
      * @throws NoSuchAlgorithmException
      * @throws IOException
+     * @throws CompressorException 
      */
-    BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums, String pCompression ) throws NoSuchAlgorithmException, IOException {
+    BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums, String pCompression ) throws NoSuchAlgorithmException, IOException, CompressorException {
 
-        OutputStream out = new FileOutputStream(pOutput);
-        if ("gzip".equals(pCompression)) {
-            out = new GZIPOutputStream(out);
-        } else if ("bzip2".equals(pCompression)) {
-            out.write("BZ".getBytes());
-            out = new CBZip2OutputStream(out);
-        }
+    	if (!pOutput.canWrite()) {
+    		throw new IOException("Cannot write data file at '" + pOutput + "'");
+    	}
 
-        final TarOutputStream outputStream = new TarOutputStream(out);
-        outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
+    	final OutputStream fileOutputStream = new FileOutputStream(pOutput);
+    	final OutputStream compressedOutputStream = compressedOutputStream(pCompression, fileOutputStream);
+        final TarOutputStream tarOutputStream = new TarOutputStream(compressedOutputStream);
+        tarOutputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
         final MessageDigest digest = MessageDigest.getInstance("MD5");
 
@@ -413,7 +422,7 @@ public class Processor {
 
                 createParentDirectories((new File(filename)).getParent(), user, uid, group, gid);
 
-                TarEntry entry = new TarEntry(filename);
+                final TarEntry entry = new TarEntry(filename);
 
                 // FIXME: link is in the constructor
                 entry.setUserName(user);
@@ -423,17 +432,16 @@ public class Processor {
                 entry.setMode(mode);
                 entry.setSize(size);
 
-                outputStream.putNextEntry(entry);
+                tarOutputStream.putNextEntry(entry);
 
                 dataSize.add(size);
-
                 digest.reset();
 
-                Utils.copy(inputStream, new DigestOutputStream(outputStream, digest));
+                Utils.copy(inputStream, new DigestOutputStream(tarOutputStream, digest));
 
                 final String md5 = Utils.toHex(digest.digest());
 
-                outputStream.closeEntry();
+                tarOutputStream.closeEntry();
 
                 console.println(
                         "file:" + entry.getName() +
@@ -448,13 +456,14 @@ public class Processor {
                         " md5: " + md5
                 );
 
+                // append to file md5 list
                 pChecksums.append(md5).append(" ").append(entry.getName()).append('\n');
-
             }
 
             private String fixPath(String path) {
                 // If we're receiving directory names from Windows, then we'll convert to use slash
-                // This does eliminate the ability to use of a backslash in a directory name on *NIX, but in practice, this is a non-issue
+                // This does eliminate the ability to use of a backslash in a directory name on *NIX,
+            	// but in practice, this is a non-issue
                 if (path.indexOf('\\') > -1) {
                     path = path.replace('\\', '/');
                 }
@@ -478,7 +487,6 @@ public class Processor {
 
                 if (!addedDirectories.contains(directory)) {
                     TarEntry entry = new TarEntry(directory);
-                    // FIXME: link is in the constructor
                     entry.setUserName(user);
                     entry.setUserId(uid);
                     entry.setGroupName(group);
@@ -486,8 +494,8 @@ public class Processor {
                     entry.setMode(mode);
                     entry.setSize(size);
 
-                    outputStream.putNextEntry(entry);
-                    outputStream.closeEntry();
+                    tarOutputStream.putNextEntry(entry);
+                    tarOutputStream.closeEntry();
                     addedDirectories.add(directory); // so addedDirectories consistently have "/" for finding duplicates.
                 }
             }
@@ -537,7 +545,7 @@ public class Processor {
             data.produce(receiver);
         }
 
-        outputStream.close();
+        tarOutputStream.close();
 
         console.println("Total size: " + dataSize);
 
@@ -555,6 +563,4 @@ public class Processor {
         pOutput.write(data);
         pOutput.closeEntry();
     }
-
-
 }

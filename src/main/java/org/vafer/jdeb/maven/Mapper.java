@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 The Apache Software Foundation.
+ * Copyright 2012 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,10 @@ package org.vafer.jdeb.maven;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 
 import org.vafer.jdeb.mapping.LsMapper;
-import org.vafer.jdeb.mapping.NullMapper;
 import org.vafer.jdeb.mapping.PermMapper;
-import org.vafer.jdeb.mapping.PrefixMapper;
 
 /**
  * Maven "mapper" element acting as factory for the entry mapper.
@@ -83,15 +82,7 @@ public final class Mapper {
     private File src;
 
 
-    public org.vafer.jdeb.mapping.Mapper createMapper() {
-
-        if ("perm".equalsIgnoreCase(type)) {
-            return new PermMapper(uid, gid, user, group, filemode, dirmode, strip, prefix);
-        }
-
-        if ("prefix".equalsIgnoreCase(type)) {
-            return new PrefixMapper(strip, prefix);
-        }
+    public org.vafer.jdeb.mapping.Mapper createMapper() throws IOException {
 
         if ("ls".equalsIgnoreCase(type)) {
             try {
@@ -101,7 +92,17 @@ public final class Mapper {
             }
         }
 
-        return new NullMapper();
+        if ("perm".equalsIgnoreCase(type)) {
+            return new PermMapper(uid, gid, user, group, filemode, dirmode, strip, prefix);
+        }
+
+        // @deprecated
+        if ("prefix".equalsIgnoreCase(type)) {
+        	System.err.println("The 'prefix' mapper is deprecated. Please use 'perm' instead. Same syntax and more.");
+            return new PermMapper(strip, prefix);
+        }
+
+        throw new IOException("Unknown mapper type '" + type + "'");
     }
 
 }

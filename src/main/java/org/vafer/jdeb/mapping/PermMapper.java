@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 The Apache Software Foundation.
+ * Copyright 2012 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,10 @@ import org.vafer.jdeb.utils.Utils;
  *
  * @author Bryan Sant <bryan.sant@gmail.com>
  */
-public final class PermMapper extends PrefixMapper {
+public final class PermMapper implements Mapper {
 
+    private final int strip;
+    private final String prefix;
     private int uid = -1;
     private int gid = -1;
     private String user;
@@ -40,8 +42,15 @@ public final class PermMapper extends PrefixMapper {
         return mode;
     }
 
+    // FIXME cleanup the constructors
+
+    public PermMapper(int strip, String prefix) {
+        this.strip = strip;
+        this.prefix = (prefix == null) ? "" : prefix;    	
+    }
+
     public PermMapper(int uid, int gid, String user, String group, int fileMode, int dirMode, int strip, String prefix) {
-        super(strip, prefix);
+    	this(strip, prefix);
         this.uid = uid;
         this.gid = gid;
         this.user = user;

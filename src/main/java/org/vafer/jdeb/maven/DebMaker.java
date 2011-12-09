@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 The Apache Software Foundation.
+ * Copyright 2012 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -164,7 +164,7 @@ public class DebMaker {
 
         if (control == null || !control.isDirectory()) {
             throw new PackagingException(
-                    "You must specify a valid 'control' directory.");
+            		"\"" + control + "\" is not a valid 'control' directory)");
         }
 
         if (changesIn != null) {
@@ -217,6 +217,11 @@ public class DebMaker {
 
         final File[] controlFiles = control.listFiles();
 
+    	console.println("control dir:" + control);
+        for(File file : controlFiles) {
+        	console.println("-" + file);
+        }
+        
         final DataProducer[] data = new DataProducer[dataProducers.size()];
         dataProducers.toArray(data);
 
