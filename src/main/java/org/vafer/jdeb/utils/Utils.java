@@ -60,7 +60,7 @@ public final class Utils {
 
         int x = 0;
         for (int i=0 ; i<p; i++) {
-            x = s.indexOf('/', x);
+            x = s.indexOf('/', x+1);
             if (x < 0) {
                 return s;
             }
