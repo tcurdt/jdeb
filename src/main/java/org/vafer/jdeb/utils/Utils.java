@@ -42,7 +42,7 @@ public final class Utils {
      }
 
     public static String toHex( final byte[] pBytes ) {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < pBytes.length; ++i) {
             sb.append(Integer.toHexString((pBytes[i]>>4) & 0x0f));
@@ -98,8 +98,8 @@ public final class Utils {
         final char[] open = pOpen.toCharArray();
         final char[] close = pClose.toCharArray();
 
-        final StringBuffer out = new StringBuffer();
-        StringBuffer sb = new StringBuffer();
+        final StringBuilder out = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         char[] watch = open;
         int w = 0;
         for (int i = 0; i < s.length; i++) {
@@ -113,7 +113,7 @@ public final class Utils {
                     if (watch == open) {
                         // found open
                         out.append(sb);
-                        sb = new StringBuffer();
+                        sb = new StringBuilder();
                         // search for close
                         watch = close;
                     } else if (watch == close) {
@@ -122,9 +122,9 @@ public final class Utils {
                         if (variable != null) {
                             out.append(variable);
                         } else {
-                            throw new ParseException("Unknown variable " + sb, i);
+                            throw new ParseException("Failed to resolve variable '" + sb + "'", i);
                         }
-                        sb = new StringBuffer();
+                        sb = new StringBuilder();
                         // search for open
                         watch = open;
                     }

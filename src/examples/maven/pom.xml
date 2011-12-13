@@ -4,6 +4,7 @@
     <groupId>org.vafer</groupId>
     <artifactId>jdeb-example</artifactId>
     <version>1.0</version>
+    <description>description from pom</description>
     <build>
         <plugins>
             <plugin>

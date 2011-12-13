@@ -120,18 +120,20 @@ public class Processor {
             tempControl = File.createTempFile("deb", "control");
 
             console.println("Building data");
-            final StringBuffer md5s = new StringBuffer();
+            final StringBuilder md5s = new StringBuilder();
             final BigInteger size = buildData(pData, tempData, md5s, compression);
 
             console.println("Building control");
             final PackageDescriptor packageDescriptor = buildControl(pControlFiles, size, md5s, tempControl);
 
             if (!packageDescriptor.isValid()) {
-              throw new PackagingException("Control file descriptor keys are invalid " + packageDescriptor.invalidKeys());
+                throw new PackagingException("Control file descriptor keys are invalid " + packageDescriptor.invalidKeys() +
+                    ". The following keys are mandatory " + Arrays.toString(PackageDescriptor.mandatoryKeys) +
+                    ". Please check your pom.xml/build.xml and your control file.");
             }
 
             pOutput.getParentFile().mkdirs();
-        
+
             // pass through stream chain to calculate all the different digests
             final InformationOutputStream md5output = new InformationOutputStream(new FileOutputStream(pOutput), MessageDigest.getInstance("MD5"));
             final InformationOutputStream sha1output = new InformationOutputStream(md5output, MessageDigest.getInstance("SHA1"));
@@ -197,7 +199,7 @@ public class Processor {
      * @param pOutput
      * @return ChangesDescriptor
      * @throws IOException
-     * @throws PackagingException 
+     * @throws PackagingException
      */
     public ChangesDescriptor createChanges( final PackageDescriptor pPackageDescriptor, final ChangesProvider pChangesProvider, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException, PackagingException {
 
@@ -212,10 +214,6 @@ public class Processor {
 
         if (changesDescriptor.get("Source") == null) {
             changesDescriptor.set("Source", changesDescriptor.get("Package"));
-        }
-
-        if (changesDescriptor.get("Description") == null) {
-            changesDescriptor.set("Description", "update to " + changesDescriptor.get("Version"));
         }
 
         final StringBuilder checksumsSha1 = new StringBuilder("\n");
@@ -235,7 +233,7 @@ public class Processor {
         changesDescriptor.set("Checksums-Sha256", checksumsSha256.toString());
 
 
-        final StringBuffer files = new StringBuffer("\n");
+        final StringBuilder files = new StringBuilder("\n");
         files.append(' ').append(changesDescriptor.get("MD5"));
         files.append(' ').append(changesDescriptor.get("Size"));
         files.append(' ').append(changesDescriptor.get("Section"));
@@ -244,7 +242,7 @@ public class Processor {
         changesDescriptor.set("Files", files.toString());
 
         if (!changesDescriptor.isValid()) {
-          throw new PackagingException("Changes file descriptor keys are invalid " + changesDescriptor.invalidKeys());
+            throw new PackagingException("Changes file descriptor keys are invalid " + changesDescriptor.invalidKeys());
         }
 
         final String changes = changesDescriptor.toString();
@@ -284,11 +282,11 @@ public class Processor {
      * @throws IOException
      * @throws ParseException
      */
-    private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuffer pChecksums, final File pOutput ) throws IOException, ParseException {
+    private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuilder pChecksums, final File pOutput ) throws IOException, ParseException {
 
-      if (!pOutput.canWrite()) {
-        throw new IOException("Cannot write control file at '" + pOutput + "'");
-      }
+        if (!pOutput.canWrite()) {
+            throw new IOException("Cannot write control file at '" + pOutput + "'");
+        }
 
         final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
         outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
@@ -312,7 +310,7 @@ public class Processor {
 
             if ("control".equals(name)) {
 
-              packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
+                packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
 
                 if (packageDescriptor.get("Date") == null) {
                     // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
@@ -334,21 +332,21 @@ public class Processor {
                 final String debEmail = System.getenv("DEBEMAIL");
 
                 if (debFullName != null && debEmail != null) {
-                  final String maintainer = debFullName + " <" + debEmail + ">";
+                    final String maintainer = debFullName + " <" + debEmail + ">";
                     packageDescriptor.set("Maintainer", maintainer);
                     console.println("Using maintainer '" + maintainer + "' from the environment variables.");
                 }
 
             } else {
 
-              final InputStream inputStream = new FileInputStream(file);
+                final InputStream inputStream = new FileInputStream(file);
 
-              // copy file as new entry into the archive stream
-              outputStream.putNextEntry(entry);
-              Utils.copy(inputStream, outputStream);
-              outputStream.closeEntry();
+                // copy file as new entry into the archive stream
+                outputStream.putNextEntry(entry);
+                Utils.copy(inputStream, outputStream);
+                outputStream.closeEntry();
 
-              inputStream.close();
+                inputStream.close();
             }
         }
 
@@ -364,7 +362,7 @@ public class Processor {
         return packageDescriptor;
     }
 
-    
+
     // FIXME tempory - only until Commons Compress is fixed
     private OutputStream compressedOutputStream( String pCompression, final OutputStream outputStream) throws CompressorException {
       if ("none".equalsIgnoreCase(pCompression)) {
@@ -385,9 +383,9 @@ public class Processor {
      * @return
      * @throws NoSuchAlgorithmException
      * @throws IOException
-     * @throws CompressorException 
+     * @throws CompressorException
      */
-    BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums, String pCompression ) throws NoSuchAlgorithmException, IOException, CompressorException {
+    BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuilder pChecksums, String pCompression ) throws NoSuchAlgorithmException, IOException, CompressorException {
 
       if (!pOutput.canWrite()) {
         throw new IOException("Cannot write data file at '" + pOutput + "'");

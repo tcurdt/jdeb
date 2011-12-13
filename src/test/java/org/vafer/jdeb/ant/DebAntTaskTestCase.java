@@ -186,9 +186,9 @@ public final class DebAntTaskTestCase extends TestCase {
                 tar.close();
             } else {
                 // skip to the next entry
-                long skip = entry.getLength(); 
+                long skip = entry.getLength();
                 while(skip > 0) {
-                    long skipped = in.skip(skip); 
+                    long skipped = in.skip(skip);
                     if (skipped == -1) {
                         throw new IOException("Failed to skip");
                     }
@@ -231,9 +231,9 @@ public final class DebAntTaskTestCase extends TestCase {
                 break;
             } else {
                 // skip to the next entry
-                long skip = entry.getLength(); 
+                long skip = entry.getLength();
                 while(skip > 0) {
-                    long skipped = in.skip(skip); 
+                    long skipped = in.skip(skip);
                     if (skipped == -1) {
                         throw new IOException("Failed to skip");
                     }
@@ -265,9 +265,9 @@ public final class DebAntTaskTestCase extends TestCase {
                 tar.close();
             } else {
                 // skip to the next entry
-                long skip = entry.getLength(); 
+                long skip = entry.getLength();
                 while(skip > 0) {
-                    long skipped = in.skip(skip); 
+                    long skipped = in.skip(skip);
                     if (skipped == -1) {
                         throw new IOException("Failed to skip");
                     }

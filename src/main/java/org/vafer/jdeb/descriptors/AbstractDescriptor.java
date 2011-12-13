@@ -48,8 +48,8 @@ public abstract class AbstractDescriptor {
     }
 
     public AbstractDescriptor( final AbstractDescriptor pDescriptor ) {
+        this(pDescriptor.resolver);
         values.putAll(pDescriptor.values);
-        resolver = pDescriptor.resolver;
     }
 
     public static void setOpenToken( final String pToken ) {
@@ -62,7 +62,7 @@ public abstract class AbstractDescriptor {
 
     protected void parse( final InputStream pInput ) throws IOException, ParseException {
         final BufferedReader br = new BufferedReader(new InputStreamReader(pInput));
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         String key = null;
         int linenr = 0;
         while(true) {
@@ -91,7 +91,7 @@ public abstract class AbstractDescriptor {
                 if (buffer.length() > 0) {
                     // flush value of previous key
                     set(key, buffer.toString());
-                    buffer = new StringBuffer();
+                    buffer = new StringBuilder();
                 }
 
 
@@ -115,17 +115,15 @@ public abstract class AbstractDescriptor {
     }
 
     public void set( final String pKey, final String pValue ) {
-
-        if (resolver != null) {
-            try {
-                values.put(pKey, Utils.replaceVariables(resolver, pValue, openToken, closeToken));
-                return;
-            } catch (ParseException e) {
-                // FIXME maybe throw an Exception?
-            }
-        }
-
-        values.put(pKey, pValue);
+      String value = null;
+      try {
+        value = Utils.replaceVariables(resolver, pValue, openToken, closeToken);
+          if ("".equals(value)) {
+              value = null;
+          }
+      } catch(ParseException e) {
+      }
+        values.put(pKey, value);
     }
 
     public String get( final String pKey ) {
@@ -152,7 +150,7 @@ public abstract class AbstractDescriptor {
     }
 
     public String toString( final String[] pKeys ) {
-        final StringBuffer s = new StringBuffer();
+        final StringBuilder s = new StringBuilder();
         for (int i = 0; i < pKeys.length; i++) {
             final String key = pKeys[i];
             final String value = (String) values.get(key);

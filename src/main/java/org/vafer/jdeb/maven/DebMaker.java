@@ -217,11 +217,6 @@ public class DebMaker {
 
         final File[] controlFiles = control.listFiles();
 
-      console.println("control dir:" + control);
-        for(File file : controlFiles) {
-          console.println("-" + file);
-        }
-        
         final DataProducer[] data = new DataProducer[dataProducers.size()];
         dataProducers.toArray(data);
 
@@ -248,8 +243,7 @@ public class DebMaker {
             console.println("Creating changes file: " + changesOut);
 
             // for now only support reading the changes form a textfile provider
-            changesProvider = new TextfileChangesProvider(new FileInputStream(
-                    changesIn), packageDescriptor);
+            changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
 
             processor.createChanges(packageDescriptor, changesProvider,
                     (keyring != null) ? new FileInputStream(keyring) : null,

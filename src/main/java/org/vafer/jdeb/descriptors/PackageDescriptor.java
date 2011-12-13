@@ -51,7 +51,7 @@ public final class PackageDescriptor extends AbstractDescriptor {
         "Homepage",
     };
 
-    private final static String[] mandatoryKeys = {
+    public final static String[] mandatoryKeys = {
         "Package",
         "Version",
         "Section",

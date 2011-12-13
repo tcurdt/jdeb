@@ -44,7 +44,7 @@ public class ProcessorTestCase extends TestCase {
         fileset.setIncludes("**/*");
         fileset.setProject(project);
 
-        StringBuffer md5s = new StringBuffer();
+        StringBuilder md5s = new StringBuilder();
         processor.buildData(new DataProducer[] { new DataProducerFileSet(fileset) }, new File("target/data.tar"), md5s, "gz");
 
         assertTrue("empty md5 file", md5s.length() > 0);

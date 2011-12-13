@@ -3,8 +3,9 @@
 * [ADD] Added an "attach" attribute to specify whether maven artifact should be attached to project.
 * [CHG] "Changes" support version 1.8 
 * [ADD] Provide SHA1, SHA256 and not just MD5 for descriptors
-* [ADD} Provide "project.version" when using maven
-
+* [ADD] Provide "project.version" when using maven
+* [CHG] Default path for changes file with Maven
+* [CHG] Unresolved variables are treated as null
 
 ## Version 0.8, released 27.06.2010
 

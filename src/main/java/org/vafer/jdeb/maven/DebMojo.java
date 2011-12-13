@@ -77,7 +77,7 @@ public class DebMojo extends AbstractPluginMojo {
     /**
      * Explicitly define the file where to write the changes to.
      *
-     * @parameter default-value="[[baseDir]]/CHANGES.txt"
+     * @parameter default-value="[[buildDir]]/[[artifactId]]_[[version]].changes"
      */
     private String changesOut;
 
@@ -130,15 +130,15 @@ public class DebMojo extends AbstractPluginMojo {
      * @readonly
      */
     private File baseDir;
-    
+
     /**
      * Run the plugin on all sub-modules.
-     * If set to false, the plugin will be run in the same folder where the 
+     * If set to false, the plugin will be run in the same folder where the
      * mvn command was invoked
      * @parameter expression="${submodules}" default-value="true"
      */
     private boolean submodules;
-    
+
     /**
      * The Maven Session Object
      *
@@ -147,7 +147,7 @@ public class DebMojo extends AbstractPluginMojo {
      * @readonly
      */
     private MavenSession session;
-    
+
     /**
      * The classifier of attached artifact
      *
@@ -209,7 +209,7 @@ public class DebMojo extends AbstractPluginMojo {
     /**
      * When SNAPSHOT version replace <code>SNAPSHOT</code> with current date
      * and time to make sure each build is unique.
-     * 
+     *
      * @parameter expression="${timestamped}" default-value="false"
      */
     private boolean timestamped;
@@ -253,14 +253,14 @@ public class DebMojo extends AbstractPluginMojo {
         variables.put("url", getProject().getUrl());
         return new MapVariableResolver(variables);
     }
-    
+
     /**
      * Doc some cleanup and conversion on the Maven project version.
      * <ul>
      * <li>-: any - is replaced by +</li>
      * <li>SNAPSHOT: replace "SNAPSHOT" par of the version with the current time and date</li>
      * </ul>
-     * 
+     *
      * @return the Maven project version
      */
     private String getProjectVersion() {
@@ -276,13 +276,13 @@ public class DebMojo extends AbstractPluginMojo {
     }
 
     /**
-     * 
+     *
      * @return whether or not Maven is currently operating in the execution root
      */
     private boolean inExecRoot() {
        return session.getExecutionRootDirectory().equalsIgnoreCase(baseDir.toString());
     }
-    
+
     /**
      * Main entry point
      *
@@ -291,12 +291,12 @@ public class DebMojo extends AbstractPluginMojo {
     public void execute() throws MojoExecutionException {
 
         setData(dataSet);
-        
+
         if(! inExecRoot() && !submodules) {
           getLog().info("skipping sub module: jdeb executing at top-level only");
           return;
         }
-        
+
         try {
 
             final VariableResolver resolver = initializeVariableResolver(new HashMap());

@@ -43,7 +43,7 @@ public final class ChangesDescriptor extends AbstractDescriptor {
         "Files"
     };
 
-    private final static String[] mandatoryKeys = {
+    public final static String[] mandatoryKeys = {
         "Format",
         "Date",
         "Source",
@@ -66,16 +66,17 @@ public final class ChangesDescriptor extends AbstractDescriptor {
         super(pDescriptor);
         changeSets = pChangeSets;
 
-        final ChangeSet lastestChangeSet = changeSets[0];
+        final StringBuilder sb = new StringBuilder();
 
-        set("Urgency", lastestChangeSet.getUrgency());
-        set("Changed-By", lastestChangeSet.getChangedBy());
+        if (changeSets.length > 0) {
+            final ChangeSet lastestChangeSet = changeSets[0];
+            set("Urgency", lastestChangeSet.getUrgency());
+            set("Changed-By", lastestChangeSet.getChangedBy());
 
-        final StringBuffer sb = new StringBuffer();
-
-        for (int i = 0; i < 1; i++) {
-            final ChangeSet changeSet = changeSets[i];
-            sb.append(changeSet.toString());
+            for (int i = 0; i < 1; i++) {
+                final ChangeSet changeSet = changeSets[i];
+                sb.append(changeSet.toString());
+            }
         }
 
         set("Changes", sb.toString());
