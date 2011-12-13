@@ -127,7 +127,7 @@ public class Processor {
             final PackageDescriptor packageDescriptor = buildControl(pControlFiles, size, md5s, tempControl);
 
             if (!packageDescriptor.isValid()) {
-            	throw new PackagingException("Control file descriptor keys are invalid " + packageDescriptor.invalidKeys());
+              throw new PackagingException("Control file descriptor keys are invalid " + packageDescriptor.invalidKeys());
             }
 
             pOutput.getParentFile().mkdirs();
@@ -244,7 +244,7 @@ public class Processor {
         changesDescriptor.set("Files", files.toString());
 
         if (!changesDescriptor.isValid()) {
-        	throw new PackagingException("Changes file descriptor keys are invalid " + changesDescriptor.invalidKeys());
+          throw new PackagingException("Changes file descriptor keys are invalid " + changesDescriptor.invalidKeys());
         }
 
         final String changes = changesDescriptor.toString();
@@ -286,9 +286,9 @@ public class Processor {
      */
     private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuffer pChecksums, final File pOutput ) throws IOException, ParseException {
 
-    	if (!pOutput.canWrite()) {
-    		throw new IOException("Cannot write control file at '" + pOutput + "'");
-    	}
+      if (!pOutput.canWrite()) {
+        throw new IOException("Cannot write control file at '" + pOutput + "'");
+      }
 
         final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
         outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
@@ -312,7 +312,7 @@ public class Processor {
 
             if ("control".equals(name)) {
 
-            	packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
+              packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
 
                 if (packageDescriptor.get("Date") == null) {
                     // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
@@ -334,21 +334,21 @@ public class Processor {
                 final String debEmail = System.getenv("DEBEMAIL");
 
                 if (debFullName != null && debEmail != null) {
-                	final String maintainer = debFullName + " <" + debEmail + ">";
+                  final String maintainer = debFullName + " <" + debEmail + ">";
                     packageDescriptor.set("Maintainer", maintainer);
                     console.println("Using maintainer '" + maintainer + "' from the environment variables.");
                 }
 
             } else {
 
-	            final InputStream inputStream = new FileInputStream(file);
+              final InputStream inputStream = new FileInputStream(file);
 
-	            // copy file as new entry into the archive stream
-	            outputStream.putNextEntry(entry);
-	            Utils.copy(inputStream, outputStream);
-	            outputStream.closeEntry();
+              // copy file as new entry into the archive stream
+              outputStream.putNextEntry(entry);
+              Utils.copy(inputStream, outputStream);
+              outputStream.closeEntry();
 
-	            inputStream.close();
+              inputStream.close();
             }
         }
 
@@ -367,11 +367,11 @@ public class Processor {
     
     // FIXME tempory - only until Commons Compress is fixed
     private OutputStream compressedOutputStream( String pCompression, final OutputStream outputStream) throws CompressorException {
-    	if ("none".equalsIgnoreCase(pCompression)) {
-    		return outputStream;
-    	}
+      if ("none".equalsIgnoreCase(pCompression)) {
+        return outputStream;
+      }
         if ("gzip".equals(pCompression)) {
-        	pCompression = "gz";
+          pCompression = "gz";
         }
         return new CompressorStreamFactory().createCompressorOutputStream(pCompression, outputStream);
     }
@@ -389,12 +389,12 @@ public class Processor {
      */
     BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums, String pCompression ) throws NoSuchAlgorithmException, IOException, CompressorException {
 
-    	if (!pOutput.canWrite()) {
-    		throw new IOException("Cannot write data file at '" + pOutput + "'");
-    	}
+      if (!pOutput.canWrite()) {
+        throw new IOException("Cannot write data file at '" + pOutput + "'");
+      }
 
-    	final OutputStream fileOutputStream = new FileOutputStream(pOutput);
-    	final OutputStream compressedOutputStream = compressedOutputStream(pCompression, fileOutputStream);
+      final OutputStream fileOutputStream = new FileOutputStream(pOutput);
+      final OutputStream compressedOutputStream = compressedOutputStream(pCompression, fileOutputStream);
         final TarOutputStream tarOutputStream = new TarOutputStream(compressedOutputStream);
         tarOutputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
@@ -463,7 +463,7 @@ public class Processor {
             private String fixPath(String path) {
                 // If we're receiving directory names from Windows, then we'll convert to use slash
                 // This does eliminate the ability to use of a backslash in a directory name on *NIX,
-            	// but in practice, this is a non-issue
+              // but in practice, this is a non-issue
                 if (path.indexOf('\\') > -1) {
                     path = path.replace('\\', '/');
                 }

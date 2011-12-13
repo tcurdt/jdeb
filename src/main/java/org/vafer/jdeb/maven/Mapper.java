@@ -98,7 +98,7 @@ public final class Mapper {
 
         // @deprecated
         if ("prefix".equalsIgnoreCase(type)) {
-        	System.err.println("The 'prefix' mapper is deprecated. Please use 'perm' instead. Same syntax and more.");
+          System.err.println("The 'prefix' mapper is deprecated. Please use 'perm' instead. Same syntax and more.");
             return new PermMapper(strip, prefix);
         }
 

@@ -164,7 +164,7 @@ public class DebMaker {
 
         if (control == null || !control.isDirectory()) {
             throw new PackagingException(
-            		"\"" + control + "\" is not a valid 'control' directory)");
+                "\"" + control + "\" is not a valid 'control' directory)");
         }
 
         if (changesIn != null) {
@@ -217,9 +217,9 @@ public class DebMaker {
 
         final File[] controlFiles = control.listFiles();
 
-    	console.println("control dir:" + control);
+      console.println("control dir:" + control);
         for(File file : controlFiles) {
-        	console.println("-" + file);
+          console.println("-" + file);
         }
         
         final DataProducer[] data = new DataProducer[dataProducers.size()];

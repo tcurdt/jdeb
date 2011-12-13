@@ -293,8 +293,8 @@ public class DebMojo extends AbstractPluginMojo {
         setData(dataSet);
         
         if(! inExecRoot() && !submodules) {
-        	getLog().info("skipping sub module: jdeb executing at top-level only");
-        	return;
+          getLog().info("skipping sub module: jdeb executing at top-level only");
+          return;
         }
         
         try {
@@ -315,8 +315,8 @@ public class DebMojo extends AbstractPluginMojo {
                 final File file = getProject().getArtifact().getFile();
 
                 if (file == null) {
-                	getLog().warn("There is no artifact to include if you call jdeb directly. The jdeb plugin is run during the install phase anyway.");
-                	throw new MojoExecutionException("No artifact to include into deb");
+                  getLog().warn("There is no artifact to include if you call jdeb directly. The jdeb plugin is run during the install phase anyway.");
+                  throw new MojoExecutionException("No artifact to include into deb");
                 }
 
                 dataProducers.add(new DataProducer() {

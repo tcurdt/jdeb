@@ -46,11 +46,11 @@ public final class PermMapper implements Mapper {
 
     public PermMapper(int strip, String prefix) {
         this.strip = strip;
-        this.prefix = (prefix == null) ? "" : prefix;    	
+        this.prefix = (prefix == null) ? "" : prefix;     
     }
 
     public PermMapper(int uid, int gid, String user, String group, int fileMode, int dirMode, int strip, String prefix) {
-    	this(strip, prefix);
+      this(strip, prefix);
         this.uid = uid;
         this.gid = gid;
         this.user = user;
