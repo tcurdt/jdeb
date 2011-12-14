@@ -242,12 +242,12 @@ public class Processor {
         changesDescriptor.set("Files", files.toString());
 
         if (!changesDescriptor.isValid()) {
-            throw new PackagingException("Changes file descriptor keys are invalid " + changesDescriptor.invalidKeys());
+            throw new PackagingException("Changes file descriptor keys are invalid " + changesDescriptor.invalidKeys() +
+                ". The following keys are mandatory " + Arrays.toString(ChangesDescriptor.mandatoryKeys) +
+                ". Please check your pom.xml/build.xml and your control file.");
         }
 
         final String changes = changesDescriptor.toString();
-        //console.println(changes);
-
         final byte[] changesBytes = changes.getBytes("UTF-8");
 
         if (pRing == null || pKey == null || pPassphrase == null) {
