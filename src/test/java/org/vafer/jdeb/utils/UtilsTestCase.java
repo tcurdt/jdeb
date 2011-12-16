@@ -58,4 +58,5 @@ public class UtilsTestCase extends TestCase {
         String actual = convert("test\rtest\r\rtest");
         assertEquals(expected, actual);
     }
+    
 }

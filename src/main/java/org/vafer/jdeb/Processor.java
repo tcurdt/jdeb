@@ -48,6 +48,7 @@ import org.vafer.jdeb.descriptors.ChangesDescriptor;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 import org.vafer.jdeb.mapping.PermMapper;
 import org.vafer.jdeb.signing.SigningUtils;
+import org.vafer.jdeb.utils.InformationInputStream;
 import org.vafer.jdeb.utils.InformationOutputStream;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
@@ -339,16 +340,15 @@ public class Processor {
 
             } else {
 
-                // FIXME: usually the control directory should only have text files/shell scripts
-                // we convert all of them to unix line endings here. This could screw up binaries.
-                // better to have binary/text detection here.
-
-                final byte[] data = Utils.toUnixLineEndings(new FileInputStream(file)); 
+                final InformationInputStream infoStream = new InformationInputStream(new FileInputStream(file));
                 
-                entry.setSize(data.length);
                 outputStream.putNextEntry(entry);
-                outputStream.write(data);
+                Utils.copy(infoStream, outputStream);
                 outputStream.closeEntry();
+
+                if (infoStream.isShell() && !infoStream.hasUnixLineEndings()) {
+                    console.println("WARNING: The file '" + file + "' does not use Unix line endings. Please convert and check your VCS settings.");
+                }
             }
         }
 
