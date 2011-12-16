@@ -15,9 +15,13 @@
  */
 package org.vafer.jdeb.utils;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 
 
@@ -150,4 +154,19 @@ public final class Utils {
         return out.toString();
     }
 
+    public static byte[] toUnixLineEndings(InputStream input) throws IOException {
+        final Charset UTF8 = Charset.forName("UTF-8");
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+
+        final ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
+
+        String line;
+        while((line = reader.readLine()) != null) {
+            dataStream.write(line.getBytes(UTF8));
+            dataStream.write('\n');
+        }
+        reader.close();
+
+        return dataStream.toByteArray();
+    }
 }

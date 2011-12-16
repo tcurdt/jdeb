@@ -17,6 +17,8 @@
 package org.vafer.jdeb.utils;
 
 
+import java.io.ByteArrayInputStream;
+
 import junit.framework.TestCase;
 
 public class UtilsTestCase extends TestCase {
@@ -32,5 +34,28 @@ public class UtilsTestCase extends TestCase {
         assertEquals("foo/", Utils.stripPath(0,"foo/"));
         assertEquals("", Utils.stripPath(1,"foo/"));
         assertEquals("foo/", Utils.stripPath(2,"foo/"));
+    }
+
+    private String convert(String s) throws Exception {
+        byte[] data = Utils.toUnixLineEndings(new ByteArrayInputStream(s.getBytes("UTF-8")));
+        return new String(data, "UTF-8");
+    }
+    
+    public void testNewlineConversionLF() throws Exception {
+        String expected = "test\ntest\n\ntest\n";
+        String actual = convert("test\ntest\n\ntest");
+        assertEquals(expected, actual);
+    }
+
+    public void testNewlineConversionCRLF() throws Exception {
+        String expected = "test\ntest\n\ntest\n";
+        String actual = convert("test\r\ntest\r\n\r\ntest");
+        assertEquals(expected, actual);
+    }
+
+    public void testNewlineConversionCR() throws Exception {
+        String expected = "test\ntest\n\ntest\n";
+        String actual = convert("test\rtest\r\rtest");
+        assertEquals(expected, actual);
     }
 }

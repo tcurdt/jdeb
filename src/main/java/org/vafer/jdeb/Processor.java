@@ -339,14 +339,16 @@ public class Processor {
 
             } else {
 
-                final InputStream inputStream = new FileInputStream(file);
+                // FIXME: usually the control directory should only have text files/shell scripts
+                // we convert all of them to unix line endings here. This could screw up binaries.
+                // better to have binary/text detection here.
 
-                // copy file as new entry into the archive stream
+                final byte[] data = Utils.toUnixLineEndings(new FileInputStream(file)); 
+                
+                entry.setSize(data.length);
                 outputStream.putNextEntry(entry);
-                Utils.copy(inputStream, outputStream);
+                outputStream.write(data);
                 outputStream.closeEntry();
-
-                inputStream.close();
             }
         }
 
@@ -363,7 +365,7 @@ public class Processor {
     }
 
 
-    // FIXME tempory - only until Commons Compress is fixed
+    // FIXME temporary - only until Commons Compress is fixed
     private OutputStream compressedOutputStream( String pCompression, final OutputStream outputStream) throws CompressorException {
       if ("none".equalsIgnoreCase(pCompression)) {
         return outputStream;

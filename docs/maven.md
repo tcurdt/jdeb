@@ -8,7 +8,7 @@ the plugin to your POM like this
             <plugin>
                 <artifactId>jdeb</artifactId>
                 <groupId>org.vafer</groupId>
-                <version>0.8</version>
+                <version>0.9</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -152,7 +152,7 @@ include a directory, a tarball, and a file in your deb package:
             <plugin>
                 <artifactId>jdeb</artifactId>
                 <groupId>org.vafer</groupId>
-                <version>0.8</version>
+                <version>0.9</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
