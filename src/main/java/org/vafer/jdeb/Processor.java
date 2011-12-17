@@ -347,7 +347,7 @@ public class Processor {
                 outputStream.closeEntry();
 
                 if (infoStream.isShell() && !infoStream.hasUnixLineEndings()) {
-                    console.println("WARNING: The file '" + file + "' does not use Unix line endings. Please convert and check your VCS settings.");
+                    console.println("WARNING: The file '" + file + "' does not use Unix line endings.");
                 }
             }
         }
@@ -389,12 +389,14 @@ public class Processor {
      */
     BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuilder pChecksums, String pCompression ) throws NoSuchAlgorithmException, IOException, CompressorException {
 
-      if (!pOutput.canWrite()) {
-        throw new IOException("Cannot write data file at '" + pOutput + "'");
-      }
+        final File dir = pOutput.getParentFile();
 
-      final OutputStream fileOutputStream = new FileOutputStream(pOutput);
-      final OutputStream compressedOutputStream = compressedOutputStream(pCompression, fileOutputStream);
+        if (dir != null && (!dir.exists() || !dir.isDirectory())) {
+            throw new IOException("Cannot write data file at '" + pOutput.getAbsolutePath() + "'");
+        }
+
+        final OutputStream fileOutputStream = new FileOutputStream(pOutput);
+        final OutputStream compressedOutputStream = compressedOutputStream(pCompression, fileOutputStream);
         final TarOutputStream tarOutputStream = new TarOutputStream(compressedOutputStream);
         tarOutputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
