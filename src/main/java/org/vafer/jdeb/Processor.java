@@ -285,8 +285,9 @@ public class Processor {
      */
     private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuilder pChecksums, final File pOutput ) throws IOException, ParseException {
 
-        if (!pOutput.canWrite()) {
-            throw new IOException("Cannot write control file at '" + pOutput + "'");
+        final File dir = pOutput.getParentFile();
+        if (dir != null && (!dir.exists() || !dir.isDirectory())) {
+            throw new IOException("Cannot write control file at '" + pOutput.getAbsolutePath() + "'");
         }
 
         final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
@@ -390,7 +391,6 @@ public class Processor {
     BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuilder pChecksums, String pCompression ) throws NoSuchAlgorithmException, IOException, CompressorException {
 
         final File dir = pOutput.getParentFile();
-
         if (dir != null && (!dir.exists() || !dir.isDirectory())) {
             throw new IOException("Cannot write data file at '" + pOutput.getAbsolutePath() + "'");
         }
