@@ -205,11 +205,6 @@ public class DebMaker {
                     + compression + "' is not supported");
         }
 
-        if (dataProducers.size() == 0) {
-            throw new PackagingException(
-                    "You need to provide at least one reference to a tgz or directory with data.");
-        }
-
         if (deb == null) {
             throw new PackagingException(
                     "You need to specify where the deb file is supposed to be created.");

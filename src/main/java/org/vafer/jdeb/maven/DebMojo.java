@@ -24,9 +24,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.Console;
@@ -276,11 +279,11 @@ public class DebMojo extends AbstractPluginMojo {
     }
 
     /**
-     *
      * @return whether or not Maven is currently operating in the execution root
      */
-    private boolean inExecRoot() {
-       return session.getExecutionRootDirectory().equalsIgnoreCase(baseDir.toString());
+    private boolean isSubmodule() {
+        // FIXME there must be a better way
+        return !session.getExecutionRootDirectory().equalsIgnoreCase(baseDir.toString());
     }
 
     /**
@@ -290,12 +293,14 @@ public class DebMojo extends AbstractPluginMojo {
      */
     public void execute() throws MojoExecutionException {
 
-        setData(dataSet);
+        final MavenProject project = getProject();
 
-        if(! inExecRoot() && !submodules) {
-          getLog().info("skipping sub module: jdeb executing at top-level only");
-          return;
+        if(isSubmodule() && !submodules) {
+            getLog().info("skipping sub module: jdeb executing at top-level only");
+            return;
         }
+
+        setData(dataSet);
 
         try {
 
@@ -308,29 +313,47 @@ public class DebMojo extends AbstractPluginMojo {
             final File changesOutFile = new File(Utils.replaceVariables(resolver, changesOut, openReplaceToken, closeReplaceToken));
             final File changesSaveFile = new File(Utils.replaceVariables(resolver, changesSave, openReplaceToken, closeReplaceToken));
 
-            // If there are no dataProducers, then we'll add a single producer that
-            // processes the
-            // maven artifact file (be it a jar, war, etc.)
+            // if there are no producers defined we try to use the artifacts
             if (dataProducers.isEmpty()) {
-                final File file = getProject().getArtifact().getFile();
 
-                if (file == null) {
-                  getLog().warn("There is no artifact to include if you call jdeb directly. The jdeb plugin is run during the install phase anyway.");
-                  throw new MojoExecutionException("No artifact to include into deb");
-                }
+                final Set<Artifact> artifacts = project.getArtifacts();
+                if (artifacts.size() == 0) {
+                    // no artifacts
+                    final String packaging = project.getPackaging();
+                    if ("pom".equalsIgnoreCase(packaging)) {
+                        getLog().warn("Creating empty debian package.");
+                    } else {
+                        throw new MojoExecutionException(
+                            "Nothing to include into the debian package. " +
+                            "Did you maybe forget to add a <data> tag or call the plugin directly?");
+                    }
 
-                dataProducers.add(new DataProducer() {
-                    public void produce(final DataConsumer receiver) {
-                        try {
-                            receiver.onEachFile(new FileInputStream(file),
-                                    new File(installDirFile, file.getName()).getAbsolutePath(), "",
-                                    "root", 0, "root", 0,
-                                    TarEntry.DEFAULT_FILE_MODE, file.length());
-                        } catch (Exception e) {
-                            getLog().error(e);
+                } else {
+
+                    // attach artifacts (jar, war, etc)
+                    for(Artifact artifact : artifacts) {
+                        final File file = artifact.getFile();
+                        if (file != null) {
+                            dataProducers.add(new DataProducer() {
+                                public void produce(final DataConsumer receiver) {
+                                    try {
+                                        receiver.onEachFile(
+                                                new FileInputStream(file),
+                                                new File(installDirFile, file.getName()).getAbsolutePath(),
+                                                "",
+                                                "root", 0, "root", 0,
+                                                TarEntry.DEFAULT_FILE_MODE,
+                                                file.length());
+                                    } catch (Exception e) {
+                                        getLog().error(e);
+                                    }
+                                }
+                            });
+                        } else {
+                            getLog().error("No file for artifact " + artifact);
                         }
                     }
-                });
+                }
             }
 
             Console infoConsole = new Console() {
@@ -355,7 +378,7 @@ public class DebMojo extends AbstractPluginMojo {
                 // Always attach unless explicitly set to false
                 if ("true".equalsIgnoreCase(attach)) {
                     getLog().info("Attaching created debian archive " + debFile);
-                    projectHelper.attachArtifact(getProject(), type, classifier, debFile);
+                    projectHelper.attachArtifact(project, type, classifier, debFile);
                 }
 
             } catch (PackagingException e) {
