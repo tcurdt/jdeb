@@ -25,46 +25,52 @@
 ###############################################################################
 
 ROOT_REP=/home/maven/public_html
+SNAPSHOTS_REP="snapshots"
+RELEASES_REP="releases"
+STABLE_REP="stable"
 
 cd "$ROOT_REP"
 
 ## snapshots
-if [ -d snapshots ]; then
+if [ -d $SNAPSHOTS_REP ]; then
   echo "Generates snapshots index"
 
-  dpkg-scanpackages snapshots /dev/null | gzip -9c > snapshots/Packages.gz.tmp && mv -f snapshots/Packages.gz.tmp snapshots/Packages.gz
+  dpkg-scanpackages -m $SNAPSHOTS_REP /dev/null | gzip -9c > $SNAPSHOTS_REP/Packages.gz.tmp && mv -f $SNAPSHOTS_REP/Packages.gz.tmp $SNAPSHOTS_REP/Packages.gz
 fi
 
 ## releases
-if [ -d releases ]; then
+if [ -d $RELEASES_REP ]; then
   echo "Generates releases index"
 
-  dpkg-scanpackages releases /dev/null | gzip -9c > releases/Packages.gz.tmp && mv -f releases/Packages.gz.tmp releases/Packages.gz
+  dpkg-scanpackages -m $RELEASES_REP /dev/null | gzip -9c > $RELEASES_REP/Packages.gz.tmp && mv -f $RELEASES_REP/Packages.gz.tmp $RELEASES_REP/Packages.gz
 fi
 
 ## stable
 if [ -d stable ]; then
   echo "Generates stable index"
 
-  rm -rf /tmp/maven_scanpackages
-  mkdir -p /tmp/maven_scanpackages/releases
+  rm -rf /tmp/stable_scanpackages
+  mkdir -p /tmp/stable_scanpackages/$RELEASES_REP
 
   function link_package ()
   {
-    basepath=`dirname $0`
-    cd result && mkdir -p $basepath && cd ..
-    fullpath=`readlink -f $0`
-    ln -sf $fullpath "/tmp/maven_scanpackages/$basepath"
+    basepath=`dirname $1`
+    basepath=${basepath##$ROOT_REP/}
+    basepath=${basepath%*/}
+    mkdir -p $basepath
+    fullpath=`readlink -f $1`
+    ln -sf $fullpath "/tmp/stable_scanpackages/$basepath"
   }
 
-  for i in $(find "$ROOT_REP/releases" -name "*.[0-9][0-9].deb" ) ; do
+  cd /tmp/stable_scanpackages/
+
+  for i in $(find "$ROOT_REP/$RELEASES_REP" -name "*.[0-9][0-9].deb" ) ; do
     link_package $i
   done
 
-  for i in $(find "$ROOT_REP/releases" -name "*.[0-9].deb" ) ; do
+  for i in $(find "$ROOT_REP/$RELEASES_REP" -name "*.[0-9].deb" ) ; do
     link_package $i
   done
 
-  cd /tmp/xwiki_scanpackages/
-  dpkg-scanpackages releases /dev/null | gzip -9c > "$ROOT_REP/stable/Packages.gz.tmp" && mv -f "$ROOT_REP/stable/Packages.gz.tmp" "$ROOT_REP/stable/Packages.gz"
+  dpkg-scanpackages -m $RELEASES_REP /dev/null | gzip -9c > "$ROOT_REP/$STABLE_REP/Packages.gz.tmp" && mv -f "$ROOT_REP/$STABLE_REP/Packages.gz.tmp" "$ROOT_REP/$STABLE_REP/Packages.gz"
 fi
