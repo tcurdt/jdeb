@@ -60,7 +60,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
         try {
             compressorInputStream = new CompressorStreamFactory().createCompressorInputStream(is);
         } catch(CompressorException e) {
-          throw new IOException("Unsupported compression format: " + archive, e);
+            // expected if the input file is a zip archive
         }
 
         if (compressorInputStream != null) {
