@@ -156,7 +156,7 @@ public class Processor {
 
             return packageDescriptor;
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new PackagingException("Could not create deb package", e);
         } finally {
             if (tempData != null) {
@@ -394,10 +394,8 @@ public class Processor {
         if (dir != null && (!dir.exists() || !dir.isDirectory())) {
             throw new IOException("Cannot write data file at '" + pOutput.getAbsolutePath() + "'");
         }
-
-        final OutputStream fileOutputStream = new FileOutputStream(pOutput);
-        final OutputStream compressedOutputStream = compressedOutputStream(pCompression, fileOutputStream);
-        final TarOutputStream tarOutputStream = new TarOutputStream(compressedOutputStream);
+        
+        final TarOutputStream tarOutputStream = new TarOutputStream(compressedOutputStream(pCompression, new FileOutputStream(pOutput)));
         tarOutputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
         final MessageDigest digest = MessageDigest.getInstance("MD5");
@@ -541,14 +539,16 @@ public class Processor {
                 }
             }
         };
-
-        for (int i = 0; i < pData.length; i++) {
-            final DataProducer data = pData[i];
-            data.produce(receiver);
+        
+        try {
+            for (int i = 0; i < pData.length; i++) {
+                final DataProducer data = pData[i];
+                data.produce(receiver);
+            }
+        } finally {
+            tarOutputStream.close();
         }
-
-        tarOutputStream.close();
-
+        
         console.println("Total size: " + dataSize);
 
         return dataSize.count;
