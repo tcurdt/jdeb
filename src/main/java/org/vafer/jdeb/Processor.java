@@ -40,6 +40,7 @@ import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
+import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarOutputStream;
 import org.vafer.jdeb.changes.ChangeSet;
@@ -299,7 +300,18 @@ public class Processor {
             final File file = pControlFiles[i];
 
             if (file.isDirectory()) {
-                console.println("Found directory '" + file + "' in the control directory. Maybe you are pointing to wrong dir?");
+                // warn about the misplaced directory, except for directories ignored by default (.svn, cvs, etc)
+                boolean isDefaultExcludes = false;
+                for (String pattern : DirectoryScanner.getDefaultExcludes()) {
+                    isDefaultExcludes = DirectoryScanner.match(pattern, file.getAbsolutePath().replace("\\", "/"));
+                    if (isDefaultExcludes) {
+                        break;
+                    }
+                }
+                
+                if (!isDefaultExcludes) {
+                    console.println("Found directory '" + file + "' in the control directory. Maybe you are pointing to wrong dir?");
+                }
                 continue;
             }
 
