@@ -309,7 +309,7 @@ public class Processor {
                         break;
                     }
                 }
-                
+
                 if (!isDefaultExcludes) {
                     console.println("Found directory '" + file + "' in the control directory. Maybe you are pointing to wrong dir?");
                 }
@@ -356,7 +356,8 @@ public class Processor {
 
                 InformationInputStream infoStream = new InformationInputStream(new FileInputStream(file));
                 Utils.copy(infoStream, NullOutputStream.NULL_OUTPUT_STREAM);
-                
+                infoStream.close();
+
                 InputStream in = new FileInputStream(file);
                 if (infoStream.isShell() && !infoStream.hasUnixLineEndings()) {
                     // fix the line endings automatically
@@ -364,10 +365,11 @@ public class Processor {
                     entry.setSize(buf.length);
                     in = new ByteArrayInputStream(buf);
                 }
-                
+
                 outputStream.putNextEntry(entry);
                 Utils.copy(in, outputStream);
                 outputStream.closeEntry();
+                in.close();
             }
         }
 
@@ -412,7 +414,7 @@ public class Processor {
         if (dir != null && (!dir.exists() || !dir.isDirectory())) {
             throw new IOException("Cannot write data file at '" + pOutput.getAbsolutePath() + "'");
         }
-        
+
         final TarOutputStream tarOutputStream = new TarOutputStream(compressedOutputStream(pCompression, new FileOutputStream(pOutput)));
         tarOutputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
@@ -557,7 +559,7 @@ public class Processor {
                 }
             }
         };
-        
+
         try {
             for (int i = 0; i < pData.length; i++) {
                 final DataProducer data = pData[i];
@@ -566,7 +568,7 @@ public class Processor {
         } finally {
             tarOutputStream.close();
         }
-        
+
         console.println("Total size: " + dataSize);
 
         return dataSize.count;
