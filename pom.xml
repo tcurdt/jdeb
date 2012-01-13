@@ -98,6 +98,7 @@
                             <artifactSet>
                                 <includes>
                                     <include>org.apache.commons:commons-compress</include>
+                                    <include>commons-io:commons-io</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
@@ -113,6 +114,11 @@
         </plugins>
     </build>
     <dependencies>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.1</version>
+      </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>

@@ -40,6 +40,7 @@ import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
+import org.apache.commons.io.output.NullOutputStream;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarOutputStream;
@@ -353,15 +354,20 @@ public class Processor {
 
             } else {
 
-                final InformationInputStream infoStream = new InformationInputStream(new FileInputStream(file));
+                InformationInputStream infoStream = new InformationInputStream(new FileInputStream(file));
+                Utils.copy(infoStream, NullOutputStream.NULL_OUTPUT_STREAM);
+                
+                InputStream in = new FileInputStream(file);
+                if (infoStream.isShell() && !infoStream.hasUnixLineEndings()) {
+                    // fix the line endings automatically
+                    byte[] buf = Utils.toUnixLineEndings(in);
+                    entry.setSize(buf.length);
+                    in = new ByteArrayInputStream(buf);
+                }
                 
                 outputStream.putNextEntry(entry);
-                Utils.copy(infoStream, outputStream);
+                Utils.copy(in, outputStream);
                 outputStream.closeEntry();
-
-                if (infoStream.isShell() && !infoStream.hasUnixLineEndings()) {
-                    console.println("WARNING: The file '" + file + "' does not use Unix line endings.");
-                }
             }
         }
 
