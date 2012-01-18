@@ -26,48 +26,53 @@ public class InformationInputStreamTestCase extends TestCase {
 
     private InputStream getStream(String file) {
         return getClass().getClassLoader().getResourceAsStream("org/vafer/jdeb/utils/" + file);
-
     }
+
     public void testUTF8() throws Exception {
         InformationInputStream informationStream = new InformationInputStream(getStream("utf8-lf.txt"));
         Utils.copy(informationStream, new ByteArrayOutputStream());
-        // System.out.println("" + informationStream);
-        assertTrue(informationStream.isShell());
-        assertTrue(!informationStream.hasBom());
+        assertTrue("Shebang not detected", informationStream.isShell());
+        assertTrue("BOM detected", !informationStream.hasBom());
+        assertEquals("Encoding", null, informationStream.getEncoding());
     }
+
     public void testUTF8BOM() throws Exception {
         InformationInputStream informationStream = new InformationInputStream(getStream("utf8-lf-bom.txt"));
         Utils.copy(informationStream, new ByteArrayOutputStream());
-        // System.out.println("" + informationStream);
-        assertTrue(informationStream.isShell());
-        assertTrue(informationStream.hasBom());
+        assertTrue("Shebang not detected", informationStream.isShell());
+        assertTrue("BOM not detected", informationStream.hasBom());
+        assertEquals("Encoding", "UTF-8", informationStream.getEncoding());
     }
+
     public void testUTF16BE() throws Exception {
         InformationInputStream informationStream = new InformationInputStream(getStream("utf16be-lf.txt"));
         Utils.copy(informationStream, new ByteArrayOutputStream());
-        // System.out.println("" + informationStream);
-        assertTrue(informationStream.isShell());
-        assertTrue(!informationStream.hasBom());
+        assertTrue("Shebang not detected", informationStream.isShell());
+        assertTrue("BOM detected", !informationStream.hasBom());
+        assertEquals("Encoding", "UTF-16BE", informationStream.getEncoding());
     }
+
     public void testUTF16BEBOM() throws Exception {
         InformationInputStream informationStream = new InformationInputStream(getStream("utf16be-lf-bom.txt"));
         Utils.copy(informationStream, new ByteArrayOutputStream());
-        // System.out.println("" + informationStream);
-        assertTrue(informationStream.isShell());
-        assertTrue(informationStream.hasBom());
+        assertTrue("Shebang not detected", informationStream.isShell());
+        assertTrue("BOM not detected", informationStream.hasBom());
+        assertEquals("Encoding", "UTF-16BE", informationStream.getEncoding());
     }
+
     public void testUTF16LE() throws Exception {
         InformationInputStream informationStream = new InformationInputStream(getStream("utf16le-lf.txt"));
         Utils.copy(informationStream, new ByteArrayOutputStream());
-        // System.out.println("" + informationStream);
-        assertTrue(informationStream.isShell());
-        assertTrue(!informationStream.hasBom());
+        assertTrue("Shebang not detected", informationStream.isShell());
+        assertTrue("BOM detected", !informationStream.hasBom());
+        assertEquals("Encoding", "UTF-16LE", informationStream.getEncoding());
     }
+
     public void testUTF16LEBOM() throws Exception {
         InformationInputStream informationStream = new InformationInputStream(getStream("utf16le-lf-bom.txt"));
         Utils.copy(informationStream, new ByteArrayOutputStream());
-        // System.out.println("" + informationStream);
-        assertTrue(informationStream.isShell());
-        assertTrue(informationStream.hasBom());
+        assertTrue("Shebang not detected", informationStream.isShell());
+        assertTrue("BOM not detected", informationStream.hasBom());
+        assertEquals("Encoding", "UTF-16LE", informationStream.getEncoding());
     }
 }
