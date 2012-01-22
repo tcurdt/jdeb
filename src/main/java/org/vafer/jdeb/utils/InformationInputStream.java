@@ -31,18 +31,18 @@ public final class InformationInputStream extends FilterInputStream {
     private long lf;
     private long zero;
 
-    private Map<BOM, Integer> positions1 = new HashMap<BOM, Integer>();
-    private Map<Shell, Integer> positions2 = new HashMap<Shell, Integer>();
+    private final Map<BOM, Integer> bomPositions = new HashMap<BOM, Integer>();
+    private final Map<Shell, Integer> shellPositions = new HashMap<Shell, Integer>();
 
     /**
      * Byte Order Marks
      */
     private enum BOM {
         NONE(null),
-        UTF8("UTF-8", 0xEF, 0xBB, 0xBF), 
-        UTF16LE("UTF-16LE", 0xFF, 0xFE), 
+        UTF8("UTF-8", 0xEF, 0xBB, 0xBF),
+        UTF16LE("UTF-16LE", 0xFF, 0xFE),
         UTF16BE("UTF-16BE", 0xFE, 0xFF);
-        
+
         int[] sequence;
         String encoding;
 
@@ -57,8 +57,8 @@ public final class InformationInputStream extends FilterInputStream {
      */
     private enum Shell {
         NONE,
-        ASCII(0x23, 0x21), 
-        UTF16BE(0x00, 0x23, 0x00, 0x21), 
+        ASCII(0x23, 0x21),
+        UTF16BE(0x00, 0x23, 0x00, 0x21),
         UTF16LE(0x23, 0x00, 0x21, 0x00);
 
         int[] header;
@@ -89,7 +89,7 @@ public final class InformationInputStream extends FilterInputStream {
 
     public String getEncoding() {
         String encoding = bom.encoding;
-        
+
         if (encoding == null) {
             // guess the encoding from the shebang
             if (shell == Shell.UTF16BE) {
@@ -98,7 +98,7 @@ public final class InformationInputStream extends FilterInputStream {
                 encoding = BOM.UTF16LE.encoding;
             }
         }
-        
+
         return encoding;
     }
 
@@ -106,27 +106,27 @@ public final class InformationInputStream extends FilterInputStream {
         if (i < 10) {
             if (shell == Shell.NONE) {
                 for (Shell shell : Shell.values()) {
-                    int position = positions2.containsKey(shell) ? positions2.get(shell) : 0;
+                    int position = shellPositions.containsKey(shell) ? shellPositions.get(shell) : 0;
                     if (position < shell.header.length) {
                         if (c == shell.header[position]) {
-                            positions2.put(shell, position + 1);
+                            shellPositions.put(shell, position + 1);
                         } else {
-                            positions2.put(shell, 0);
+                            shellPositions.put(shell, 0);
                         }
                     } else {
                         this.shell = shell;
                     }
                 }
             }
-            
+
             if (bom == BOM.NONE) {
                 for (BOM bom : BOM.values()) {
-                    int position = positions1.containsKey(bom) ? positions1.get(bom) : 0;
+                    int position = bomPositions.containsKey(bom) ? bomPositions.get(bom) : 0;
                     if (position < bom.sequence.length) {
                         if (c == bom.sequence[position] && position == i) {
-                            positions1.put(bom, position + 1);
+                            bomPositions.put(bom, position + 1);
                         } else {
-                            positions1.put(bom, 0);
+                            bomPositions.put(bom, 0);
                         }
                     } else {
                         this.bom = bom;
