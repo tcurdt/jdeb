@@ -16,26 +16,13 @@
 
 package org.vafer.jdeb.utils;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
-public final class InformationInputStream extends InputStream {
-
-    private final InputStream inputStream;
-
-    private final char[] shell_utf8 = { 0x23, 0x21 };
-    private final char[] shell_utf16be = { 0x00, 0x23, 0x00, 0x21 };
-    private final char[] shell_utf16le = { 0x23, 0x00, 0x21, 0x00 };
-    private final char[] bom1 = { 0xEF, 0xBB, 0xBF };
-    private final char[] bom2 = { 0xFF, 0xFE };
-    private final char[] bom3 = { 0xFE, 0xFF };
-
-    private int shell_utf8_i;
-    private int shell_utf16be_i;
-    private int shell_utf16le_i;
-    private int bom1_i;
-    private int bom2_i;
-    private int bom3_i;
+public final class InformationInputStream extends FilterInputStream {
 
     private long i;
     private long ascii;
@@ -44,14 +31,48 @@ public final class InformationInputStream extends InputStream {
     private long lf;
     private long zero;
 
-    private enum BOM { NONE, BOM1, BOM2, BOM3 };
-    private enum SHELL { NONE, UTF8, UTF16BE, UTF16LE };
+    private Map<BOM, Integer> positions1 = new HashMap<BOM, Integer>();
+    private Map<Shell, Integer> positions2 = new HashMap<Shell, Integer>();
+
+    /**
+     * Byte Order Marks
+     */
+    private enum BOM {
+        NONE(null),
+        UTF8("UTF-8", 0xEF, 0xBB, 0xBF), 
+        UTF16LE("UTF-16LE", 0xFF, 0xFE), 
+        UTF16BE("UTF-16BE", 0xFE, 0xFF);
+        
+        int[] sequence;
+        String encoding;
+
+        private BOM(String encoding, int... sequence) {
+            this.encoding = encoding;
+            this.sequence = sequence;
+        }
+    }
+
+    /**
+     * Shebang for shell scripts in various encodings.
+     */
+    private enum Shell {
+        NONE,
+        ASCII(0x23, 0x21), 
+        UTF16BE(0x00, 0x23, 0x00, 0x21), 
+        UTF16LE(0x23, 0x00, 0x21, 0x00);
+
+        int[] header;
+
+        private Shell(int... header) {
+            this.header = header;
+        }
+    }
 
     private BOM bom = BOM.NONE;
-    private SHELL shell = SHELL.NONE;
+    private Shell shell = Shell.NONE;
 
-    public InformationInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
+    public InformationInputStream(InputStream in) {
+        super(in);
     }
 
     public boolean hasBom() {
@@ -59,84 +80,58 @@ public final class InformationInputStream extends InputStream {
     }
 
     public boolean isShell() {
-        return shell != SHELL.NONE;
+        return shell != Shell.NONE;
     }
+
     public boolean hasUnixLineEndings() {
         return cr == 0;
     }
 
+    public String getEncoding() {
+        String encoding = bom.encoding;
+        
+        if (encoding == null) {
+            // guess the encoding from the shebang
+            if (shell == Shell.UTF16BE) {
+                encoding = BOM.UTF16BE.encoding;
+            } else if (shell == Shell.UTF16LE) {
+                encoding = BOM.UTF16LE.encoding;
+            }
+        }
+        
+        return encoding;
+    }
+
     private void add(int c) {
-        // System.out.println(i + ": " + Integer.toHexString(c));
         if (i < 10) {
-            // FIXME refactor to make this DRY
-            if (shell == SHELL.NONE) {
-                if (shell_utf8_i < shell_utf8.length) {
-                    if (c == shell_utf8[shell_utf8_i]) {
-                        shell_utf8_i++;
+            if (shell == Shell.NONE) {
+                for (Shell shell : Shell.values()) {
+                    int position = positions2.containsKey(shell) ? positions2.get(shell) : 0;
+                    if (position < shell.header.length) {
+                        if (c == shell.header[position]) {
+                            positions2.put(shell, position + 1);
+                        } else {
+                            positions2.put(shell, 0);
+                        }
                     } else {
-                        shell_utf8_i = 0;
+                        this.shell = shell;
                     }
-                } else {
-                    // System.out.println("utf8 shell at " + (i-shell_utf8.length));
-                    shell = SHELL.UTF8;
-                }
-
-                if (shell_utf16be_i < shell_utf16be.length) {
-                    if (c == shell_utf16be[shell_utf16be_i]) {
-                        shell_utf16be_i++;
-                    } else {
-                        shell_utf16be_i = 0;
-                    }
-                } else {
-                    // System.out.println("utf16be shell at " + (i-shell_utf16be.length));
-                    shell = SHELL.UTF16BE;
-                }
-
-                if (shell_utf16le_i < shell_utf16le.length) {
-                    if (c == shell_utf16le[shell_utf16le_i]) {
-                        shell_utf16le_i++;
-                    } else {
-                        shell_utf16le_i = 0;
-                    }
-                } else {
-                    // System.out.println("utf16le shell at " + (i-shell_utf16le.length));
-                    shell = SHELL.UTF16LE;
                 }
             }
+            
             if (bom == BOM.NONE) {
-                if (bom1_i < bom1.length) {
-                    if (c == bom1[bom1_i] && bom1_i == i) {
-                        bom1_i++;
+                for (BOM bom : BOM.values()) {
+                    int position = positions1.containsKey(bom) ? positions1.get(bom) : 0;
+                    if (position < bom.sequence.length) {
+                        if (c == bom.sequence[position] && position == i) {
+                            positions1.put(bom, position + 1);
+                        } else {
+                            positions1.put(bom, 0);
+                        }
                     } else {
-                        bom1_i = 0;
+                        this.bom = bom;
                     }
-                } else {
-                    // System.out.println("bom1 at " + (i-bom1.length));
-                    bom = BOM.BOM1;
                 }
-
-                if (bom2_i < bom2.length) {
-                    if (c == bom2[bom2_i] && bom2_i == i) {
-                        bom2_i++;
-                    } else {
-                        bom2_i = 0;
-                    }
-                } else {
-                    // System.out.println("bom2 at " + (i-bom2.length));
-                    bom = BOM.BOM2;
-                }
-
-                if (bom3_i < bom3.length) {
-                    if (c == bom3[bom3_i] && bom3_i == i) {
-                        bom3_i++;
-                    } else {
-                        bom3_i = 0;
-                    }
-                } else {
-                    // System.out.println("bom3 at " + (i-bom3.length));
-                    bom = BOM.BOM3;
-                }
-
             }
         }
 
@@ -161,48 +156,20 @@ public final class InformationInputStream extends InputStream {
         nonascii++;
     }
 
-    public int available() throws IOException {
-        return inputStream.available();
-    }
-
-    public void close() throws IOException {
-        inputStream.close();
-    }
-
-    public void mark(int readlimit) {
-        inputStream.mark(readlimit);
-    }
-
-    public boolean markSupported() {
-        return inputStream.markSupported();
-    }
-
     public int read() throws IOException {
-        int ret = inputStream.read();
-        if (ret != -1) {
-            add(ret & 0xFF);
+        int b = super.read();
+        if (b != -1) {
+            add(b & 0xFF);
         }
-        return ret;
+        return b;
     }
 
     public int read(byte[] b, int off, int len) throws IOException {
-        int ret = inputStream.read(b, off, len);
-        for(int i = 0; i<ret; i++) {
+        int length = super.read(b, off, len);
+        for(int i = 0; i<length; i++) {
             add(b[off+i] & 0xFF);
         }
-        return ret;
-    }
-
-    public int read(byte[] b) throws IOException {
-        return read(b, 0, b.length);
-    }
-
-    public void reset() throws IOException {
-        inputStream.reset();
-    }
-
-    public long skip(long n) throws IOException {
-        return inputStream.skip(n);
+        return length;
     }
 
     public String toString() {

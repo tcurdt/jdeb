@@ -244,6 +244,8 @@ public class DebMojo extends AbstractPluginMojo {
     }
 
     protected VariableResolver initializeVariableResolver(Map variables) {
+        variables.putAll(getProject().getProperties());
+
         variables.put("name", getProject().getName());
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
@@ -254,6 +256,7 @@ public class DebMojo extends AbstractPluginMojo {
         variables.put("buildDir", buildDirectory.getAbsolutePath());
         variables.put("project.version", getProject().getVersion());
         variables.put("url", getProject().getUrl());
+        
         return new MapVariableResolver(variables);
     }
 
