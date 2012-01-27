@@ -222,7 +222,7 @@ public class DebMaker {
         
         final File staticConfFiles = new File(control, "conffiles");
         if (staticConfFiles.exists() && confFiles != null && controlFiles.length > 0) {
-            console.println("WARNING: The confFiles rules in the pom will be overriden by "+staticConfFiles.getAbsolutePath());                    
+            console.warn("The confFiles rules in the pom will be overriden by "+staticConfFiles.getAbsolutePath());                    
         } else if (confFiles != null) {
             List<File> files = new ArrayList<File>(Arrays.asList(controlFiles));
             files.add(confFiles);

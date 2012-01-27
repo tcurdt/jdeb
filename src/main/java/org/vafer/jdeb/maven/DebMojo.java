@@ -407,6 +407,9 @@ public class DebMojo extends AbstractPluginMojo {
                 public void println(String s) {
                     getLog().info(s);
                 }
+                public void warn(String message) {
+                    getLog().warn(message);
+                }
             };
 
             try {
