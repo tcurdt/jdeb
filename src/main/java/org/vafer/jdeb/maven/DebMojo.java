@@ -15,22 +15,20 @@
  */
 package org.vafer.jdeb.maven;
 
-import java.io.File;
-import java.io.FileInputStream;
+import com.google.common.io.Files;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.model.fileset.FileSet;
+import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataConsumer;
@@ -210,6 +208,13 @@ public class DebMojo extends AbstractPluginMojo {
     private Data[] dataSet;
 
     /**
+     * The debian conffiles data.
+     * 
+     * @parameter
+     */
+    private FileSet[] confFiles;
+    
+    /**
      * When SNAPSHOT version replace <code>SNAPSHOT</code> with current date
      * and time to make sure each build is unique.
      *
@@ -260,6 +265,43 @@ public class DebMojo extends AbstractPluginMojo {
         return new MapVariableResolver(variables);
     }
 
+    // Generates a "conffiles" file if files are specified in the pom
+    private File generateConfFiles() throws MojoExecutionException {
+      
+        File generatedConfFiles = null;
+
+        List<File> allConfigFiles = new ArrayList<File>();
+        
+        FileSetManager fileSetManager = new FileSetManager();
+        for (FileSet nextFileSet : confFiles) {
+            List<String> configFileNames = new ArrayList<String>();
+
+            configFileNames.addAll(Arrays.asList(fileSetManager.getIncludedFiles(nextFileSet)));
+            configFileNames.addAll(Arrays.asList(fileSetManager.getIncludedDirectories(nextFileSet)));
+
+            for (String nextFileName : configFileNames) {
+                allConfigFiles.add(new File(nextFileSet.getOutputDirectory(), nextFileName));
+            }
+        }
+
+        if (!allConfigFiles.isEmpty()) {
+            PrintWriter printWriter = null;
+            generatedConfFiles = new File(Files.createTempDir(), "conffiles");
+            try {                
+                printWriter = new PrintWriter(new FileOutputStream(generatedConfFiles));
+                for (File nextFileName : allConfigFiles) {
+                    printWriter.println(nextFileName.getAbsolutePath());
+                }
+            } catch (IOException e) {
+                throw new MojoExecutionException("Failed to write to temporary conffiles file - "+generatedConfFiles.getAbsolutePath(), e);
+            } finally {
+                printWriter.close();
+            }
+        }
+
+        return generatedConfFiles;
+    }
+
     /**
      * Doc some cleanup and conversion on the Maven project version.
      * <ul>
@@ -305,6 +347,8 @@ public class DebMojo extends AbstractPluginMojo {
 
         setData(dataSet);
 
+        final File generatedConfFiles = generateConfFiles();
+        
         try {
 
             final VariableResolver resolver = initializeVariableResolver(new HashMap());
@@ -369,6 +413,8 @@ public class DebMojo extends AbstractPluginMojo {
 
                 DebMaker debMaker = new DebMaker(infoConsole, debFile, controlDirFile, dataProducers, resolver);
 
+                debMaker.setConfFiles(generatedConfFiles);
+                
                 if (changesInFile.exists() && changesInFile.canRead()) {
                     debMaker.setChangesIn(changesInFile);
                     debMaker.setChangesOut(changesOutFile);
@@ -391,6 +437,12 @@ public class DebMojo extends AbstractPluginMojo {
 
         } catch (ParseException e) {
             throw new MojoExecutionException("Failed parsing pattern", e);
+        } finally {
+            if (generatedConfFiles != null && generatedConfFiles.exists()) {
+                if (!generatedConfFiles.delete()) {
+                    generatedConfFiles.deleteOnExit();
+                }
+            }
         }
     }
 }

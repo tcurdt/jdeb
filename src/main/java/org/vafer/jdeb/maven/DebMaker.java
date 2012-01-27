@@ -19,7 +19,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataProducer;
@@ -70,6 +72,9 @@ public class DebMaker {
     /** The file where to write the changes of the changes input to */
     private File changesSave;
 
+    /** The file to use as the debian conffiles file */
+    private File confFiles = null;
+    
     /** The compression method used for the data file (none, gzip or bzip2) */
     private String compression = "gzip";
 
@@ -98,6 +103,9 @@ public class DebMaker {
         }
     }
 
+    public void setConfFiles(File confFiles) {
+        this.confFiles = confFiles;
+    }
     public void setDeb(File deb) {
         this.deb = deb;
     }
@@ -209,8 +217,18 @@ public class DebMaker {
             throw new PackagingException(
                     "You need to specify where the deb file is supposed to be created.");
         }
-
-        final File[] controlFiles = control.listFiles();
+        
+        File[] controlFiles = control.listFiles();
+        
+        final File staticConfFiles = new File(control, "conffiles");
+        if (staticConfFiles.exists() && confFiles != null && controlFiles.length > 0) {
+            console.println("WARNING: The confFiles rules in the pom will be overriden by "+staticConfFiles.getAbsolutePath());                    
+        } else if (confFiles != null) {
+            List<File> files = new ArrayList<File>(Arrays.asList(controlFiles));
+            files.add(confFiles);
+            controlFiles = files.toArray(controlFiles);
+        }
+        
 
         final DataProducer[] data = new DataProducer[dataProducers.size()];
         dataProducers.toArray(data);
