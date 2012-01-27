@@ -271,31 +271,33 @@ public class DebMojo extends AbstractPluginMojo {
         File generatedConfFiles = null;
 
         List<File> allConfigFiles = new ArrayList<File>();
-        
-        FileSetManager fileSetManager = new FileSetManager();
-        for (FileSet nextFileSet : confFiles) {
-            List<String> configFileNames = new ArrayList<String>();
 
-            configFileNames.addAll(Arrays.asList(fileSetManager.getIncludedFiles(nextFileSet)));
-            configFileNames.addAll(Arrays.asList(fileSetManager.getIncludedDirectories(nextFileSet)));
+        if (confFiles != null) {
+            FileSetManager fileSetManager = new FileSetManager();
+            for (FileSet nextFileSet : confFiles) {
+                List<String> configFileNames = new ArrayList<String>();
 
-            for (String nextFileName : configFileNames) {
-                allConfigFiles.add(new File(nextFileSet.getOutputDirectory(), nextFileName));
-            }
-        }
+                configFileNames.addAll(Arrays.asList(fileSetManager.getIncludedFiles(nextFileSet)));
+                configFileNames.addAll(Arrays.asList(fileSetManager.getIncludedDirectories(nextFileSet)));
 
-        if (!allConfigFiles.isEmpty()) {
-            PrintWriter printWriter = null;
-            generatedConfFiles = new File(Files.createTempDir(), "conffiles");
-            try {                
-                printWriter = new PrintWriter(new FileOutputStream(generatedConfFiles));
-                for (File nextFileName : allConfigFiles) {
-                    printWriter.println(nextFileName.getAbsolutePath());
+                for (String nextFileName : configFileNames) {
+                    allConfigFiles.add(new File(nextFileSet.getOutputDirectory(), nextFileName));
                 }
-            } catch (IOException e) {
-                throw new MojoExecutionException("Failed to write to temporary conffiles file - "+generatedConfFiles.getAbsolutePath(), e);
-            } finally {
-                printWriter.close();
+            }
+
+            if (!allConfigFiles.isEmpty()) {
+                PrintWriter printWriter = null;
+                generatedConfFiles = new File(Files.createTempDir(), "conffiles");
+                try {
+                    printWriter = new PrintWriter(new FileOutputStream(generatedConfFiles));
+                    for (File nextFileName : allConfigFiles) {
+                        printWriter.println(nextFileName.getAbsolutePath());
+                    }
+                } catch (IOException e) {
+                    throw new MojoExecutionException("Failed to write to temporary conffiles file - " + generatedConfFiles.getAbsolutePath(), e);
+                } finally {
+                    printWriter.close();
+                }
             }
         }
 
