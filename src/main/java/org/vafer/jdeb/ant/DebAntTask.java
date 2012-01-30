@@ -25,6 +25,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.apache.tools.ant.taskdefs.Tar;
 import org.apache.tools.ant.types.FileSet;
+import org.apache.tools.ant.types.LogLevel;
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Processor;
@@ -189,6 +190,10 @@ public class DebAntTask extends MatchingTask {
                 if (verbose) {
                     log(s);
                 }
+            }
+
+            public void warn(String message) {
+                log(message, LogLevel.WARN.getLevel());
             }
         }, null);
 

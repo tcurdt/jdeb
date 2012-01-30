@@ -33,6 +33,9 @@ public class ProcessorTestCase extends TestCase {
         Processor processor = new Processor(new Console() {
             public void println(String s) {
             }
+
+            public void warn(String message) {
+            }
         }, null);
 
         Project project = new Project();
