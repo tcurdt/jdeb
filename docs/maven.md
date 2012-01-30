@@ -97,7 +97,10 @@ section with any of the following options:
     *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
     | attach        | Attach artifact to project                                                   | No; defaults to 'true'                                           |
     *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | submodules    | Execute the goal on all sub-modules                                          | No; defaults to 'true'                   |
+    | submodules    | Execute the goal on all sub-modules                                          | No; defaults to 'true'                                           |
+    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | confFiles     | FileSet specifying config files to be kept on package updates or removal.    | No                                                               |
+    |               | Ignored if a 'conffiles' file is present in the control directory.           |                                                                  | 
     *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
 
 If you use the 'dataSet' element, you'll need to populate it with a one or
@@ -197,6 +200,15 @@ include a directory, a tarball, and a file in your deb package:
                                 </data>
                             </dataSet>
                             ...
+                            <confFiles>
+                                <fileSet>
+                                    <directory>${project.basedir}/src/main/config</directory>
+                                    <outputDirectory>/etc/my-project</outputDirectory>
+                                    <includes>
+                                        <include>*.conf</include>
+                                    </includes>
+                                 </fileSet>
+                            </confFiles>
                         </configuration>
                     </execution>
                 </executions>

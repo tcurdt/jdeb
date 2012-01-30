@@ -39,6 +39,8 @@ public final class DataProducerTestCase extends TestCase {
         final Processor processor = new Processor(new Console() {
             public void println(String s) {
             }
+            public void warn(String message) {
+            }
         }, null);
 
         final File control = new File(getClass().getResource("deb/control/control").toURI());
