@@ -1,5 +1,15 @@
 ## Version 1.0, unreleased
 
+## Version 0.10, released 18.02.2012
+
+Polishing and regression fixes
+
+* [FIX] Don't throw exception when detecting zip archives
+* [FIX] Make sure to close the tar output stream
+* [CHG] Have warn/info level on messages
+* [CHG] Fix line endings for control files
+* [ADD] Access to all Maven variables
+
 
 ## Version 0.9, released 17.12.2011
 
