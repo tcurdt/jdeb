@@ -185,11 +185,14 @@ public class DebAntTask extends MatchingTask {
         dataProducers.toArray(data);
 
         final Processor processor = new Processor(new Console() {
-            public void println(String s) {
+            public void info(String s) {
                 if (verbose) {
                     log(s);
                 }
             }
+            public void warn(String s) {
+                log(s);
+            }                
         }, null);
 
         final PackageDescriptor packageDescriptor;

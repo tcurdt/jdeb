@@ -220,7 +220,7 @@ public class DebMaker {
         final PackageDescriptor packageDescriptor;
         try {
 
-            console.println("Creating debian package: " + deb);
+            console.info("Creating debian package: " + deb);
 
             packageDescriptor = processor.createDeb(controlFiles, data, deb, compression);
 
@@ -235,7 +235,7 @@ public class DebMaker {
                 return;
             }
 
-            console.println("Creating changes file: " + changesOut);
+            console.info("Creating changes file: " + changesOut);
 
             // for now only support reading the changes form a textfile provider
             changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
@@ -254,7 +254,7 @@ public class DebMaker {
                 return;
             }
 
-            console.println("Saving changes to file: " + changesSave);
+            console.info("Saving changes to file: " + changesSave);
 
             changesProvider.save(new FileOutputStream(changesSave));
 

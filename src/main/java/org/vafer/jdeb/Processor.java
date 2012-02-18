@@ -122,11 +122,11 @@ public class Processor {
             tempData = File.createTempFile("deb", "data");
             tempControl = File.createTempFile("deb", "control");
 
-            console.println("Building data");
+            console.info("Building data");
             final StringBuilder md5s = new StringBuilder();
             final BigInteger size = buildData(pData, tempData, md5s, compression);
 
-            console.println("Building control");
+            console.info("Building control");
             final PackageDescriptor packageDescriptor = buildControl(pControlFiles, size, md5s, tempControl);
 
             if (!packageDescriptor.isValid()) {
@@ -259,7 +259,7 @@ public class Processor {
             return changesDescriptor;
         }
 
-        console.println("Signing changes with key " + pKey);
+        console.info("Signing changes with key " + pKey);
 
         final InputStream input = new ByteArrayInputStream(changesBytes);
 
@@ -311,7 +311,7 @@ public class Processor {
                 }
 
                 if (!isDefaultExcludes) {
-                    console.println("Found directory '" + file + "' in the control directory. Maybe you are pointing to wrong dir?");
+                    console.info("Found directory '" + file + "' in the control directory. Maybe you are pointing to wrong dir?");
                 }
                 continue;
             }
@@ -349,7 +349,7 @@ public class Processor {
                 if (debFullName != null && debEmail != null) {
                     final String maintainer = debFullName + " <" + debEmail + ">";
                     packageDescriptor.set("Maintainer", maintainer);
-                    console.println("Using maintainer '" + maintainer + "' from the environment variables.");
+                    console.info("Using maintainer '" + maintainer + "' from the environment variables.");
                 }
 
             } else {
@@ -434,7 +434,7 @@ public class Processor {
                 // createParentDirectories, including about a possible bug.)
                 createDirectory(dirname, user, uid, group, gid, mode, 0);
 
-                console.println("dir: " + dirname);
+                console.info("dir: " + dirname);
             }
 
             public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
@@ -463,17 +463,17 @@ public class Processor {
 
                 tarOutputStream.closeEntry();
 
-                console.println(
+                console.info(
                         "file:" + entry.getName() +
-                        " size:" + entry.getSize() +
-                        " mode:" + entry.getMode() +
-                        " linkname:" + entry.getLinkName() +
-                        " username:" + entry.getUserName() +
-                        " userid:" + entry.getUserId() +
-                        " groupname:" + entry.getGroupName() +
-                        " groupid:" + entry.getGroupId() +
-                        " modtime:" + entry.getModTime() +
-                        " md5: " + md5
+                                " size:" + entry.getSize() +
+                                " mode:" + entry.getMode() +
+                                " linkname:" + entry.getLinkName() +
+                                " username:" + entry.getUserName() +
+                                " userid:" + entry.getUserId() +
+                                " groupname:" + entry.getGroupName() +
+                                " groupid:" + entry.getGroupId() +
+                                " modtime:" + entry.getModTime() +
+                                " md5: " + md5
                 );
 
                 // append to file md5 list
@@ -569,7 +569,7 @@ public class Processor {
             tarOutputStream.close();
         }
 
-        console.println("Total size: " + dataSize);
+        console.info("Total size: " + dataSize);
 
         return dataSize.count;
     }

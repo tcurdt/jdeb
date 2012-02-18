@@ -360,8 +360,11 @@ public class DebMojo extends AbstractPluginMojo {
             }
 
             Console infoConsole = new Console() {
-                public void println(String s) {
+                public void info(String s) {
                     getLog().info(s);
+                }
+                public void warn(String s) {
+                    getLog().warn(s);
                 }
             };
 
