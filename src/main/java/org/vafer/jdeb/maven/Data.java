@@ -19,9 +19,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.StringTokenizer;
+
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.producers.DataProducerArchive;
@@ -47,6 +47,15 @@ public final class Data implements DataProducer {
         this.src = src;
     }
 
+    private String destinationName;
+
+    /**
+     * @parameter expression="${destinationName}"
+     * @required
+     */
+    public void setDest( String destinationName ) {
+        this.destinationName = destinationName;
+    }
 
     private String type;
 
@@ -56,7 +65,6 @@ public final class Data implements DataProducer {
     public void setType(String type) {
         this.type = type;
     }
-
 
     /**
      * @parameter expression="${includes}" alias="includes"
@@ -93,9 +101,10 @@ public final class Data implements DataProducer {
         return result;
     }
 
+    @Override
     public void produce(final DataConsumer pReceiver) throws IOException {
 
-      if (!src.exists()) {
+        if (!src.exists()) {
             throw new FileNotFoundException("Data source not found : " + src);
         }
 
@@ -105,7 +114,7 @@ public final class Data implements DataProducer {
         }
 
         if ("file".equalsIgnoreCase(type)) {
-            new DataProducerFile(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            new DataProducerFile(src, destinationName, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 
