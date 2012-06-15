@@ -391,7 +391,7 @@ public class Processor {
         }
 
         for (FilteredConfigurationFile configurationFile : configurationFiles) {
-            addEntry(configurationFile.getName(), configurationFile.toString(), outputStream);
+            addControlEntry(configurationFile.getName(), configurationFile.toString(), outputStream);
         }
         addEntry("control", packageDescriptor.toString(), outputStream);
         addEntry("md5sums", pChecksums.toString(), outputStream);
@@ -596,7 +596,20 @@ public class Processor {
         final TarEntry entry = new TarEntry("./" + pName);
         entry.setSize(data.length);
         entry.setNames("root", "root");
+        
+        pOutput.putNextEntry(entry);
+        pOutput.write(data);
+        pOutput.closeEntry();
+    }
+    
+    private static void addControlEntry( final String pName, final String pContent, final TarOutputStream pOutput ) throws IOException {
+        final byte[] data = pContent.getBytes("UTF-8");
 
+        final TarEntry entry = new TarEntry("./" + pName);
+        entry.setSize(data.length);
+        entry.setNames("root", "root");
+        entry.setMode(PermMapper.toMode("755"));
+        
         pOutput.putNextEntry(entry);
         pOutput.write(data);
         pOutput.closeEntry();
