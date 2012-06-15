@@ -19,9 +19,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.StringTokenizer;
+
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.producers.DataProducerArchive;
@@ -32,7 +32,7 @@ import org.vafer.jdeb.producers.DataProducerFile;
  * Maven "data" elment acting as a factory for DataProducers. So far Archive and
  * Directory producers are supported. Both support the usual ant pattern set
  * matching.
- *
+ * 
  * @author Bryan Sant <bryan.sant@gmail.com>
  */
 public final class Data implements DataProducer {
@@ -43,25 +43,32 @@ public final class Data implements DataProducer {
      * @parameter expression="${src}"
      * @required
      */
-    public void setSrc(File src) {
+    public void setSrc( File src ) {
         this.src = src;
     }
-
 
     private String type;
 
     /**
      * @parameter expression="${type}"
      */
-    public void setType(String type) {
+    public void setType( String type ) {
         this.type = type;
     }
 
+    private boolean failOnMissingSrc = true;
+
+    /**
+     * @parameter expression="${failOnMissingSrc}"
+     */
+    public void setFailOnMissingSrc( boolean failOnMissingSrc ) {
+        this.failOnMissingSrc = failOnMissingSrc;
+    }
 
     /**
      * @parameter expression="${includes}" alias="includes"
      */
-    public void setIncludes(String includes) {
+    public void setIncludes( String includes ) {
         includePatterns = splitPatterns(includes);
     }
 
@@ -70,7 +77,7 @@ public final class Data implements DataProducer {
     /**
      * @parameter expression="${excludes}" alias="excludes"
      */
-    public void setExcludes(String excludes) {
+    public void setExcludes( String excludes ) {
         excludePatterns = splitPatterns(excludes);
     }
 
@@ -80,7 +87,7 @@ public final class Data implements DataProducer {
      */
     private Mapper mapper;
 
-    public String[] splitPatterns(String patterns) {
+    public String[] splitPatterns( String patterns ) {
         String[] result = null;
         if (patterns != null && patterns.length() > 0) {
             List tokens = new ArrayList();
@@ -88,15 +95,19 @@ public final class Data implements DataProducer {
             while (tok.hasMoreTokens()) {
                 tokens.add(tok.nextToken());
             }
-            result = (String[]) tokens.toArray(new String[tokens.size()]);
+            result = (String[])tokens.toArray(new String[tokens.size()]);
         }
         return result;
     }
 
-    public void produce(final DataConsumer pReceiver) throws IOException {
+    public void produce( final DataConsumer pReceiver ) throws IOException {
 
-      if (!src.exists()) {
-            throw new FileNotFoundException("Data source not found : " + src);
+        if (src != null && !src.exists()) {
+            if (failOnMissingSrc) {
+                throw new FileNotFoundException("Data source not found : " + src);
+            } else {
+                return;
+            }
         }
 
         org.vafer.jdeb.mapping.Mapper[] mappers = null;
