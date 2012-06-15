@@ -295,14 +295,11 @@ public class Processor {
      * @throws ParseException
      */
     private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuilder pChecksums, final File pOutput ) throws IOException, ParseException {
-        console.info("Building control");
         
-        // ?
         final File dir = pOutput.getParentFile();
         if (dir != null && (!dir.exists() || !dir.isDirectory())) {
             throw new IOException("Cannot write control file at '" + pOutput.getAbsolutePath() + "'");
         }
-        // ?
 
         final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
         outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
