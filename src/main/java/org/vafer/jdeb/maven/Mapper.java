@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.vafer.jdeb.mapping.LsMapper;
+import org.vafer.jdeb.mapping.NullMapper;
 import org.vafer.jdeb.mapping.PermMapper;
 
 /**
@@ -102,7 +103,8 @@ public final class Mapper {
             return new PermMapper(strip, prefix);
         }
 
-        throw new IOException("Unknown mapper type '" + type + "'");
+        /* NullMapper required for DataProducerPathTemplate */ 
+        return NullMapper.INSTANCE;
     }
 
 }
