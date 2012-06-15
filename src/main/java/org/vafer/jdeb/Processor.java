@@ -32,8 +32,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
@@ -46,6 +48,7 @@ import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarOutputStream;
 import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.ChangesProvider;
+import org.vafer.jdeb.control.FilteredConfigurationFile;
 import org.vafer.jdeb.descriptors.ChangesDescriptor;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 import org.vafer.jdeb.mapping.PermMapper;
@@ -63,8 +66,13 @@ import org.vafer.jdeb.utils.VariableResolver;
  */
 public class Processor {
 
+    private static final Set<String> CONFIGURATION_FILENAMES
+        = new HashSet<String>(Arrays.asList(new String[] { "conffiles", "preinst", "postinst", "prerm", "postrm" } ));
+
     private final Console console;
     private final VariableResolver resolver;
+    private List<FilteredConfigurationFile> configurationFiles;
+
 
     private static final class Total {
         private BigInteger count = BigInteger.valueOf(0);
@@ -81,6 +89,7 @@ public class Processor {
     public Processor( final Console pConsole, final VariableResolver pResolver ) {
         console = pConsole;
         resolver = pResolver;
+        configurationFiles = new ArrayList<FilteredConfigurationFile>();
     }
 
     private void addTo( final ArArchiveOutputStream pOutput, final String pName, final String pContent ) throws IOException {
@@ -286,20 +295,22 @@ public class Processor {
      * @throws ParseException
      */
     private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuilder pChecksums, final File pOutput ) throws IOException, ParseException {
-
+        console.info("Building control");
+        
+        // ?
         final File dir = pOutput.getParentFile();
         if (dir != null && (!dir.exists() || !dir.isDirectory())) {
             throw new IOException("Cannot write control file at '" + pOutput.getAbsolutePath() + "'");
         }
+        // ?
 
         final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
         outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
+        
         // create a descriptor out of the "control" file, copy all other files, ignore directories
         PackageDescriptor packageDescriptor = null;
-        for (int i = 0; i < pControlFiles.length; i++) {
-            final File file = pControlFiles[i];
-
+        for (File file : pControlFiles) {
             if (file.isDirectory()) {
                 // warn about the misplaced directory, except for directories ignored by default (.svn, cvs, etc)
                 boolean isDefaultExcludes = false;
@@ -323,7 +334,12 @@ public class Processor {
             entry.setNames("root", "root");
             entry.setMode(PermMapper.toMode("755"));
 
-            if ("control".equals(name)) {
+            if (CONFIGURATION_FILENAMES.contains(name)) {
+                
+                FilteredConfigurationFile configurationFile = new FilteredConfigurationFile(file.getName(), new FileInputStream(file), resolver);
+                configurationFiles.add(configurationFile);
+                
+            } else if ("control".equals(name)) {
 
                 packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
 
@@ -377,6 +393,9 @@ public class Processor {
             throw new FileNotFoundException("No 'control' found in " + Arrays.toString(pControlFiles));
         }
 
+        for (FilteredConfigurationFile configurationFile : configurationFiles) {
+            addEntry(configurationFile.getName(), configurationFile.toString(), outputStream);
+        }
         addEntry("control", packageDescriptor.toString(), outputStream);
         addEntry("md5sums", pChecksums.toString(), outputStream);
 
@@ -585,4 +604,5 @@ public class Processor {
         pOutput.write(data);
         pOutput.closeEntry();
     }
+    
 }
