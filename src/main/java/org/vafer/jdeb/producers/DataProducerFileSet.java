@@ -24,7 +24,6 @@ import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.taskdefs.Tar;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.tar.TarEntry;
-import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 
@@ -42,7 +41,7 @@ public final class DataProducerFileSet implements DataProducer {
         fileset = pFileset;
     }
 
-    public void produce( final DataConsumer pReceiver, final Console console ) throws IOException {
+    public void produce( final DataConsumer pReceiver ) throws IOException {
         String user = "root";
         int uid = 0;
         String group = "root";

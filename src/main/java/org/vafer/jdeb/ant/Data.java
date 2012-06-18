@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.tools.ant.types.PatternSet;
-import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.producers.DataProducerArchive;
@@ -57,7 +56,7 @@ public final class Data extends PatternSet implements DataProducer {
         mapperWrapper.add(pMapper);
     }
 
-    public void produce( final DataConsumer pReceiver, Console console ) throws IOException {
+    public void produce( final DataConsumer pReceiver) throws IOException {
 
         if (!src.exists()) {
             throw new FileNotFoundException("Data source not found : " + src);
@@ -75,7 +74,7 @@ public final class Data extends PatternSet implements DataProducer {
                     getIncludePatterns(getProject()),
                     getExcludePatterns(getProject()),
                     mappers
-                    ).produce(pReceiver, console);
+                    ).produce(pReceiver);
             return;
         }
 
@@ -85,7 +84,7 @@ public final class Data extends PatternSet implements DataProducer {
                     getIncludePatterns(getProject()),
                     getExcludePatterns(getProject()),
                     mappers
-                    ).produce(pReceiver, console);
+                    ).produce(pReceiver);
             return;
         }
 
@@ -95,7 +94,7 @@ public final class Data extends PatternSet implements DataProducer {
                     getIncludePatterns(getProject()),
                     getExcludePatterns(getProject()),
                     mappers
-                    ).produce(pReceiver, console);
+                    ).produce(pReceiver);
             return;
         }
 

@@ -16,6 +16,7 @@
 package org.vafer.jdeb.maven;
 
 import static org.vafer.jdeb.maven.MissingSourceBehavior.FAIL;
+import static org.vafer.jdeb.maven.MissingSourceBehavior.IGNORE;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.producers.DataProducerArchive;
@@ -106,16 +106,12 @@ public final class Data implements DataProducer {
         return result;
     }
 
-    public void produce( final DataConsumer pReceiver, final Console console ) throws IOException {
+    public void produce( final DataConsumer pReceiver ) throws IOException {
 
         if (src != null && !src.exists()) {
-            switch (missingSrc) {
-            case IGNORE:
+            if (missingSrc == IGNORE) {
                 return;
-            case WARN:
-                console.warn("Data source not found : " + src);
-                return;
-            default:
+            } else {
                 throw new FileNotFoundException("Data source not found : " + src);
             }
         }
@@ -126,17 +122,17 @@ public final class Data implements DataProducer {
         }
 
         if ("file".equalsIgnoreCase(type)) {
-            new DataProducerFile(src, includePatterns, excludePatterns, mappers).produce(pReceiver, console);
+            new DataProducerFile(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 
         if ("archive".equalsIgnoreCase(type)) {
-            new DataProducerArchive(src, includePatterns, excludePatterns, mappers).produce(pReceiver, console);
+            new DataProducerArchive(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 
         if ("directory".equalsIgnoreCase(type)) {
-            new DataProducerDirectory(src, includePatterns, excludePatterns, mappers).produce(pReceiver, console);
+            new DataProducerDirectory(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 

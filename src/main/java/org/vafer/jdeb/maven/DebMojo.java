@@ -339,7 +339,7 @@ public class DebMojo extends AbstractPluginMojo {
                         final File file = artifact.getFile();
                         if (file != null) {
                             dataProducers.add(new DataProducer() {
-                                public void produce(final DataConsumer receiver, final Console console) {
+                                public void produce(final DataConsumer receiver) {
                                     try {
                                         receiver.onEachFile(
                                                 new FileInputStream(file),

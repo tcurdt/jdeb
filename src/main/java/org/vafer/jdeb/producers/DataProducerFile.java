@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.tools.tar.TarEntry;
-import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
@@ -41,7 +40,7 @@ public final class DataProducerFile extends AbstractDataProducer implements Data
         file = pFile;
     }
 
-    public void produce( final DataConsumer pReceiver, final Console console ) throws IOException {
+    public void produce( final DataConsumer pReceiver ) throws IOException {
 
         TarEntry entry = new TarEntry(file.getName());
         entry.setUserId(0);

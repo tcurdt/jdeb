@@ -33,7 +33,6 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.tools.tar.TarEntry;
-import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
@@ -52,7 +51,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
         archive = pArchive;
     }
 
-    public void produce( final DataConsumer pReceiver, final Console console ) throws IOException {
+    public void produce( final DataConsumer pReceiver ) throws IOException {
 
         InputStream is = new BufferedInputStream(new FileInputStream(archive));
 

@@ -22,7 +22,6 @@ import java.io.InputStream;
 
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.tar.TarEntry;
-import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
@@ -47,7 +46,7 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
         scanner.setFollowSymlinks(true);
     }
 
-    public void produce( final DataConsumer pReceiver, final Console console ) throws IOException {
+    public void produce( final DataConsumer pReceiver ) throws IOException {
 
         scanner.scan();
 

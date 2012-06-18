@@ -24,6 +24,6 @@ import java.io.IOException;
  */
 public interface DataProducer {
 
-    void produce( DataConsumer receiver, Console console ) throws IOException;
+    void produce( DataConsumer receiver ) throws IOException;
 
 }
