@@ -63,7 +63,7 @@ configuration of the form:
 
     /etc/[[artifactId]]/[[artifactId]].properties
     /etc/[[artifactId]]/log4j.xml
-    
+
 If you now do a 'mvn clean install', the 'deb' goal will be called and
 artifacts consisting of the deb and potentially the changes file will
 automatically be attached to the project.
@@ -113,7 +113,6 @@ more 'data' elements. A 'data' element is used to specify a 'directory', a
 elements to your 'dataSet' as you'd like. The 'data' element has the
 following options:
 
-<<<<<<< HEAD
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     ||   Element       || Description                                                                 || Required                                  ||
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
@@ -131,7 +130,7 @@ following options:
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | paths/(path..)   | One or more string literal paths that will created in the package            | No; Yes for type 'template'                 |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    
+
 There are different kinds of mappers that can be selected via the `type` argument. The most common one is the 'perm' mapper.
 
     *---------------+-------------------------------------------------------+------------------------+
@@ -172,8 +171,9 @@ include a directory, a tarball, and a file in your deb package:
                             <goal>jdeb</goal>
                         </goals>
                         <configuration>
-                            ...
+
                             <dataSet>
+
                                 <!-- Tarball example -->
                                 <data>
                                     <src>${project.basedir}/target/my_archive.tar.gz</src>
@@ -189,7 +189,7 @@ include a directory, a tarball, and a file in your deb package:
                                         <filemode>600</filemode>
                                     </mapper>
                                 </data>
-                                ...
+
                                 <!-- Directory example -->
                                 <data>
                                     <src>${project.build.directory}/data</src>
@@ -201,13 +201,14 @@ include a directory, a tarball, and a file in your deb package:
                                         <src>mapping.txt</src>
                                     </mapper>
                                 </data>
-                                ...
+
                                 <!-- File example -->
                                 <data>
                                     <src>${project.basedir}/README.txt</src>
                                     <type>file</type>
-                                    <failOnMissingSrc>false</failOnMissingSrc>
+                                    <missingSrc>ignore</missingSrc>
                                 </data>
+
                                 <!-- Template example -->
                                 <data>
                                     <type>template</type>
@@ -219,7 +220,7 @@ include a directory, a tarball, and a file in your deb package:
                                     </paths>
                                 </data>
                             </dataSet>
-                            ...
+
                         </configuration>
                     </execution>
                 </executions>
