@@ -56,7 +56,7 @@ public final class Data extends PatternSet implements DataProducer {
         mapperWrapper.add(pMapper);
     }
 
-    public void produce( final DataConsumer pReceiver ) throws IOException {
+    public void produce( final DataConsumer pReceiver) throws IOException {
 
         if (!src.exists()) {
             throw new FileNotFoundException("Data source not found : " + src);
@@ -100,4 +100,5 @@ public final class Data extends PatternSet implements DataProducer {
 
         throw new IOException("Unknown type '" + type + "' (file|directory|archive) for " + src);
     }
+    
 }

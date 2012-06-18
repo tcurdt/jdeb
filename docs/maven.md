@@ -119,7 +119,9 @@ following options:
     | src           | The directory, tarball, or file to include in the package                    | Yes                                         |
     *---------------+------------------------------------------------------------------------------+---------------------------------------------+
     | type          | Type of the data source. (archive|directory|file)                            | No; but will be Yes in the future           |
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
+    *------------------+---------------------------------------------------------------------------+---------------------------------------------+
+    | missingSource | Fail if src file/folder is missing (ignore|warn|fail)                        | No; defaults to 'fail'                      |
+    *------------------+---------------------------------------------------------------------------+---------------------------------------------+
     | includes      | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files                   |
     *---------------+------------------------------------------------------------------------------+---------------------------------------------+
     | excludes      | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions               |
@@ -201,6 +203,7 @@ include a directory, a tarball, and a file in your deb package:
                                 <data>
                                     <src>${project.basedir}/README.txt</src>
                                     <type>file</type>
+                                    <failOnMissingSrc>false</failOnMissingSrc>
                                 </data>
                             </dataSet>
                             ...
