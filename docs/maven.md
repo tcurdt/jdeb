@@ -51,12 +51,19 @@ along the lines of
     Distribution: development
 
 
-If the enviroment variables 'DEBEMAIL' and 'DEBFULLNAME' are both set this
+If the environment variables 'DEBEMAIL' and 'DEBFULLNAME' are both set this
 will overrule the 'Maintainer' field set in there. The 'Installed-Size' will
 also be injected. If a changes file is used, the 'Distribution' usually comes
 from that file. The default changes file is called 'CHANGES.txt'. See below
 for the syntax of the content of the changes file.
 
+Property replacement will also occur in any of the standard debian control
+files: conffiles, preinst, postinst, prerm, postrm. This allows dynamic
+configuration of the form:
+
+    /etc/[[artifactId]]/[[artifactId]].properties
+    /etc/[[artifactId]]/log4j.xml
+    
 If you now do a 'mvn clean install', the 'deb' goal will be called and
 artifacts consisting of the deb and potentially the changes file will
 automatically be attached to the project.
@@ -106,12 +113,15 @@ more 'data' elements. A 'data' element is used to specify a 'directory', a
 elements to your 'dataSet' as you'd like. The 'data' element has the
 following options:
 
+<<<<<<< HEAD
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     ||   Element       || Description                                                                 || Required                                  ||
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | src              | The directory, tarball, or file to include in the package                    | Yes                                         |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | type             | Type of the data source. (archive|directory|file|template)                   | No; but will be Yes in the future           |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | missingSource    | Fail if src file/folder is missing (ignore|fail)                             | No; defaults to 'fail'                      |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | includes         | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files                   |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
@@ -196,6 +206,7 @@ include a directory, a tarball, and a file in your deb package:
                                 <data>
                                     <src>${project.basedir}/README.txt</src>
                                     <type>file</type>
+                                    <failOnMissingSrc>false</failOnMissingSrc>
                                 </data>
                                 <!-- Template example -->
                                 <data>

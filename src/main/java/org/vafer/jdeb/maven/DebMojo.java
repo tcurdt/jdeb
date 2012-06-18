@@ -306,6 +306,7 @@ public class DebMojo extends AbstractPluginMojo {
         setData(dataSet);
 
         try {
+            Console infoConsole = new MojoConsole(getLog());
 
             final VariableResolver resolver = initializeVariableResolver(new HashMap());
 
@@ -358,15 +359,6 @@ public class DebMojo extends AbstractPluginMojo {
                     }
                 }
             }
-
-            Console infoConsole = new Console() {
-                public void info(String s) {
-                    getLog().info(s);
-                }
-                public void warn(String s) {
-                    getLog().warn(s);
-                }
-            };
 
             try {
 

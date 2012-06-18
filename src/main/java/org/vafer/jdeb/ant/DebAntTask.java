@@ -25,7 +25,6 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.apache.tools.ant.taskdefs.Tar;
 import org.apache.tools.ant.types.FileSet;
-import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Processor;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
@@ -184,16 +183,7 @@ public class DebAntTask extends MatchingTask {
         final DataProducer[] data = new DataProducer[dataProducers.size()];
         dataProducers.toArray(data);
 
-        final Processor processor = new Processor(new Console() {
-            public void info(String s) {
-                if (verbose) {
-                    log(s);
-                }
-            }
-            public void warn(String s) {
-                log(s);
-            }                
-        }, null);
+        final Processor processor = new Processor(new TaskConsole(this, verbose), null);
 
         final PackageDescriptor packageDescriptor;
         try {
