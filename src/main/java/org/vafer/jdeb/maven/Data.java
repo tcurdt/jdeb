@@ -50,10 +50,10 @@ public final class Data implements DataProducer {
     private String destinationName;
 
     /**
-     * @parameter expression="${destinationName}"
+     * @parameter expression="${dst}"
      * @required
      */
-    public void setDest( String destinationName ) {
+    public void setDestinationName( String destinationName ) {
         this.destinationName = destinationName;
     }
 

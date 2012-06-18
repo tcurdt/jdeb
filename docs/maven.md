@@ -51,7 +51,7 @@ along the lines of
     Distribution: development
 
 
-If the enviroment variables 'DEBEMAIL' and 'DEBFULLNAME' are both set this
+If the environment variables 'DEBEMAIL' and 'DEBFULLNAME' are both set this
 will overrule the 'Maintainer' field set in there. The 'Installed-Size' will
 also be injected. If a changes file is used, the 'Distribution' usually comes
 from that file. The default changes file is called 'CHANGES.txt'. See below
@@ -63,7 +63,7 @@ automatically be attached to the project.
 
 The jdeb maven plugin also supports a variety of configuration options. These
 configuration options provide the same features available in the jdeb ant
-task. To configure the jdeb maven plugin, populate the jdeb configuraiton
+task. To configure the jdeb maven plugin, populate the jdeb configuration
 section with any of the following options:
 
     *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
@@ -106,21 +106,21 @@ more 'data' elements. A 'data' element is used to specify a 'directory', a
 elements to your 'dataSet' as you'd like. The 'data' element has the
 following options:
 
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    ||   Element       || Description                                                                 || Required                                  ||
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | src              | The directory, tarball, or file to include in the package                    | Yes                                         |
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | destinationName  | New filename at destination (type must be 'file')                            | No                                          |
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | type             | Type of the data source. (archive|directory|file)                            | No; but will be Yes in the future           |
-    *------------- ----+------------------------------------------------------------------------------+---------------------------------------------+
-    | includes         | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files                   |
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | excludes         | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions               |
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | mapper           | The files to exclude from the directory or tarball                           | No                                          |
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    *----------- +------------------------------------------------------------------------------+---------------------------------------------+
+    ||   Element || Description                                                                 || Required                                  ||
+    *------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | src        | The directory, tarball, or file to include in the package                    | Yes                                         |
+    *------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | dst        | New filename at destination (type must be 'file')                            | No                                          |
+    *------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | type       | Type of the data source. (archive|directory|file)                            | No; but will be Yes in the future           |
+    *------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | includes   | A comma separated list of files to include from the directory or tarball     | No; defaults to all files                   |
+    *------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | excludes   | A comma separated list of files to exclude from the directory or tarball     | No; defaults to no exclusions               |
+    *------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | mapper     | The files to exclude from the directory or tarball                           | No                                          |
+    *------------+------------------------------------------------------------------------------+---------------------------------------------+
 
 There are different kinds of mappers that can be selected via the `type` argument. The most common one is the 'perm' mapper.
 
@@ -195,7 +195,7 @@ include a directory, a tarball, and a file in your deb package:
                                 <!-- File example -->
                                 <data>
                                     <src>${project.basedir}/README.txt</src>
-                                    <destinationName>README</destinationName>
+                                    <dst>README</dst>
                                     <type>file</type>
                                 </data>
                             </dataSet>
