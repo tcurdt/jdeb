@@ -29,6 +29,32 @@ public class DataTestCase extends TestCase {
             file.delete();
         }
     }
+    
+    public void testSrcAndPathsNotSetFails() throws IOException {
+        RuntimeException expectedException = null;
+        try {
+            data.setPaths(null);
+            data.setSrc(null);
+            data.produce(null);
+            fail();
+        } catch(RuntimeException expected) {
+            expectedException = expected;
+        }
+        assertEquals("src or paths not set", expectedException.getMessage());
+    }
+
+    public void testPathsMaySubstituteSrc()throws IOException {
+        IOException expectedException = null;
+        try {
+            data.setPaths(new String[] { "/var/log", "/var/lib" });
+            data.setSrc(null);
+            data.produce(null);
+            fail();
+        } catch(IOException expected) {
+            expectedException = expected;
+        }
+        assertTrue(expectedException.getMessage().startsWith("Unknown type "));
+    }
 
     public void testFailOnUnknownValue() throws IOException {
         try {
