@@ -54,7 +54,7 @@ public final class Data extends PatternSet implements DataProducer {
         type = pType;
     }
 
-    public void setDestinationName( String pDestinationName ) {
+    public void setDst( String pDestinationName ) {
         destinationName = pDestinationName;
     }
 
