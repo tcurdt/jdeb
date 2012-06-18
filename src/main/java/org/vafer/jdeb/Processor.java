@@ -563,7 +563,7 @@ public class Processor {
         try {
             for (int i = 0; i < pData.length; i++) {
                 final DataProducer data = pData[i];
-                data.produce(receiver);
+                data.produce(receiver, console);
             }
         } finally {
             tarOutputStream.close();

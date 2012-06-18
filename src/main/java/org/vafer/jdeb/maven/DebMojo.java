@@ -306,6 +306,7 @@ public class DebMojo extends AbstractPluginMojo {
         setData(dataSet);
 
         try {
+            Console infoConsole = new MojoConsole(getLog());
 
             final VariableResolver resolver = initializeVariableResolver(new HashMap());
 
@@ -338,7 +339,7 @@ public class DebMojo extends AbstractPluginMojo {
                         final File file = artifact.getFile();
                         if (file != null) {
                             dataProducers.add(new DataProducer() {
-                                public void produce(final DataConsumer receiver) {
+                                public void produce(final DataConsumer receiver, final Console console) {
                                     try {
                                         receiver.onEachFile(
                                                 new FileInputStream(file),
@@ -358,15 +359,6 @@ public class DebMojo extends AbstractPluginMojo {
                     }
                 }
             }
-
-            Console infoConsole = new Console() {
-                public void info(String s) {
-                    getLog().info(s);
-                }
-                public void warn(String s) {
-                    getLog().warn(s);
-                }
-            };
 
             try {
 

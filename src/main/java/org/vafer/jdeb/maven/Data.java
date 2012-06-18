@@ -15,6 +15,8 @@
  */
 package org.vafer.jdeb.maven;
 
+import static org.vafer.jdeb.maven.MissingSourceBehavior.FAIL;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,12 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
 import org.vafer.jdeb.producers.DataProducerFile;
-
 /**
  * Maven "data" elment acting as a factory for DataProducers. So far Archive and
  * Directory producers are supported. Both support the usual ant pattern set
@@ -38,7 +40,7 @@ import org.vafer.jdeb.producers.DataProducerFile;
 public final class Data implements DataProducer {
 
     private File src;
-
+    
     /**
      * @parameter expression="${src}"
      * @required
@@ -56,13 +58,17 @@ public final class Data implements DataProducer {
         this.type = type;
     }
 
-    private boolean failOnMissingSrc = true;
+    private MissingSourceBehavior missingSrc = FAIL;
 
     /**
-     * @parameter expression="${failOnMissingSrc}"
+     * @parameter expression="${missingSrc}"
      */
-    public void setFailOnMissingSrc( boolean failOnMissingSrc ) {
-        this.failOnMissingSrc = failOnMissingSrc;
+    public void setMissingSrc( String missingSrc ) {
+        MissingSourceBehavior value = MissingSourceBehavior.valueOf(missingSrc.trim().toUpperCase());
+        if (value == null) {
+            throw new IllegalArgumentException("Unknown " + MissingSourceBehavior.class.getSimpleName() + ": " + missingSrc);
+        }
+        this.missingSrc = value;
     }
 
     /**
@@ -100,13 +106,17 @@ public final class Data implements DataProducer {
         return result;
     }
 
-    public void produce( final DataConsumer pReceiver ) throws IOException {
+    public void produce( final DataConsumer pReceiver, final Console console ) throws IOException {
 
         if (src != null && !src.exists()) {
-            if (failOnMissingSrc) {
-                throw new FileNotFoundException("Data source not found : " + src);
-            } else {
+            switch (missingSrc) {
+            case IGNORE:
                 return;
+            case WARN:
+                console.warn("Data source not found : " + src);
+                return;
+            default:
+                throw new FileNotFoundException("Data source not found : " + src);
             }
         }
 
@@ -116,20 +126,21 @@ public final class Data implements DataProducer {
         }
 
         if ("file".equalsIgnoreCase(type)) {
-            new DataProducerFile(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            new DataProducerFile(src, includePatterns, excludePatterns, mappers).produce(pReceiver, console);
             return;
         }
 
         if ("archive".equalsIgnoreCase(type)) {
-            new DataProducerArchive(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            new DataProducerArchive(src, includePatterns, excludePatterns, mappers).produce(pReceiver, console);
             return;
         }
 
         if ("directory".equalsIgnoreCase(type)) {
-            new DataProducerDirectory(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            new DataProducerDirectory(src, includePatterns, excludePatterns, mappers).produce(pReceiver, console);
             return;
         }
 
         throw new IOException("Unknown type '" + type + "' (file|directory|archive) for " + src);
     }
+    
 }
