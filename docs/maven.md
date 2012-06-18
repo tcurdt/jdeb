@@ -57,6 +57,13 @@ also be injected. If a changes file is used, the 'Distribution' usually comes
 from that file. The default changes file is called 'CHANGES.txt'. See below
 for the syntax of the content of the changes file.
 
+Property replacement will also occur in any of the standard debian control
+files: conffiles, preinst, postinst, prerm, postrm. This allows dynamic
+configuration of the form:
+
+    /etc/[[artifactId]]/[[artifactId]].properties
+    /etc/[[artifactId]]/log4j.xml
+    
 If you now do a 'mvn clean install', the 'deb' goal will be called and
 artifacts consisting of the deb and potentially the changes file will
 automatically be attached to the project.
@@ -106,21 +113,23 @@ more 'data' elements. A 'data' element is used to specify a 'directory', a
 elements to your 'dataSet' as you'd like. The 'data' element has the
 following options:
 
-    *----------- +------------------------------------------------------------------------------+---------------------------------------------+
-    ||   Element || Description                                                                 || Required                                  ||
-    *------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | src        | The directory, tarball, or file to include in the package                    | Yes                                         |
-    *------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | dst        | New filename at destination (type must be 'file')                            | No                                          |
-    *------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | type       | Type of the data source. (archive|directory|file)                            | No; but will be Yes in the future           |
-    *------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | includes   | A comma separated list of files to include from the directory or tarball     | No; defaults to all files                   |
-    *------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | excludes   | A comma separated list of files to exclude from the directory or tarball     | No; defaults to no exclusions               |
-    *------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | mapper     | The files to exclude from the directory or tarball                           | No                                          |
-    *------------+------------------------------------------------------------------------------+---------------------------------------------+
+    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
+    ||   Element    || Description                                                                 || Required                                  ||
+    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | src           | The directory, tarball, or file to include in the package                    | Yes                                         |
+    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | dst           | New filename at destination (type must be 'file')                            | No                                          |
+    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | type          | Type of the data source. (archive|directory|file)                            | No; but will be Yes in the future           |
+    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | missingSource | Fail if src file/folder is missing (ignore|fail)                             | No; defaults to 'fail'                      |
+    *------------------+---------------------------------------------------------------------------+---------------------------------------------+
+    | includes      | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files                   |
+    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | excludes      | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions               |
+    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | mapper        | The files to exclude from the directory or tarball                           | No                                          |
+    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
 
 There are different kinds of mappers that can be selected via the `type` argument. The most common one is the 'perm' mapper.
 
@@ -197,6 +206,7 @@ include a directory, a tarball, and a file in your deb package:
                                     <src>${project.basedir}/README.txt</src>
                                     <dst>README</dst>
                                     <type>file</type>
+                                    <failOnMissingSrc>false</failOnMissingSrc>
                                 </data>
                             </dataSet>
                             ...
