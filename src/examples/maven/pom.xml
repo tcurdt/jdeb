@@ -10,7 +10,7 @@
             <plugin>
                 <artifactId>jdeb</artifactId>
                 <groupId>org.vafer</groupId>
-                <version>0.9</version>
+                <version>0.10</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -40,6 +40,20 @@
                                     <group>loader</group>
                                   </mapper>
                                 </data>
+                                <data>
+                                  <type>template</type>
+                                  <paths>
+                                    <path>etc/${project.artifactId}</path>
+                                    <path>var/lib/${project.artifactId}</path>
+                                    <path>var/log/${project.artifactId}</path>
+                                    <path>var/run/${project.artifactId}</path>
+                                  </paths>
+                                  <mapper>
+                                    <type>perm</type>
+                                    <user>loader</user>
+                                    <group>loader</group>
+                                  </mapper>
+                                </data>                                
                             </dataSet>
                         </configuration>
                     </execution>
