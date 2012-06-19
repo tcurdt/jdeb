@@ -26,23 +26,32 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
 
 /**
- * DataProducer representing a single file
- * For cross-platform permissions and ownerships you probably want to use a Mapper, too.
- *
+ * DataProducer representing a single file For cross-platform permissions and ownerships you probably want to use a
+ * Mapper, too.
+ * 
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class DataProducerFile extends AbstractDataProducer implements DataProducer {
 
     private final File file;
 
-    public DataProducerFile(final File pFile, String[] pIncludes, String[] pExcludes, Mapper[] pMapper) {
+    private final String destinationName;
+
+    public DataProducerFile( final File pFile, String pDestinationName, String[] pIncludes, String[] pExcludes, Mapper[] pMapper ) {
         super(pIncludes, pExcludes, pMapper);
         file = pFile;
+        destinationName = pDestinationName;
     }
 
+    @Override
     public void produce( final DataConsumer pReceiver ) throws IOException {
-
-        TarEntry entry = new TarEntry(file.getName());
+        String fileName;
+        if (destinationName != null && destinationName.trim().length() > 0) {
+            fileName = destinationName.trim();
+        } else {
+            fileName = file.getName();
+        }
+        TarEntry entry = new TarEntry(fileName);
         entry.setUserId(0);
         entry.setUserName("root");
         entry.setGroupId(0);
