@@ -103,7 +103,7 @@ public class DebMojo extends AbstractPluginMojo {
     /**
      * Boolean option whether to attach the artifact to the project
      *
-     *  @parameter default-value="true"
+     * @parameter default-value="true"
      */
     private String attach;
 
@@ -138,6 +138,7 @@ public class DebMojo extends AbstractPluginMojo {
      * Run the plugin on all sub-modules.
      * If set to false, the plugin will be run in the same folder where the
      * mvn command was invoked
+     *
      * @parameter expression="${submodules}" default-value="true"
      */
     private boolean submodules;
@@ -223,17 +224,17 @@ public class DebMojo extends AbstractPluginMojo {
     private String closeReplaceToken = "]]";
     private Collection dataProducers = new ArrayList();
 
-    public void setOpenReplaceToken(String openReplaceToken) {
+    public void setOpenReplaceToken( String openReplaceToken ) {
         this.openReplaceToken = openReplaceToken;
         AbstractDescriptor.setOpenToken(openReplaceToken);
     }
 
-    public void setCloseReplaceToken(String closeReplaceToken) {
+    public void setCloseReplaceToken( String closeReplaceToken ) {
         this.closeReplaceToken = closeReplaceToken;
         AbstractDescriptor.setCloseToken(closeReplaceToken);
     }
 
-    protected void setData(Data[] pData) {
+    protected void setData( Data[] pData ) {
         dataSet = pData;
         dataProducers.clear();
         if (pData != null) {
@@ -243,7 +244,7 @@ public class DebMojo extends AbstractPluginMojo {
         }
     }
 
-    protected VariableResolver initializeVariableResolver(Map variables) {
+    protected VariableResolver initializeVariableResolver( Map variables ) {
         variables.putAll(getProject().getProperties());
 
         variables.put("name", getProject().getName());
@@ -256,7 +257,7 @@ public class DebMojo extends AbstractPluginMojo {
         variables.put("buildDir", buildDirectory.getAbsolutePath());
         variables.put("project.version", getProject().getVersion());
         variables.put("url", getProject().getUrl());
-        
+
         return new MapVariableResolver(variables);
     }
 
@@ -298,7 +299,7 @@ public class DebMojo extends AbstractPluginMojo {
 
         final MavenProject project = getProject();
 
-        if(isSubmodule() && !submodules) {
+        if (isSubmodule() && !submodules) {
             getLog().info("skipping sub module: jdeb executing at top-level only");
             return;
         }
@@ -328,18 +329,18 @@ public class DebMojo extends AbstractPluginMojo {
                         getLog().warn("Creating empty debian package.");
                     } else {
                         throw new MojoExecutionException(
-                            "Nothing to include into the debian package. " +
-                            "Did you maybe forget to add a <data> tag or call the plugin directly?");
+                                "Nothing to include into the debian package. " +
+                                        "Did you maybe forget to add a <data> tag or call the plugin directly?");
                     }
 
                 } else {
 
                     // attach artifacts (jar, war, etc)
-                    for(Artifact artifact : artifacts) {
+                    for (Artifact artifact : artifacts) {
                         final File file = artifact.getFile();
                         if (file != null) {
                             dataProducers.add(new DataProducer() {
-                                public void produce(final DataConsumer receiver) {
+                                public void produce( final DataConsumer receiver ) {
                                     try {
                                         receiver.onEachFile(
                                                 new FileInputStream(file),

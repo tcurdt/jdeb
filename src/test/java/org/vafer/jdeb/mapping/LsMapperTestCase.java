@@ -18,33 +18,32 @@ package org.vafer.jdeb.mapping;
 import java.io.ByteArrayInputStream;
 
 import junit.framework.TestCase;
-
 import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.mapping.LsMapper.ParseError;
 
 public final class LsMapperTestCase extends TestCase {
 
     private final static String output =
-        "total 0\n" +
-        "drwxr-xr-x   23 tcurdt  tcurdt   782 Jun 25 03:48 .\n" +
-        "drwxr-xr-x    3 tcurdt  tcurdt   102 Jun 25 03:48 ..\n" +
-        "\n" +
-        "./trunk/target/test-classes/org/vafer/dependency:\n" +
-        "total 176\n" +
-        "drwxr-xr-x   23 tcurdt  tcurdt   782 Jun 25 03:48 .\n" +
-        "drwxr-xr-x    3 tcurdt  tcurdt   102 Jun 25 03:48 ..\n" +
-        "-rw-r--r--    1 tcurdt  tcurdt  2934 Jun 25 03:48 DependenciesTestCase.class\n" +
-        "-rw-r--r--    1 tcurdt  tcurdt   786 Jun 25 03:48 JarCombiningTestCase$1.class\n" +
-        "drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes\n" +
-        "\n" +
-        "./trunk/src/test-classes/org/vafer/dependency:\n" +
-        "total 76\n" +
-        "drwxr-xr-x   23 tcurdt  tcurdt   782 Jun 25 03:48 .\n" +
-        "drwxr-xr-x    3 tcurdt  tcurdt   102 Jun 25 03:48 ..\n" +
-        "-rw-r--r--    1 tcurdt  tcurdt  2934 Jun 25 03:48 DependenciesTestCase.class\n" +
-        "-rw-r--r--    1 tcurdt  tcurdt   786 Jun 25 03:48 JarCombiningTestCase$1.class\n" +
-        "drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes\n" +
-        "\n";
+            "total 0\n" +
+                    "drwxr-xr-x   23 tcurdt  tcurdt   782 Jun 25 03:48 .\n" +
+                    "drwxr-xr-x    3 tcurdt  tcurdt   102 Jun 25 03:48 ..\n" +
+                    "\n" +
+                    "./trunk/target/test-classes/org/vafer/dependency:\n" +
+                    "total 176\n" +
+                    "drwxr-xr-x   23 tcurdt  tcurdt   782 Jun 25 03:48 .\n" +
+                    "drwxr-xr-x    3 tcurdt  tcurdt   102 Jun 25 03:48 ..\n" +
+                    "-rw-r--r--    1 tcurdt  tcurdt  2934 Jun 25 03:48 DependenciesTestCase.class\n" +
+                    "-rw-r--r--    1 tcurdt  tcurdt   786 Jun 25 03:48 JarCombiningTestCase$1.class\n" +
+                    "drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes\n" +
+                    "\n" +
+                    "./trunk/src/test-classes/org/vafer/dependency:\n" +
+                    "total 76\n" +
+                    "drwxr-xr-x   23 tcurdt  tcurdt   782 Jun 25 03:48 .\n" +
+                    "drwxr-xr-x    3 tcurdt  tcurdt   102 Jun 25 03:48 ..\n" +
+                    "-rw-r--r--    1 tcurdt  tcurdt  2934 Jun 25 03:48 DependenciesTestCase.class\n" +
+                    "-rw-r--r--    1 tcurdt  tcurdt   786 Jun 25 03:48 JarCombiningTestCase$1.class\n" +
+                    "drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes\n" +
+                    "\n";
 
     public void testModes() throws Exception {
         final ByteArrayInputStream is = new ByteArrayInputStream(output.getBytes("UTF-8"));
@@ -85,7 +84,7 @@ public final class LsMapperTestCase extends TestCase {
         try {
             new LsMapper(is);
             fail("should fail to parse");
-        } catch(ParseError e) {
+        } catch (ParseError e) {
         }
     }
 
@@ -95,7 +94,7 @@ public final class LsMapperTestCase extends TestCase {
         try {
             new LsMapper(is);
             fail("should fail to parse");
-        } catch(ParseError e) {
+        } catch (ParseError e) {
         }
     }
 }

@@ -67,7 +67,7 @@ import org.vafer.jdeb.utils.VariableResolver;
 public class Processor {
 
     private static final Set<String> CONFIGURATION_FILENAMES
-        = new HashSet<String>(Arrays.asList(new String[] { "conffiles", "preinst", "postinst", "prerm", "postrm" } ));
+            = new HashSet<String>(Arrays.asList(new String[] { "conffiles", "preinst", "postinst", "prerm", "postrm" }));
 
     private final Console console;
     private final VariableResolver resolver;
@@ -77,7 +77,7 @@ public class Processor {
     private static final class Total {
         private BigInteger count = BigInteger.valueOf(0);
 
-        public void add(long size) {
+        public void add( long size ) {
             count = count.add(BigInteger.valueOf(size));
         }
 
@@ -118,7 +118,7 @@ public class Processor {
      * @param pControlFiles
      * @param pData
      * @param pOutput
-     * @param compression the compression method used for the data file (gzip, bzip2 or anything else for no compression)
+     * @param compression   the compression method used for the data file (gzip, bzip2 or anything else for no compression)
      * @return PackageDescriptor
      * @throws PackagingException
      */
@@ -140,8 +140,8 @@ public class Processor {
 
             if (!packageDescriptor.isValid()) {
                 throw new PackagingException("Control file descriptor keys are invalid " + packageDescriptor.invalidKeys() +
-                    ". The following keys are mandatory " + Arrays.toString(PackageDescriptor.mandatoryKeys) +
-                    ". Please check your pom.xml/build.xml and your control file.");
+                        ". The following keys are mandatory " + Arrays.toString(PackageDescriptor.mandatoryKeys) +
+                        ". Please check your pom.xml/build.xml and your control file.");
             }
 
             pOutput.getParentFile().mkdirs();
@@ -203,6 +203,7 @@ public class Processor {
      * Create changes file based on the provided PackageDescriptor.
      * If pRing, pKey and pPassphrase are provided the changes file will also be signed.
      * It returns a ChangesDescriptor reflecting the changes
+     *
      * @param pPackageDescriptor
      * @param pChangesProvider
      * @param pRing
@@ -255,8 +256,8 @@ public class Processor {
 
         if (!changesDescriptor.isValid()) {
             throw new PackagingException("Changes file descriptor keys are invalid " + changesDescriptor.invalidKeys() +
-                ". The following keys are mandatory " + Arrays.toString(ChangesDescriptor.mandatoryKeys) +
-                ". Please check your pom.xml/build.xml and your control file.");
+                    ". The following keys are mandatory " + Arrays.toString(ChangesDescriptor.mandatoryKeys) +
+                    ". Please check your pom.xml/build.xml and your control file.");
         }
 
         final String changes = changesDescriptor.toString();
@@ -285,6 +286,7 @@ public class Processor {
 
     /**
      * Build control archive of the deb
+     *
      * @param pControlFiles
      * @param pDataSize
      * @param pChecksums
@@ -295,7 +297,7 @@ public class Processor {
      * @throws ParseException
      */
     private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuilder pChecksums, final File pOutput ) throws IOException, ParseException {
-        
+
         final File dir = pOutput.getParentFile();
         if (dir != null && (!dir.exists() || !dir.isDirectory())) {
             throw new IOException("Cannot write control file at '" + pOutput.getAbsolutePath() + "'");
@@ -304,7 +306,7 @@ public class Processor {
         final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
         outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
-        
+
         // create a descriptor out of the "control" file, copy all other files, ignore directories
         PackageDescriptor packageDescriptor = null;
         for (File file : pControlFiles) {
@@ -332,10 +334,10 @@ public class Processor {
             entry.setMode(PermMapper.toMode("755"));
 
             if (CONFIGURATION_FILENAMES.contains(name)) {
-                
+
                 FilteredConfigurationFile configurationFile = new FilteredConfigurationFile(file.getName(), new FileInputStream(file), resolver);
                 configurationFiles.add(configurationFile);
-                
+
             } else if ("control".equals(name)) {
 
                 packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
@@ -403,18 +405,19 @@ public class Processor {
 
 
     // FIXME temporary - only until Commons Compress is fixed
-    private OutputStream compressedOutputStream( String pCompression, final OutputStream outputStream) throws CompressorException {
-      if ("none".equalsIgnoreCase(pCompression)) {
-        return outputStream;
-      }
+    private OutputStream compressedOutputStream( String pCompression, final OutputStream outputStream ) throws CompressorException {
+        if ("none".equalsIgnoreCase(pCompression)) {
+            return outputStream;
+        }
         if ("gzip".equals(pCompression)) {
-          pCompression = "gz";
+            pCompression = "gz";
         }
         return new CompressorStreamFactory().createCompressorOutputStream(pCompression, outputStream);
     }
 
     /**
      * Build the data archive of the deb from the provided DataProducers
+     *
      * @param pData
      * @param pOutput
      * @param pChecksums
@@ -496,10 +499,10 @@ public class Processor {
                 pChecksums.append(md5).append(" ").append(entry.getName()).append('\n');
             }
 
-            private String fixPath(String path) {
+            private String fixPath( String path ) {
                 // If we're receiving directory names from Windows, then we'll convert to use slash
                 // This does eliminate the ability to use of a backslash in a directory name on *NIX,
-              // but in practice, this is a non-issue
+                // but in practice, this is a non-issue
                 if (path.indexOf('\\') > -1) {
                     path = path.replace('\\', '/');
                 }
@@ -512,7 +515,7 @@ public class Processor {
                 return path;
             }
 
-            private void createDirectory(String directory, String user, int uid, String group, int gid, int mode, long size) throws IOException {
+            private void createDirectory( String directory, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 // All dirs should end with "/" when created, or the test DebAndTaskTestCase.testTarFileSet() thinks its a file
                 // and so thinks it has the wrong permission.
                 // This consistency also helps when checking if a directory already exists in addedDirectories.
@@ -536,7 +539,7 @@ public class Processor {
                 }
             }
 
-            private void createParentDirectories(String dirname, String user, int uid, String group, int gid) throws IOException {
+            private void createParentDirectories( String dirname, String user, int uid, String group, int gid ) throws IOException {
                 // Debian packages must have parent directories created
                 // before sub-directories or files can be installed.
                 // For example, if an entry of ./usr/lib/foo/bar existed
@@ -545,7 +548,7 @@ public class Processor {
                 // then have an entry for ./usr/lib/foo and then ./usr/lib/foo/bar
 
                 if (dirname == null) {
-                  return;
+                    return;
                 }
 
                 // The loop below will create entries for all parent directories
@@ -596,12 +599,12 @@ public class Processor {
         final TarEntry entry = new TarEntry("./" + pName);
         entry.setSize(data.length);
         entry.setNames("root", "root");
-        
+
         pOutput.putNextEntry(entry);
         pOutput.write(data);
         pOutput.closeEntry();
     }
-    
+
     private static void addControlEntry( final String pName, final String pContent, final TarOutputStream pOutput ) throws IOException {
         final byte[] data = pContent.getBytes("UTF-8");
 
@@ -609,10 +612,10 @@ public class Processor {
         entry.setSize(data.length);
         entry.setNames("root", "root");
         entry.setMode(PermMapper.toMode("755"));
-        
+
         pOutput.putNextEntry(entry);
         pOutput.write(data);
         pOutput.closeEntry();
     }
-    
+
 }

@@ -35,12 +35,12 @@ import org.vafer.jdeb.descriptors.PackageDescriptor;
 /**
  * Gets the changes from a changes file. The first entry are the current changes.
  * The release line will be added. Example:
-
-release date=22:13 19.08.2007,version=1.5+r90114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
-  * debian changes support
-release date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
-  * debian changes support
-
+ *
+ * release date=22:13 19.08.2007,version=1.5+r90114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
+ * debian changes support
+ * release date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
+ * debian changes support
+ *
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class TextfileChangesProvider implements ChangesProvider {
@@ -64,7 +64,7 @@ public final class TextfileChangesProvider implements ChangesProvider {
         final Collection changeSetColl = new ArrayList();
 
 
-        while(true) {
+        while (true) {
             final String line = reader.readLine();
             if (line == null) {
                 final String[] changes = (String[]) changesColl.toArray(new String[changesColl.size()]);

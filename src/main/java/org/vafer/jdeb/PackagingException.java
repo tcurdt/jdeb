@@ -28,15 +28,15 @@ public final class PackagingException extends Exception {
         super();
     }
 
-    public PackagingException(String message, Throwable cause) {
+    public PackagingException( String message, Throwable cause ) {
         super(message, cause);
     }
 
-    public PackagingException(String message) {
+    public PackagingException( String message ) {
         super(message);
     }
 
-    public PackagingException(Throwable cause) {
+    public PackagingException( Throwable cause ) {
         super(cause);
     }
 

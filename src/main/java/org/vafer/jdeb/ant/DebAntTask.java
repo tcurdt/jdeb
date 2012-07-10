@@ -42,34 +42,54 @@ import org.vafer.jdeb.producers.DataProducerFileSet;
 
 public class DebAntTask extends MatchingTask {
 
-    /** The Debian package produced */
+    /**
+     * The Debian package produced
+     */
     private File deb;
 
-    /** The directory containing the control files to build the package */
+    /**
+     * The directory containing the control files to build the package
+     */
     private File control;
 
-    /** The file containing the PGP keys */
+    /**
+     * The file containing the PGP keys
+     */
     private File keyring;
 
-    /** The key to use in the keyring */
+    /**
+     * The key to use in the keyring
+     */
     private String key;
 
-    /** The passphrase for the key to sign the changes file */
+    /**
+     * The passphrase for the key to sign the changes file
+     */
     private String passphrase;
 
-    /** The file to read the changes from */
+    /**
+     * The file to read the changes from
+     */
     private File changesIn;
 
-    /** The file where to write the changes to */
+    /**
+     * The file where to write the changes to
+     */
     private File changesOut;
 
-    /** The file where to write the changes of the changes input to */
+    /**
+     * The file where to write the changes of the changes input to
+     */
     private File changesSave;
 
-    /** The compression method used for the data file (none, gzip or bzip2) */
+    /**
+     * The compression method used for the data file (none, gzip or bzip2)
+     */
     private String compression = "gzip";
 
-    /** Trigger the verbose mode detailing all operations */
+    /**
+     * Trigger the verbose mode detailing all operations
+     */
     private boolean verbose;
 
     private Collection dataProducers = new ArrayList();
@@ -208,7 +228,7 @@ public class DebAntTask extends MatchingTask {
             // for now only support reading the changes form a textfile provider
             changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
 
-            processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
+            processor.createChanges(packageDescriptor, changesProvider, (keyring != null) ? new FileInputStream(keyring) : null, key, passphrase, new FileOutputStream(changesOut));
 
         } catch (Exception e) {
             throw new BuildException("Failed to create debian changes file " + changesOut, e);

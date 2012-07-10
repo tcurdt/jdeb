@@ -39,17 +39,17 @@ public final class Utils {
         int count = 0;
         int n = 0;
         while (-1 != (n = pInput.read(buffer))) {
-                pOutput.write(buffer, 0, n);
-                count += n;
+            pOutput.write(buffer, 0, n);
+            count += n;
         }
         return count;
-     }
+    }
 
     public static String toHex( final byte[] pBytes ) {
         final StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < pBytes.length; ++i) {
-            sb.append(Integer.toHexString((pBytes[i]>>4) & 0x0f));
+            sb.append(Integer.toHexString((pBytes[i] >> 4) & 0x0f));
             sb.append(Integer.toHexString(pBytes[i] & 0x0f));
         }
 
@@ -63,14 +63,14 @@ public final class Utils {
         }
 
         int x = 0;
-        for (int i=0 ; i<p; i++) {
-            x = s.indexOf('/', x+1);
+        for (int i = 0; i < p; i++) {
+            x = s.indexOf('/', x + 1);
             if (x < 0) {
                 return s;
             }
         }
 
-        return s.substring(x+1);
+        return s.substring(x + 1);
     }
 
     public static String stripLeadingSlash( final String s ) {
@@ -95,7 +95,7 @@ public final class Utils {
      * @param pExpression
      * @return
      */
-    public static String replaceVariables(final VariableResolver pResolver, final String pExpression, final String pOpen, final String pClose) throws ParseException {
+    public static String replaceVariables( final VariableResolver pResolver, final String pExpression, final String pOpen, final String pClose ) throws ParseException {
 
         final char[] s = pExpression.toCharArray();
 
@@ -156,17 +156,17 @@ public final class Utils {
 
     /**
      * Replaces new line delimiters in the input stream with the Unix line feed.
-     * 
+     *
      * @param input
      */
-    public static byte[] toUnixLineEndings(InputStream input) throws IOException {
+    public static byte[] toUnixLineEndings( InputStream input ) throws IOException {
         String encoding = "ISO-8859-1";
         FixCrLfFilter filter = new FixCrLfFilter(new InputStreamReader(input, encoding));
         filter.setEol(FixCrLfFilter.CrLf.newInstance("unix"));
-        
+
         ByteArrayOutputStream filteredFile = new ByteArrayOutputStream();
         Utils.copy(new ReaderInputStream(filter, encoding), filteredFile);
-        
+
         return filteredFile.toByteArray();
     }
 }

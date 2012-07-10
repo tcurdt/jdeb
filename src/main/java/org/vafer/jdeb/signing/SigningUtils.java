@@ -84,7 +84,7 @@ public final class SigningUtils {
      */
     public static void clearSign( final InputStream pInput, final InputStream pKeyring, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException, PGPException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException {
 
-        Security.addProvider( new BouncyCastleProvider() );
+        Security.addProvider(new BouncyCastleProvider());
 
         final PGPSecretKey secretKey = getSecretKey(pKeyring, pKey);
         final PGPPrivateKey privateKey = secretKey.extractPrivateKey(pPassphrase.toCharArray(), "BC");
@@ -94,13 +94,13 @@ public final class SigningUtils {
         final PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(secretKey.getPublicKey().getAlgorithm(), digest, "BC");
         signatureGenerator.initSign(PGPSignature.CANONICAL_TEXT_DOCUMENT, privateKey);
 
-//        final PGPSignatureSubpacketGenerator subpackageGenerator = new PGPSignatureSubpacketGenerator();
-//
-//        final Iterator it = secretKey.getPublicKey().getUserIDs();
-//        if (it.hasNext()) {
-//            subpackageGenerator.setSignerUserID(false, (String)it.next());
-//            signatureGenerator.setHashedSubpackets(subpackageGenerator.generate());
-//        }
+        //        final PGPSignatureSubpacketGenerator subpackageGenerator = new PGPSignatureSubpacketGenerator();
+        //
+        //        final Iterator it = secretKey.getPublicKey().getUserIDs();
+        //        if (it.hasNext()) {
+        //            subpackageGenerator.setSignerUserID(false, (String)it.next());
+        //            signatureGenerator.setHashedSubpackets(subpackageGenerator.generate());
+        //        }
 
         final ArmoredOutputStream armoredOutput = new ArmoredOutputStream(pOutput);
 
@@ -112,7 +112,7 @@ public final class SigningUtils {
 
         processLine(reader.readLine(), armoredOutput, signatureGenerator);
 
-        while(true) {
+        while (true) {
             final String line = reader.readLine();
 
             if (line == null) {
@@ -146,8 +146,8 @@ public final class SigningUtils {
         final char[] chars = pLine.toCharArray();
         int len = chars.length;
 
-        while(len > 0) {
-            if (!Character.isWhitespace(chars[len-1])) {
+        while (len > 0) {
+            if (!Character.isWhitespace(chars[len - 1])) {
                 break;
             }
             len--;

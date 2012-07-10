@@ -24,7 +24,6 @@ import java.io.PrintStream;
 import java.util.zip.GZIPInputStream;
 
 import junit.framework.TestCase;
-
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveInputStream;
 import org.apache.tools.ant.BuildException;
@@ -130,7 +129,7 @@ public final class DebAntTaskTestCase extends TestCase {
     /**
      * Redirects the Ant output to the specified stream.
      */
-    private void redirectOutput(OutputStream out) {
+    private void redirectOutput( OutputStream out ) {
         DefaultLogger logger = new DefaultLogger();
         logger.setOutputPrintStream(new PrintStream(out));
         logger.setMessageOutputLevel(Project.MSG_INFO);
@@ -187,7 +186,7 @@ public final class DebAntTaskTestCase extends TestCase {
             } else {
                 // skip to the next entry
                 long skip = entry.getLength();
-                while(skip > 0) {
+                while (skip > 0) {
                     long skipped = in.skip(skip);
                     if (skipped == -1) {
                         throw new IOException("Failed to skip");
@@ -226,13 +225,15 @@ public final class DebAntTaskTestCase extends TestCase {
                 assertEquals("header 1", (byte) 'Z', in.read());
 
                 TarInputStream tar = new TarInputStream(new CBZip2InputStream(in));
-                while ((tar.getNextEntry()) != null);
+                while ((tar.getNextEntry()) != null) {
+                    ;
+                }
                 tar.close();
                 break;
             } else {
                 // skip to the next entry
                 long skip = entry.getLength();
-                while(skip > 0) {
+                while (skip > 0) {
                     long skipped = in.skip(skip);
                     if (skipped == -1) {
                         throw new IOException("Failed to skip");
@@ -261,12 +262,14 @@ public final class DebAntTaskTestCase extends TestCase {
                 found = true;
 
                 TarInputStream tar = new TarInputStream(new NonClosingInputStream(in));
-                while ((tar.getNextEntry()) != null);
+                while ((tar.getNextEntry()) != null) {
+                    ;
+                }
                 tar.close();
             } else {
                 // skip to the next entry
                 long skip = entry.getLength();
-                while(skip > 0) {
+                while (skip > 0) {
                     long skipped = in.skip(skip);
                     if (skipped == -1) {
                         throw new IOException("Failed to skip");

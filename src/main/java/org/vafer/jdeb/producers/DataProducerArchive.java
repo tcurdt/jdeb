@@ -59,7 +59,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 
         try {
             compressorInputStream = new CompressorStreamFactory().createCompressorInputStream(is);
-        } catch(CompressorException e) {
+        } catch (CompressorException e) {
             // expected if the input file is a zip archive
         }
 
@@ -71,7 +71,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 
         try {
             archiveInputStream = new ArchiveStreamFactory().createArchiveInputStream(is);
-        } catch(ArchiveException e) {
+        } catch (ArchiveException e) {
             throw new IOException("Unsupported archive format: " + archive, e);
         }
 
@@ -80,8 +80,8 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
         if (archiveInputStream instanceof TarArchiveInputStream) {
 
             converter = new EntryConverter() {
-                public TarEntry convert(ArchiveEntry entry) {
-                    TarArchiveEntry src = (TarArchiveEntry)entry;
+                public TarEntry convert( ArchiveEntry entry ) {
+                    TarArchiveEntry src = (TarArchiveEntry) entry;
                     TarEntry dst = new TarEntry(src.getName());
 
                     dst.setSize(src.getSize());
@@ -98,8 +98,8 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
         } else if (archiveInputStream instanceof ZipArchiveInputStream) {
 
             converter = new EntryConverter() {
-                public TarEntry convert(ArchiveEntry entry) {
-                    ZipArchiveEntry src = (ZipArchiveEntry)entry;
+                public TarEntry convert( ArchiveEntry entry ) {
+                    ZipArchiveEntry src = (ZipArchiveEntry) entry;
                     TarEntry dst = new TarEntry(src.getName());
 
                     dst.setSize(src.getSize());
@@ -116,7 +116,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 
 
         try {
-            while(true) {
+            while (true) {
 
                 ArchiveEntry archiveEntry = archiveInputStream.getNextEntry();
 
@@ -147,6 +147,6 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
     }
 
     private interface EntryConverter {
-        public TarEntry convert(ArchiveEntry entry);
+        public TarEntry convert( ArchiveEntry entry );
     }
 }

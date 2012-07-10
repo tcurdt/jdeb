@@ -34,7 +34,7 @@ public final class PermMapper implements Mapper {
     private int fileMode = -1;
     private int dirMode = -1;
 
-    public static int toMode(String modeString) {
+    public static int toMode( String modeString ) {
         int mode = -1;
         if (modeString != null && modeString.length() > 0) {
             mode = Integer.parseInt(modeString, 8);
@@ -44,13 +44,13 @@ public final class PermMapper implements Mapper {
 
     // FIXME cleanup the constructors
 
-    public PermMapper(int strip, String prefix) {
+    public PermMapper( int strip, String prefix ) {
         this.strip = strip;
-        this.prefix = (prefix == null) ? "" : prefix;     
+        this.prefix = (prefix == null) ? "" : prefix;
     }
 
-    public PermMapper(int uid, int gid, String user, String group, int fileMode, int dirMode, int strip, String prefix) {
-      this(strip, prefix);
+    public PermMapper( int uid, int gid, String user, String group, int fileMode, int dirMode, int strip, String prefix ) {
+        this(strip, prefix);
         this.uid = uid;
         this.gid = gid;
         this.user = user;
@@ -59,15 +59,15 @@ public final class PermMapper implements Mapper {
         this.dirMode = dirMode;
     }
 
-    public PermMapper(int uid, int gid, String user, String group, String fileMode, String dirMode, int strip, String prefix) {
+    public PermMapper( int uid, int gid, String user, String group, String fileMode, String dirMode, int strip, String prefix ) {
         this(uid, gid, user, group, toMode(fileMode), toMode(dirMode), strip, prefix);
     }
 
-    public PermMapper(String user, String group, String fileMode, String dirMode, int strip, String prefix) {
+    public PermMapper( String user, String group, String fileMode, String dirMode, int strip, String prefix ) {
         this(-1, -1, user, group, toMode(fileMode), toMode(dirMode), strip, prefix);
     }
 
-    public TarEntry map(final TarEntry entry) {
+    public TarEntry map( final TarEntry entry ) {
         final String name = entry.getName();
 
         final TarEntry newEntry = new TarEntry(prefix + '/' + Utils.stripPath(strip, name));

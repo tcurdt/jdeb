@@ -18,7 +18,6 @@ package org.vafer.jdeb.changes;
 import java.io.ByteArrayInputStream;
 
 import junit.framework.TestCase;
-
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 
 public final class TextfileChangesProviderTestCase extends TestCase {
@@ -26,14 +25,14 @@ public final class TextfileChangesProviderTestCase extends TestCase {
     public void testParsing() throws Exception {
 
         final String input =
-            " * change1\n" +
-            " * change2\n" +
-            "release date=14:00 13.01.2007, version=12324, urgency=low, by=tcurdt@joost.com\n" +
-            " * change1\n" +
-            " * change2\n" +
-            "release date=12:00 10.01.2007, version=10324, urgency=low, by=tcurdt@joost.com\n" +
-            " * change1\n" +
-            " * change2\n";
+                " * change1\n" +
+                        " * change2\n" +
+                        "release date=14:00 13.01.2007, version=12324, urgency=low, by=tcurdt@joost.com\n" +
+                        " * change1\n" +
+                        " * change2\n" +
+                        "release date=12:00 10.01.2007, version=10324, urgency=low, by=tcurdt@joost.com\n" +
+                        " * change1\n" +
+                        " * change2\n";
 
         final PackageDescriptor descriptor = new PackageDescriptor();
         descriptor.set("Package", "package");
@@ -51,15 +50,15 @@ public final class TextfileChangesProviderTestCase extends TestCase {
     public void testDistributionFromChangesProvider() throws Exception {
 
         final String input =
-            "release distribution=production\n" +
-            " * change1\n" +
-            " * change2\n" +
-            "release distribution=staging, date=14:00 13.01.2007, version=12324, urgency=low, by=tcurdt@joost.com\n" +
-            " * change1\n" +
-            " * change2\n" +
-            "release distribution=development, date=12:00 10.01.2007, version=10324, urgency=low, by=tcurdt@joost.com\n" +
-            " * change1\n" +
-            " * change2\n";
+                "release distribution=production\n" +
+                        " * change1\n" +
+                        " * change2\n" +
+                        "release distribution=staging, date=14:00 13.01.2007, version=12324, urgency=low, by=tcurdt@joost.com\n" +
+                        " * change1\n" +
+                        " * change2\n" +
+                        "release distribution=development, date=12:00 10.01.2007, version=10324, urgency=low, by=tcurdt@joost.com\n" +
+                        " * change1\n" +
+                        " * change2\n";
 
         final PackageDescriptor descriptor = new PackageDescriptor();
         descriptor.set("Package", "package");

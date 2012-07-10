@@ -56,7 +56,7 @@ public final class Data extends PatternSet implements DataProducer {
         mapperWrapper.add(pMapper);
     }
 
-    public void produce( final DataConsumer pReceiver) throws IOException {
+    public void produce( final DataConsumer pReceiver ) throws IOException {
 
         if (!src.exists()) {
             throw new FileNotFoundException("Data source not found : " + src);
@@ -65,7 +65,7 @@ public final class Data extends PatternSet implements DataProducer {
         org.vafer.jdeb.mapping.Mapper[] mappers = new org.vafer.jdeb.mapping.Mapper[mapperWrapper.size()];
         final Iterator it = mapperWrapper.iterator();
         for (int i = 0; i < mappers.length; i++) {
-            mappers[i] = ((Mapper)it.next()).createMapper();
+            mappers[i] = ((Mapper) it.next()).createMapper();
         }
 
         if ("file".equalsIgnoreCase(type)) {
@@ -74,7 +74,7 @@ public final class Data extends PatternSet implements DataProducer {
                     getIncludePatterns(getProject()),
                     getExcludePatterns(getProject()),
                     mappers
-                    ).produce(pReceiver);
+            ).produce(pReceiver);
             return;
         }
 
@@ -84,7 +84,7 @@ public final class Data extends PatternSet implements DataProducer {
                     getIncludePatterns(getProject()),
                     getExcludePatterns(getProject()),
                     mappers
-                    ).produce(pReceiver);
+            ).produce(pReceiver);
             return;
         }
 
@@ -94,11 +94,11 @@ public final class Data extends PatternSet implements DataProducer {
                     getIncludePatterns(getProject()),
                     getExcludePatterns(getProject()),
                     mappers
-                    ).produce(pReceiver);
+            ).produce(pReceiver);
             return;
         }
 
         throw new IOException("Unknown type '" + type + "' (file|directory|archive) for " + src);
     }
-    
+
 }

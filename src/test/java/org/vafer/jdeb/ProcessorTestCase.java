@@ -31,9 +31,10 @@ public class ProcessorTestCase extends TestCase {
      */
     public void testBuildDataWithFileSet() throws Exception {
         Processor processor = new Processor(new Console() {
-            public void info(String s) {
+            public void info( String s ) {
             }
-            public void warn(String s) {
+
+            public void warn( String s ) {
             }
         }, null);
 

@@ -37,7 +37,7 @@ public abstract class AbstractPluginMojo extends AbstractMojo {
     protected File buildDirectory;
 
     protected MavenProject getProject() {
-        if ( project.getExecutionProject() != null ) {
+        if (project.getExecutionProject() != null) {
             return project.getExecutionProject();
         }
 

@@ -80,7 +80,7 @@ public final class Mapper {
         fileMode = pFileMode;
     }
 
-    public void setDirMode(int pDirMode) {
+    public void setDirMode( int pDirMode ) {
         dirMode = pDirMode;
     }
 
@@ -100,10 +100,10 @@ public final class Mapper {
 
         // @deprecated
         if ("prefix".equalsIgnoreCase(mapperType)) {
-          System.err.println("The 'prefix' mapper is deprecated. Please use 'perm' instead. Same syntax and more.");
+            System.err.println("The 'prefix' mapper is deprecated. Please use 'perm' instead. Same syntax and more.");
             return new PermMapper(strip, prefix);
         }
-        
+
         throw new IOException("Unknown mapper type '" + mapperType + "'");
     }
 

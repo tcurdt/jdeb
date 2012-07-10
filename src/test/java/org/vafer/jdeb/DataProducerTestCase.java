@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 import junit.framework.TestCase;
-
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveInputStream;
 import org.apache.tools.tar.TarEntry;
@@ -37,9 +36,10 @@ public final class DataProducerTestCase extends TestCase {
     public void testCreation() throws Exception {
 
         final Processor processor = new Processor(new Console() {
-            public void info(String s) {
+            public void info( String s ) {
             }
-            public void warn(String s) {
+
+            public void warn( String s ) {
             }
         }, null);
 
@@ -65,7 +65,7 @@ public final class DataProducerTestCase extends TestCase {
         final Set filesInDeb = new HashSet();
 
         final ArArchiveInputStream ar = new ArArchiveInputStream(new FileInputStream(deb));
-        while(true) {
+        while (true) {
             final ArArchiveEntry arEntry = ar.getNextArEntry();
             if (arEntry == null) {
                 break;
@@ -75,7 +75,7 @@ public final class DataProducerTestCase extends TestCase {
 
                 final TarInputStream tar = new TarInputStream(new GZIPInputStream(new NonClosingInputStream(ar)));
 
-                while(true) {
+                while (true) {
                     final TarEntry tarEntry = tar.getNextEntry();
                     if (tarEntry == null) {
                         break;

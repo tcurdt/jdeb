@@ -20,7 +20,7 @@ import org.apache.tools.tar.TarEntry;
 public final class NullMapper implements Mapper {
 
     public static final Mapper INSTANCE = new NullMapper();
-    
+
     private NullMapper() {
     }
 

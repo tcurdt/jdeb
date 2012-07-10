@@ -80,7 +80,7 @@ public final class DataProducerFileSet implements DataProducer {
 
             final InputStream inputStream = new FileInputStream(file);
             try {
-                pReceiver.onEachFile(inputStream, prefix + "/" + name, null, user, uid, group, gid,filemode, file.length());
+                pReceiver.onEachFile(inputStream, prefix + "/" + name, null, user, uid, group, gid, filemode, file.length());
             } finally {
                 inputStream.close();
             }

@@ -18,5 +18,5 @@ class MojoConsole implements Console {
     public void warn( String s ) {
         log.warn(s);
     }
-    
+
 }

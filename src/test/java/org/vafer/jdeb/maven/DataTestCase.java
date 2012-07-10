@@ -29,7 +29,7 @@ public class DataTestCase extends TestCase {
             file.delete();
         }
     }
-    
+
     public void testSrcAndPathsNotSetFails() throws IOException {
         RuntimeException expectedException = null;
         try {
@@ -37,20 +37,20 @@ public class DataTestCase extends TestCase {
             data.setSrc(null);
             data.produce(null);
             fail();
-        } catch(RuntimeException expected) {
+        } catch (RuntimeException expected) {
             expectedException = expected;
         }
         assertEquals("src or paths not set", expectedException.getMessage());
     }
 
-    public void testPathsMaySubstituteSrc()throws IOException {
+    public void testPathsMaySubstituteSrc() throws IOException {
         IOException expectedException = null;
         try {
             data.setPaths(new String[] { "/var/log", "/var/lib" });
             data.setSrc(null);
             data.produce(null);
             fail();
-        } catch(IOException expected) {
+        } catch (IOException expected) {
             expectedException = expected;
         }
         assertTrue(expectedException.getMessage().startsWith("Unknown type "));
@@ -62,7 +62,7 @@ public class DataTestCase extends TestCase {
             data.setMissingSrc("not a value value");
             data.produce(null);
             fail();
-        } catch(IllegalArgumentException expected) {
+        } catch (IllegalArgumentException expected) {
         }
     }
 
@@ -71,7 +71,7 @@ public class DataTestCase extends TestCase {
             data.setSrc(missingFile);
             data.produce(null);
             fail();
-        } catch(FileNotFoundException expected) {
+        } catch (FileNotFoundException expected) {
         }
     }
 
@@ -93,7 +93,7 @@ public class DataTestCase extends TestCase {
             data.setMissingSrc("fail");
             data.produce(null);
             fail();
-        } catch(FileNotFoundException expected) {
+        } catch (FileNotFoundException expected) {
         }
     }
 
@@ -102,7 +102,7 @@ public class DataTestCase extends TestCase {
         try {
             data.setSrc(file);
             data.produce(null);
-        } catch(IOException expected) {
+        } catch (IOException expected) {
             unknownTypeException = expected;
         }
         assertTrue(unknownTypeException.getMessage().startsWith("Unknown type"));
@@ -114,7 +114,7 @@ public class DataTestCase extends TestCase {
             data.setSrc(file);
             data.setMissingSrc("ignore");
             data.produce(null);
-        } catch(IOException expected) {
+        } catch (IOException expected) {
             unknownTypeException = expected;
         }
         assertTrue(unknownTypeException.getMessage().startsWith("Unknown type"));
@@ -126,7 +126,7 @@ public class DataTestCase extends TestCase {
             data.setSrc(file);
             data.setMissingSrc("fail");
             data.produce(null);
-        } catch(IOException expected) {
+        } catch (IOException expected) {
             unknownTypeException = expected;
         }
         assertTrue(unknownTypeException.getMessage().startsWith("Unknown type"));

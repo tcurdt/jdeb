@@ -40,7 +40,7 @@ public final class NonClosingInputStream extends InputStream {
         // delegate.close();
     }
 
-    public void mark(int readlimit) {
+    public void mark( int readlimit ) {
         delegate.mark(readlimit);
     }
 
@@ -52,11 +52,11 @@ public final class NonClosingInputStream extends InputStream {
         return delegate.read();
     }
 
-    public int read(byte[] b, int off, int len) throws IOException {
+    public int read( byte[] b, int off, int len ) throws IOException {
         return delegate.read(b, off, len);
     }
 
-    public int read(byte[] b) throws IOException {
+    public int read( byte[] b ) throws IOException {
         return delegate.read(b);
     }
 
@@ -64,7 +64,7 @@ public final class NonClosingInputStream extends InputStream {
         delegate.reset();
     }
 
-    public long skip(long n) throws IOException {
+    public long skip( long n ) throws IOException {
         return delegate.skip(n);
     }
 

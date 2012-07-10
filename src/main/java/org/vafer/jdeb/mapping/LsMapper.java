@@ -45,19 +45,21 @@ public final class LsMapper implements Mapper {
             super();
         }
 
-        public ParseError(String message, Throwable cause) {
+        public ParseError( String message, Throwable cause ) {
             super(message, cause);
         }
 
-        public ParseError(String message) {
+        public ParseError( String message ) {
             super(message);
         }
 
-        public ParseError(Throwable cause) {
+        public ParseError( Throwable cause ) {
             super(cause);
         }
 
-    };
+    }
+
+    ;
 
     public LsMapper( final InputStream pInput ) throws IOException, ParseError {
         mapping = parse(pInput);
@@ -148,7 +150,7 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
         // TODO: simplified - needs fixing
         int sum = 0;
         int bit = 1;
-        for(int i=m.length-1; i>=0 ; i--) {
+        for (int i = m.length - 1; i >= 0; i--) {
             if (m[i] != '-') {
                 sum += bit;
             }
@@ -159,7 +161,7 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 
     private TarEntry readFile( final BufferedReader reader, final String base ) throws IOException, ParseError {
 
-        while(true) {
+        while (true) {
             final String line = reader.readLine();
 
             if (line == null) {
@@ -195,7 +197,7 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
         final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
 
         boolean first = true;
-        while(true) {
+        while (true) {
 
             final String base;
             if (first) {
@@ -212,7 +214,7 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
             final TarEntry dir = readDir(reader, base);
             mapping.put(dir.getName(), dir);
 
-            while(true) {
+            while (true) {
                 final TarEntry file = readFile(reader, base);
 
                 if (file == null) {

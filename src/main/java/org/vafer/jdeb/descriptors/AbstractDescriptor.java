@@ -32,9 +32,8 @@ import org.vafer.jdeb.utils.VariableResolver;
 /**
  * A descriptor holds the usual key value pairs.
  *
- * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html">Debian Policy Manual - Control files and their fields</a>
- *
  * @author Torsten Curdt <tcurdt@vafer.org>
+ * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html">Debian Policy Manual - Control files and their fields</a>
  */
 public abstract class AbstractDescriptor {
 
@@ -65,7 +64,7 @@ public abstract class AbstractDescriptor {
         StringBuilder buffer = new StringBuilder();
         String key = null;
         int linenr = 0;
-        while(true) {
+        while (true) {
             final String line = br.readLine();
 
             if (line == null) {
@@ -102,7 +101,7 @@ public abstract class AbstractDescriptor {
                 }
 
                 key = line.substring(0, i);
-                buffer.append(line.substring(i+1).trim());
+                buffer.append(line.substring(i + 1).trim());
 
                 continue;
             }
@@ -115,19 +114,19 @@ public abstract class AbstractDescriptor {
     }
 
     public void set( final String pKey, final String pValue ) {
-      String value = null;
-      try {
-        value = Utils.replaceVariables(resolver, pValue, openToken, closeToken);
-          if ("".equals(value)) {
-              value = null;
-          }
-      } catch(ParseException e) {
-      }
+        String value = null;
+        try {
+            value = Utils.replaceVariables(resolver, pValue, openToken, closeToken);
+            if ("".equals(value)) {
+                value = null;
+            }
+        } catch (ParseException e) {
+        }
         values.put(pKey, value);
     }
 
     public String get( final String pKey ) {
-        return (String)values.get(pKey);
+        return (String) values.get(pKey);
     }
 
     public abstract String[] getMandatoryKeys();

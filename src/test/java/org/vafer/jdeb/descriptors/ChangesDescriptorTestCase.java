@@ -16,7 +16,6 @@
 package org.vafer.jdeb.descriptors;
 
 import junit.framework.TestCase;
-
 import org.vafer.jdeb.changes.ChangeSet;
 
 public final class ChangesDescriptorTestCase extends TestCase {

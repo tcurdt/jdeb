@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 
 public class InformationInputStreamTestCase extends TestCase {
 
-    private InputStream getStream(String file) {
+    private InputStream getStream( String file ) {
         return getClass().getClassLoader().getResourceAsStream("org/vafer/jdeb/utils/" + file);
     }
 

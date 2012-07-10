@@ -35,7 +35,7 @@ public final class DataProducerFile extends AbstractDataProducer implements Data
 
     private final File file;
 
-    public DataProducerFile(final File pFile, String[] pIncludes, String[] pExcludes, Mapper[] pMapper) {
+    public DataProducerFile( final File pFile, String[] pIncludes, String[] pExcludes, Mapper[] pMapper ) {
         super(pIncludes, pExcludes, pMapper);
         file = pFile;
     }

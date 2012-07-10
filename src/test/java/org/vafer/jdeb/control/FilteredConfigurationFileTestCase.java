@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
-
 import org.apache.tools.ant.util.ReaderInputStream;
 import org.vafer.jdeb.utils.MapVariableResolver;
 import org.vafer.jdeb.utils.VariableResolver;

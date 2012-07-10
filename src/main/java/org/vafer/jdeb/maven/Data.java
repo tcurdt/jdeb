@@ -15,9 +15,6 @@
  */
 package org.vafer.jdeb.maven;
 
-import static org.vafer.jdeb.maven.MissingSourceBehavior.FAIL;
-import static org.vafer.jdeb.maven.MissingSourceBehavior.IGNORE;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,17 +29,20 @@ import org.vafer.jdeb.producers.DataProducerDirectory;
 import org.vafer.jdeb.producers.DataProducerFile;
 import org.vafer.jdeb.producers.DataProducerPathTemplate;
 
+import static org.vafer.jdeb.maven.MissingSourceBehavior.FAIL;
+import static org.vafer.jdeb.maven.MissingSourceBehavior.IGNORE;
+
 /**
  * Maven "data" element acting as a factory for DataProducers. So far Archive and
  * Directory producers are supported. Both support the usual ant pattern set
  * matching.
- * 
+ *
  * @author Bryan Sant <bryan.sant@gmail.com>
  */
 public final class Data implements DataProducer {
 
     private File src;
-    
+
     /**
      * @parameter expression="${src}"
      * @required
@@ -104,8 +104,8 @@ public final class Data implements DataProducer {
     void setPaths( String[] paths ) {
         this.paths = paths;
     }
-    
-    public String[] splitPatterns(String patterns) {
+
+    public String[] splitPatterns( String patterns ) {
         String[] result = null;
         if (patterns != null && patterns.length() > 0) {
             List tokens = new ArrayList();
@@ -113,7 +113,7 @@ public final class Data implements DataProducer {
             while (tok.hasMoreTokens()) {
                 tokens.add(tok.nextToken());
             }
-            result = (String[])tokens.toArray(new String[tokens.size()]);
+            result = (String[]) tokens.toArray(new String[tokens.size()]);
         }
         return result;
     }
@@ -131,7 +131,7 @@ public final class Data implements DataProducer {
         if (src == null && (paths == null || paths.length == 0)) {
             throw new RuntimeException("src or paths not set");
         }
-        
+
         org.vafer.jdeb.mapping.Mapper[] mappers = null;
         if (mapper != null) {
             mappers = new org.vafer.jdeb.mapping.Mapper[] { mapper.createMapper() };
@@ -159,5 +159,5 @@ public final class Data implements DataProducer {
 
         throw new IOException("Unknown type '" + type + "' (file|directory|archive|template) for " + src);
     }
-    
+
 }

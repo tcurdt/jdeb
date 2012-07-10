@@ -46,7 +46,7 @@ public final class InformationInputStream extends FilterInputStream {
         int[] sequence;
         String encoding;
 
-        private BOM(String encoding, int... sequence) {
+        private BOM( String encoding, int... sequence ) {
             this.encoding = encoding;
             this.sequence = sequence;
         }
@@ -63,7 +63,7 @@ public final class InformationInputStream extends FilterInputStream {
 
         int[] header;
 
-        private Shell(int... header) {
+        private Shell( int... header ) {
             this.header = header;
         }
     }
@@ -71,7 +71,7 @@ public final class InformationInputStream extends FilterInputStream {
     private BOM bom = BOM.NONE;
     private Shell shell = Shell.NONE;
 
-    public InformationInputStream(InputStream in) {
+    public InformationInputStream( InputStream in ) {
         super(in);
     }
 
@@ -102,7 +102,7 @@ public final class InformationInputStream extends FilterInputStream {
         return encoding;
     }
 
-    private void add(int c) {
+    private void add( int c ) {
         if (i < 10) {
             if (shell == Shell.NONE) {
                 for (Shell shell : Shell.values()) {
@@ -164,10 +164,10 @@ public final class InformationInputStream extends FilterInputStream {
         return b;
     }
 
-    public int read(byte[] b, int off, int len) throws IOException {
+    public int read( byte[] b, int off, int len ) throws IOException {
         int length = super.read(b, off, len);
-        for(int i = 0; i<length; i++) {
-            add(b[off+i] & 0xFF);
+        for (int i = 0; i < length; i++) {
+            add(b[off + i] & 0xFF);
         }
         return length;
     }

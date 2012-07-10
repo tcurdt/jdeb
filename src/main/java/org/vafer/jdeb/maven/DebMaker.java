@@ -38,39 +38,59 @@ import org.vafer.jdeb.utils.VariableResolver;
  * This class is largely based on the DebAntTask class, and provides the same
  * featues to maven developers that the ant task provides to ant developers.
  *
- * @see org.vafer.jdeb.ant.DebAntTask
  * @author Bryan Sant <bryan.sant@gmail.com>
+ * @see org.vafer.jdeb.ant.DebAntTask
  */
 public class DebMaker {
 
-    /** A console to output log message with */
+    /**
+     * A console to output log message with
+     */
     private Console console;
 
-    /** The Debian package produced */
+    /**
+     * The Debian package produced
+     */
     private File deb;
 
-    /** The directory containing the control files to build the package */
+    /**
+     * The directory containing the control files to build the package
+     */
     private File control;
 
-    /** The file containing the PGP keys */
+    /**
+     * The file containing the PGP keys
+     */
     private File keyring;
 
-    /** The key to use in the keyring */
+    /**
+     * The key to use in the keyring
+     */
     private String key;
 
-    /** The passphrase for the key to sign the changes file */
+    /**
+     * The passphrase for the key to sign the changes file
+     */
     private String passphrase;
 
-    /** The file to read the changes from */
+    /**
+     * The file to read the changes from
+     */
     private File changesIn;
 
-    /** The file where to write the changes to */
+    /**
+     * The file where to write the changes to
+     */
     private File changesOut;
 
-    /** The file where to write the changes of the changes input to */
+    /**
+     * The file where to write the changes of the changes input to
+     */
     private File changesSave;
 
-    /** The compression method used for the data file (none, gzip or bzip2) */
+    /**
+     * The compression method used for the data file (none, gzip or bzip2)
+     */
     private String compression = "gzip";
 
     private final VariableResolver variableResolver;
@@ -78,15 +98,15 @@ public class DebMaker {
 
     private final Collection dataProducers;
 
-    public DebMaker(Console console, VariableResolver variableResolver) {
+    public DebMaker( Console console, VariableResolver variableResolver ) {
         this(console, null, null, null, variableResolver);
     }
 
-    public DebMaker(Console console, File deb, File controlDir, VariableResolver variableResolver) {
+    public DebMaker( Console console, File deb, File controlDir, VariableResolver variableResolver ) {
         this(console, deb, controlDir, null, variableResolver);
     }
 
-    public DebMaker(Console console, File deb, File controlDir, Collection dataProducers, VariableResolver variableResolver) {
+    public DebMaker( Console console, File deb, File controlDir, Collection dataProducers, VariableResolver variableResolver ) {
         this.console = console;
         this.deb = deb;
         this.control = controlDir;
@@ -98,39 +118,39 @@ public class DebMaker {
         }
     }
 
-    public void setDeb(File deb) {
+    public void setDeb( File deb ) {
         this.deb = deb;
     }
 
-    public void setControl(File control) {
+    public void setControl( File control ) {
         this.control = control;
     }
 
-    public void setChangesIn(File changes) {
+    public void setChangesIn( File changes ) {
         this.changesIn = changes;
     }
 
-    public void setChangesOut(File changes) {
+    public void setChangesOut( File changes ) {
         this.changesOut = changes;
     }
 
-    public void setChangesSave(File changes) {
+    public void setChangesSave( File changes ) {
         this.changesSave = changes;
     }
 
-    public void setKeyring(File keyring) {
+    public void setKeyring( File keyring ) {
         this.keyring = keyring;
     }
 
-    public void setKey(String key) {
+    public void setKey( String key ) {
         this.key = key;
     }
 
-    public void setPassphrase(String passphrase) {
+    public void setPassphrase( String passphrase ) {
         this.passphrase = passphrase;
     }
 
-    public void setCompression(String compression) {
+    public void setCompression( String compression ) {
         this.compression = compression;
     }
 
@@ -138,20 +158,19 @@ public class DebMaker {
      * Adds a new data source to the deb. The new data source may point to a
      * single file, a directory, or a tarball.
      *
-     * @param file
-     *            The data source to add
+     * @param file The data source to add
      */
-    public void addData(File file) {
+    public void addData( File file ) {
         final Data data = new Data();
         data.setSrc(file);
         dataProducers.add(data);
     }
 
-    public void addData(Data data) {
+    public void addData( Data data ) {
         dataProducers.add(data);
     }
 
-    private boolean isPossibleOutput(File file) {
+    private boolean isPossibleOutput( File file ) {
 
         if (file.exists()) {
             return file.isFile() && file.canWrite();
@@ -164,7 +183,7 @@ public class DebMaker {
 
         if (control == null || !control.isDirectory()) {
             throw new PackagingException(
-                "\"" + control + "\" is not a valid 'control' directory)");
+                    "\"" + control + "\" is not a valid 'control' directory)");
         }
 
         if (changesIn != null) {

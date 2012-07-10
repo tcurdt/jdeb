@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
-
 import org.vafer.jdeb.utils.MapVariableResolver;
 
 public final class PackageDescriptorTestCase extends TestCase {
@@ -31,10 +30,10 @@ public final class PackageDescriptorTestCase extends TestCase {
 
         final InputStream is = new ByteArrayInputStream(
                 ("Key1: Value1\n" +
-                 "Key2: Value2\n" +
-                 " Value2.1\n" +
-                 " Value2.2\n" +
-                 "Key3: Value3\n").getBytes());
+                        "Key2: Value2\n" +
+                        " Value2.1\n" +
+                        " Value2.2\n" +
+                        "Key3: Value3\n").getBytes());
 
         final PackageDescriptor d = new PackageDescriptor(is, null);
         assertFalse(d.isValid());
@@ -79,12 +78,12 @@ public final class PackageDescriptorTestCase extends TestCase {
     public void testEmptyLines() throws Exception {
         final InputStream is = new ByteArrayInputStream(
                 ("Key1: Value1\n" +
-                 "Key2: Value2\n" +
-                 "\n").getBytes());
+                        "Key2: Value2\n" +
+                        "\n").getBytes());
         try {
             new PackageDescriptor(is, null);
             fail("Should throw a ParseException");
-        } catch(ParseException e) {
+        } catch (ParseException e) {
         }
     }
 }

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
-
 import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
@@ -14,8 +13,8 @@ import org.vafer.jdeb.mapping.Mapper;
 
 public class DataProducerPathTemplateTestCase extends TestCase {
 
-    private static final String[] INCLUDES = {};
-    private static final String[] EXCLUDES = {};
+    private static final String[] INCLUDES = { };
+    private static final String[] EXCLUDES = { };
 
     private CaptureDataConsumer captureDataConsumer = new CaptureDataConsumer();
 
@@ -23,13 +22,13 @@ public class DataProducerPathTemplateTestCase extends TestCase {
     private DataProducer dataProducer;
 
     public void testTypical() throws Exception {
-        
+
         String[] paths = { "/var/log", "/var/lib" };
         dataProducer = new DataProducerPathTemplate(paths, INCLUDES, EXCLUDES, mappers);
         dataProducer.produce(captureDataConsumer);
-        
+
         assertEquals(2, captureDataConsumer.invocations.size());
-        
+
         CaptureDataConsumer.Invocation invocation = captureDataConsumer.invocations.get(0);
         assertEquals(invocation.dirname, "/var/log");
         assertEquals(invocation.gid, 0);
@@ -39,7 +38,7 @@ public class DataProducerPathTemplateTestCase extends TestCase {
         assertEquals(invocation.size, 0);
         assertEquals(invocation.uid, 0);
         assertEquals(invocation.user, "root");
-        
+
         invocation = captureDataConsumer.invocations.get(1);
         assertEquals(invocation.dirname, "/var/lib");
         assertEquals(invocation.gid, 0);
@@ -58,7 +57,7 @@ public class DataProducerPathTemplateTestCase extends TestCase {
         public CaptureDataConsumer() {
             invocations = new ArrayList<Invocation>();
         }
-        
+
         @Override
         public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
             invocations.add(new Invocation(dirname, linkname, user, uid, group, gid, mode, size));
@@ -67,9 +66,9 @@ public class DataProducerPathTemplateTestCase extends TestCase {
         @Override
         public void onEachFile( InputStream input, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
         }
-        
+
         private class Invocation {
-            
+
             private String dirname;
             private String linkname;
             private String user;
@@ -79,7 +78,7 @@ public class DataProducerPathTemplateTestCase extends TestCase {
             private int mode;
             private long size;
 
-            private Invocation(String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+            private Invocation( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 this.dirname = dirname;
                 this.linkname = linkname;
                 this.user = user;
@@ -89,8 +88,8 @@ public class DataProducerPathTemplateTestCase extends TestCase {
                 this.mode = mode;
                 this.size = size;
             }
-            
+
         }
-        
+
     }
 }

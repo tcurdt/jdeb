@@ -18,7 +18,7 @@ public class FilteredConfigurationFile {
     private List<String> lines = new ArrayList<String>();
     private String name;
 
-    public FilteredConfigurationFile(String name, InputStream pInputStream, VariableResolver pResolver) throws IOException, ParseException {
+    public FilteredConfigurationFile( String name, InputStream pInputStream, VariableResolver pResolver ) throws IOException, ParseException {
         this.name = name;
         parse(pInputStream, pResolver);
     }
@@ -31,7 +31,7 @@ public class FilteredConfigurationFile {
         closeToken = pToken;
     }
 
-    private void parse(InputStream pInputStream, VariableResolver pResolver) throws IOException, ParseException {
+    private void parse( InputStream pInputStream, VariableResolver pResolver ) throws IOException, ParseException {
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(pInputStream));

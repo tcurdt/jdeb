@@ -24,23 +24,23 @@ import junit.framework.TestCase;
 public class UtilsTestCase extends TestCase {
 
     public void testStripPath() throws Exception {
-        assertEquals("foo/bar", Utils.stripPath(0,"foo/bar"));
+        assertEquals("foo/bar", Utils.stripPath(0, "foo/bar"));
 
-        assertEquals("bar", Utils.stripPath(1,"foo/bar"));
+        assertEquals("bar", Utils.stripPath(1, "foo/bar"));
 
-        assertEquals("bar/baz", Utils.stripPath(1,"foo/bar/baz"));
-        assertEquals("baz", Utils.stripPath(2,"foo/bar/baz"));
+        assertEquals("bar/baz", Utils.stripPath(1, "foo/bar/baz"));
+        assertEquals("baz", Utils.stripPath(2, "foo/bar/baz"));
 
-        assertEquals("foo/", Utils.stripPath(0,"foo/"));
-        assertEquals("", Utils.stripPath(1,"foo/"));
-        assertEquals("foo/", Utils.stripPath(2,"foo/"));
+        assertEquals("foo/", Utils.stripPath(0, "foo/"));
+        assertEquals("", Utils.stripPath(1, "foo/"));
+        assertEquals("foo/", Utils.stripPath(2, "foo/"));
     }
 
-    private String convert(String s) throws Exception {
+    private String convert( String s ) throws Exception {
         byte[] data = Utils.toUnixLineEndings(new ByteArrayInputStream(s.getBytes("UTF-8")));
         return new String(data, "UTF-8");
     }
-    
+
     public void testNewlineConversionLF() throws Exception {
         String expected = "test\ntest\n\ntest\n";
         String actual = convert("test\ntest\n\ntest");
@@ -58,5 +58,5 @@ public class UtilsTestCase extends TestCase {
         String actual = convert("test\rtest\r\rtest");
         assertEquals(expected, actual);
     }
-    
+
 }

@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import junit.framework.TestCase;
-
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveInputStream;
 
