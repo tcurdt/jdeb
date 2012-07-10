@@ -51,6 +51,16 @@ public final class Data implements DataProducer {
         this.src = src;
     }
 
+    private String destinationName;
+
+    /**
+     * @parameter expression="${dst}"
+     * @required
+     */
+    public void setDestinationName( String destinationName ) {
+        this.destinationName = destinationName;
+    }
+
     private String type;
 
     /**
@@ -119,7 +129,6 @@ public final class Data implements DataProducer {
     }
 
     public void produce( final DataConsumer pReceiver ) throws IOException {
-
         if (src != null && !src.exists()) {
             if (missingSrc == IGNORE) {
                 return;
@@ -138,7 +147,7 @@ public final class Data implements DataProducer {
         }
 
         if ("file".equalsIgnoreCase(type)) {
-            new DataProducerFile(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            new DataProducerFile(src, destinationName, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 

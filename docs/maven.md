@@ -70,7 +70,7 @@ automatically be attached to the project.
 
 The jdeb maven plugin also supports a variety of configuration options. These
 configuration options provide the same features available in the jdeb ant
-task. To configure the jdeb maven plugin, populate the jdeb configuraiton
+task. To configure the jdeb maven plugin, populate the jdeb configuration
 section with any of the following options:
 
     *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
@@ -121,6 +121,8 @@ following options:
     ||   Element       || Description                                                                 || Required                                  ||
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | src              | The directory, tarball, or file to include in the package                    | Yes                                         |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | dst              | New filename at destination (type must be 'file')                            | No                                          |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | type             | Type of the data source. (archive|directory|file|template)                   | No; but will be Yes in the future           |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
@@ -209,6 +211,7 @@ include a directory, a tarball, and a file in your deb package:
                                 <!-- File example -->
                                 <data>
                                     <src>${project.basedir}/README.txt</src>
+                                    <dst>README</dst>
                                     <type>file</type>
                                     <missingSrc>ignore</missingSrc>
                                 </data>

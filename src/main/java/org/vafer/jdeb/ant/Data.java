@@ -33,8 +33,13 @@ import org.vafer.jdeb.producers.DataProducerFile;
  * Ant "data" element acting as a factory for DataProducers.
  * So far Archive and Directory producers are supported.
  * Both support the usual ant pattern set matching.
+<<<<<<< HEAD
  *
  * @author Torsten Curdt
+=======
+ * 
+ * @author Torsten Curdt <tcurdt@vafer.org>
+>>>>>>> f88db2e1d33844d20786cfae1bff61010517d461
  */
 public final class Data extends PatternSet implements DataProducer {
 
@@ -44,12 +49,18 @@ public final class Data extends PatternSet implements DataProducer {
 
     private String type;
 
+    private String destinationName;
+
     public void setSrc( final File pSrc ) {
         src = pSrc;
     }
 
     public void setType( final String pType ) {
         type = pType;
+    }
+
+    public void setDst( String pDestinationName ) {
+        destinationName = pDestinationName;
     }
 
     public void addMapper( final Mapper pMapper ) {
@@ -71,6 +82,7 @@ public final class Data extends PatternSet implements DataProducer {
         if ("file".equalsIgnoreCase(type)) {
             new DataProducerFile(
                 src,
+                destinationName,
                 getIncludePatterns(getProject()),
                 getExcludePatterns(getProject()),
                 mappers
