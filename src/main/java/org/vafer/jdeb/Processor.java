@@ -67,7 +67,7 @@ import org.vafer.jdeb.utils.VariableResolver;
 public class Processor {
 
     private static final Set<String> CONFIGURATION_FILENAMES
-            = new HashSet<String>(Arrays.asList(new String[] { "conffiles", "preinst", "postinst", "prerm", "postrm" }));
+        = new HashSet<String>(Arrays.asList(new String[] { "conffiles", "preinst", "postinst", "prerm", "postrm" }));
 
     private final Console console;
     private final VariableResolver resolver;
@@ -140,8 +140,8 @@ public class Processor {
 
             if (!packageDescriptor.isValid()) {
                 throw new PackagingException("Control file descriptor keys are invalid " + packageDescriptor.invalidKeys() +
-                        ". The following keys are mandatory " + Arrays.toString(PackageDescriptor.mandatoryKeys) +
-                        ". Please check your pom.xml/build.xml and your control file.");
+                    ". The following keys are mandatory " + Arrays.toString(PackageDescriptor.mandatoryKeys) +
+                    ". Please check your pom.xml/build.xml and your control file.");
             }
 
             pOutput.getParentFile().mkdirs();
@@ -256,8 +256,8 @@ public class Processor {
 
         if (!changesDescriptor.isValid()) {
             throw new PackagingException("Changes file descriptor keys are invalid " + changesDescriptor.invalidKeys() +
-                    ". The following keys are mandatory " + Arrays.toString(ChangesDescriptor.mandatoryKeys) +
-                    ". Please check your pom.xml/build.xml and your control file.");
+                ". The following keys are mandatory " + Arrays.toString(ChangesDescriptor.mandatoryKeys) +
+                ". Please check your pom.xml/build.xml and your control file.");
         }
 
         final String changes = changesDescriptor.toString();
@@ -483,16 +483,16 @@ public class Processor {
                 tarOutputStream.closeEntry();
 
                 console.info(
-                        "file:" + entry.getName() +
-                                " size:" + entry.getSize() +
-                                " mode:" + entry.getMode() +
-                                " linkname:" + entry.getLinkName() +
-                                " username:" + entry.getUserName() +
-                                " userid:" + entry.getUserId() +
-                                " groupname:" + entry.getGroupName() +
-                                " groupid:" + entry.getGroupId() +
-                                " modtime:" + entry.getModTime() +
-                                " md5: " + md5
+                    "file:" + entry.getName() +
+                        " size:" + entry.getSize() +
+                        " mode:" + entry.getMode() +
+                        " linkname:" + entry.getLinkName() +
+                        " username:" + entry.getUserName() +
+                        " userid:" + entry.getUserId() +
+                        " groupname:" + entry.getGroupName() +
+                        " groupid:" + entry.getGroupId() +
+                        " modtime:" + entry.getModTime() +
+                        " md5: " + md5
                 );
 
                 // append to file md5 list

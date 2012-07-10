@@ -34,29 +34,29 @@ public final class SigningTestCase extends TestCase {
         final byte[] input = inputStr.getBytes("UTF-8");
 
         final String expectedOutputStr =
-                "-----BEGIN PGP SIGNED MESSAGE-----\n" +
-                        "Hash: SHA1\n" +
-                        "\n" +
-                        "TEST1\r\n" +
-                        "TEST2\r\n" +
-                        "TEST3\r\n" +
-                        "-----BEGIN PGP SIGNATURE-----\n" +
-                        "Version: BCPG v1.29\n" +
-                        "\n" +
-                        "iEYEARECABAFAkax1rgJEHM9pIAuB02PAABIJgCghFmoCJCZ0CGiqgVLGGPd/Yh5\n" +
-                        "FQQAnRVqvI2ij45JQSHYJBblZ0Vv2meN\n" +
-                        "=aAAT\n" +
-                        "-----END PGP SIGNATURE-----\n";
+            "-----BEGIN PGP SIGNED MESSAGE-----\n" +
+                "Hash: SHA1\n" +
+                "\n" +
+                "TEST1\r\n" +
+                "TEST2\r\n" +
+                "TEST3\r\n" +
+                "-----BEGIN PGP SIGNATURE-----\n" +
+                "Version: BCPG v1.29\n" +
+                "\n" +
+                "iEYEARECABAFAkax1rgJEHM9pIAuB02PAABIJgCghFmoCJCZ0CGiqgVLGGPd/Yh5\n" +
+                "FQQAnRVqvI2ij45JQSHYJBblZ0Vv2meN\n" +
+                "=aAAT\n" +
+                "-----END PGP SIGNATURE-----\n";
 
         final byte[] expectedOutput = expectedOutputStr.getBytes("UTF-8");
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
 
         SigningUtils.clearSign(
-                new ByteArrayInputStream(input),
-                ring,
-                "2E074D8F", "test",
-                os);
+            new ByteArrayInputStream(input),
+            ring,
+            "2E074D8F", "test",
+            os);
 
         final byte[] output = os.toByteArray();
 

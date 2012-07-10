@@ -50,10 +50,10 @@ public final class DataProducerTestCase extends TestCase {
         final File directory = new File(getClass().getResource("deb/data").toURI());
 
         final DataProducer[] data = new DataProducer[] {
-                new DataProducerArchive(archive1, null, null, null),
-                new DataProducerArchive(archive2, null, null, null),
-                new DataProducerArchive(archive3, null, null, null),
-                new DataProducerDirectory(directory, null, new String[] { "**/.svn/**" }, null)
+            new DataProducerArchive(archive1, null, null, null),
+            new DataProducerArchive(archive2, null, null, null),
+            new DataProducerArchive(archive3, null, null, null),
+            new DataProducerDirectory(directory, null, new String[] { "**/.svn/**" }, null)
         };
 
         final File deb = File.createTempFile("jdeb", ".deb");

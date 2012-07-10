@@ -29,36 +29,36 @@ import org.vafer.jdeb.utils.VariableResolver;
 public final class PackageDescriptor extends AbstractDescriptor {
 
     private final static String[] keys = {
-            "Package",
-            "Source",
-            "Version",
-            "Section",
-            "Priority",
-            "Architecture",
-            "Essential",
-            "Depends",
-            "Pre-Depends",
-            "Recommends",
-            "Suggests",
-            "Breaks",
-            "Enhances",
-            "Conflicts",
-            "Provides",
-            "Replaces",
-            "Installed-Size",
-            "Maintainer",
-            "Description",
-            "Homepage",
+        "Package",
+        "Source",
+        "Version",
+        "Section",
+        "Priority",
+        "Architecture",
+        "Essential",
+        "Depends",
+        "Pre-Depends",
+        "Recommends",
+        "Suggests",
+        "Breaks",
+        "Enhances",
+        "Conflicts",
+        "Provides",
+        "Replaces",
+        "Installed-Size",
+        "Maintainer",
+        "Description",
+        "Homepage",
     };
 
     public final static String[] mandatoryKeys = {
-            "Package",
-            "Version",
-            "Section",
-            "Priority",
-            "Architecture",
-            "Maintainer",
-            "Description"
+        "Package",
+        "Version",
+        "Section",
+        "Priority",
+        "Architecture",
+        "Maintainer",
+        "Description"
     };
 
     public PackageDescriptor() {

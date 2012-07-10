@@ -25,39 +25,39 @@ import org.vafer.jdeb.changes.ChangeSet;
 public final class ChangesDescriptor extends AbstractDescriptor {
 
     private final static String[] keys = {
-            "Format",
-            "Date",
-            "Source",
-            "Binary",
-            "Architecture",
-            "Version",
-            "Distribution",
-            "Urgency",
-            "Maintainer",
-            "Changed-By",
-            "Description",
-            "Changes",
-            "Closes",
-            "Checksums-Sha1",
-            "Checksums-Sha256",
-            "Files"
+        "Format",
+        "Date",
+        "Source",
+        "Binary",
+        "Architecture",
+        "Version",
+        "Distribution",
+        "Urgency",
+        "Maintainer",
+        "Changed-By",
+        "Description",
+        "Changes",
+        "Closes",
+        "Checksums-Sha1",
+        "Checksums-Sha256",
+        "Files"
     };
 
     public final static String[] mandatoryKeys = {
-            "Format",
-            "Date",
-            "Source",
-            "Binary",
-            "Architecture",
-            "Version",
-            "Distribution",
-            "Urgency",
-            "Maintainer",
-            "Description",
-            "Changes",
-            "Checksums-Sha1",
-            "Checksums-Sha256",
-            "Files"
+        "Format",
+        "Date",
+        "Source",
+        "Binary",
+        "Architecture",
+        "Version",
+        "Distribution",
+        "Urgency",
+        "Maintainer",
+        "Description",
+        "Changes",
+        "Checksums-Sha1",
+        "Checksums-Sha256",
+        "Files"
     };
 
     private final ChangeSet[] changeSets;

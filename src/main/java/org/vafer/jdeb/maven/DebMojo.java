@@ -329,8 +329,8 @@ public class DebMojo extends AbstractPluginMojo {
                         getLog().warn("Creating empty debian package.");
                     } else {
                         throw new MojoExecutionException(
-                                "Nothing to include into the debian package. " +
-                                        "Did you maybe forget to add a <data> tag or call the plugin directly?");
+                            "Nothing to include into the debian package. " +
+                                "Did you maybe forget to add a <data> tag or call the plugin directly?");
                     }
 
                 } else {
@@ -343,12 +343,12 @@ public class DebMojo extends AbstractPluginMojo {
                                 public void produce( final DataConsumer receiver ) {
                                     try {
                                         receiver.onEachFile(
-                                                new FileInputStream(file),
-                                                new File(installDirFile, file.getName()).getAbsolutePath(),
-                                                "",
-                                                "root", 0, "root", 0,
-                                                TarEntry.DEFAULT_FILE_MODE,
-                                                file.length());
+                                            new FileInputStream(file),
+                                            new File(installDirFile, file.getName()).getAbsolutePath(),
+                                            "",
+                                            "root", 0, "root", 0,
+                                            TarEntry.DEFAULT_FILE_MODE,
+                                            file.length());
                                     } catch (Exception e) {
                                         getLog().error(e);
                                     }

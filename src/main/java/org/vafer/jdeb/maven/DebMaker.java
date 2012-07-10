@@ -183,50 +183,50 @@ public class DebMaker {
 
         if (control == null || !control.isDirectory()) {
             throw new PackagingException(
-                    "\"" + control + "\" is not a valid 'control' directory)");
+                "\"" + control + "\" is not a valid 'control' directory)");
         }
 
         if (changesIn != null) {
 
             if (!changesIn.isFile() || !changesIn.canRead()) {
                 throw new PackagingException(
-                        "The 'changesIn' setting needs to point to a readable file. "
-                                + changesIn + " was not found/readable.");
+                    "The 'changesIn' setting needs to point to a readable file. "
+                        + changesIn + " was not found/readable.");
             }
 
             if (changesOut == null) {
                 throw new PackagingException(
-                        "A 'changesIn' without a 'changesOut' does not make much sense.");
+                    "A 'changesIn' without a 'changesOut' does not make much sense.");
             }
 
             if (!isPossibleOutput(changesOut)) {
                 throw new PackagingException(
-                        "Cannot write the output for 'changesOut' to "
-                                + changesOut);
+                    "Cannot write the output for 'changesOut' to "
+                        + changesOut);
             }
 
             if (changesSave != null && !isPossibleOutput(changesSave)) {
                 throw new PackagingException(
-                        "Cannot write the output for 'changesSave' to "
-                                + changesSave);
+                    "Cannot write the output for 'changesSave' to "
+                        + changesSave);
             }
 
         } else {
             if (changesOut != null || changesSave != null) {
                 throw new PackagingException(
-                        "The 'changesOut' or 'changesSave' settings may only be used when there is a 'changesIn' specified.");
+                    "The 'changesOut' or 'changesSave' settings may only be used when there is a 'changesIn' specified.");
             }
         }
 
         if (!"gzip".equals(compression) && !"bzip2".equals(compression)
-                && !"none".equals(compression)) {
+            && !"none".equals(compression)) {
             throw new PackagingException("The compression method '"
-                    + compression + "' is not supported");
+                + compression + "' is not supported");
         }
 
         if (deb == null) {
             throw new PackagingException(
-                    "You need to specify where the deb file is supposed to be created.");
+                "You need to specify where the deb file is supposed to be created.");
         }
 
         final File[] controlFiles = control.listFiles();
@@ -260,12 +260,12 @@ public class DebMaker {
             changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
 
             processor.createChanges(packageDescriptor, changesProvider,
-                    (keyring != null) ? new FileInputStream(keyring) : null,
-                    key, passphrase, new FileOutputStream(changesOut));
+                (keyring != null) ? new FileInputStream(keyring) : null,
+                key, passphrase, new FileOutputStream(changesOut));
 
         } catch (Exception e) {
             throw new PackagingException(
-                    "Failed to create debian changes file " + changesOut, e);
+                "Failed to create debian changes file " + changesOut, e);
         }
 
         try {

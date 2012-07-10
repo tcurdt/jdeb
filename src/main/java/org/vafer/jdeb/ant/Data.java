@@ -70,30 +70,30 @@ public final class Data extends PatternSet implements DataProducer {
 
         if ("file".equalsIgnoreCase(type)) {
             new DataProducerFile(
-                    src,
-                    getIncludePatterns(getProject()),
-                    getExcludePatterns(getProject()),
-                    mappers
+                src,
+                getIncludePatterns(getProject()),
+                getExcludePatterns(getProject()),
+                mappers
             ).produce(pReceiver);
             return;
         }
 
         if ("archive".equalsIgnoreCase(type)) {
             new DataProducerArchive(
-                    src,
-                    getIncludePatterns(getProject()),
-                    getExcludePatterns(getProject()),
-                    mappers
+                src,
+                getIncludePatterns(getProject()),
+                getExcludePatterns(getProject()),
+                mappers
             ).produce(pReceiver);
             return;
         }
 
         if ("directory".equalsIgnoreCase(type)) {
             new DataProducerDirectory(
-                    src,
-                    getIncludePatterns(getProject()),
-                    getExcludePatterns(getProject()),
-                    mappers
+                src,
+                getIncludePatterns(getProject()),
+                getExcludePatterns(getProject()),
+                mappers
             ).produce(pReceiver);
             return;
         }
