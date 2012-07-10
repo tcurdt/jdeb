@@ -1,5 +1,7 @@
 ## Version 1.0, unreleased
 
+## Version 0.11, released 14.07.2012
+
 ## Version 0.10, released 18.02.2012
 
 Polishing and regression fixes
