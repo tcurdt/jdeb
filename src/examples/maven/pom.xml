@@ -5,12 +5,17 @@
     <artifactId>jdeb-example</artifactId>
     <version>1.0</version>
     <description>description from pom</description>
+    <!-- <packaging>pom</packaging> -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
     <build>
         <plugins>
             <plugin>
                 <artifactId>jdeb</artifactId>
                 <groupId>org.vafer</groupId>
-                <version>0.10</version>
+                <version>0.11</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -18,6 +23,7 @@
                             <goal>jdeb</goal>
                         </goals>
                         <configuration>
+                            <verbose>true</verbose>
                             <controlDir>${basedir}/src/deb/control</controlDir>
                             <dataSet>
                                 <data>

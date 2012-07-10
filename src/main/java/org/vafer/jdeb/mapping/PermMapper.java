@@ -42,15 +42,9 @@ public final class PermMapper implements Mapper {
         return mode;
     }
 
-    // FIXME cleanup the constructors
-
-    public PermMapper( int strip, String prefix ) {
+    public PermMapper( int uid, int gid, String user, String group, int fileMode, int dirMode, int strip, String prefix ) {
         this.strip = strip;
         this.prefix = (prefix == null) ? "" : prefix;
-    }
-
-    public PermMapper( int uid, int gid, String user, String group, int fileMode, int dirMode, int strip, String prefix ) {
-        this(strip, prefix);
         this.uid = uid;
         this.gid = gid;
         this.user = user;
@@ -61,10 +55,6 @@ public final class PermMapper implements Mapper {
 
     public PermMapper( int uid, int gid, String user, String group, String fileMode, String dirMode, int strip, String prefix ) {
         this(uid, gid, user, group, toMode(fileMode), toMode(dirMode), strip, prefix);
-    }
-
-    public PermMapper( String user, String group, String fileMode, String dirMode, int strip, String prefix ) {
-        this(-1, -1, user, group, toMode(fileMode), toMode(dirMode), strip, prefix);
     }
 
     public TarEntry map( final TarEntry entry ) {
