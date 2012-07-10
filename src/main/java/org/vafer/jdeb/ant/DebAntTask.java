@@ -213,6 +213,8 @@ public class DebAntTask extends MatchingTask {
             packageDescriptor = processor.createDeb(controlFiles, data, deb, compression);
 
         } catch (Exception e) {
+            // what the fuck ant? why are you not printing the exception chain?
+            e.printStackTrace();
             throw new BuildException("Failed to create debian package " + deb, e);
         }
 
