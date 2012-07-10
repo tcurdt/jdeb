@@ -20,7 +20,7 @@ import java.io.IOException;
 /**
  * Provides Data to a DataConsumer.
  *
- * @author Torsten Curdt <tcurdt@vafer.org>
+ * @author Torsten Curdt
  */
 public interface DataProducer {
 

@@ -218,6 +218,15 @@ public class DebMojo extends AbstractPluginMojo {
      */
     private boolean timestamped;
 
+    /**
+     * If verbose is true info messages also get logged.
+     * Will be changed to "false" in future versions.
+     * Left to "true" for the transition.
+     *
+     * @parameter expression="${verbose}" default-value="true"
+     */
+    private boolean verbose;
+
     /* end of parameters */
 
     private String openReplaceToken = "[[";
@@ -264,8 +273,8 @@ public class DebMojo extends AbstractPluginMojo {
     /**
      * Doc some cleanup and conversion on the Maven project version.
      * <ul>
-     * <li>-: any - is replaced by +</li>
-     * <li>SNAPSHOT: replace "SNAPSHOT" par of the version with the current time and date</li>
+     * <li>any "-" is replaced by "+"</li>
+     * <li>"SNAPSHOT" is replaced with the current time and date, prepended by "~"</li>
      * </ul>
      *
      * @return the Maven project version
@@ -307,7 +316,7 @@ public class DebMojo extends AbstractPluginMojo {
         setData(dataSet);
 
         try {
-            Console infoConsole = new MojoConsole(getLog());
+            Console infoConsole = new MojoConsole(getLog(), verbose);
 
             final VariableResolver resolver = initializeVariableResolver(new HashMap());
 

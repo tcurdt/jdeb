@@ -27,7 +27,7 @@ import org.vafer.jdeb.mapping.PermMapper;
  * Maven "mapper" element acting as factory for the entry mapper.
  * Supported types: ls, prefix, perm
  *
- * @author Bryan Sant <bryan.sant@gmail.com>
+ * @author Bryan Sant
  */
 public final class Mapper {
 
@@ -95,12 +95,6 @@ public final class Mapper {
 
         if ("perm".equalsIgnoreCase(type)) {
             return new PermMapper(uid, gid, user, group, filemode, dirmode, strip, prefix);
-        }
-
-        // @deprecated
-        if ("prefix".equalsIgnoreCase(type)) {
-            System.err.println("The 'prefix' mapper is deprecated. Please use 'perm' instead. Same syntax and more.");
-            return new PermMapper(strip, prefix);
         }
 
         /* NullMapper required for DataProducerPathTemplate */

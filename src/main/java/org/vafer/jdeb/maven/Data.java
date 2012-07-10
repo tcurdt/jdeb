@@ -37,7 +37,7 @@ import static org.vafer.jdeb.maven.MissingSourceBehavior.IGNORE;
  * Directory producers are supported. Both support the usual ant pattern set
  * matching.
  *
- * @author Bryan Sant <bryan.sant@gmail.com>
+ * @author Bryan Sant
  */
 public final class Data implements DataProducer {
 

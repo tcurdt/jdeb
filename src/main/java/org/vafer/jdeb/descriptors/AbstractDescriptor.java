@@ -32,7 +32,7 @@ import org.vafer.jdeb.utils.VariableResolver;
 /**
  * A descriptor holds the usual key value pairs.
  *
- * @author Torsten Curdt <tcurdt@vafer.org>
+ * @author Torsten Curdt
  * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html">Debian Policy Manual - Control files and their fields</a>
  */
 public abstract class AbstractDescriptor {

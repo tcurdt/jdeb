@@ -35,24 +35,13 @@
         <filter token="name" value="${ant.project.name}"/>
       </filterset>
     </copy>
-  
+
     <deb destfile="${build.dir}/${ant.project.name}.deb" control="${build.dir}/deb/control" verbose="true">
-      
-      <!-- old
-      <tarfileset dir="${build.dir}/jar"
-               prefix="/usr/bin"
-             filemode="600"
-             username="tcurdt"
-                group="tcurdt">
-        <include name="${ant.project.name}-${version}.jar"/>
-      </tarfileset>
-      -->
-      
-      <!-- new -->
+
       <data src="${build.dir}/jar/${ant.project.name}-${version}.jar" type="file">
         <mapper type="perm" prefix="/usr/share/jdeb/lib"/>
       </data>
-      
+
     </deb>
 
   </target>

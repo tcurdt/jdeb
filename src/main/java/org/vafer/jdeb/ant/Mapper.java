@@ -26,7 +26,7 @@ import org.vafer.jdeb.mapping.PermMapper;
  * Ant "mapper" element acting as factory for the entry mapper.
  * Supported types: ls, prefix, perm
  *
- * @author Torsten Curdt <tcurdt@vafer.org>
+ * @author Torsten Curdt
  */
 public final class Mapper {
 

@@ -37,7 +37,7 @@ import org.vafer.jdeb.producers.DataProducerFileSet;
  * AntTask for creating debian archives.
  * Even supports signed changes files.
  *
- * @author Torsten Curdt <tcurdt@vafer.org>
+ * @author Torsten Curdt
  */
 
 public class DebAntTask extends MatchingTask {

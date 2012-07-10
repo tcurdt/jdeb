@@ -20,7 +20,7 @@ import org.vafer.jdeb.changes.ChangeSet;
 /**
  * Reflecting a changes file
  *
- * @author Torsten Curdt <tcurdt@vafer.org>
+ * @author Torsten Curdt
  */
 public final class ChangesDescriptor extends AbstractDescriptor {
 

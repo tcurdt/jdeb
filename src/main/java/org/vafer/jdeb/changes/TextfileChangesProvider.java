@@ -37,11 +37,11 @@ import org.vafer.jdeb.descriptors.PackageDescriptor;
  * The release line will be added. Example:
  *
  * release date=22:13 19.08.2007,version=1.5+r90114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
- * debian changes support
+ *   * debian changes support
  * release date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
- * debian changes support
+ *   * debian changes support
  *
- * @author Torsten Curdt <tcurdt@vafer.org>
+ * @author Torsten Curdt
  */
 public final class TextfileChangesProvider implements ChangesProvider {
 

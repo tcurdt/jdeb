@@ -38,7 +38,7 @@ import org.vafer.jdeb.utils.VariableResolver;
  * This class is largely based on the DebAntTask class, and provides the same
  * featues to maven developers that the ant task provides to ant developers.
  *
- * @author Bryan Sant <bryan.sant@gmail.com>
+ * @author Bryan Sant
  * @see org.vafer.jdeb.ant.DebAntTask
  */
 public class DebMaker {

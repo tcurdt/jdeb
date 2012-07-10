@@ -30,7 +30,7 @@ import org.apache.tools.tar.TarEntry;
  * Reads permissions and ownerships from a "ls -laR > mapping.txt" dump and
  * maps entries accordingly.
  *
- * @author Torsten Curdt <tcurdt@vafer.org>
+ * @author Torsten Curdt
  */
 public final class LsMapper implements Mapper {
 

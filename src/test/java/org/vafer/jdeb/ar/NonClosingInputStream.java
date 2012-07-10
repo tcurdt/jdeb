@@ -21,7 +21,7 @@ import java.io.InputStream;
 /**
  * ATTENTION: don't use outside of jdeb
  *
- * @author Torsten Curdt <tcurdt@vafer.org>
+ * @author Torsten Curdt
  */
 public final class NonClosingInputStream extends InputStream {
 

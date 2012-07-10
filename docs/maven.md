@@ -8,7 +8,7 @@ the plugin to your POM like this
             <plugin>
                 <artifactId>jdeb</artifactId>
                 <groupId>org.vafer</groupId>
-                <version>0.9</version>
+                <version>0.11</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -105,6 +105,10 @@ section with any of the following options:
     | attach        | Attach artifact to project                                                   | No; defaults to 'true'                                           |
     *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
     | submodules    | Execute the goal on all sub-modules                                          | No; defaults to 'true'                   |
+    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | timestamped   | Turn SNAPSHOT into timestamps                                                | No; defaults to 'false'                                          |
+    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | verbose       | Verbose logging                                                              | No; defaults to 'true', will be 'false' in the future            |
     *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
 
 If you use the 'dataSet' element, you'll need to populate it with a one or

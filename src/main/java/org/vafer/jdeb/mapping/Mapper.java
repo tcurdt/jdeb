@@ -20,7 +20,7 @@ import org.apache.tools.tar.TarEntry;
 /**
  * Maps one entry to another. So you modify ownerships permissions etc in a Mapper.
  *
- * @author Torsten Curdt <tcurdt@vafer.org>
+ * @author Torsten Curdt
  */
 public interface Mapper {
 

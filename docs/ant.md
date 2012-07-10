@@ -52,7 +52,7 @@ modifications like prefixing or stripping of paths though.
 
     <deb destfile="jdeb.deb" control="${deb}/control">
       <data src="src/release.tgz" type="archive">
-        <mapper type="prefix" strip="1" prefix="/somewhere/else"/>
+        <mapper type="perm" strip="1" prefix="/somewhere/else"/>
         <exclude name="**/.svn"/>
       </data>
     </deb>
@@ -113,7 +113,7 @@ jdeb did to the file.) From Ant you have to call jdeb like this
 
 If you also provide a 'changesSave' attribute the jdeb will add release
 information to the original input and write out the new file.
- 
+
     <deb destfile="jdeb.deb"
           control="${deb}/control"
         changesIn="changes.txt"

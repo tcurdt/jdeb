@@ -53,7 +53,7 @@
                                     <user>loader</user>
                                     <group>loader</group>
                                   </mapper>
-                                </data>                                
+                                </data>
                             </dataSet>
                         </configuration>
                     </execution>

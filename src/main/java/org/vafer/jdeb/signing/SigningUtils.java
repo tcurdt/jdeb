@@ -41,7 +41,7 @@ import org.bouncycastle.openpgp.PGPUtil;
 /**
  * Utils to do the signing with OpenPGP
  *
- * @author Torsten Curdt <tcurdt@vafer.org>
+ * @author Torsten Curdt
  */
 
 public final class SigningUtils {

@@ -1,26 +1,39 @@
+/*
+ * Copyright 2012 The Apache Software Foundation.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.vafer.jdeb.ant;
 
 import org.apache.tools.ant.Task;
 import org.vafer.jdeb.Console;
 
-class TaskConsole implements Console {
+public final class TaskConsole implements Console {
 
     private final Task task;
     private final boolean verbose;
 
-    TaskConsole( Task task, boolean verbose ) {
+    public TaskConsole( Task task, boolean verbose ) {
         this.task = task;
         this.verbose = verbose;
     }
 
-    @Override
     public void info( String message ) {
         if (verbose) {
             task.log(message);
         }
     }
 
-    @Override
     public void warn( String message ) {
         task.log(message);
     }

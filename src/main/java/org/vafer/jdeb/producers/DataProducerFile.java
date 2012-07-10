@@ -29,7 +29,7 @@ import org.vafer.jdeb.mapping.Mapper;
  * DataProducer representing a single file
  * For cross-platform permissions and ownerships you probably want to use a Mapper, too.
  *
- * @author Torsten Curdt <tcurdt@vafer.org>
+ * @author Torsten Curdt
  */
 public final class DataProducerFile extends AbstractDataProducer implements DataProducer {
 

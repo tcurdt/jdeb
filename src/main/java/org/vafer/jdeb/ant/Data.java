@@ -34,7 +34,7 @@ import org.vafer.jdeb.producers.DataProducerFile;
  * So far Archive and Directory producers are supported.
  * Both support the usual ant pattern set matching.
  *
- * @author Torsten Curdt <tcurdt@vafer.org>
+ * @author Torsten Curdt
  */
 public final class Data extends PatternSet implements DataProducer {
 

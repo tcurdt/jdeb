@@ -62,7 +62,7 @@ import org.vafer.jdeb.utils.VariableResolver;
  * The processor does the actual work of building the deb related files.
  * It is been used by the ant task and (later) the maven plugin.
  *
- * @author Torsten Curdt <tcurdt@vafer.org>
+ * @author Torsten Curdt
  */
 public class Processor {
 
