@@ -1,0 +1,2 @@
+release date=20:13 15.12.2011,version=0.9,urgency=low,by=Torsten Curdt <torsten@youknowwhere.org>,distribution=unknown
+ * lots of fixes here
