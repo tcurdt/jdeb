@@ -8,9 +8,9 @@
     <name>jdeb</name>
     <version>0.11</version>
     <description>
-      This library provides an Ant task and a Maven plugin to create Debian packages from Java builds in a truly cross
-      platform manner. Build your Debian packages on any platform that has Java support. Windows, Linux - it does not
-      require additional native tools installed.
+        This library provides an Ant task and a Maven plugin to create Debian packages from Java builds in a truly cross
+        platform manner. Build your Debian packages on any platform that has Java support. Windows, Linux - it does not
+        require additional native tools installed.
     </description>
     <url>http://github.com/tcurdt/jdeb</url>
     <developers>
@@ -29,15 +29,15 @@
         </developer>
     </developers>
     <contributors>
-      <contributor><name>Elliot West</name></contributor>
-      <contributor><name>Thomas Mortagne</name></contributor>
-      <contributor><name>Patrick Schultz</name></contributor>
-      <contributor><name>Scott Kuehn</name></contributor>
-      <contributor><name>Manuel Woelker</name></contributor>
-      <contributor><name>Jeroen Rosenberg</name></contributor>
-      <contributor><name>Petr Kozelka</name></contributor>
-      <contributor><name>Christian Rigdon</name></contributor>
-      <contributor><name>Bryan Sant</name></contributor>
+        <contributor><name>Elliot West</name></contributor>
+        <contributor><name>Thomas Mortagne</name></contributor>
+        <contributor><name>Patrick Schultz</name></contributor>
+        <contributor><name>Scott Kuehn</name></contributor>
+        <contributor><name>Manuel Woelker</name></contributor>
+        <contributor><name>Jeroen Rosenberg</name></contributor>
+        <contributor><name>Petr Kozelka</name></contributor>
+        <contributor><name>Christian Rigdon</name></contributor>
+        <contributor><name>Bryan Sant</name></contributor>
     </contributors>
     <licenses>
         <license>
@@ -79,22 +79,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.12</version>
-                <configuration>
-                    <forkMode>never</forkMode>
-                    <includes>
-                        <include>**/*TestCase.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>**/Abstract*</exclude>
-                    </excludes>
-                    <testFailureIgnore>false</testFailureIgnore>
-                    <skip>false</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>1.7.1</version>
                 <executions>
@@ -121,16 +105,59 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12</version>
+                <configuration>
+                    <forkMode>never</forkMode>
+                    <includes>
+                        <include>**/*TestCase.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/Abstract*</exclude>
+                    </excludes>
+                    <testFailureIgnore>false</testFailureIgnore>
+                    <skip>false</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-invoker-plugin</artifactId>
+                <version>1.6</version>
+                <configuration>
+                    <debug>true</debug>
+                    <projectsDirectory>src/it</projectsDirectory>
+                    <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+                    <preBuildHookScript>setup</preBuildHookScript>
+                    <postBuildHookScript>verify</postBuildHookScript>
+                    <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
+                    <settingsFile>src/it/settings.xml</settingsFile>
+                    <pomIncludes>
+                        <pomInclude>*/pom.xml</pomInclude>
+                    </pomIncludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>install</goal>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
-      <!-- mvn versions:display-dependency-updates -->
-      <!-- mvn versions:display-plugin-updates -->
-      <dependency>
+        <!-- mvn versions:display-dependency-updates -->
+        <!-- mvn versions:display-plugin-updates -->
+        <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
         <version>2.4</version>
-      </dependency>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
@@ -187,8 +214,8 @@
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
-                  <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
-                  <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                    <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                 </configuration>
                 <reportSets>
                     <reportSet>
@@ -243,40 +270,4 @@
             </plugin>
         </plugins>
     </reporting>
-  <profiles>
-    <profile>
-      <id>run-its</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-invoker-plugin</artifactId>
-            <version>1.6</version>
-            <configuration>
-              <debug>true</debug>
-              <projectsDirectory>src/it</projectsDirectory>
-              <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-              <preBuildHookScript>setup</preBuildHookScript>
-              <postBuildHookScript>verify</postBuildHookScript>
-              <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-              <settingsFile>src/it/settings.xml</settingsFile>
-              <pomIncludes>
-                <pomInclude>*/pom.xml</pomInclude>
-              </pomIncludes>
-            </configuration>
-            <executions>
-              <execution>
-                <id>integration-test</id>
-                <goals>
-                  <goal>install</goal>
-                  <goal>integration-test</goal>
-                  <goal>verify</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
