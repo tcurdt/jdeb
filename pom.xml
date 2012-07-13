@@ -29,15 +29,15 @@
         </developer>
     </developers>
     <contributors>
-        <contributor><name>Elliot West</name></contributor>
-        <contributor><name>Thomas Mortagne</name></contributor>
-        <contributor><name>Patrick Schultz</name></contributor>
-        <contributor><name>Scott Kuehn</name></contributor>
-        <contributor><name>Manuel Woelker</name></contributor>
-        <contributor><name>Jeroen Rosenberg</name></contributor>
-        <contributor><name>Petr Kozelka</name></contributor>
-        <contributor><name>Christian Rigdon</name></contributor>
         <contributor><name>Bryan Sant</name></contributor>
+        <contributor><name>Christian Rigdon</name></contributor>
+        <contributor><name>Elliot West</name></contributor>
+        <contributor><name>Jeroen Rosenberg</name></contributor>
+        <contributor><name>Manuel Woelker</name></contributor>
+        <contributor><name>Patrick Schultz</name></contributor>
+        <contributor><name>Petr Kozelka</name></contributor>
+        <contributor><name>Scott Kuehn</name></contributor>
+        <contributor><name>Thomas Mortagne</name></contributor>
     </contributors>
     <licenses>
         <license>
