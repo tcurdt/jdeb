@@ -51,14 +51,14 @@ public final class Data implements DataProducer {
         this.src = src;
     }
 
-    private String destinationName;
+    private String dst;
 
     /**
      * @parameter expression="${dst}"
      * @required
      */
-    public void setDestinationName( String destinationName ) {
-        this.destinationName = destinationName;
+    public void setDst( String dst ) {
+        this.dst = dst;
     }
 
     private String type;
@@ -147,7 +147,7 @@ public final class Data implements DataProducer {
         }
 
         if ("file".equalsIgnoreCase(type)) {
-            new DataProducerFile(src, destinationName, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            new DataProducerFile(src, dst, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 
