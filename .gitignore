@@ -4,6 +4,7 @@
 .settings
 target
 eclipse
+dependency-reduced-pom.xml
 *.iml
 *.iws
 *.ipr
