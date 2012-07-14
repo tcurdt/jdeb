@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,6 +47,7 @@ import org.vafer.jdeb.utils.VariableResolver;
  * Creates deb archive
  *
  * @goal jdeb
+ * @phase package
  */
 public class DebMojo extends AbstractPluginMojo {
 
@@ -300,6 +303,15 @@ public class DebMojo extends AbstractPluginMojo {
     }
 
     /**
+     * @return whether or not the main artifact was created
+     */
+    private boolean hasMainArtifact() {
+        final MavenProject project = getProject();
+        final Artifact artifact = project.getArtifact();
+        return artifact.getFile() != null && artifact.getFile().isFile();
+    }
+
+    /**
      * Main entry point
      *
      * @throws MojoExecutionException on error
@@ -330,9 +342,8 @@ public class DebMojo extends AbstractPluginMojo {
             // if there are no producers defined we try to use the artifacts
             if (dataProducers.isEmpty()) {
 
-                final Set<Artifact> artifacts = project.getArtifacts();
-                if (artifacts.size() == 0) {
-                    // no artifacts
+                if (!hasMainArtifact()) {
+
                     final String packaging = project.getPackaging();
                     if ("pom".equalsIgnoreCase(packaging)) {
                         getLog().warn("Creating empty debian package.");
@@ -344,8 +355,19 @@ public class DebMojo extends AbstractPluginMojo {
 
                 } else {
 
-                    // attach artifacts (jar, war, etc)
-                    for (Artifact artifact : artifacts) {
+                    Set<Artifact> artifacts = new HashSet<Artifact>();
+
+                    artifacts.add(project.getArtifact());
+
+                    for (Artifact artifact : (Set<Artifact>) project.getArtifacts()) {
+                        artifacts.add(artifact);
+                    }
+
+                    for (Artifact artifact : (List<Artifact>) project.getAttachedArtifacts()) {
+                        artifacts.add(artifact);
+                    }
+
+                    for(Artifact artifact : artifacts) {
                         final File file = artifact.getFile();
                         if (file != null) {
                             dataProducers.add(new DataProducer() {
