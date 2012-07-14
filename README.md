@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/tcurdt/jdeb.png)](http://travis-ci.org/tcurdt/jdeb)
+
 # Debian packages in java
 
 This library provides an Ant task and a Maven plugin to create Debian packages
