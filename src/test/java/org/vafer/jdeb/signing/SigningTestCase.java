@@ -37,9 +37,9 @@ public final class SigningTestCase extends TestCase {
             "-----BEGIN PGP SIGNED MESSAGE-----\n" +
                 "Hash: SHA1\n" +
                 "\n" +
-                "TEST1\r\n" +
-                "TEST2\r\n" +
-                "TEST3\r\n" +
+                "TEST1\n" +
+                "TEST2\n" +
+                "TEST3\n" +
                 "-----BEGIN PGP SIGNATURE-----\n" +
                 "Version: BCPG v1.29\n" +
                 "\n" +
@@ -58,7 +58,7 @@ public final class SigningTestCase extends TestCase {
             "2E074D8F", "test",
             os);
 
-        final byte[] output = os.toByteArray();
+        final byte[] output = fixCRLF(os.toByteArray());
 
         final int from = expectedOutputStr.indexOf("iEYEAREC");
         final int until = expectedOutputStr.indexOf("=aAAT") + 5;
@@ -66,5 +66,11 @@ public final class SigningTestCase extends TestCase {
         Arrays.fill(expectedOutput, from, until, (byte) '?');
 
         assertEquals(new String(expectedOutput), new String(output));
+    }
+
+    private byte[] fixCRLF(byte[] b) {
+        String s = new String(b);
+        s = s.replaceAll("\r\n", "\n");
+        return s.getBytes();
     }
 }
