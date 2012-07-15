@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.tools.ant.BuildException;
@@ -39,7 +40,6 @@ import org.vafer.jdeb.producers.DataProducerFileSet;
  *
  * @author Torsten Curdt
  */
-
 public class DebAntTask extends MatchingTask {
 
     /**
@@ -92,7 +92,7 @@ public class DebAntTask extends MatchingTask {
      */
     private boolean verbose;
 
-    private Collection dataProducers = new ArrayList();
+    private Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
 
 
     public void setDestfile( File deb ) {
@@ -193,7 +193,19 @@ public class DebAntTask extends MatchingTask {
         if (dataProducers.size() == 0) {
             throw new BuildException("You need to provide at least one reference to a tgz or directory with data.");
         }
-
+        
+        // validation of the type of the <data> elements
+        for (DataProducer dataProducer : dataProducers) {
+            if (dataProducer instanceof Data) {
+                Data data = (Data) dataProducer;
+                if (data.getType() == null) {
+                    throw new BuildException("The type of the data element wasn't specified (expected 'file', 'directory' or 'archive')");
+                } else if (!Arrays.asList("file", "directory", "archive").contains(data.getType().toLowerCase())) {
+                    throw new BuildException("The type '" + data.getType() + "' of the data element is unknown (expected 'file', 'directory' or 'archive')");
+                }
+            }
+        }
+        
         if (deb == null) {
             throw new BuildException("You need to point the 'destfile' attribute to where the deb is supposed to be created.");
         }

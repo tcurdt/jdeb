@@ -38,7 +38,7 @@ import org.vafer.jdeb.producers.DataProducerFile;
  */
 public final class Data extends PatternSet implements DataProducer {
 
-    private final Collection mapperWrapper = new ArrayList();
+    private final Collection<Mapper> mapperWrapper = new ArrayList<Mapper>();
 
     private File src;
 
@@ -46,20 +46,24 @@ public final class Data extends PatternSet implements DataProducer {
 
     private String destinationName;
 
-    public void setSrc( final File pSrc ) {
-        src = pSrc;
+    public void setSrc(File src) {
+        this.src = src;
     }
 
-    public void setType( final String pType ) {
-        type = pType;
+    public String getType() {
+        return type;
     }
 
-    public void setDst( String pDestinationName ) {
-        destinationName = pDestinationName;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public void addMapper( final Mapper pMapper ) {
-        mapperWrapper.add(pMapper);
+    public void setDst(String destinationName) {
+        this.destinationName = destinationName;
+    }
+
+    public void addMapper(Mapper mapper) {
+        mapperWrapper.add(mapper);
     }
 
     public void produce( final DataConsumer pReceiver ) throws IOException {
@@ -69,9 +73,9 @@ public final class Data extends PatternSet implements DataProducer {
         }
 
         org.vafer.jdeb.mapping.Mapper[] mappers = new org.vafer.jdeb.mapping.Mapper[mapperWrapper.size()];
-        final Iterator it = mapperWrapper.iterator();
+        final Iterator<Mapper> it = mapperWrapper.iterator();
         for (int i = 0; i < mappers.length; i++) {
-            mappers[i] = ((Mapper) it.next()).createMapper();
+            mappers[i] = it.next().createMapper();
         }
 
         if ("file".equalsIgnoreCase(type)) {
@@ -82,30 +86,22 @@ public final class Data extends PatternSet implements DataProducer {
                 getExcludePatterns(getProject()),
                 mappers
             ).produce(pReceiver);
-            return;
-        }
-
-        if ("archive".equalsIgnoreCase(type)) {
+            
+        } else if ("archive".equalsIgnoreCase(type)) {
             new DataProducerArchive(
                 src,
                 getIncludePatterns(getProject()),
                 getExcludePatterns(getProject()),
                 mappers
             ).produce(pReceiver);
-            return;
-        }
-
-        if ("directory".equalsIgnoreCase(type)) {
+            
+        } else if ("directory".equalsIgnoreCase(type)) {
             new DataProducerDirectory(
                 src,
                 getIncludePatterns(getProject()),
                 getExcludePatterns(getProject()),
                 mappers
             ).produce(pReceiver);
-            return;
         }
-
-        throw new IOException("Unknown type '" + type + "' (file|directory|archive) for " + src);
     }
-
 }

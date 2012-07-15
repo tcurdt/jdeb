@@ -142,7 +142,7 @@ public final class DebAntTaskTestCase extends TestCase {
 
         project.executeTarget("verbose-enabled");
 
-        assertTrue(out.toString().indexOf("Total size") != -1);
+        assertTrue(out.toString().contains("Total size"));
     }
 
     public void testVerboseDisabled() {
@@ -151,7 +151,25 @@ public final class DebAntTaskTestCase extends TestCase {
 
         project.executeTarget("verbose-disabled");
 
-        assertTrue(out.toString().indexOf("Total size") == -1);
+        assertTrue(!out.toString().contains("Total size"));
+    }
+
+    public void testMissingDataType() {
+        try {
+            project.executeTarget("missing-data-type");
+            fail("No exception thrown");
+        } catch (BuildException e) {
+            // expected
+        }
+    }
+
+    public void testUnknownDataType() {
+        try {
+            project.executeTarget("unknown-data-type");
+            fail("No exception thrown");
+        } catch (BuildException e) {
+            // expected
+        }
     }
 
     public void testFileSet() {

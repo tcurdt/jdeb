@@ -12,7 +12,7 @@
 
   <target name="missing-destfile">
     <deb control="org/vafer/jdeb/deb/control">
-      <data src="org/vafer/jdeb/deb/invalid.tgz"/>
+      <data src="org/vafer/jdeb/deb/invalid.tgz" type="archive"/>
     </deb>
   </target>
 
@@ -53,6 +53,18 @@
   <target name="verbose-disabled">
     <deb destfile="test.deb" control="org/vafer/jdeb/deb/control" verbose="false">
       <data src="org/vafer/jdeb/deb/data" type="directory"/>
+    </deb>
+  </target>
+
+  <target name="missing-data-type">
+    <deb destfile="test.deb" control="org/vafer/jdeb/deb/control" verbose="false">
+      <data src="org/vafer/jdeb/deb/data"/>
+    </deb>
+  </target>
+
+  <target name="unknown-data-type">
+    <deb destfile="test.deb" control="org/vafer/jdeb/deb/control" verbose="false">
+      <data src="org/vafer/jdeb/deb/data" type="container"/>
     </deb>
   </target>
 
