@@ -125,9 +125,9 @@ information to the original input and write out the new file.
 ## Signing changes
 
 To have the changes be signed, make sure you have the
-[bouncycastle jar](http://www.bouncycastle.org/java.html) in your
+[BouncyCastle OpenPGP/BCPG jar](http://www.bouncycastle.org/latest_releases.html) in your
 classpath (just copy it into the '$ANT_HOME/lib' folder - next to jdeb).
-Then you can sign your changes file with
+Then you can sign your changes file with:
 
     <deb destfile="jdeb.deb"
           control="${deb}/control"
