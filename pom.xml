@@ -197,8 +197,8 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpg-jdk12</artifactId>
-            <version>130</version>
+            <artifactId>bcpg-jdk15on</artifactId>
+            <version>1.47</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

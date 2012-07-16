@@ -20,15 +20,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.Security;
+import java.security.GeneralSecurityException;
 import java.security.SignatureException;
 import java.util.Iterator;
 
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.bcpg.BCPGOutputStream;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPSecretKey;
@@ -37,13 +34,15 @@ import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSignature;
 import org.bouncycastle.openpgp.PGPSignatureGenerator;
 import org.bouncycastle.openpgp.PGPUtil;
+import org.bouncycastle.openpgp.operator.bc.BcPBESecretKeyDecryptorBuilder;
+import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
+import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
 
 /**
  * Utils to do the signing with OpenPGP
  *
  * @author Torsten Curdt
  */
-
 public final class SigningUtils {
 
     private static PGPSecretKey getSecretKey( final InputStream pInput, final String pKey ) throws IOException, PGPException {
@@ -78,21 +77,18 @@ public final class SigningUtils {
      * @param pOutput
      * @throws IOException
      * @throws PGPException
-     * @throws NoSuchProviderException
-     * @throws NoSuchAlgorithmException
-     * @throws SignatureException
+     * @throws GeneralSecurityException
      */
-    public static void clearSign( final InputStream pInput, final InputStream pKeyring, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException, PGPException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException {
-
-        Security.addProvider(new BouncyCastleProvider());
+    public static void clearSign( final InputStream pInput, final InputStream pKeyring, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException, PGPException, GeneralSecurityException {
 
         final PGPSecretKey secretKey = getSecretKey(pKeyring, pKey);
-        final PGPPrivateKey privateKey = secretKey.extractPrivateKey(pPassphrase.toCharArray(), "BC");
-
+        
+        final PGPPrivateKey privateKey = secretKey.extractPrivateKey(new BcPBESecretKeyDecryptorBuilder(new BcPGPDigestCalculatorProvider()).build(pPassphrase.toCharArray()));
+        
         final int digest = PGPUtil.SHA1;
-
-        final PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(secretKey.getPublicKey().getAlgorithm(), digest, "BC");
-        signatureGenerator.initSign(PGPSignature.CANONICAL_TEXT_DOCUMENT, privateKey);
+        
+        PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(secretKey.getPublicKey().getAlgorithm(), digest));
+        signatureGenerator.init(PGPSignature.CANONICAL_TEXT_DOCUMENT, privateKey);
 
         //        final PGPSignatureSubpacketGenerator subpackageGenerator = new PGPSignatureSubpacketGenerator();
         //
@@ -133,7 +129,6 @@ public final class SigningUtils {
         signatureGenerator.generate().encode(pgpOutput);
 
         armoredOutput.close();
-
     }
 
 
