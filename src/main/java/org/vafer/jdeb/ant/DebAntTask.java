@@ -22,15 +22,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.apache.tools.ant.taskdefs.Tar;
 import org.apache.tools.ant.types.FileSet;
+import org.apache.tools.ant.types.PropertySet;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Processor;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 import org.vafer.jdeb.producers.DataProducerFileSet;
+import org.vafer.jdeb.utils.MapVariableResolver;
 
 /**
  * TODO generalize with DebMaker
@@ -92,6 +96,11 @@ public class DebAntTask extends MatchingTask {
      */
     private boolean verbose;
 
+    /**
+     * Mappings for the control keys
+     */
+    private Map propMappings = new HashMap();
+
     private Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
 
 
@@ -138,6 +147,11 @@ public class DebAntTask extends MatchingTask {
     public void addFileSet( FileSet fileset ) {
         dataProducers.add(new DataProducerFileSet(fileset));
     }
+
+    public void addConfiguredPropertySet( PropertySet propertySet){
+        propMappings.putAll(propertySet.getProperties());
+    }
+
 
     public void addTarFileSet( Tar.TarFileSet fileset ) {
         dataProducers.add(new DataProducerFileSet(fileset));
@@ -215,7 +229,7 @@ public class DebAntTask extends MatchingTask {
         final DataProducer[] data = new DataProducer[dataProducers.size()];
         dataProducers.toArray(data);
 
-        final Processor processor = new Processor(new TaskConsole(this, verbose));
+        final Processor processor = new Processor(new TaskConsole(this, verbose), new MapVariableResolver(propMappings));
 
         final PackageDescriptor packageDescriptor;
         try {
