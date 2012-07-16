@@ -193,7 +193,7 @@ public class DebAntTask extends MatchingTask {
         if (dataProducers.size() == 0) {
             throw new BuildException("You need to provide at least one reference to a tgz or directory with data.");
         }
-        
+
         // validation of the type of the <data> elements
         for (DataProducer dataProducer : dataProducers) {
             if (dataProducer instanceof Data) {
@@ -205,7 +205,7 @@ public class DebAntTask extends MatchingTask {
                 }
             }
         }
-        
+
         if (deb == null) {
             throw new BuildException("You need to point the 'destfile' attribute to where the deb is supposed to be created.");
         }
@@ -215,7 +215,7 @@ public class DebAntTask extends MatchingTask {
         final DataProducer[] data = new DataProducer[dataProducers.size()];
         dataProducers.toArray(data);
 
-        final Processor processor = new Processor(new TaskConsole(this, verbose), null);
+        final Processor processor = new Processor(new TaskConsole(this, verbose));
 
         final PackageDescriptor packageDescriptor;
         try {

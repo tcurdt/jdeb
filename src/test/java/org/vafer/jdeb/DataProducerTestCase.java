@@ -41,7 +41,7 @@ public final class DataProducerTestCase extends TestCase {
 
             public void warn( String s ) {
             }
-        }, null);
+        });
 
         final File control = new File(getClass().getResource("deb/control/control").toURI());
         final File archive1 = new File(getClass().getResource("deb/data.tgz").toURI());

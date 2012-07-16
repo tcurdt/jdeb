@@ -36,7 +36,7 @@ public class ProcessorTestCase extends TestCase {
 
             public void warn( String s ) {
             }
-        }, null);
+        });
 
         Project project = new Project();
         project.setCoreLoader(getClass().getClassLoader());

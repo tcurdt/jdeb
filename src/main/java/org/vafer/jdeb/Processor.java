@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -55,6 +56,7 @@ import org.vafer.jdeb.mapping.PermMapper;
 import org.vafer.jdeb.signing.SigningUtils;
 import org.vafer.jdeb.utils.InformationInputStream;
 import org.vafer.jdeb.utils.InformationOutputStream;
+import org.vafer.jdeb.utils.MapVariableResolver;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
@@ -86,7 +88,13 @@ public class Processor {
         }
     }
 
+    public Processor( final Console pConsole ) {
+        this(pConsole, new MapVariableResolver(new HashMap()));
+    }
+
     public Processor( final Console pConsole, final VariableResolver pResolver ) {
+        if(pResolver == null)
+            throw new IllegalArgumentException("pResolver needs to be non-null");
         console = pConsole;
         resolver = pResolver;
         configurationFiles = new ArrayList<FilteredConfigurationFile>();
