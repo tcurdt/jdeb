@@ -152,7 +152,6 @@ public class DebAntTask extends MatchingTask {
         propMappings.putAll(propertySet.getProperties());
     }
 
-
     public void addTarFileSet( Tar.TarFileSet fileset ) {
         dataProducers.add(new DataProducerFileSet(fileset));
     }

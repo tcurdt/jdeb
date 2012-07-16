@@ -34,7 +34,32 @@ public final class PermMapper implements Mapper {
     private int fileMode = -1;
     private int dirMode = -1;
 
-    public static int toMode( String modeString ) {
+    public static int toModeFromRWX(String perm) {
+        if (perm == null || perm.length() != 9) {
+            throw new IllegalArgumentException(perm + " does not seem to be a valid posix rwxrwxrwx permission");
+        }
+        int octal = 0, n = 0;
+        if (isRWX(perm.charAt(0), 'r')) n += 4;
+        if (isRWX(perm.charAt(1), 'w')) n += 2;
+        if (isRWX(perm.charAt(2), 'x')) n += 1; octal += n * 64; n = 0;
+        if (isRWX(perm.charAt(3), 'r')) n += 4;
+        if (isRWX(perm.charAt(4), 'w')) n += 2;
+        if (isRWX(perm.charAt(5), 'x')) n += 1; octal += n * 8; n = 0;
+        if (isRWX(perm.charAt(6), 'r')) n += 4;
+        if (isRWX(perm.charAt(7), 'w')) n += 2;
+        if (isRWX(perm.charAt(8), 'x')) n += 1; octal += n;
+
+        return octal;
+    }
+
+    private static boolean isRWX(char charAt, char expected) {
+        if(charAt == expected)
+            return true;
+        else if(charAt == '-')
+            return false;
+        throw new IllegalArgumentException("Illegal posix rwxrwxrwx permission");    }
+
+    public static int toMode(String modeString) {
         int mode = -1;
         if (modeString != null && modeString.length() > 0) {
             mode = Integer.parseInt(modeString, 8);
@@ -42,7 +67,7 @@ public final class PermMapper implements Mapper {
         return mode;
     }
 
-    public PermMapper( int uid, int gid, String user, String group, int fileMode, int dirMode, int strip, String prefix ) {
+    public PermMapper(int uid, int gid, String user, String group, int fileMode, int dirMode, int strip, String prefix) {
         this.strip = strip;
         this.prefix = (prefix == null) ? "" : prefix;
         this.uid = uid;
@@ -53,11 +78,11 @@ public final class PermMapper implements Mapper {
         this.dirMode = dirMode;
     }
 
-    public PermMapper( int uid, int gid, String user, String group, String fileMode, String dirMode, int strip, String prefix ) {
+    public PermMapper(int uid, int gid, String user, String group, String fileMode, String dirMode, int strip, String prefix) {
         this(uid, gid, user, group, toMode(fileMode), toMode(dirMode), strip, prefix);
     }
 
-    public TarEntry map( final TarEntry entry ) {
+    public TarEntry map(final TarEntry entry) {
         final String name = entry.getName();
 
         final TarEntry newEntry = new TarEntry(prefix + '/' + Utils.stripPath(strip, name));

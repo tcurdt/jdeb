@@ -20,10 +20,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -339,11 +343,19 @@ public class Processor {
 
             entry.setName("./" + name);
             entry.setNames("root", "root");
-            entry.setMode(PermMapper.toMode("755"));
+
+            try{
+                Set<PosixFilePermission> set = Files.getPosixFilePermissions(file.toPath());
+                String perm = PosixFilePermissions.toString(set);
+                entry.setMode(PermMapper.toModeFromRWX(perm));
+            } catch ( UnsupportedOperationException op){
+                console.warn("Could not get the permissions for file "+ file.getName()+", will use default rwxr-xr-x");
+                entry.setMode(PermMapper.toMode("755"));
+            }
 
             if (CONFIGURATION_FILENAMES.contains(name)) {
 
-                FilteredConfigurationFile configurationFile = new FilteredConfigurationFile(file.getName(), new FileInputStream(file), resolver);
+                FilteredConfigurationFile configurationFile = new FilteredConfigurationFile(file.getName(), new FileInputStream(file), entry.getMode(), resolver);
                 configurationFiles.add(configurationFile);
 
             } else if ("control".equals(name)) {
@@ -401,7 +413,7 @@ public class Processor {
         }
 
         for (FilteredConfigurationFile configurationFile : configurationFiles) {
-            addControlEntry(configurationFile.getName(), configurationFile.toString(), outputStream);
+            addControlEntry(configurationFile, outputStream);
         }
         addEntry("control", packageDescriptor.toString(), outputStream);
         addEntry("md5sums", pChecksums.toString(), outputStream);
@@ -613,13 +625,13 @@ public class Processor {
         pOutput.closeEntry();
     }
 
-    private static void addControlEntry( final String pName, final String pContent, final TarOutputStream pOutput ) throws IOException {
-        final byte[] data = pContent.getBytes("UTF-8");
+    private static void addControlEntry( FilteredConfigurationFile cf, final TarOutputStream pOutput ) throws IOException {
+        final byte[] data = cf.toString().getBytes("UTF-8");
 
-        final TarEntry entry = new TarEntry("./" + pName);
+        final TarEntry entry = new TarEntry("./" + cf.getName());
         entry.setSize(data.length);
         entry.setNames("root", "root");
-        entry.setMode(PermMapper.toMode("755"));
+        entry.setMode(cf.getOriginalFilePermissions());
 
         pOutput.putNextEntry(entry);
         pOutput.write(data);

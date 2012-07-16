@@ -16,6 +16,7 @@
 package org.vafer.jdeb.control;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,21 +33,27 @@ public class FilteredConfigurationFile {
     private static String closeToken = "]]";
     private List<String> lines = new ArrayList<String>();
     private String name;
+    private final int mode;
 
-    public FilteredConfigurationFile( String name, InputStream pInputStream, VariableResolver pResolver ) throws IOException, ParseException {
+    public FilteredConfigurationFile(String name, InputStream pInputStream, VariableResolver pResolver) throws IOException, ParseException {
+        this(name, pInputStream, -1, pResolver);
+    }
+
+    public FilteredConfigurationFile(String name, InputStream pInputStream, int mode, VariableResolver pResolver) throws IOException, ParseException {
         this.name = name;
+        this.mode = mode;
         parse(pInputStream, pResolver);
     }
 
-    public static void setOpenToken( final String pToken ) {
+    public static void setOpenToken(final String pToken) {
         openToken = pToken;
     }
 
-    public static void setCloseToken( final String pToken ) {
+    public static void setCloseToken(final String pToken) {
         closeToken = pToken;
     }
 
-    private void parse( InputStream pInputStream, VariableResolver pResolver ) throws IOException, ParseException {
+    private void parse(InputStream pInputStream, VariableResolver pResolver) throws IOException, ParseException {
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(pInputStream));
@@ -73,4 +80,9 @@ public class FilteredConfigurationFile {
         return name;
     }
 
+    public int getOriginalFilePermissions() {
+        if(mode == -1)
+            throw new UnsupportedOperationException("required permissions were never set");
+        return mode;
+    }
 }
