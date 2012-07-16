@@ -30,7 +30,7 @@ public final class SigningTestCase extends TestCase {
 
         assertNotNull(ring);
 
-        final String inputStr = "TEST1\nTEST2\nTEST3\n";
+        final String inputStr = "TEST1 \n-TEST2 \n  \nTEST3 \n";
         final byte[] input = inputStr.getBytes("UTF-8");
 
         final String expectedOutputStr =
@@ -38,7 +38,8 @@ public final class SigningTestCase extends TestCase {
                 "Hash: SHA1\n" +
                 "\n" +
                 "TEST1\n" +
-                "TEST2\n" +
+                "- -TEST2\n" +
+                "\n" +
                 "TEST3\n" +
                 "-----BEGIN PGP SIGNATURE-----\n" +
                 "Version: BCPG v1.47\n" +
@@ -51,13 +52,9 @@ public final class SigningTestCase extends TestCase {
         final byte[] expectedOutput = expectedOutputStr.getBytes("UTF-8");
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
-
-        SigningUtils.clearSign(
-            new ByteArrayInputStream(input),
-            ring,
-            "2E074D8F", "test",
-            os);
-
+        
+        SigningUtils.clearSign(new ByteArrayInputStream(input), ring, "2E074D8F", "test", os);
+        
         final byte[] output = fixCRLF(os.toByteArray());
 
         final int from = expectedOutputStr.indexOf("iEYEAREC");
