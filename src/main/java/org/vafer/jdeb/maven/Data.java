@@ -118,12 +118,12 @@ public final class Data implements DataProducer {
     public String[] splitPatterns( String patterns ) {
         String[] result = null;
         if (patterns != null && patterns.length() > 0) {
-            List tokens = new ArrayList();
+            List<String> tokens = new ArrayList<String>();
             StringTokenizer tok = new StringTokenizer(patterns, ", ", false);
             while (tok.hasMoreTokens()) {
                 tokens.add(tok.nextToken());
             }
-            result = (String[]) tokens.toArray(new String[tokens.size()]);
+            result = tokens.toArray(new String[tokens.size()]);
         }
         return result;
     }

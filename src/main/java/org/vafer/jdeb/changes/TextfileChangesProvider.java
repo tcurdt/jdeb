@@ -60,14 +60,14 @@ public final class TextfileChangesProvider implements ChangesProvider {
         String distribution = pDescriptor.get("Distribution");
         String urgency = pDescriptor.get("Urgency");
         String changedBy = pDescriptor.get("Maintainer");
-        final Collection changesColl = new ArrayList();
-        final Collection changeSetColl = new ArrayList();
+        Collection<String> changesColl = new ArrayList<String>();
+        Collection<ChangeSet> changeSetColl = new ArrayList<ChangeSet>();
 
 
         while (true) {
             final String line = reader.readLine();
             if (line == null) {
-                final String[] changes = (String[]) changesColl.toArray(new String[changesColl.size()]);
+                final String[] changes = changesColl.toArray(new String[changesColl.size()]);
                 final ChangeSet changeSet = new ChangeSet(packageName, version, date, distribution, urgency, changedBy, changes);
                 changeSetColl.add(changeSet);
                 break;
@@ -76,16 +76,15 @@ public final class TextfileChangesProvider implements ChangesProvider {
             if (line.startsWith("release ")) {
 
                 if (changesColl.size() > 0) {
-                    final String[] changes = (String[]) changesColl.toArray(new String[changesColl.size()]);
+                    final String[] changes = changesColl.toArray(new String[changesColl.size()]);
                     final ChangeSet changeSet = new ChangeSet(packageName, version, date, distribution, urgency, changedBy, changes);
                     changeSetColl.add(changeSet);
                     changesColl.clear();
                 }
 
                 final String[] tokens = line.substring("release ".length()).split(",");
-                for (int i = 0; i < tokens.length; i++) {
-                    final String token = tokens[i].trim();
-                    final String[] lr = token.split("=");
+                for (String token : tokens) {
+                    final String[] lr = token.trim().split("=");
                     final String key = lr[0];
                     final String value = lr[1];
 
@@ -114,7 +113,7 @@ public final class TextfileChangesProvider implements ChangesProvider {
 
         reader.close();
 
-        changeSets = (ChangeSet[]) changeSetColl.toArray(new ChangeSet[changeSetColl.size()]);
+        changeSets = changeSetColl.toArray(new ChangeSet[changeSetColl.size()]);
     }
 
     public void save( final OutputStream pOutput ) throws IOException {
@@ -122,9 +121,7 @@ public final class TextfileChangesProvider implements ChangesProvider {
 
         final DateFormat df = ChangeSet.createDateForma();
 
-        for (int i = 0; i < changeSets.length; i++) {
-            final ChangeSet changeSet = changeSets[i];
-
+        for (ChangeSet changeSet : changeSets) {
             writer.write("release ");
             writer.write("date=" + df.format(changeSet.getDate()) + ",");
             writer.write("version=" + changeSet.getVersion() + ",");
@@ -133,10 +130,9 @@ public final class TextfileChangesProvider implements ChangesProvider {
             writer.write("distribution=" + changeSet.getDistribution());
             writer.write("\n");
 
-            final String[] changes = changeSet.getChanges();
-            for (int j = 0; j < changes.length; j++) {
+            for (String change : changeSet.getChanges()) {
                 writer.write(" * ");
-                writer.write(changes[j]);
+                writer.write(change);
                 writer.write("\n");
             }
         }

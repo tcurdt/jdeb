@@ -59,7 +59,7 @@ public final class PackageDescriptorTestCase extends TestCase {
 
     public void testVariableSubstitution() {
 
-        final Map map = new HashMap();
+        final Map<String, String> map = new HashMap<String, String>();
         map.put("VERSION", "1.2");
         map.put("MAINTAINER", "Torsten Curdt <tcurdt@vafer.org>");
 

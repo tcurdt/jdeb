@@ -96,7 +96,7 @@ public class DebMaker {
     private final VariableResolver variableResolver;
 
 
-    private final Collection dataProducers;
+    private final Collection<DataProducer> dataProducers;
 
     public DebMaker( Console console, VariableResolver variableResolver ) {
         this(console, null, null, null, variableResolver);
@@ -106,7 +106,7 @@ public class DebMaker {
         this(console, deb, controlDir, null, variableResolver);
     }
 
-    public DebMaker( Console console, File deb, File controlDir, Collection dataProducers, VariableResolver variableResolver ) {
+    public DebMaker( Console console, File deb, File controlDir, Collection<DataProducer> dataProducers, VariableResolver variableResolver ) {
         this.console = console;
         this.deb = deb;
         this.control = controlDir;
@@ -114,7 +114,7 @@ public class DebMaker {
         if (dataProducers != null) {
             this.dataProducers = dataProducers;
         } else {
-            this.dataProducers = new ArrayList();
+            this.dataProducers = new ArrayList<DataProducer>();
         }
     }
 

@@ -92,8 +92,8 @@ public final class ChangeSet {
 
         sb.append(" ").append(getPackage()).append(" (").append(getVersion()).append(") ");
         sb.append(getDistribution()).append("; urgency=").append(getUrgency());
-        for (int i = 0; i < changes.length; i++) {
-            sb.append('\n').append(" * ").append(changes[i]);
+        for (String change : changes) {
+            sb.append('\n').append(" * ").append(change);
         }
 
         return sb.toString();

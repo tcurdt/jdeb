@@ -16,5 +16,5 @@
 package org.vafer.jdeb.maven;
 
 public enum MissingSourceBehavior {
-    IGNORE, FAIL;
+    IGNORE, FAIL
 }

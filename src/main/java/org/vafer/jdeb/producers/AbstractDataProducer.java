@@ -49,8 +49,8 @@ public abstract class AbstractDataProducer implements DataProducer {
     }
 
     private boolean isIncluded( String name, String[] includes ) {
-        for (int i = 0; i < includes.length; i++) {
-            if (SelectorUtils.matchPath(includes[i], name)) {
+        for (String include : includes) {
+            if (SelectorUtils.matchPath(include, name)) {
                 return true;
             }
         }
@@ -59,8 +59,8 @@ public abstract class AbstractDataProducer implements DataProducer {
 
 
     private boolean isExcluded( String name, String[] excludes ) {
-        for (int i = 0; i < excludes.length; i++) {
-            if (SelectorUtils.matchPath(excludes[i], name)) {
+        for (String exclude : excludes) {
+            if (SelectorUtils.matchPath(exclude, name)) {
                 return true;
             }
         }
@@ -71,8 +71,8 @@ public abstract class AbstractDataProducer implements DataProducer {
 
         TarEntry entry = pEntry;
 
-        for (int i = 0; i < mappers.length; i++) {
-            entry = mappers[i].map(entry);
+        for (Mapper mapper : mappers) {
+            entry = mapper.map(entry);
         }
 
         return entry;

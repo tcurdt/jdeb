@@ -122,7 +122,7 @@ public final class Utils {
                         watch = close;
                     } else if (watch == close) {
                         // found close
-                        final String variable = (String) pResolver.get(sb.toString());
+                        final String variable = pResolver.get(sb.toString());
                         if (variable != null) {
                             out.append(variable);
                         } else {

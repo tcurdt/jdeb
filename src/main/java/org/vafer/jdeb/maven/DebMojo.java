@@ -21,6 +21,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -234,7 +235,7 @@ public class DebMojo extends AbstractPluginMojo {
 
     private String openReplaceToken = "[[";
     private String closeReplaceToken = "]]";
-    private Collection dataProducers = new ArrayList();
+    private Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
 
     public void setOpenReplaceToken( String openReplaceToken ) {
         this.openReplaceToken = openReplaceToken;
@@ -246,19 +247,17 @@ public class DebMojo extends AbstractPluginMojo {
         AbstractDescriptor.setCloseToken(closeReplaceToken);
     }
 
-    protected void setData( Data[] pData ) {
-        dataSet = pData;
+    protected void setData( Data[] dataSet ) {
+        this.dataSet = dataSet;
         dataProducers.clear();
-        if (pData != null) {
-            for (int i = 0; i < pData.length; i++) {
-                dataProducers.add(pData[i]);
-            }
+        if (dataSet != null) {
+            Collections.addAll(dataProducers, dataSet);
         }
     }
 
-    protected VariableResolver initializeVariableResolver( Map variables ) {
-        variables.putAll(getProject().getProperties());
-
+    protected VariableResolver initializeVariableResolver( Map<String, String> variables ) {
+        ((Map) variables).putAll(getProject().getProperties());
+        
         variables.put("name", getProject().getName());
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
@@ -330,7 +329,7 @@ public class DebMojo extends AbstractPluginMojo {
         try {
             Console infoConsole = new MojoConsole(getLog(), verbose);
 
-            final VariableResolver resolver = initializeVariableResolver(new HashMap());
+            final VariableResolver resolver = initializeVariableResolver(new HashMap<String, String>());
 
             final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken));
             final File controlDirFile = new File(Utils.replaceVariables(resolver, controlDir, openReplaceToken, closeReplaceToken));

@@ -37,8 +37,8 @@ public final class DataProducerFileSet implements DataProducer {
 
     private final FileSet fileset;
 
-    public DataProducerFileSet( final FileSet pFileset ) {
-        fileset = pFileset;
+    public DataProducerFileSet( final FileSet fileset ) {
+        this.fileset = fileset;
     }
 
     public void produce( final DataConsumer pReceiver ) throws IOException {
@@ -65,17 +65,15 @@ public final class DataProducerFileSet implements DataProducer {
         scanner.scan();
 
         final File basedir = scanner.getBasedir();
-
-        final String[] directories = scanner.getIncludedDirectories();
-        for (int i = 0; i < directories.length; i++) {
-            final String name = directories[i].replace('\\', '/');
+        
+        for (String directory : scanner.getIncludedDirectories()) {
+            String name = directory.replace('\\', '/');
 
             pReceiver.onEachDir(prefix + "/" + name, null, user, uid, group, gid, dirmode, 0);
         }
-
-        final String[] files = scanner.getIncludedFiles();
-        for (int i = 0; i < files.length; i++) {
-            final String name = files[i].replace('\\', '/');
+        
+        for (String filename : scanner.getIncludedFiles()) {
+            final String name = filename.replace('\\', '/');
             final File file = new File(basedir, name);
 
             final InputStream inputStream = new FileInputStream(file);

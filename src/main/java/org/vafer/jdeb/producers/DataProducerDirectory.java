@@ -51,10 +51,9 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
         scanner.scan();
 
         final File baseDir = scanner.getBasedir();
-
-        final String[] dirs = scanner.getIncludedDirectories();
-        for (int i = 0; i < dirs.length; i++) {
-            final File file = new File(baseDir, dirs[i]);
+        
+        for (String dir : scanner.getIncludedDirectories()) {
+            final File file = new File(baseDir, dir);
             String dirname = getFilename(baseDir, file);
 
             if ("".equals(dirname)) {
@@ -88,10 +87,8 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
         }
 
 
-        final String[] files = scanner.getIncludedFiles();
-
-        for (int i = 0; i < files.length; i++) {
-            final File file = new File(baseDir, files[i]);
+        for (String f : scanner.getIncludedFiles()) {
+            final File file = new File(baseDir, f);
             String filename = getFilename(baseDir, file);
 
             if (!isIncluded(filename)) {

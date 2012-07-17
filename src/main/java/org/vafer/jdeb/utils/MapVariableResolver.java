@@ -24,17 +24,16 @@ import java.util.Map;
  *
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
-
 public final class MapVariableResolver implements VariableResolver {
 
-    private final Map map;
+    private final Map<String, String> map;
 
-    public MapVariableResolver( final Map pMap ) {
-        map = pMap;
+    public MapVariableResolver( Map<String, String> map ) {
+        this.map = map;
     }
 
-    public String get( final String pKey ) {
-        return (String) map.get(pKey);
+    public String get( String key ) {
+        return map.get(key);
     }
 
 }
