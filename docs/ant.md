@@ -1,4 +1,4 @@
-# Howto use "jdeb" with ant
+# How to use jdeb with Ant
 
     *---------------+------------------------------------------------------------------------------+-----------------------------+
     || Attribute    || Description                                                                 || Required                  ||
@@ -26,7 +26,7 @@
 
 The jdeb Ant task can package up a directory as Debian package. You have to
 provide the control files defining meta information about the package (except
-the 'md5sums' which gets created automatically). It creates the archive
+the `md5sums` which gets created automatically). It creates the archive
 and if you want even a signed changes file.
 
     <target name="package">
@@ -78,7 +78,7 @@ that should look like this
     -rw-r--r--    1 tcurdt  tcurdt  2176 Jun 25 03:48 WarTestCase.class
     drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 
-It's also possible to use a 'fileset' or even a 'tarfileset' to
+It's also possible to use a `fileset` or even a `tarfileset` to
 specify the set of files to include with their permissions :
 
     <deb destfile="jdeb.deb" control="${deb}/control">
@@ -111,7 +111,7 @@ jdeb did to the file.) From Ant you have to call jdeb like this
       <data src="some/dir"/>
     </deb>
 
-If you also provide a 'changesSave' attribute the jdeb will add release
+If you also provide a `changesSave` attribute the jdeb will add release
 information to the original input and write out the new file.
 
     <deb destfile="jdeb.deb"
@@ -126,7 +126,7 @@ information to the original input and write out the new file.
 
 To have the changes be signed, make sure you have the
 [BouncyCastle OpenPGP/BCPG jar](http://www.bouncycastle.org/latest_releases.html) in your
-classpath (just copy it into the '$ANT_HOME/lib' folder - next to jdeb).
+classpath (just copy it into the `$ANT_HOME/lib` folder - next to jdeb).
 Then you can sign your changes file with:
 
     <deb destfile="jdeb.deb"
@@ -138,3 +138,7 @@ Then you can sign your changes file with:
           keyring="/Users/tcurdt/.gnupg/secring.gpg">
       <data src="some/dir"/>
     </deb>
+
+<b>Security Note</b>: Hard coding the passphrase in the `<deb>` task can be a serious
+security hole. Consider using variable substitution and asking the passphrase
+to the user with the `<input>` task, or retrieving it from a secured `.properties` file.
