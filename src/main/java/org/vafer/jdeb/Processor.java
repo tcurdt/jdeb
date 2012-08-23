@@ -46,6 +46,7 @@ import org.apache.commons.io.output.NullOutputStream;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarOutputStream;
+import org.bouncycastle.openpgp.PGPSignatureGenerator;
 import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.ChangesProvider;
 import org.vafer.jdeb.control.FilteredConfigurationFile;
@@ -55,6 +56,7 @@ import org.vafer.jdeb.mapping.PermMapper;
 import org.vafer.jdeb.signing.SigningUtils;
 import org.vafer.jdeb.utils.InformationInputStream;
 import org.vafer.jdeb.utils.InformationOutputStream;
+import org.vafer.jdeb.utils.PGPSignatureOutputStream;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
@@ -111,6 +113,20 @@ public class Processor {
 
         pOutput.closeArchiveEntry();
     }
+    
+    private void addTo( final PGPSignatureOutputStream pOutput, final String pContent ) throws IOException {
+        final byte[] content = pContent.getBytes();
+        pOutput.write(content);
+    }
+
+    private void addTo( final PGPSignatureOutputStream pOutput, final File pContent ) throws IOException {
+        final InputStream input = new FileInputStream(pContent);
+        try {
+            Utils.copy(input, pOutput);
+        } finally {
+            input.close();
+        }
+    }
 
     /**
      * Create the debian archive with from the provided control files and data producers.
@@ -123,6 +139,19 @@ public class Processor {
      * @throws PackagingException
      */
     public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput, String compression ) throws PackagingException {
+        return createSignedDeb(pControlFiles, pData, pOutput, compression, null);
+    }
+    /**
+     * Create the debian archive with from the provided control files and data producers.
+     *
+     * @param pControlFiles
+     * @param pData
+     * @param pOutput
+     * @param compression   the compression method used for the data file (gzip, bzip2 or anything else for no compression)
+     * @return PackageDescriptor
+     * @throws PackagingException
+     */
+    public PackageDescriptor createSignedDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput, String compression, final PGPSignatureGenerator signatureGenerator ) throws PackagingException {
 
         File tempData = null;
         File tempControl = null;
@@ -155,6 +184,14 @@ public class Processor {
             addTo(ar, "debian-binary", "2.0\n");
             addTo(ar, "control.tar.gz", tempControl);
             addTo(ar, "data.tar" + getExtension(compression), tempData);
+            
+            if (signatureGenerator != null) {
+                PGPSignatureOutputStream sigStream = new PGPSignatureOutputStream(signatureGenerator);
+                addTo(sigStream, "2.0\n");
+                addTo(sigStream, tempControl);
+                addTo(sigStream, tempData);
+                addTo(ar, "_gpgorigin", sigStream.generateASCIISignature());
+            }
 
             ar.close();
 

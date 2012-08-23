@@ -58,7 +58,7 @@ public final class SigningUtils {
      */
     public static void clearSign(InputStream input, InputStream keyring, String keyId, String passphrase, OutputStream output) throws IOException, PGPException, GeneralSecurityException {
         PGPSecretKey secretKey = getSecretKey(keyring, keyId);
-        PGPPrivateKey privateKey = secretKey.extractPrivateKey(new BcPBESecretKeyDecryptorBuilder(new BcPGPDigestCalculatorProvider()).build(passphrase.toCharArray()));
+        PGPPrivateKey privateKey = getPrivateKey(secretKey, passphrase);
         
         int digest = PGPUtil.SHA1;
         
@@ -96,7 +96,7 @@ public final class SigningUtils {
      * @param input the input stream containing the keyring collection
      * @param keyId the 4 bytes identifier of the key
      */
-    private static PGPSecretKey getSecretKey(InputStream input, String keyId) throws IOException, PGPException {
+    public static PGPSecretKey getSecretKey(InputStream input, String keyId) throws IOException, PGPException {
         PGPSecretKeyRingCollection keyrings = new PGPSecretKeyRingCollection(PGPUtil.getDecoderStream(input));
         
         Iterator rIt = keyrings.getKeyRings();
@@ -115,6 +115,10 @@ public final class SigningUtils {
         }
 
         return null;
+    }
+    
+    public static PGPPrivateKey getPrivateKey(PGPSecretKey secretKey, String passphrase) throws PGPException {
+        return  secretKey.extractPrivateKey(new BcPBESecretKeyDecryptorBuilder(new BcPGPDigestCalculatorProvider()).build(passphrase.toCharArray()));
     }
 
     /**

@@ -230,7 +230,36 @@ public class DebMojo extends AbstractPluginMojo {
      * @parameter expression="${verbose}" default-value="true"
      */
     private boolean verbose;
-
+    
+    /**
+     * If signPackage is true then a origin signature will be placed
+     * in the generated package.
+     *
+     * @parameter expression="${signPackage}" default-value="false"
+     */
+    private boolean signPackage;
+    
+    /**
+     * The keyring to use for signing operations.
+     * 
+     * @parameter expression="${keyring}
+     */
+    private String keyring;
+    
+    /**
+     * The key to use for signing operations.
+     * 
+     * @parameter expression="${key}
+     */
+    private String key;
+    
+    /**
+     * The passphrase to use for signing operations.
+     * 
+     * @parameter expression="${passphrase}
+     */
+    private String passphrase;
+    
     /* end of parameters */
 
     private String openReplaceToken = "[[";
@@ -337,6 +366,7 @@ public class DebMojo extends AbstractPluginMojo {
             final File changesInFile = new File(Utils.replaceVariables(resolver, changesIn, openReplaceToken, closeReplaceToken));
             final File changesOutFile = new File(Utils.replaceVariables(resolver, changesOut, openReplaceToken, closeReplaceToken));
             final File changesSaveFile = new File(Utils.replaceVariables(resolver, changesSave, openReplaceToken, closeReplaceToken));
+            final File keyringFile = keyring == null ? null : new File(Utils.replaceVariables(resolver, keyring, openReplaceToken, closeReplaceToken));
 
             // if there are no producers defined we try to use the artifacts
             if (dataProducers.isEmpty()) {
@@ -400,6 +430,11 @@ public class DebMojo extends AbstractPluginMojo {
                     debMaker.setChangesOut(changesOutFile);
                     debMaker.setChangesSave(changesSaveFile);
                 }
+                
+                debMaker.setKeyring(keyringFile);
+                debMaker.setKey(key);
+                debMaker.setPassphrase(passphrase);
+                debMaker.setSignPackage(signPackage);
 
                 debMaker.setCompression(compression);
                 debMaker.makeDeb();
