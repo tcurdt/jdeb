@@ -80,7 +80,7 @@ public final class Utils {
         if (s.length() == 0) {
             return s;
         }
-        if (s.charAt(0) == '/') {
+        if (s.charAt(0) == '/' || s.charAt(0) == '\\') {
             return s.substring(1);
         }
         return s;
