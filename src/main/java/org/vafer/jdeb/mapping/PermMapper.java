@@ -15,7 +15,7 @@
  */
 package org.vafer.jdeb.mapping;
 
-import org.apache.tools.tar.TarEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.utils.Utils;
 
 /**
@@ -57,10 +57,10 @@ public final class PermMapper implements Mapper {
         this(uid, gid, user, group, toMode(fileMode), toMode(dirMode), strip, prefix);
     }
 
-    public TarEntry map( final TarEntry entry ) {
+    public TarArchiveEntry map( final TarArchiveEntry entry ) {
         final String name = entry.getName();
 
-        final TarEntry newEntry = new TarEntry(prefix + '/' + Utils.stripPath(strip, name));
+        final TarArchiveEntry newEntry = new TarArchiveEntry(prefix + '/' + Utils.stripPath(strip, name), true);
 
         // Set ownership
         if (uid > -1) {

@@ -32,7 +32,6 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
-import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
@@ -80,9 +79,9 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
         if (archiveInputStream instanceof TarArchiveInputStream) {
 
             converter = new EntryConverter() {
-                public TarEntry convert( ArchiveEntry entry ) {
+                public TarArchiveEntry convert( ArchiveEntry entry ) {
                     TarArchiveEntry src = (TarArchiveEntry) entry;
-                    TarEntry dst = new TarEntry(src.getName());
+                    TarArchiveEntry dst = new TarArchiveEntry(src.getName(), true);
 
                     dst.setSize(src.getSize());
                     dst.setGroupName(src.getGroupName());
@@ -98,9 +97,9 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
         } else if (archiveInputStream instanceof ZipArchiveInputStream) {
 
             converter = new EntryConverter() {
-                public TarEntry convert( ArchiveEntry entry ) {
+                public TarArchiveEntry convert( ArchiveEntry entry ) {
                     ZipArchiveEntry src = (ZipArchiveEntry) entry;
-                    TarEntry dst = new TarEntry(src.getName());
+                    TarArchiveEntry dst = new TarArchiveEntry(src.getName(), true);
 
                     dst.setSize(src.getSize());
                     dst.setMode(src.getUnixMode());
@@ -128,7 +127,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
                     continue;
                 }
 
-                TarEntry entry = converter.convert(archiveEntry);
+                TarArchiveEntry entry = converter.convert(archiveEntry);
 
                 entry = map(entry);
 
@@ -147,6 +146,6 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
     }
 
     private interface EntryConverter {
-        public TarEntry convert( ArchiveEntry entry );
+        public TarArchiveEntry convert( ArchiveEntry entry );
     }
 }

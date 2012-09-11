@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.tools.tar.TarEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
  * Reads permissions and ownerships from a "ls -laR > mapping.txt" dump and
@@ -105,7 +105,7 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
         return matcher.group(1);
     }
 
-    private TarEntry readDir( final BufferedReader reader, final String base ) throws IOException, ParseError {
+    private TarArchiveEntry readDir( final BufferedReader reader, final String base ) throws IOException, ParseError {
         final String current = reader.readLine();
         final Matcher currentMatcher = dirPattern.matcher(current);
         if (!currentMatcher.matches()) {
@@ -118,7 +118,7 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
             throw new ParseError("expected dirline but got \"" + parent + "\"");
         }
 
-        final TarEntry entry = new TarEntry(base);
+        final TarArchiveEntry entry = new TarArchiveEntry(base, true);
 
         entry.setMode(convertModeFromString(currentMatcher.group(1)));
         entry.setUserName(currentMatcher.group(3));
@@ -159,7 +159,7 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
         return sum;
     }
 
-    private TarEntry readFile( final BufferedReader reader, final String base ) throws IOException, ParseError {
+    private TarArchiveEntry readFile( final BufferedReader reader, final String base ) throws IOException, ParseError {
 
         while (true) {
             final String line = reader.readLine();
@@ -179,7 +179,7 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 
             final String type = currentMatcher.group(1);
             if (type.startsWith("-")) {
-                final TarEntry entry = new TarEntry(base + "/" + currentMatcher.group(8));
+                final TarArchiveEntry entry = new TarArchiveEntry(base + "/" + currentMatcher.group(8), true);
 
                 entry.setMode(convertModeFromString(currentMatcher.group(2)));
                 entry.setUserName(currentMatcher.group(4));
@@ -211,11 +211,11 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
             }
 
             readTotal(reader);
-            final TarEntry dir = readDir(reader, base);
+            final TarArchiveEntry dir = readDir(reader, base);
             mapping.put(dir.getName(), dir);
 
             while (true) {
-                final TarEntry file = readFile(reader, base);
+                final TarArchiveEntry file = readFile(reader, base);
 
                 if (file == null) {
                     break;
@@ -228,13 +228,13 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
         return mapping;
     }
 
-    public TarEntry map( final TarEntry pEntry ) {
+    public TarArchiveEntry map( final TarArchiveEntry pEntry ) {
 
-        final TarEntry entry = (TarEntry) mapping.get(pEntry.getName());
+        final TarArchiveEntry entry = (TarArchiveEntry) mapping.get(pEntry.getName());
 
         if (entry != null) {
 
-            final TarEntry newEntry = new TarEntry(entry.getName());
+            final TarArchiveEntry newEntry = new TarArchiveEntry(entry.getName(), true);
             newEntry.setUserId(entry.getUserId());
             newEntry.setGroupId(entry.getGroupId());
             newEntry.setUserName(entry.getUserName());
