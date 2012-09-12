@@ -18,7 +18,8 @@ package org.vafer.jdeb.mapping;
 import java.io.ByteArrayInputStream;
 
 import junit.framework.TestCase;
-import org.apache.tools.tar.TarEntry;
+
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.mapping.LsMapper.ParseError;
 
 public final class LsMapperTestCase extends TestCase {
@@ -50,13 +51,13 @@ public final class LsMapperTestCase extends TestCase {
 
         final Mapper mapper = new LsMapper(is);
 
-        final TarEntry entry1 = mapper.map(new TarEntry("trunk/target/test-classes/org/vafer/dependency"));
+        final TarArchiveEntry entry1 = mapper.map(new TarArchiveEntry("trunk/target/test-classes/org/vafer/dependency", true));
 
         assertEquals(493, entry1.getMode());
         assertEquals("tcurdt", entry1.getUserName());
         assertEquals("tcurdt", entry1.getGroupName());
 
-        final TarEntry entry2 = mapper.map(new TarEntry("trunk/target/test-classes/org/vafer/dependency/DependenciesTestCase.class"));
+        final TarArchiveEntry entry2 = mapper.map(new TarArchiveEntry("trunk/target/test-classes/org/vafer/dependency/DependenciesTestCase.class", true));
 
         assertEquals(420, entry2.getMode());
         assertEquals("tcurdt", entry2.getUserName());
@@ -68,11 +69,11 @@ public final class LsMapperTestCase extends TestCase {
 
         final Mapper mapper = new LsMapper(is);
 
-        final TarEntry unknown = new TarEntry("xyz");
+        final TarArchiveEntry unknown = new TarArchiveEntry("xyz", true);
         assertSame(unknown, mapper.map(unknown));
 
-        final TarEntry known = new TarEntry("trunk/target/test-classes/org/vafer/dependency");
-        final TarEntry knownMapped = mapper.map(known);
+        final TarArchiveEntry known = new TarArchiveEntry("trunk/target/test-classes/org/vafer/dependency", true);
+        final TarArchiveEntry knownMapped = mapper.map(known);
 
         assertNotSame(known, knownMapped);
 

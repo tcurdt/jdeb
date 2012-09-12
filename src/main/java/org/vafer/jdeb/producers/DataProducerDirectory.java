@@ -20,8 +20,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.tools.ant.DirectoryScanner;
-import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
@@ -72,12 +72,12 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
                 dirname += "/";
             }
 
-            TarEntry entry = new TarEntry(dirname);
+            TarArchiveEntry entry = new TarArchiveEntry(dirname, true);
             entry.setUserId(0);
             entry.setUserName("root");
             entry.setGroupId(0);
             entry.setGroupName("root");
-            entry.setMode(TarEntry.DEFAULT_DIR_MODE);
+            entry.setMode(TarArchiveEntry.DEFAULT_DIR_MODE);
 
             entry = map(entry);
 
@@ -99,12 +99,12 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
                 filename = filename.replace(File.separatorChar, '/');
             }
 
-            TarEntry entry = new TarEntry(filename);
+            TarArchiveEntry entry = new TarArchiveEntry(filename, true);
             entry.setUserId(0);
             entry.setUserName("root");
             entry.setGroupId(0);
             entry.setGroupName("root");
-            entry.setMode(TarEntry.DEFAULT_FILE_MODE);
+            entry.setMode(TarArchiveEntry.DEFAULT_FILE_MODE);
 
             entry = map(entry);
 
