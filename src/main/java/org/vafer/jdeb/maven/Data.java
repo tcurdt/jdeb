@@ -15,6 +15,9 @@
  */
 package org.vafer.jdeb.maven;
 
+import static org.vafer.jdeb.maven.MissingSourceBehavior.FAIL;
+import static org.vafer.jdeb.maven.MissingSourceBehavior.IGNORE;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,10 +30,8 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
 import org.vafer.jdeb.producers.DataProducerFile;
+import org.vafer.jdeb.producers.DataProducerLink;
 import org.vafer.jdeb.producers.DataProducerPathTemplate;
-
-import static org.vafer.jdeb.maven.MissingSourceBehavior.FAIL;
-import static org.vafer.jdeb.maven.MissingSourceBehavior.IGNORE;
 
 /**
  * Maven "data" element acting as a factory for DataProducers. So far Archive and
@@ -83,6 +84,26 @@ public final class Data implements DataProducer {
         this.missingSrc = value;
     }
 
+    private String linkTarget;
+
+    /**
+     * @parameter expression="${linkTarget}"
+     */
+    public void setLinkTarget(String linkTarget) {
+        this.linkTarget = linkTarget;
+    }
+
+    private boolean symlink;
+
+    /**
+     * @parameter expression="${symlink}"
+     */
+    public void setSymlink(boolean symlink) {
+        this.symlink = symlink;
+    }
+
+    private String[] includePatterns;
+
     /**
      * @parameter expression="${includes}" alias="includes"
      */
@@ -90,7 +111,7 @@ public final class Data implements DataProducer {
         includePatterns = splitPatterns(includes);
     }
 
-    private String[] includePatterns;
+    private String[] excludePatterns;
 
     /**
      * @parameter expression="${excludes}" alias="excludes"
@@ -99,7 +120,6 @@ public final class Data implements DataProducer {
         excludePatterns = splitPatterns(excludes);
     }
 
-    private String[] excludePatterns;
     /**
      * @parameter expression="${mapper}"
      */
@@ -160,13 +180,18 @@ public final class Data implements DataProducer {
             new DataProducerDirectory(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
+        
+        if ("link".equalsIgnoreCase(type)) {
+            new DataProducerLink(src.getPath(), linkTarget, symlink, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            return;
+        }
 
         if ("template".equalsIgnoreCase(type)) {
             new DataProducerPathTemplate(paths, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 
-        throw new IOException("Unknown type '" + type + "' (file|directory|archive|template) for " + src);
+        throw new IOException("Unknown type '" + type + "' (file|directory|archive|template|link) for " + src);
     }
 
 }

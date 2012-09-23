@@ -15,7 +15,7 @@
  */
 package org.vafer.jdeb.mapping;
 
-import org.apache.tools.tar.TarEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 public final class NullMapper implements Mapper {
 
@@ -24,7 +24,7 @@ public final class NullMapper implements Mapper {
     private NullMapper() {
     }
 
-    public TarEntry map( final TarEntry pEntry ) {
+    public TarArchiveEntry map( final TarArchiveEntry pEntry ) {
         return pEntry;
     }
 

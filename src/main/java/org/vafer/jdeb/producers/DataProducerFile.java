@@ -20,7 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.tools.tar.TarEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
@@ -50,12 +50,12 @@ public final class DataProducerFile extends AbstractDataProducer implements Data
         } else {
             fileName = file.getName();
         }
-        TarEntry entry = new TarEntry(fileName);
+        TarArchiveEntry entry = new TarArchiveEntry(fileName, true);
         entry.setUserId(0);
         entry.setUserName("root");
         entry.setGroupId(0);
         entry.setGroupName("root");
-        entry.setMode(TarEntry.DEFAULT_FILE_MODE);
+        entry.setMode(TarArchiveEntry.DEFAULT_FILE_MODE);
 
         entry = map(entry);
 

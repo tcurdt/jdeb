@@ -40,12 +40,12 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.tools.ant.DirectoryScanner;
-import org.apache.tools.tar.TarEntry;
-import org.apache.tools.tar.TarOutputStream;
 import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.ChangesProvider;
 import org.vafer.jdeb.control.FilteredConfigurationFile;
@@ -303,8 +303,8 @@ public class Processor {
             throw new IOException("Cannot write control file at '" + pOutput.getAbsolutePath() + "'");
         }
 
-        final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
-        outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
+        final TarArchiveOutputStream outputStream = new TarArchiveOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
+        outputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
 
 
         // create a descriptor out of the "control" file, copy all other files, ignore directories
@@ -326,7 +326,7 @@ public class Processor {
                 continue;
             }
 
-            final TarEntry entry = new TarEntry(file);
+            final TarArchiveEntry entry = new TarArchiveEntry(file);
             final String name = file.getName();
 
             entry.setName("./" + name);
@@ -381,9 +381,9 @@ public class Processor {
                     in = new ByteArrayInputStream(buf);
                 }
 
-                outputStream.putNextEntry(entry);
+                outputStream.putArchiveEntry(entry);
                 Utils.copy(in, outputStream);
-                outputStream.closeEntry();
+                outputStream.closeArchiveEntry();
                 in.close();
             }
         }
@@ -434,8 +434,8 @@ public class Processor {
             throw new IOException("Cannot write data file at '" + pOutput.getAbsolutePath() + "'");
         }
 
-        final TarOutputStream tarOutputStream = new TarOutputStream(compressedOutputStream(pCompression, new FileOutputStream(pOutput)));
-        tarOutputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
+        final TarArchiveOutputStream tarOutputStream = new TarArchiveOutputStream(compressedOutputStream(pCompression, new FileOutputStream(pOutput)));
+        tarOutputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
 
         final MessageDigest digest = MessageDigest.getInstance("MD5");
 
@@ -461,7 +461,7 @@ public class Processor {
 
                 createParentDirectories((new File(filename)).getParent(), user, uid, group, gid);
 
-                final TarEntry entry = new TarEntry(filename);
+                final TarArchiveEntry entry = new TarArchiveEntry(filename, true);
 
                 // FIXME: link is in the constructor
                 entry.setUserName(user);
@@ -471,7 +471,7 @@ public class Processor {
                 entry.setMode(mode);
                 entry.setSize(size);
 
-                tarOutputStream.putNextEntry(entry);
+                tarOutputStream.putArchiveEntry(entry);
 
                 dataSize.add(size);
                 digest.reset();
@@ -480,7 +480,7 @@ public class Processor {
 
                 final String md5 = Utils.toHex(digest.digest());
 
-                tarOutputStream.closeEntry();
+                tarOutputStream.closeArchiveEntry();
 
                 console.info(
                     "file:" + entry.getName() +
@@ -497,6 +497,21 @@ public class Processor {
 
                 // append to file md5 list
                 pChecksums.append(md5).append(" ").append(entry.getName()).append('\n');
+            }
+
+            public void onEachLink(String path, String linkName, boolean symlink, String user, int uid, String group, int gid) throws IOException {
+                path = fixPath(path);
+
+                createParentDirectories((new File(path)).getParent(), user, uid, group, gid);
+
+                final TarArchiveEntry entry = new TarArchiveEntry(path, symlink ? TarArchiveEntry.LF_SYMLINK : TarArchiveEntry.LF_LINK);
+                // Required to avoid loosing leading slash. See https://issues.apache.org/jira/browse/COMPRESS-201.
+                entry.setName(path);
+
+                entry.setLinkName(linkName);
+
+                tarOutputStream.putArchiveEntry(entry);
+                tarOutputStream.closeArchiveEntry();
             }
 
             private String fixPath( String path ) {
@@ -525,7 +540,7 @@ public class Processor {
                 }
 
                 if (!addedDirectories.contains(directory)) {
-                    TarEntry entry = new TarEntry(directory);
+                    TarArchiveEntry entry = new TarArchiveEntry(directory, true);
                     entry.setUserName(user);
                     entry.setUserId(uid);
                     entry.setGroupName(group);
@@ -533,8 +548,8 @@ public class Processor {
                     entry.setMode(mode);
                     entry.setSize(size);
 
-                    tarOutputStream.putNextEntry(entry);
-                    tarOutputStream.closeEntry();
+                    tarOutputStream.putArchiveEntry(entry);
+                    tarOutputStream.closeArchiveEntry();
                     addedDirectories.add(directory); // so addedDirectories consistently have "/" for finding duplicates.
                 }
             }
@@ -572,7 +587,7 @@ public class Processor {
                     // But for now, keeping it simple by making every dir a+rx.   Examples are:
                     // drw-r----- fs/fs   # what you get with setMode(mode)
                     // drwxr-xr-x fs/fs   # Usable. Too loose?
-                    int mode = TarEntry.DEFAULT_DIR_MODE;
+                    int mode = TarArchiveEntry.DEFAULT_DIR_MODE;
 
                     createDirectory(parentDir, user, uid, group, gid, mode, 0);
                 }
@@ -593,29 +608,29 @@ public class Processor {
         return dataSize.count;
     }
 
-    private static void addEntry( final String pName, final String pContent, final TarOutputStream pOutput ) throws IOException {
+    private static void addEntry( final String pName, final String pContent, final TarArchiveOutputStream pOutput ) throws IOException {
         final byte[] data = pContent.getBytes("UTF-8");
 
-        final TarEntry entry = new TarEntry("./" + pName);
+        final TarArchiveEntry entry = new TarArchiveEntry("./" + pName, true);
         entry.setSize(data.length);
         entry.setNames("root", "root");
 
-        pOutput.putNextEntry(entry);
+        pOutput.putArchiveEntry(entry);
         pOutput.write(data);
-        pOutput.closeEntry();
+        pOutput.closeArchiveEntry();
     }
 
-    private static void addControlEntry( final String pName, final String pContent, final TarOutputStream pOutput ) throws IOException {
+    private static void addControlEntry( final String pName, final String pContent, final TarArchiveOutputStream pOutput ) throws IOException {
         final byte[] data = pContent.getBytes("UTF-8");
 
-        final TarEntry entry = new TarEntry("./" + pName);
+        final TarArchiveEntry entry = new TarArchiveEntry("./" + pName, true);
         entry.setSize(data.length);
         entry.setNames("root", "root");
         entry.setMode(PermMapper.toMode("755"));
 
-        pOutput.putNextEntry(entry);
+        pOutput.putArchiveEntry(entry);
         pOutput.write(data);
-        pOutput.closeEntry();
+        pOutput.closeArchiveEntry();
     }
 
 }

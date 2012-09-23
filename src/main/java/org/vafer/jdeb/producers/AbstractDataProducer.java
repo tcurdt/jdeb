@@ -15,8 +15,8 @@
  */
 package org.vafer.jdeb.producers;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.tools.ant.types.selectors.SelectorUtils;
-import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
 
@@ -67,9 +67,9 @@ public abstract class AbstractDataProducer implements DataProducer {
         return false;
     }
 
-    public TarEntry map( final TarEntry pEntry ) {
+    public TarArchiveEntry map( final TarArchiveEntry pEntry ) {
 
-        TarEntry entry = pEntry;
+        TarArchiveEntry entry = pEntry;
 
         for (Mapper mapper : mappers) {
             entry = mapper.map(entry);

@@ -21,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
-import org.apache.tools.tar.TarEntry;
+
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
@@ -49,7 +50,7 @@ public class DataProducerPathTemplateTestCase extends TestCase {
         assertEquals(invocation.gid, 0);
         assertEquals(invocation.group, "root");
         assertEquals(invocation.linkname, "");
-        assertEquals(invocation.mode, TarEntry.DEFAULT_DIR_MODE);
+        assertEquals(invocation.mode, TarArchiveEntry.DEFAULT_DIR_MODE);
         assertEquals(invocation.size, 0);
         assertEquals(invocation.uid, 0);
         assertEquals(invocation.user, "root");
@@ -59,7 +60,7 @@ public class DataProducerPathTemplateTestCase extends TestCase {
         assertEquals(invocation.gid, 0);
         assertEquals(invocation.group, "root");
         assertEquals(invocation.linkname, "");
-        assertEquals(invocation.mode, TarEntry.DEFAULT_DIR_MODE);
+        assertEquals(invocation.mode, TarArchiveEntry.DEFAULT_DIR_MODE);
         assertEquals(invocation.size, 0);
         assertEquals(invocation.uid, 0);
         assertEquals(invocation.user, "root");
@@ -80,6 +81,10 @@ public class DataProducerPathTemplateTestCase extends TestCase {
 
         @Override
         public void onEachFile( InputStream input, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+        }
+
+        @Override
+        public void onEachLink(String path, String linkName, boolean symlink, String user, int uid, String group, int gid) throws IOException {
         }
 
         private class Invocation {

@@ -17,7 +17,7 @@ package org.vafer.jdeb.producers;
 
 import java.io.IOException;
 
-import org.apache.tools.tar.TarEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
@@ -33,12 +33,12 @@ public class DataProducerPathTemplate extends AbstractDataProducer implements Da
 
     public void produce( DataConsumer pReceiver ) throws IOException {
         for (String literalPath : literalPaths) {
-            TarEntry entry = new TarEntry(literalPath);
+            TarArchiveEntry entry = new TarArchiveEntry(literalPath, true);
             entry.setUserId(0);
             entry.setUserName("root");
             entry.setGroupId(0);
             entry.setGroupName("root");
-            entry.setMode(TarEntry.DEFAULT_DIR_MODE);
+            entry.setMode(TarArchiveEntry.DEFAULT_DIR_MODE);
 
             entry = map(entry);
 
