@@ -1,7 +1,7 @@
 #!/bin/bash
 ###############################################################################
 #
-# Update debian repository indexes
+# Update debian repository indexes.
 #
 # It actually makes maven repositories expose a debian index.
 #
@@ -9,11 +9,11 @@
 # stable releases (filter milestonnes and release candidates).
 #
 # Requirements:
-# * This script is based on scna_packages. It is provided by dpkg-dev.
-# * The script expect to find
+# * This script is based on dpkg-scanpackages. It is provided by dpkg-dev package.
+# * The script expect to find (configurable)
 # ** a "releases" folder containing a maven repository with the deployed
 #    releases
-# ** a "snapshots" dolder containing a maven repository with the deployed
+# ** a "snapshots" folder containing a maven repository with the deployed
 #    snaphots
 # ** make sure the "stable" folder exists if you want a filtered stable debian
 #    repository
