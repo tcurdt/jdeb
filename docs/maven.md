@@ -1,4 +1,4 @@
-# Howto use "jdeb" with maven
+# How to use jdeb with Maven
 
 Generating a default Debian package with maven is particular easy. Just add
 the plugin to your POM like this
@@ -123,10 +123,10 @@ following options:
     | src              | The directory, tarball, or file to include in the package                    | Yes                                         |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | dst              | New filename at destination (type must be 'file')                            | No                                          |
-    *---------------+---------------------------------------------------------------------------------+---------------------------------------------+
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | linkTarget       | The target of the link (type must be 'link')                                 | No;                                         |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | type             | Type of the data source. (archive|directory|file|template)                   | No; but will be Yes in the future           |
+    | type             | Type of the data source. (archive|directory|file|link|template)              | No; but will be Yes in the future           |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | missingSource    | Fail if src file/folder is missing (ignore|fail)                             | No; defaults to 'fail'                      |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
