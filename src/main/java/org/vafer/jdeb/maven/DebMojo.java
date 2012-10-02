@@ -287,7 +287,7 @@ public class DebMojo extends AbstractPluginMojo {
         if (this.timestamped && version.endsWith("+SNAPSHOT")) {
             version = version.substring(0, version.length() - "+SNAPSHOT".length());
             version += "~";
-            version += new SimpleDateFormat("yyyyMMdd.HHmmss.SSS").format(new Date());
+            version += new SimpleDateFormat("yyyyMMdd.HHmmss").format(new Date());
         }
 
         return version;
