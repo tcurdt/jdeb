@@ -1,4 +1,8 @@
-## Version 1.0, unreleased
+## Version 0.12, unreleased
+
+* [ADD] Support for symbolic links (Maven only)
+* [FIX] Unresolved variables in package maintainer scripts no longer break the build
+
 
 ## Version 0.11, released 14.07.2012
 
