@@ -19,7 +19,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class FilteredConfigurationFile {
     private List<String> lines = new ArrayList<String>();
     private String name;
 
-    public FilteredConfigurationFile( String name, InputStream pInputStream, VariableResolver pResolver ) throws IOException, ParseException {
+    public FilteredConfigurationFile( String name, InputStream pInputStream, VariableResolver pResolver ) throws IOException {
         this.name = name;
         parse(pInputStream, pResolver);
     }
@@ -46,7 +45,7 @@ public class FilteredConfigurationFile {
         closeToken = pToken;
     }
 
-    private void parse( InputStream pInputStream, VariableResolver pResolver ) throws IOException, ParseException {
+    private void parse( InputStream pInputStream, VariableResolver pResolver ) throws IOException {
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(pInputStream));

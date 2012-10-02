@@ -61,7 +61,7 @@ public class UtilsTestCase extends TestCase {
         assertEquals(expected, actual);
     }
 
-    public void testReplaceVariables() throws Exception {
+    public void testReplaceVariables() {
         Map<String, String> variables = new HashMap<String, String>();
         variables.put("version", "1.2.3");
         variables.put("name", "jdeb");

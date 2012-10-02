@@ -17,7 +17,6 @@ package org.vafer.jdeb.maven;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -326,97 +325,92 @@ public class DebMojo extends AbstractPluginMojo {
 
         setData(dataSet);
 
-        try {
-            Console infoConsole = new MojoConsole(getLog(), verbose);
+        Console infoConsole = new MojoConsole(getLog(), verbose);
 
-            final VariableResolver resolver = initializeVariableResolver(new HashMap<String, String>());
+        final VariableResolver resolver = initializeVariableResolver(new HashMap<String, String>());
 
-            final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken));
-            final File controlDirFile = new File(Utils.replaceVariables(resolver, controlDir, openReplaceToken, closeReplaceToken));
-            final File installDirFile = new File(Utils.replaceVariables(resolver, installDir, openReplaceToken, closeReplaceToken));
-            final File changesInFile = new File(Utils.replaceVariables(resolver, changesIn, openReplaceToken, closeReplaceToken));
-            final File changesOutFile = new File(Utils.replaceVariables(resolver, changesOut, openReplaceToken, closeReplaceToken));
-            final File changesSaveFile = new File(Utils.replaceVariables(resolver, changesSave, openReplaceToken, closeReplaceToken));
+        final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken));
+        final File controlDirFile = new File(Utils.replaceVariables(resolver, controlDir, openReplaceToken, closeReplaceToken));
+        final File installDirFile = new File(Utils.replaceVariables(resolver, installDir, openReplaceToken, closeReplaceToken));
+        final File changesInFile = new File(Utils.replaceVariables(resolver, changesIn, openReplaceToken, closeReplaceToken));
+        final File changesOutFile = new File(Utils.replaceVariables(resolver, changesOut, openReplaceToken, closeReplaceToken));
+        final File changesSaveFile = new File(Utils.replaceVariables(resolver, changesSave, openReplaceToken, closeReplaceToken));
 
-            // if there are no producers defined we try to use the artifacts
-            if (dataProducers.isEmpty()) {
+        // if there are no producers defined we try to use the artifacts
+        if (dataProducers.isEmpty()) {
 
-                if (!hasMainArtifact()) {
+            if (!hasMainArtifact()) {
 
-                    final String packaging = project.getPackaging();
-                    if ("pom".equalsIgnoreCase(packaging)) {
-                        getLog().warn("Creating empty debian package.");
-                    } else {
-                        throw new MojoExecutionException(
-                            "Nothing to include into the debian package. " +
-                                "Did you maybe forget to add a <data> tag or call the plugin directly?");
-                    }
-
+                final String packaging = project.getPackaging();
+                if ("pom".equalsIgnoreCase(packaging)) {
+                    getLog().warn("Creating empty debian package.");
                 } else {
+                    throw new MojoExecutionException(
+                        "Nothing to include into the debian package. " +
+                            "Did you maybe forget to add a <data> tag or call the plugin directly?");
+                }
 
-                    Set<Artifact> artifacts = new HashSet<Artifact>();
+            } else {
 
-                    artifacts.add(project.getArtifact());
+                Set<Artifact> artifacts = new HashSet<Artifact>();
 
-                    for (Artifact artifact : (Set<Artifact>) project.getArtifacts()) {
-                        artifacts.add(artifact);
-                    }
+                artifacts.add(project.getArtifact());
 
-                    for (Artifact artifact : (List<Artifact>) project.getAttachedArtifacts()) {
-                        artifacts.add(artifact);
-                    }
+                for (Artifact artifact : (Set<Artifact>) project.getArtifacts()) {
+                    artifacts.add(artifact);
+                }
 
-                    for(Artifact artifact : artifacts) {
-                        final File file = artifact.getFile();
-                        if (file != null) {
-                            dataProducers.add(new DataProducer() {
-                                public void produce( final DataConsumer receiver ) {
-                                    try {
-                                        receiver.onEachFile(
-                                            new FileInputStream(file),
-                                            new File(installDirFile, file.getName()).getAbsolutePath(),
-                                            "",
-                                            "root", 0, "root", 0,
-                                            TarEntry.DEFAULT_FILE_MODE,
-                                            file.length());
-                                    } catch (Exception e) {
-                                        getLog().error(e);
-                                    }
+                for (Artifact artifact : (List<Artifact>) project.getAttachedArtifacts()) {
+                    artifacts.add(artifact);
+                }
+
+                for(Artifact artifact : artifacts) {
+                    final File file = artifact.getFile();
+                    if (file != null) {
+                        dataProducers.add(new DataProducer() {
+                            public void produce( final DataConsumer receiver ) {
+                                try {
+                                    receiver.onEachFile(
+                                        new FileInputStream(file),
+                                        new File(installDirFile, file.getName()).getAbsolutePath(),
+                                        "",
+                                        "root", 0, "root", 0,
+                                        TarEntry.DEFAULT_FILE_MODE,
+                                        file.length());
+                                } catch (Exception e) {
+                                    getLog().error(e);
                                 }
-                            });
-                        } else {
-                            getLog().error("No file for artifact " + artifact);
-                        }
+                            }
+                        });
+                    } else {
+                        getLog().error("No file for artifact " + artifact);
                     }
                 }
             }
+        }
 
-            try {
+        try {
 
-                DebMaker debMaker = new DebMaker(infoConsole, debFile, controlDirFile, dataProducers, resolver);
+            DebMaker debMaker = new DebMaker(infoConsole, debFile, controlDirFile, dataProducers, resolver);
 
-                if (changesInFile.exists() && changesInFile.canRead()) {
-                    debMaker.setChangesIn(changesInFile);
-                    debMaker.setChangesOut(changesOutFile);
-                    debMaker.setChangesSave(changesSaveFile);
-                }
-
-                debMaker.setCompression(compression);
-                debMaker.makeDeb();
-
-                // Always attach unless explicitly set to false
-                if ("true".equalsIgnoreCase(attach)) {
-                    getLog().info("Attaching created debian archive " + debFile);
-                    projectHelper.attachArtifact(project, type, classifier, debFile);
-                }
-
-            } catch (PackagingException e) {
-                getLog().error("Failed to create debian package " + debFile, e);
-                throw new MojoExecutionException("Failed to create debian package " + debFile, e);
+            if (changesInFile.exists() && changesInFile.canRead()) {
+                debMaker.setChangesIn(changesInFile);
+                debMaker.setChangesOut(changesOutFile);
+                debMaker.setChangesSave(changesSaveFile);
             }
 
-        } catch (ParseException e) {
-            throw new MojoExecutionException("Failed parsing pattern", e);
+            debMaker.setCompression(compression);
+            debMaker.makeDeb();
+
+            // Always attach unless explicitly set to false
+            if ("true".equalsIgnoreCase(attach)) {
+                getLog().info("Attaching created debian archive " + debFile);
+                projectHelper.attachArtifact(project, type, classifier, debFile);
+            }
+
+        } catch (PackagingException e) {
+            getLog().error("Failed to create debian package " + debFile, e);
+            throw new MojoExecutionException("Failed to create debian package " + debFile, e);
         }
     }
 }

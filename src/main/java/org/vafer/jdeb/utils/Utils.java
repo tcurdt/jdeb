@@ -94,7 +94,7 @@ public final class Utils {
      * @param pResolver
      * @param pExpression
      */
-    public static String replaceVariables( final VariableResolver pResolver, final String pExpression, final String pOpen, final String pClose ) throws ParseException {
+    public static String replaceVariables( final VariableResolver pResolver, final String pExpression, final String pOpen, final String pClose ) {
         final char[] open = pOpen.toCharArray();
         final char[] close = pClose.toCharArray();
         

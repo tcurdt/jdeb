@@ -114,14 +114,10 @@ public abstract class AbstractDescriptor {
 
     }
 
-    public void set( final String pKey, final String pValue ) {
-        String value = null;
-        try {
-            value = Utils.replaceVariables(resolver, pValue, openToken, closeToken);
-            if ("".equals(value)) {
-                value = null;
-            }
-        } catch (ParseException e) {
+    public void set(final String pKey, final String pValue) {
+        String value = Utils.replaceVariables(resolver, pValue, openToken, closeToken);
+        if ("".equals(value)) {
+            value = null;
         }
         values.put(pKey, value);
     }
