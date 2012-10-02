@@ -21,8 +21,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,8 +37,9 @@ import org.vafer.jdeb.utils.VariableResolver;
  */
 public abstract class AbstractDescriptor {
 
-    private final Map<String, String> values = new HashMap<String, String>();
-    private final VariableResolver resolver;
+    protected final Map<String, String> values = new LinkedHashMap<String, String>();
+    protected final VariableResolver resolver;
+
     private static String openToken = "[[";
     private static String closeToken = "]]";
 
