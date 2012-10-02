@@ -37,7 +37,7 @@ public final class Utils {
     public static int copy( final InputStream pInput, final OutputStream pOutput ) throws IOException {
         final byte[] buffer = new byte[2048];
         int count = 0;
-        int n = 0;
+        int n;
         while (-1 != (n = pInput.read(buffer))) {
             pOutput.write(buffer, 0, n);
             count += n;
@@ -45,12 +45,12 @@ public final class Utils {
         return count;
     }
 
-    public static String toHex( final byte[] pBytes ) {
+    public static String toHex( final byte[] bytes ) {
         final StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < pBytes.length; ++i) {
-            sb.append(Integer.toHexString((pBytes[i] >> 4) & 0x0f));
-            sb.append(Integer.toHexString(pBytes[i] & 0x0f));
+        
+        for (byte b : bytes) {
+            sb.append(Integer.toHexString((b >> 4) & 0x0f));
+            sb.append(Integer.toHexString(b & 0x0f));
         }
 
         return sb.toString();
@@ -91,24 +91,18 @@ public final class Utils {
      * Substitute the variables in the given expression with the
      * values from the resolver
      *
-     * @param pVariables
+     * @param pResolver
      * @param pExpression
-     * @return
      */
     public static String replaceVariables( final VariableResolver pResolver, final String pExpression, final String pOpen, final String pClose ) throws ParseException {
-
-        final char[] s = pExpression.toCharArray();
-
         final char[] open = pOpen.toCharArray();
         final char[] close = pClose.toCharArray();
-
+        
         final StringBuilder out = new StringBuilder();
         StringBuilder sb = new StringBuilder();
         char[] watch = open;
         int w = 0;
-        for (int i = 0; i < s.length; i++) {
-            char c = s[i];
-
+        for (char c : pExpression.toCharArray()) {
             if (c == watch[w]) {
                 w++;
                 if (watch.length == w) {
@@ -120,13 +114,15 @@ public final class Utils {
                         sb = new StringBuilder();
                         // search for close
                         watch = close;
-                    } else if (watch == close) {
+                    } else {
                         // found close
                         final String variable = pResolver.get(sb.toString());
                         if (variable != null) {
                             out.append(variable);
                         } else {
-                            throw new ParseException("Failed to resolve variable '" + sb + "'", i);
+                            out.append(pOpen);
+                            out.append(sb);
+                            out.append(pClose);
                         }
                         sb = new StringBuilder();
                         // search for open

@@ -72,7 +72,7 @@ public final class PackageDescriptorTestCase extends TestCase {
         assertEquals("1.2", d.get("Version"));
         assertEquals("Torsten Curdt <tcurdt@vafer.org>", d.get("Maintainer"));
         assertEquals("test[[test", d.get("NoResolve1"));
-        assertEquals(null, d.get("NoResolve2"));
+        assertEquals("[[test]]", d.get("NoResolve2"));
     }
 
     public void testEmptyLines() throws Exception {

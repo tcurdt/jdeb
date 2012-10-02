@@ -18,6 +18,8 @@ package org.vafer.jdeb.utils;
 
 
 import java.io.ByteArrayInputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -36,7 +38,7 @@ public class UtilsTestCase extends TestCase {
         assertEquals("foo/", Utils.stripPath(2, "foo/"));
     }
 
-    private String convert( String s ) throws Exception {
+    private String convert(String s) throws Exception {
         byte[] data = Utils.toUnixLineEndings(new ByteArrayInputStream(s.getBytes("UTF-8")));
         return new String(data, "UTF-8");
     }
@@ -59,4 +61,28 @@ public class UtilsTestCase extends TestCase {
         assertEquals(expected, actual);
     }
 
+    public void testReplaceVariables() throws Exception {
+        Map<String, String> variables = new HashMap<String, String>();
+        variables.put("version", "1.2.3");
+        variables.put("name", "jdeb");
+        variables.put("url", "https://github.com/tcurdt/jdeb");
+
+        VariableResolver resolver = new MapVariableResolver(variables);
+
+        // main case
+        String result = Utils.replaceVariables(resolver, "Version: [[version]]", "[[", "]]");
+        assertEquals("Version: 1.2.3", result);
+
+        // multiple variables in the same expression
+        result = Utils.replaceVariables(resolver, "[[name]] [[version]]", "[[", "]]");
+        assertEquals("jdeb 1.2.3", result);
+
+        // collision with script syntax
+        result = Utils.replaceVariables(resolver, "if [[ \"${HOST_TYPE}\" -eq \"admin\" ]] ; then", "[[", "]]");
+        assertEquals("if [[ \"${HOST_TYPE}\" -eq \"admin\" ]] ; then", result);
+
+        // mixed valid and unknown variables
+        result = Utils.replaceVariables(resolver, "[[name]] [[test]]", "[[", "]]");
+        assertEquals("jdeb [[test]]", result);
+    }
 }
