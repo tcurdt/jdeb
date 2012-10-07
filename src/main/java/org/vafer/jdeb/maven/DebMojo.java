@@ -284,9 +284,10 @@ public class DebMojo extends AbstractPluginMojo {
         String version = getProject().getVersion().replace('-', '+');
 
         if (this.timestamped && version.endsWith("+SNAPSHOT")) {
+            Date buildStartTime = getProject().getProjectBuilderConfiguration().getBuildStartTime();
             version = version.substring(0, version.length() - "+SNAPSHOT".length());
             version += "~";
-            version += new SimpleDateFormat("yyyyMMdd.HHmmss").format(new Date());
+            version += new SimpleDateFormat("yyyyMMdd.HHmmss").format(buildStartTime);
         }
 
         return version;
