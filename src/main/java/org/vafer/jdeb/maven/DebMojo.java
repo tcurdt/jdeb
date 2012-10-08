@@ -283,15 +283,35 @@ public class DebMojo extends AbstractPluginMojo {
     private String getProjectVersion() {
         String version = getProject().getVersion().replace('-', '+');
 
-        if (this.timestamped && version.endsWith("+SNAPSHOT")) {
-            Date buildStartTime = getProject().getProjectBuilderConfiguration().getBuildStartTime();
+        if (this.timestamped && version.endsWith("+SNAPSHOT")) {            
             version = version.substring(0, version.length() - "+SNAPSHOT".length());
             version += "~";
-            version += new SimpleDateFormat("yyyyMMdd.HHmmss").format(buildStartTime);
+            version += new SimpleDateFormat("yyyyMMdd.HHmmss").format(getBuildStartTime());
         }
 
         return version;
     }
+    
+    protected Date getBuildStartTime() {
+        try {
+            //for maven 3.x
+            Method getRequestMethod = session.getClass().getMethod("getRequest");
+            Object mavenExecutionRequest = getRequestMethod.invoke(session);
+            Method getStartTimeMethod = mavenExecutionRequest.getClass().getMethod("getStartTime");
+            return (Date) getStartTimeMethod.invoke(mavenExecutionRequest);
+        } catch (Exception ex3) {
+            try {
+                //for maven 2.2.x
+                Method getRequestMethod = session.getClass().getMethod("getProjectBuilderConfiguration");
+                Object mavenExecutionRequest = getRequestMethod.invoke(session);
+                Method getStartTimeMethod = mavenExecutionRequest.getClass().getMethod("getBuildStartTime");
+                return (Date) getStartTimeMethod.invoke(mavenExecutionRequest);
+            } catch (Exception ex2) {
+                getLog().debug("unable to get start time for the current build: " + ex2.getMessage());
+                return new Date();
+            }
+        }
+    }    
 
     /**
      * @return whether or not Maven is currently operating in the execution root
