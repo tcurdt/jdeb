@@ -283,16 +283,15 @@ public class DebMojo extends AbstractPluginMojo {
     private String getProjectVersion() {
         String version = getProject().getVersion().replace('-', '+');
 
-        if (this.timestamped && version.endsWith("+SNAPSHOT")) {
-            Date buildStartTime = getProject().getProjectBuilderConfiguration().getBuildStartTime();
+        if (this.timestamped && version.endsWith("+SNAPSHOT")) {            
             version = version.substring(0, version.length() - "+SNAPSHOT".length());
             version += "~";
-            version += new SimpleDateFormat("yyyyMMdd.HHmmss").format(buildStartTime);
+            version += new SimpleDateFormat("yyyyMMdd.HHmmss").format(session.getStartTime());
         }
 
         return version;
     }
-
+    
     /**
      * @return whether or not Maven is currently operating in the execution root
      */
