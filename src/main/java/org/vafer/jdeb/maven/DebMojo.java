@@ -55,6 +55,13 @@ public class DebMojo extends AbstractPluginMojo {
      * @component
      */
     private MavenProjectHelper projectHelper;
+    
+    /**
+     * Defines the name of deb package.
+     *
+     * @parameter
+     */
+    private String name;
 
     /**
      * Defines the pattern of the name of final artifacts. Possible
@@ -257,7 +264,7 @@ public class DebMojo extends AbstractPluginMojo {
     protected VariableResolver initializeVariableResolver( Map<String, String> variables ) {
         ((Map) variables).putAll(getProject().getProperties());
         
-        variables.put("name", getProject().getName());
+		variables.put("name", name != null ? name : getProject().getArtifactId());
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
         variables.put("version", getProjectVersion());
