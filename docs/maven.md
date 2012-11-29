@@ -128,7 +128,7 @@ following options:
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | type             | Type of the data source. (archive|directory|file|link|template)              | No; but will be Yes in the future           |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | missingSource    | Fail if src file/folder is missing (ignore|fail)                             | No; defaults to 'fail'                      |
+    | missingSrc       | Fail if src file/folder is missing (ignore|fail)                             | No; defaults to 'fail'                      |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | includes         | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files                   |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
