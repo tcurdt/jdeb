@@ -256,7 +256,7 @@ public class DebMojo extends AbstractPluginMojo {
 
     protected VariableResolver initializeVariableResolver( Map<String, String> variables ) {
         ((Map) variables).putAll(getProject().getProperties());
-        
+
         variables.put("name", getProject().getName());
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
@@ -291,7 +291,7 @@ public class DebMojo extends AbstractPluginMojo {
 
         return version;
     }
-    
+
     /**
      * @return whether or not Maven is currently operating in the execution root
      */

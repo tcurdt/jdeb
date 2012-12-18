@@ -6,7 +6,7 @@
     <artifactId>jdeb</artifactId>
     <packaging>maven-plugin</packaging>
     <name>jdeb</name>
-    <version>0.12-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <description>
         This library provides an Ant task and a Maven plugin to create Debian packages from Java builds in a truly cross
         platform manner. Build your Debian packages on any platform that has Java support. Windows, Linux - it does not
@@ -38,6 +38,8 @@
         <contributor><name>Petr Kozelka</name></contributor>
         <contributor><name>Scott Kuehn</name></contributor>
         <contributor><name>Thomas Mortagne</name></contributor>
+        <contributor><name>Ralph van Etten</name></contributor>
+        <contributor><name>Michael ?</name></contributor>
     </contributors>
     <licenses>
         <license>

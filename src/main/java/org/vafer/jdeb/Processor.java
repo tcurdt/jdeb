@@ -463,7 +463,6 @@ public class Processor {
 
                 final TarArchiveEntry entry = new TarArchiveEntry(filename, true);
 
-                // FIXME: link is in the constructor
                 entry.setUserName(user);
                 entry.setUserId(uid);
                 entry.setGroupName(group);
