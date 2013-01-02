@@ -21,7 +21,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -200,9 +199,15 @@ public class DebMojo extends AbstractPluginMojo {
      *               <src>mapping.txt</src>
      *             </mapper>
      *           </data>
-     *         <data>
-     *           <src>${project.basedir}/README.txt</src>
-     *         </data>
+     *           <data>
+     *             <src>/a/path/on/the/target/fs</src>
+     *             <type>link</type>
+     *             <linkTarget>/a/sym/link/to/the/scr/file</linkTarget>
+     *             <symlink>true</symlink>
+     *           </data>
+     *           <data>
+     *             <src>${project.basedir}/README.txt</src>
+     *           </data>
      *         </dataSet>
      *       </configuration>
      *     </plugins>
@@ -314,6 +319,7 @@ public class DebMojo extends AbstractPluginMojo {
      *
      * @throws MojoExecutionException on error
      */
+    @Override
     public void execute() throws MojoExecutionException {
 
         final MavenProject project = getProject();
@@ -368,6 +374,7 @@ public class DebMojo extends AbstractPluginMojo {
                     final File file = artifact.getFile();
                     if (file != null) {
                         dataProducers.add(new DataProducer() {
+                            @Override
                             public void produce( final DataConsumer receiver ) {
                                 try {
                                     receiver.onEachFile(

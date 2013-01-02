@@ -120,11 +120,11 @@ following options:
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     ||   Element       || Description                                                                 || Required                                  ||
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | src              | The directory, tarball, or file to include in the package                    | Yes                                         |
+    | src              | The directory, tarball, file or link path to include in the package          | Yes                                         |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | dst              | New filename at destination (type must be 'file')                            | No                                          |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | linkTarget       | The target of the link (type must be 'link')                                 | No;                                         |
+    | linkTarget       | The target of the link (type must be 'link')                                 | No                                          |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | type             | Type of the data source. (archive|directory|file|link|template)              | No; but will be Yes in the future           |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
@@ -227,6 +227,22 @@ include a directory, a tarball, and a file in your deb package:
                                         <path>/var/log/${artifactId}</path>
                                         <path>/var/run/${artifactId}</path>
                                     </paths>
+                                </data>
+
+                                <!-- Hard link example -->
+                                <data>
+                                    <type>link</type>
+                                    <src>/a/path/on/the/target/fs</src>
+                                    <linkTarget>/a/link/to/the/scr/file</linkTarget>
+                                    <symlink>false</symlink>
+                                </data>
+
+                                <!-- Symbolic link example -->
+                                <data>
+                                    <type>link</type>
+                                    <src>/a/path/on/the/target/fs</src>
+                                    <linkTarget>/a/sym/link/to/the/scr/file</linkTarget>
+                                    <symlink>true</symlink>
                                 </data>
                             </dataSet>
 
