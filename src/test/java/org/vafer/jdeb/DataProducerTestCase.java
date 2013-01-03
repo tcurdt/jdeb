@@ -30,6 +30,7 @@ import org.vafer.jdeb.ar.NonClosingInputStream;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
+import org.vafer.jdeb.producers.DataProducerLink;
 
 public final class DataProducerTestCase extends TestCase {
 
@@ -53,7 +54,8 @@ public final class DataProducerTestCase extends TestCase {
             new DataProducerArchive(archive1, null, null, null),
             new DataProducerArchive(archive2, null, null, null),
             new DataProducerArchive(archive3, null, null, null),
-            new DataProducerDirectory(directory, null, new String[] { "**/.svn/**" }, null)
+            new DataProducerDirectory(directory, null, new String[] { "**/.svn/**" }, null),
+            new DataProducerLink("/link/path", "/link/target", true, null, null, null)
         };
 
         final File deb = File.createTempFile("jdeb", ".deb");
@@ -98,6 +100,7 @@ public final class DataProducerTestCase extends TestCase {
         assertTrue("testfile2 wasn't found in the package", filesInDeb.contains("./test/testfile2"));
         assertTrue("testfile3 wasn't found in the package", filesInDeb.contains("./test/testfile3"));
         assertTrue("testfile4 wasn't found in the package", filesInDeb.contains("./test/testfile4"));
+        assertTrue("/link/path wasn't found in the package", filesInDeb.contains("/link/path"));
 
         assertTrue("Cannot delete the file " + deb, deb.delete());
     }

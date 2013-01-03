@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
@@ -499,13 +500,17 @@ public class Processor {
             }
 
             public void onEachLink(String path, String linkName, boolean symlink, String user, int uid, String group, int gid) throws IOException {
-                path = fixPath(path);
-
                 createParentDirectories((new File(path)).getParent(), user, uid, group, gid);
 
                 final TarArchiveEntry entry = new TarArchiveEntry(path, symlink ? TarArchiveEntry.LF_SYMLINK : TarArchiveEntry.LF_LINK);
                 // Required to avoid loosing leading slash. See https://issues.apache.org/jira/browse/COMPRESS-201.
-                entry.setName(path);
+                try {
+                    Field field = TarArchiveEntry.class.getDeclaredField("name");
+                    field.setAccessible(true);
+                    field.set(entry, path);
+                } catch (Exception e) {
+                    // Should never happen
+                }
 
                 entry.setLinkName(linkName);
 
