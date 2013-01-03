@@ -149,14 +149,6 @@ public final class Data implements DataProducer {
     }
 
     public void produce( final DataConsumer pReceiver ) throws IOException {
-        if (src != null && !src.exists()) {
-            if (missingSrc == IGNORE) {
-                return;
-            } else {
-                throw new FileNotFoundException("Data source not found : " + src);
-            }
-        }
-
         if (src == null && (paths == null || paths.length == 0)) {
             throw new RuntimeException("src or paths not set");
         }
@@ -164,6 +156,21 @@ public final class Data implements DataProducer {
         org.vafer.jdeb.mapping.Mapper[] mappers = null;
         if (mapper != null) {
             mappers = new org.vafer.jdeb.mapping.Mapper[] { mapper.createMapper() };
+        }
+
+        if ("link".equalsIgnoreCase(type)) {
+            new DataProducerLink(src.getPath(), linkTarget, symlink, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            return;
+        }
+
+        // Types that require src to exist
+
+        if (!src.exists()) {
+            if (missingSrc == IGNORE) {
+                return;
+            } else {
+                throw new FileNotFoundException("Data source not found : " + src);
+            }
         }
 
         if ("file".equalsIgnoreCase(type)) {
@@ -178,11 +185,6 @@ public final class Data implements DataProducer {
 
         if ("directory".equalsIgnoreCase(type)) {
             new DataProducerDirectory(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
-            return;
-        }
-        
-        if ("link".equalsIgnoreCase(type)) {
-            new DataProducerLink(src.getPath(), linkTarget, symlink, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 
