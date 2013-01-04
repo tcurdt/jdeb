@@ -120,11 +120,13 @@ following options:
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     ||   Element       || Description                                                                 || Required                                  ||
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | src              | The directory, tarball, file or link path to include in the package          | Yes                                         |
+    | src              | The directory, tarball, file to include in the package                       | Yes                                         |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | dst              | New filename at destination (type must be 'file')                            | No                                          |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | linkTarget       | The target of the link (type must be 'link')                                 | No                                          |
+    | linkPath         | The path of the link (type must be 'link')                                   | Yes for link                                |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | linkTarget       | The target of the link (type must be 'link')                                 | Yes for link                                |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | type             | Type of the data source. (archive|directory|file|link|template)              | No; but will be Yes in the future           |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
@@ -232,7 +234,7 @@ include a directory, a tarball, and a file in your deb package:
                                 <!-- Hard link example -->
                                 <data>
                                     <type>link</type>
-                                    <src>/a/path/on/the/target/fs</src>
+                                    <linkPath>/a/path/on/the/target/fs</linkPath>
                                     <linkTarget>/a/link/to/the/scr/file</linkTarget>
                                     <symlink>false</symlink>
                                 </data>
@@ -240,7 +242,7 @@ include a directory, a tarball, and a file in your deb package:
                                 <!-- Symbolic link example -->
                                 <data>
                                     <type>link</type>
-                                    <src>/a/path/on/the/target/fs</src>
+                                    <linkPath>/a/path/on/the/target/fs</linkPath>
                                     <linkTarget>/a/sym/link/to/the/scr/file</linkTarget>
                                     <symlink>true</symlink>
                                 </data>

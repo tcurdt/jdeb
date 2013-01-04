@@ -33,9 +33,9 @@ public final class DataProducerLink extends AbstractDataProducer implements Data
     private final String linkName;
     private final boolean symlink;
 
-    public DataProducerLink(final String name, final String linkName, final boolean symlink, String[] pIncludes, String[] pExcludes, Mapper[] pMapper) {
+    public DataProducerLink(final String path, final String linkName, final boolean symlink, String[] pIncludes, String[] pExcludes, Mapper[] pMapper) {
         super(pIncludes, pExcludes, pMapper);
-        this.path = name;
+        this.path = path;
         this.symlink = symlink;
         this.linkName = linkName;
     }
