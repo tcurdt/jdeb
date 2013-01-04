@@ -196,21 +196,6 @@ public final class Data implements DataProducer {
             }
         }
 
-        if ("link".equalsIgnoreCase(type)) {
-            new DataProducerLink(src.getPath(), linkTarget, symlink, includePatterns, excludePatterns, mappers).produce(pReceiver);
-            return;
-        }
-
-        // Types that require src to exist
-
-        if (!src.exists()) {
-            if (missingSrc == IGNORE) {
-                return;
-            } else {
-                throw new FileNotFoundException("Data source not found : " + src);
-            }
-        }
-
         if ("file".equalsIgnoreCase(type)) {
             new DataProducerFile(src, dst, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
