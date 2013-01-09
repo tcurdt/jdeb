@@ -69,9 +69,9 @@ public final class ChangesDescriptor extends AbstractDescriptor {
         final StringBuilder sb = new StringBuilder();
 
         if (changeSets.length > 0) {
-            final ChangeSet lastestChangeSet = changeSets[0];
-            set("Urgency", lastestChangeSet.getUrgency());
-            set("Changed-By", lastestChangeSet.getChangedBy());
+            final ChangeSet latestChangeSet = changeSets[0];
+            set("Urgency", latestChangeSet.getUrgency());
+            set("Changed-By", latestChangeSet.getChangedBy());
 
             for (int i = 0; i < 1; i++) {
                 final ChangeSet changeSet = changeSets[i];

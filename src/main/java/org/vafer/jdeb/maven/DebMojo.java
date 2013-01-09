@@ -60,7 +60,7 @@ public class DebMojo extends AbstractPluginMojo {
      * substitutions are [[baseDir]] [[buildDir]] [[artifactId]] [[version]]
      * [[extension]] and [[groupId]].
      *
-     * @parameter default-value="[[buildDir]]/[[artifactId]]_[[version]].[[extension]]"
+     * @parameter default-value="[[buildDir]]/[[artifactId]]_[[version]]_all.[[extension]]"
      */
     private String deb;
 
@@ -82,7 +82,7 @@ public class DebMojo extends AbstractPluginMojo {
     /**
      * Explicitly define the file where to write the changes to.
      *
-     * @parameter default-value="[[buildDir]]/[[artifactId]]_[[version]].changes"
+     * @parameter default-value="[[buildDir]]/[[artifactId]]_[[version]]_all.changes"
      */
     private String changesOut;
 

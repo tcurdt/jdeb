@@ -98,7 +98,7 @@ public abstract class AbstractDescriptor {
                 final int i = line.indexOf(':');
 
                 if (i < 0) {
-                    throw new ParseException("Line misses ':' delimitter", linenr);
+                    throw new ParseException("Line misses ':' delimiter", linenr);
                 }
 
                 key = line.substring(0, i);

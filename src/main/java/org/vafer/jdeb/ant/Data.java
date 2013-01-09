@@ -68,7 +68,7 @@ public final class Data extends PatternSet implements DataProducer {
 
     public void produce( final DataConsumer pReceiver ) throws IOException {
 
-        if (!src.exists()) {
+        if (src == null || !src.exists()) {
             throw new FileNotFoundException("Data source not found : " + src);
         }
 

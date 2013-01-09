@@ -50,6 +50,7 @@ public final class DataProducerFile extends AbstractDataProducer implements Data
         } else {
             fileName = file.getName();
         }
+
         TarArchiveEntry entry = new TarArchiveEntry(fileName, true);
         entry.setUserId(0);
         entry.setUserName("root");

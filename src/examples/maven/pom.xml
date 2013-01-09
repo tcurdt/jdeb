@@ -14,7 +14,7 @@
             <plugin>
                 <artifactId>jdeb</artifactId>
                 <groupId>org.vafer</groupId>
-                <version>0.11</version>
+                <version>1.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -25,6 +25,7 @@
                             <verbose>true</verbose>
                             <controlDir>${basedir}/src/deb/control</controlDir>
                             <dataSet>
+
                                 <data>
                                   <src>${project.build.directory}/${project.build.finalName}.jar</src>
                                   <type>file</type>
@@ -35,6 +36,14 @@
                                     <group>loader</group>
                                   </mapper>
                                 </data>
+
+                                <data>
+                                  <type>link</type>
+                                  <symlink>true</symlink>
+                                  <linkPath>/usr/share/jdeb/lib/${project.build.finalName}.jar</linkPath>
+                                  <linkTarget>/usr/share/java/jdeb.jar</linkTarget>
+                                </data>
+
                                 <data>
                                   <src>${basedir}/src/deb/init.d</src>
                                   <type>directory</type>
@@ -45,6 +54,7 @@
                                     <group>loader</group>
                                   </mapper>
                                 </data>
+
                                 <data>
                                   <type>template</type>
                                   <paths>
@@ -59,6 +69,7 @@
                                     <group>loader</group>
                                   </mapper>
                                 </data>
+
                             </dataSet>
                         </configuration>
                     </execution>
