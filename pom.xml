@@ -26,6 +26,12 @@
             <email>ebourg at apache.org</email>
             <timezone>+1</timezone>
         </developer>
+        <developer>
+            <id>tmortagne</id>
+            <name>Thomas Mortagne</name>
+            <email> at </email>
+            <timezone>+1</timezone>
+        </developer>
     </developers>
     <contributors>
         <contributor><name>Bryan Sant</name></contributor>
@@ -36,7 +42,6 @@
         <contributor><name>Patrick Schultz</name></contributor>
         <contributor><name>Petr Kozelka</name></contributor>
         <contributor><name>Scott Kuehn</name></contributor>
-        <contributor><name>Thomas Mortagne</name></contributor>
         <contributor><name>Ralph van Etten</name></contributor>
     </contributors>
     <licenses>
