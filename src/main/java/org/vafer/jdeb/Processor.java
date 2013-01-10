@@ -375,11 +375,15 @@ public class Processor {
                 infoStream.close();
 
                 InputStream in = new FileInputStream(file);
-                if (infoStream.isShell() && !infoStream.hasUnixLineEndings()) {
-                    // fix the line endings automatically
-                    byte[] buf = Utils.toUnixLineEndings(in);
-                    entry.setSize(buf.length);
-                    in = new ByteArrayInputStream(buf);
+                if (infoStream.isShell()) {
+                    if(!infoStream.hasUnixLineEndings()) {
+                        // fix the line endings automatically
+                        byte[] buf = Utils.toUnixLineEndings(in);
+                        entry.setSize(buf.length);
+                        in = new ByteArrayInputStream(buf);
+                    }
+                } else {
+                    // entry.setMode(PermMapper.toMode("644"));
                 }
 
                 outputStream.putArchiveEntry(entry);
