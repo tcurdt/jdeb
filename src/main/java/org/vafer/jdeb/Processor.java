@@ -509,6 +509,10 @@ public class Processor {
 
                 tarOutputStream.putArchiveEntry(entry);
                 tarOutputStream.closeArchiveEntry();
+
+                console.info(
+                    "link:" + entry.getName() + " linkname:" + entry.getLinkName()
+                 );
             }
 
             private String fixPath( String path ) {
