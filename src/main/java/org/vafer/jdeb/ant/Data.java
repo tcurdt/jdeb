@@ -86,7 +86,7 @@ public final class Data extends PatternSet implements DataProducer {
                 getExcludePatterns(getProject()),
                 mappers
             ).produce(pReceiver);
-            
+
         } else if ("archive".equalsIgnoreCase(type)) {
             new DataProducerArchive(
                 src,
@@ -94,7 +94,7 @@ public final class Data extends PatternSet implements DataProducer {
                 getExcludePatterns(getProject()),
                 mappers
             ).produce(pReceiver);
-            
+
         } else if ("directory".equalsIgnoreCase(type)) {
             new DataProducerDirectory(
                 src,
