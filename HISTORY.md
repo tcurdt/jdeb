@@ -10,7 +10,7 @@
 * [ADD] Added "verbose" maven config option to show/hide INFO logs
 * [ADD] Expand variables in configuration files "conffiles", "preinst", "postinst", "prerm", "postrm"
 * [ADD] Added a "template" data type to create dirs
-* [ADD] Added "missingSource" maven config to control behavior on missing files/folders
+* [ADD] Added "missingSrc" maven config to control behavior on missing files/folders
 * [CHG] use "~" instead of "+" when converting from a SNAPSHOT version
 * [REM] Deprecated PrefixMapper was removed (use PermMapper instead)
 
