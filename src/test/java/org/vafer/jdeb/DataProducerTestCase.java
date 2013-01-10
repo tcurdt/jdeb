@@ -17,7 +17,9 @@ package org.vafer.jdeb;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
@@ -55,7 +57,7 @@ public final class DataProducerTestCase extends TestCase {
             new DataProducerArchive(archive2, null, null, null),
             new DataProducerArchive(archive3, null, null, null),
             new DataProducerDirectory(directory, null, new String[] { "**/.svn/**" }, null),
-            new DataProducerLink("/link/path", "/link/target", true, null, null, null)
+            new DataProducerLink("/link/path-element.ext", "/link/target-element.ext", true, null, null, null)
         };
 
         final File deb = File.createTempFile("jdeb", ".deb");
@@ -64,7 +66,7 @@ public final class DataProducerTestCase extends TestCase {
 
         assertTrue(packageDescriptor.isValid());
 
-        final Set filesInDeb = new HashSet();
+        final Map<String, TarEntry> filesInDeb = new HashMap<String, TarEntry>();
 
         final ArArchiveInputStream ar = new ArArchiveInputStream(new FileInputStream(deb));
         while (true) {
@@ -83,7 +85,7 @@ public final class DataProducerTestCase extends TestCase {
                         break;
                     }
 
-                    filesInDeb.add(tarEntry.getName());
+                    filesInDeb.put(tarEntry.getName(), tarEntry);
                 }
 
                 tar.close();
@@ -96,11 +98,12 @@ public final class DataProducerTestCase extends TestCase {
 
         ar.close();
 
-        assertTrue("testfile wasn't found in the package", filesInDeb.contains("./test/testfile"));
-        assertTrue("testfile2 wasn't found in the package", filesInDeb.contains("./test/testfile2"));
-        assertTrue("testfile3 wasn't found in the package", filesInDeb.contains("./test/testfile3"));
-        assertTrue("testfile4 wasn't found in the package", filesInDeb.contains("./test/testfile4"));
-        assertTrue("/link/path wasn't found in the package", filesInDeb.contains("./link/path"));
+        assertTrue("testfile wasn't found in the package", filesInDeb.containsKey("./test/testfile"));
+        assertTrue("testfile2 wasn't found in the package", filesInDeb.containsKey("./test/testfile2"));
+        assertTrue("testfile3 wasn't found in the package", filesInDeb.containsKey("./test/testfile3"));
+        assertTrue("testfile4 wasn't found in the package", filesInDeb.containsKey("./test/testfile4"));
+        assertTrue("/link/path-element.ext wasn't found in the package", filesInDeb.containsKey("./link/path-element.ext"));
+        assertEquals("/link/path-element.ext has wrong link target", "/link/target-element.ext", filesInDeb.get("./link/path-element.ext").getLinkName());
 
         assertTrue("Cannot delete the file " + deb, deb.delete());
     }
