@@ -38,7 +38,6 @@
         <contributor><name>Scott Kuehn</name></contributor>
         <contributor><name>Thomas Mortagne</name></contributor>
         <contributor><name>Ralph van Etten</name></contributor>
-        <contributor><name>Michael ?</name></contributor>
     </contributors>
     <licenses>
         <license>
@@ -142,8 +141,8 @@
                 <executions>
                     <execution>
                         <goals>
+                          <goal>integration-test</goal>
                             <!--
-                            <goal>integration-test</goal>
                             <goal>verify</goal>
                             <goal>install</goal>
                             -->

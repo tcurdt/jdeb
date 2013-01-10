@@ -47,7 +47,7 @@ public final class Utils {
 
     public static String toHex( final byte[] bytes ) {
         final StringBuilder sb = new StringBuilder();
-        
+
         for (byte b : bytes) {
             sb.append(Integer.toHexString((b >> 4) & 0x0f));
             sb.append(Integer.toHexString(b & 0x0f));

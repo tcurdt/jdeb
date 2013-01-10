@@ -149,6 +149,10 @@ public class DebAntTask extends MatchingTask {
 
     private boolean isPossibleOutput( File file ) {
 
+        if (file == null) {
+            return false;
+        }
+
         if (file.exists()) {
             return file.isFile() && file.canWrite();
         }

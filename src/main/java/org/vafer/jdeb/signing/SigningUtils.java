@@ -59,34 +59,34 @@ public final class SigningUtils {
     public static void clearSign(InputStream input, InputStream keyring, String keyId, String passphrase, OutputStream output) throws IOException, PGPException, GeneralSecurityException {
         PGPSecretKey secretKey = getSecretKey(keyring, keyId);
         PGPPrivateKey privateKey = secretKey.extractPrivateKey(new BcPBESecretKeyDecryptorBuilder(new BcPGPDigestCalculatorProvider()).build(passphrase.toCharArray()));
-        
+
         int digest = PGPUtil.SHA1;
-        
+
         PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(secretKey.getPublicKey().getAlgorithm(), digest));
         signatureGenerator.init(PGPSignature.CANONICAL_TEXT_DOCUMENT, privateKey);
-        
+
         ArmoredOutputStream armoredOutput = new ArmoredOutputStream(output);
         armoredOutput.beginClearText(digest);
-        
+
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-        
+
         String line;
         while ((line = reader.readLine()) != null) {
             // trailing spaces must be removed for signature calculation (see http://tools.ietf.org/html/rfc4880#section-7.1)
             byte[] data = trim(line).getBytes("UTF-8");
-            
+
             armoredOutput.write(data);
             armoredOutput.write(EOL);
-            
+
             signatureGenerator.update(data);
             signatureGenerator.update(EOL);
         }
 
         armoredOutput.endClearText();
-        
+
         PGPSignature signature = signatureGenerator.generate();
         signature.encode(new BCPGOutputStream(armoredOutput));
-        
+
         armoredOutput.close();
     }
 
@@ -98,7 +98,7 @@ public final class SigningUtils {
      */
     private static PGPSecretKey getSecretKey(InputStream input, String keyId) throws IOException, PGPException {
         PGPSecretKeyRingCollection keyrings = new PGPSecretKeyRingCollection(PGPUtil.getDecoderStream(input));
-        
+
         Iterator rIt = keyrings.getKeyRings();
 
         while (rIt.hasNext()) {
@@ -107,7 +107,7 @@ public final class SigningUtils {
 
             while (kIt.hasNext()) {
                 PGPSecretKey key = (PGPSecretKey) kIt.next();
-                
+
                 if (key.isSigningKey() && Long.toHexString(key.getKeyID() & 0xFFFFFFFFL).equals(keyId.toLowerCase())) {
                     return key;
                 }
@@ -132,7 +132,7 @@ public final class SigningUtils {
             }
             len--;
         }
-        
+
         return line.substring(0, len);
     }
 }

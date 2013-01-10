@@ -1,7 +1,8 @@
-## Version 0.12, unreleased
+## Version 1.0, released 10.01.2013
 
 * [ADD] Support for symbolic links (Maven only)
 * [FIX] Unresolved variables in package maintainer scripts no longer break the build
+* [CHG] use "_all" as architecture postfix by default
 
 
 ## Version 0.11, released 14.07.2012
