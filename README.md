@@ -10,8 +10,8 @@ easily be adopted for other areas as well.
 
 Check the documentation on how to use it with [maven](http://github.com/tcurdt/jdeb/blob/master/docs/maven.md)
 or [ant](http://github.com/tcurdt/jdeb/blob/master/docs/ant.md). Current
-[javadocs](http://tcurdt.github.com/jdeb/release/0.11/apidocs/) and a source
-[xref](http://tcurdt.github.com/jdeb/release/0.11/xref/) is also available.
+[javadocs](http://tcurdt.github.com/jdeb/release/1.0/apidocs/) and a source
+[xref](http://tcurdt.github.com/jdeb/release/1.0/xref/) is also available.
 
 
 ## Where to get it
