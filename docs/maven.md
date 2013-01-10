@@ -8,7 +8,7 @@ the plugin to your POM like this
             <plugin>
                 <artifactId>jdeb</artifactId>
                 <groupId>org.vafer</groupId>
-                <version>0.11</version>
+                <version>1.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -84,7 +84,7 @@ section with any of the following options:
     *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
     | controlDir    | The directory containing the control files                                   | No; defaults to 'src/deb/control'                                |
     *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | installDir    | The directory where your file(s) will be place when your deb is installed    | No; defaults to '/opt/${artifactId}'                             |
+    | installDir    | The default directory for the project artifact if no data section is present | No; defaults to '/opt/${artifactId}'                             |
     *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
     | dataSet       | A list of directories, tarballs, or files to include in the deb package      | No; defaults to include your maven artifact                      |
     *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
@@ -173,7 +173,7 @@ include a directory, a tarball, and a file in your deb package:
             <plugin>
                 <artifactId>jdeb</artifactId>
                 <groupId>org.vafer</groupId>
-                <version>0.9</version>
+                <version>1.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
