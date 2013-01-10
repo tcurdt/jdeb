@@ -124,7 +124,7 @@ following options:
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | dst              | New filename at destination (type must be 'file')                            | No                                          |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | linkPath         | The path of the link (type must be 'link')                                   | Yes for link                                |
+    | linkName         | The path of the link (type must be 'link')                                   | Yes for link                                |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | linkTarget       | The target of the link (type must be 'link')                                 | Yes for link                                |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
@@ -234,7 +234,7 @@ include a directory, a tarball, and a file in your deb package:
                                 <!-- Hard link example -->
                                 <data>
                                     <type>link</type>
-                                    <linkPath>/a/path/on/the/target/fs</linkPath>
+                                    <linkName>/a/path/on/the/target/fs</linkName>
                                     <linkTarget>/a/link/to/the/scr/file</linkTarget>
                                     <symlink>false</symlink>
                                 </data>
@@ -242,7 +242,7 @@ include a directory, a tarball, and a file in your deb package:
                                 <!-- Symbolic link example -->
                                 <data>
                                     <type>link</type>
-                                    <linkPath>/a/path/on/the/target/fs</linkPath>
+                                    <linkName>/a/path/on/the/target/fs</linkName>
                                     <linkTarget>/a/sym/link/to/the/scr/file</linkTarget>
                                     <symlink>true</symlink>
                                 </data>

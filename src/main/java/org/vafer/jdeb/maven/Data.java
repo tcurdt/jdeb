@@ -82,13 +82,13 @@ public final class Data implements DataProducer {
         this.missingSrc = value;
     }
 
-    private String linkPath;
+    private String linkName;
 
     /**
-     * @parameter expression="${linkPath}"
+     * @parameter expression="${linkName}"
      */
-    public void setLinkPath(String linkPath) {
-        this.linkPath = linkPath;
+    public void setLinkPath(String linkName) {
+        this.linkName = linkName;
     }
 
     private String linkTarget;
@@ -164,14 +164,14 @@ public final class Data implements DataProducer {
         // link type
 
         if ("link".equalsIgnoreCase(type)) {
-            if (linkPath == null) {
-                throw new RuntimeException("linkPath is not set");
+            if (linkName == null) {
+                throw new RuntimeException("linkName is not set");
             }
             if (linkTarget == null) {
                 throw new RuntimeException("linkTarget is not set");
             }
 
-            new DataProducerLink(linkPath, linkTarget, symlink, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            new DataProducerLink(linkName, linkTarget, symlink, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 

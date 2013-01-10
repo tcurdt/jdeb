@@ -208,7 +208,7 @@ public class DebMojo extends AbstractPluginMojo {
      *           </data>
      *           <data>
      *             <type>link</type>
-     *             <linkPath>/a/path/on/the/target/fs</linkPath>
+     *             <linkName>/a/path/on/the/target/fs</linkName>
      *             <linkTarget>/a/sym/link/to/the/scr/file</linkTarget>
      *             <symlink>true</symlink>
      *           </data>
