@@ -254,7 +254,7 @@ public class Processor {
 
         if (!changesDescriptor.isValid()) {
             throw new PackagingException("Changes file descriptor keys are invalid " + changesDescriptor.invalidKeys() +
-                ". The following keys are mandatory " + Arrays.toString(ChangesDescriptor.mandatoryKeys) +
+                ". The following keys are mandatory " + Arrays.toString(ChangesDescriptor.MANDATORY_KEYS) +
                 ". Please check your pom.xml/build.xml and your control file.");
         }
 
