@@ -60,11 +60,8 @@ public final class ChangesDescriptor extends AbstractDescriptor {
         "Files"
     };
 
-    private final ChangeSet[] changeSets;
-
-    public ChangesDescriptor( final AbstractDescriptor pDescriptor, final ChangeSet[] pChangeSets ) {
+    public ChangesDescriptor( final AbstractDescriptor pDescriptor, final ChangeSet[] changeSets ) {
         super(pDescriptor);
-        changeSets = pChangeSets;
 
         final StringBuilder sb = new StringBuilder();
 
