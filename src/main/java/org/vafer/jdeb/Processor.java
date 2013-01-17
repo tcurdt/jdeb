@@ -138,7 +138,7 @@ public class Processor {
 
             if (!packageDescriptor.isValid()) {
                 throw new PackagingException("Control file descriptor keys are invalid " + packageDescriptor.invalidKeys() +
-                    ". The following keys are mandatory " + Arrays.toString(PackageDescriptor.mandatoryKeys) +
+                    ". The following keys are mandatory " + Arrays.toString(PackageDescriptor.MANDATORY_KEYS) +
                     ". Please check your pom.xml/build.xml and your control file.");
             }
 

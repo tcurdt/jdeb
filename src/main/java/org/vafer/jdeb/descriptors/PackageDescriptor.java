@@ -28,7 +28,7 @@ import org.vafer.jdeb.utils.VariableResolver;
  */
 public final class PackageDescriptor extends AbstractDescriptor {
 
-    private final static String[] keys = {
+    private static final String[] KEYS = {
         "Package",
         "Source",
         "Version",
@@ -51,7 +51,7 @@ public final class PackageDescriptor extends AbstractDescriptor {
         "Homepage",
     };
 
-    public final static String[] mandatoryKeys = {
+    public static final String[] MANDATORY_KEYS = {
         "Package",
         "Version",
         "Section",
@@ -75,11 +75,11 @@ public final class PackageDescriptor extends AbstractDescriptor {
     }
 
     public String[] getMandatoryKeys() {
-        return mandatoryKeys;
+        return MANDATORY_KEYS;
     }
 
     public String toString() {
-        return toString(keys);
+        return toString(KEYS);
     }
 
 }
