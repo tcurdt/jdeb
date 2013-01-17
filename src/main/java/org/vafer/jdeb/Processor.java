@@ -32,10 +32,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
@@ -66,8 +64,8 @@ import org.vafer.jdeb.utils.VariableResolver;
  */
 public class Processor {
 
-    private static final Set<String> CONFIGURATION_FILENAMES
-        = new HashSet<String>(Arrays.asList(new String[] { "conffiles", "preinst", "postinst", "prerm", "postrm" }));
+    /** The name of the control files subject to token substitution */
+    private static final List<String> CONFIGURATION_FILENAMES = Arrays.asList("conffiles", "preinst", "postinst", "prerm", "postrm");
 
     private final Console console;
     private final VariableResolver resolver;
