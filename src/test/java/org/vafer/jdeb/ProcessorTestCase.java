@@ -30,13 +30,7 @@ public class ProcessorTestCase extends TestCase {
      * (this test can only fail on Windows)
      */
     public void testBuildDataWithFileSet() throws Exception {
-        Processor processor = new Processor(new Console() {
-            public void info( String s ) {
-            }
-
-            public void warn( String s ) {
-            }
-        }, null);
+        Processor processor = new Processor(new NullConsole(), null);
 
         Project project = new Project();
         project.setCoreLoader(getClass().getClassLoader());

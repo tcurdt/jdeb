@@ -36,13 +36,7 @@ public final class DataProducerTestCase extends TestCase {
 
     public void testCreation() throws Exception {
 
-        final Processor processor = new Processor(new Console() {
-            public void info( String s ) {
-            }
-
-            public void warn( String s ) {
-            }
-        }, null);
+        final Processor processor = new Processor(new NullConsole(), null);
 
         final File control = new File(getClass().getResource("deb/control/control").toURI());
         final File archive1 = new File(getClass().getResource("deb/data.tgz").toURI());
