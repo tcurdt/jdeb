@@ -18,9 +18,7 @@ package org.vafer.jdeb;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 import junit.framework.TestCase;
