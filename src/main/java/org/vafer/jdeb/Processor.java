@@ -599,8 +599,7 @@ public class Processor {
         };
 
         try {
-            for (int i = 0; i < pData.length; i++) {
-                final DataProducer data = pData[i];
+            for (DataProducer data : pData) {
                 data.produce(receiver);
             }
         } finally {
