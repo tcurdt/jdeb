@@ -68,8 +68,6 @@ public class Processor {
 
     private final Console console;
     private final VariableResolver resolver;
-    private List<FilteredConfigurationFile> configurationFiles;
-
 
     private static final class Total {
         private BigInteger count = BigInteger.valueOf(0);
@@ -86,7 +84,6 @@ public class Processor {
     public Processor( final Console pConsole, final VariableResolver pResolver ) {
         console = pConsole;
         resolver = pResolver;
-        configurationFiles = new ArrayList<FilteredConfigurationFile>();
     }
 
     private void addTo( final ArArchiveOutputStream pOutput, final String pName, final String pContent ) throws IOException {
@@ -286,8 +283,9 @@ public class Processor {
 
         final TarArchiveOutputStream outputStream = new TarArchiveOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
         outputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
-
-
+        
+        List<FilteredConfigurationFile> configurationFiles = new ArrayList<FilteredConfigurationFile>();
+        
         // create a descriptor out of the "control" file, copy all other files, ignore directories
         PackageDescriptor packageDescriptor = null;
         for (File file : pControlFiles) {
