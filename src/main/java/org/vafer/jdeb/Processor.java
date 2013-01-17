@@ -445,7 +445,7 @@ public class Processor {
 
         final Total dataSize = new Total();
 
-        final List addedDirectories = new ArrayList();
+        final List<String> addedDirectories = new ArrayList<String>();
         final DataConsumer receiver = new DataConsumer() {
             public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 dirname = fixPath(dirname);
