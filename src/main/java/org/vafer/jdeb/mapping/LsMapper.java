@@ -34,32 +34,18 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
  */
 public final class LsMapper implements Mapper {
 
-    private final Map mapping;
+    private final Map<String, TarArchiveEntry> mapping;
 
 
     public final static class ParseError extends Exception {
 
         private static final long serialVersionUID = 1L;
 
-        public ParseError() {
-            super();
-        }
-
-        public ParseError( String message, Throwable cause ) {
-            super(message, cause);
-        }
-
         public ParseError( String message ) {
             super(message);
         }
-
-        public ParseError( Throwable cause ) {
-            super(cause);
-        }
-
     }
 
-    ;
 
     public LsMapper( final InputStream pInput ) throws IOException, ParseError {
         mapping = parse(pInput);
@@ -191,8 +177,8 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 
     }
 
-    private Map parse( final InputStream pInput ) throws IOException, ParseError {
-        final Map mapping = new HashMap();
+    private Map<String, TarArchiveEntry> parse( final InputStream pInput ) throws IOException, ParseError {
+        final Map<String, TarArchiveEntry> mapping = new HashMap<String, TarArchiveEntry>();
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
 
@@ -230,7 +216,7 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 
     public TarArchiveEntry map( final TarArchiveEntry pEntry ) {
 
-        final TarArchiveEntry entry = (TarArchiveEntry) mapping.get(pEntry.getName());
+        final TarArchiveEntry entry = mapping.get(pEntry.getName());
 
         if (entry != null) {
 
