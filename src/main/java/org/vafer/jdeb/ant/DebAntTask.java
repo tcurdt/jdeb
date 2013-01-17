@@ -26,6 +26,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.apache.tools.ant.taskdefs.Tar;
 import org.apache.tools.ant.types.FileSet;
+import org.vafer.jdeb.Compression;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Processor;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
@@ -190,8 +191,8 @@ public class DebAntTask extends MatchingTask {
             }
         }
 
-        if (!"gzip".equals(compression) && !"bzip2".equals(compression) && !"none".equals(compression)) {
-            throw new BuildException("The compression method '" + compression + "' is not supported");
+        if (Compression.toEnum(compression) == null) {
+            throw new BuildException("The compression method '" + compression + "' is not supported (expected 'none', 'gzip' or 'bzip2')");
         }
 
         if (dataProducers.size() == 0) {
@@ -226,7 +227,7 @@ public class DebAntTask extends MatchingTask {
 
             log("Creating debian package: " + deb);
 
-            packageDescriptor = processor.createDeb(controlFiles, data, deb, compression);
+            packageDescriptor = processor.createDeb(controlFiles, data, deb, Compression.toEnum(compression));
 
         } catch (Exception e) {
             // what the fuck ant? why are you not printing the exception chain?

@@ -60,7 +60,7 @@ public final class DataProducerTestCase extends TestCase {
 
         final File deb = File.createTempFile("jdeb", ".deb");
 
-        final PackageDescriptor packageDescriptor = processor.createDeb(new File[] { control }, data, deb, "gzip");
+        final PackageDescriptor packageDescriptor = processor.createDeb(new File[] { control }, data, deb, Compression.GZIP);
 
         assertTrue(packageDescriptor.isValid());
 

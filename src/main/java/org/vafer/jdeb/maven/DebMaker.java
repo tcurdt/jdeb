@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.vafer.jdeb.Compression;
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.PackagingException;
@@ -218,10 +219,8 @@ public class DebMaker {
             }
         }
 
-        if (!"gzip".equals(compression) && !"bzip2".equals(compression)
-            && !"none".equals(compression)) {
-            throw new PackagingException("The compression method '"
-                + compression + "' is not supported");
+        if (Compression.toEnum(compression) == null) {
+            throw new PackagingException("The compression method '" + compression + "' is not supported (expected 'none', 'gzip' or 'bzip2')");
         }
 
         if (deb == null) {
@@ -241,7 +240,7 @@ public class DebMaker {
 
             console.info("Creating debian package: " + deb);
 
-            packageDescriptor = processor.createDeb(controlFiles, data, deb, compression);
+            packageDescriptor = processor.createDeb(controlFiles, data, deb, Compression.toEnum(compression));
 
         } catch (Exception e) {
             throw new PackagingException("Failed to create debian package " + deb, e);

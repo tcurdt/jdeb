@@ -41,7 +41,6 @@ import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.tools.ant.DirectoryScanner;
 import org.vafer.jdeb.changes.ChangeSet;
@@ -116,11 +115,11 @@ public class Processor {
      * @param pControlFiles
      * @param pData
      * @param pOutput
-     * @param compression   the compression method used for the data file (gzip, bzip2 or anything else for no compression)
+     * @param compression   the compression method used for the data file
      * @return PackageDescriptor
      * @throws PackagingException
      */
-    public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput, String compression ) throws PackagingException {
+    public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput, Compression compression ) throws PackagingException {
 
         File tempData = null;
         File tempControl = null;
@@ -152,7 +151,7 @@ public class Processor {
 
             addTo(ar, "debian-binary", "2.0\n");
             addTo(ar, "control.tar.gz", tempControl);
-            addTo(ar, "data.tar" + getExtension(compression), tempData);
+            addTo(ar, "data.tar" + compression.getExtension(), tempData);
 
             ar.close();
 
@@ -178,22 +177,6 @@ public class Processor {
                     console.warn("Could not delete the temporary file " + tempControl);
                 }
             }
-        }
-    }
-
-    /**
-     * Return the extension of a file compressed with the specified method.
-     *
-     * @param pCompression the compression method used
-     * @return
-     */
-    private String getExtension( final String pCompression ) {
-        if ("gzip".equals(pCompression)) {
-            return ".gz";
-        } else if ("bzip2".equals(pCompression)) {
-            return ".bz2";
-        } else {
-            return "";
         }
     }
 
@@ -405,38 +388,26 @@ public class Processor {
         return packageDescriptor;
     }
 
-
-    // FIXME temporary - only until Commons Compress is fixed
-    private OutputStream compressedOutputStream( String pCompression, final OutputStream outputStream ) throws CompressorException {
-        if ("none".equalsIgnoreCase(pCompression)) {
-            return outputStream;
-        }
-        if ("gzip".equals(pCompression)) {
-            pCompression = "gz";
-        }
-        return new CompressorStreamFactory().createCompressorOutputStream(pCompression, outputStream);
-    }
-
     /**
      * Build the data archive of the deb from the provided DataProducers
      *
      * @param pData
      * @param pOutput
      * @param pChecksums
-     * @param pCompression the compression method used for the data file (gzip, bzip2 or anything else for no compression)
+     * @param compression the compression method used for the data file
      * @return
      * @throws NoSuchAlgorithmException
      * @throws IOException
      * @throws CompressorException
      */
-    BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuilder pChecksums, String pCompression ) throws NoSuchAlgorithmException, IOException, CompressorException {
+    BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuilder pChecksums, Compression compression ) throws NoSuchAlgorithmException, IOException, CompressorException {
 
         final File dir = pOutput.getParentFile();
         if (dir != null && (!dir.exists() || !dir.isDirectory())) {
             throw new IOException("Cannot write data file at '" + pOutput.getAbsolutePath() + "'");
         }
 
-        final TarArchiveOutputStream tarOutputStream = new TarArchiveOutputStream(compressedOutputStream(pCompression, new FileOutputStream(pOutput)));
+        final TarArchiveOutputStream tarOutputStream = new TarArchiveOutputStream(compression.toCompressedOutputStream(new FileOutputStream(pOutput)));
         tarOutputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
 
         final MessageDigest digest = MessageDigest.getInstance("MD5");
