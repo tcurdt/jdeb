@@ -172,12 +172,12 @@ public class Processor {
         } finally {
             if (tempData != null) {
                 if (!tempData.delete()) {
-                    throw new PackagingException("Could not delete " + tempData);
+                    console.warn("Could not delete the temporary file " + tempData);
                 }
             }
             if (tempControl != null) {
                 if (!tempControl.delete()) {
-                    throw new PackagingException("Could not delete " + tempControl);
+                    console.warn("Could not delete the temporary file " + tempControl);
                 }
             }
         }
