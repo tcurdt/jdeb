@@ -13,27 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.ant;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.zip.GZIPInputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import junit.framework.TestCase;
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
-import org.apache.tools.bzip2.CBZip2InputStream;
-import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
-import org.vafer.jdeb.ar.NonClosingInputStream;
+import org.vafer.jdeb.ArchiveVisitor;
+import org.vafer.jdeb.ArchiveWalker;
+import org.vafer.jdeb.Compression;
 
 /**
  * @author Emmanuel Bourg
@@ -184,36 +188,18 @@ public final class DebAntTaskTestCase extends TestCase {
         File deb = new File("target/test-classes/test.deb");
         assertTrue("package not build", deb.exists());
 
-        ArArchiveInputStream in = new ArArchiveInputStream(new FileInputStream(deb));
-        ArArchiveEntry entry;
-        while ((entry = in.getNextArEntry()) != null) {
-            if (entry.getName().equals("data.tar.gz")) {
-                TarInputStream tar = new TarInputStream(new GZIPInputStream(new NonClosingInputStream(in)));
-                TarEntry tarentry;
-                while ((tarentry = tar.getNextEntry()) != null) {
-                    assertTrue("prefix", tarentry.getName().startsWith("./foo/"));
-                    if (tarentry.isDirectory()) {
-                        assertEquals("directory mode (" + tarentry.getName() + ")", 040700, tarentry.getMode());
-                    } else {
-                        assertEquals("file mode (" + tarentry.getName() + ")", 0100600, tarentry.getMode());
-                    }
-                    assertEquals("user", "ebourg", tarentry.getUserName());
-                    assertEquals("group", "ebourg", tarentry.getGroupName());
+        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
+            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
+                assertTrue("prefix", entry.getName().startsWith("./foo/"));
+                if (entry.isDirectory()) {
+                    assertEquals("directory mode (" + entry.getName() + ")", 040700, entry.getMode());
+                } else {
+                    assertEquals("file mode (" + entry.getName() + ")", 0100600, entry.getMode());
                 }
-                tar.close();
-            } else {
-                // skip to the next entry
-                long skip = entry.getLength();
-                while (skip > 0) {
-                    long skipped = in.skip(skip);
-                    if (skipped == -1) {
-                        throw new IOException("Failed to skip");
-                    }
-                    skip -= skipped;
-                }
+                assertEquals("user", "ebourg", entry.getUserName());
+                assertEquals("group", "ebourg", entry.getGroupName());
             }
-        }
-        in.close();
+        }, Compression.GZIP);
     }
 
     public void testUnkownCompression() throws Exception {
@@ -231,38 +217,25 @@ public final class DebAntTaskTestCase extends TestCase {
         File deb = new File("target/test-classes/test.deb");
         assertTrue("package not build", deb.exists());
 
-        boolean found = false;
-
+        final AtomicBoolean found = new AtomicBoolean(false); 
+        
         ArArchiveInputStream in = new ArArchiveInputStream(new FileInputStream(deb));
-        ArArchiveEntry entry;
-        while ((entry = in.getNextArEntry()) != null) {
-            if (entry.getName().equals("data.tar.bz2")) {
-                found = true;
+        ArchiveWalker.walk(in, new ArchiveVisitor<ArArchiveEntry>() {
+            public void visit(ArArchiveEntry entry, byte[] content) throws IOException {
+                if (entry.getName().equals("data.tar.bz2")) {
+                    found.set(true);
 
-                assertEquals("header 0", (byte) 'B', in.read());
-                assertEquals("header 1", (byte) 'Z', in.read());
+                    assertEquals("header 0", (byte) 'B', content[0]);
+                    assertEquals("header 1", (byte) 'Z', content[1]);
 
-                TarInputStream tar = new TarInputStream(new CBZip2InputStream(in));
-                while ((tar.getNextEntry()) != null) {
-                    ;
-                }
-                tar.close();
-                break;
-            } else {
-                // skip to the next entry
-                long skip = entry.getLength();
-                while (skip > 0) {
-                    long skipped = in.skip(skip);
-                    if (skipped == -1) {
-                        throw new IOException("Failed to skip");
-                    }
-                    skip -= skipped;
+                    TarInputStream tar = new TarInputStream(new BZip2CompressorInputStream(new ByteArrayInputStream(content)));
+                    while ((tar.getNextEntry()) != null) ;
+                    tar.close();
                 }
             }
-        }
-        in.close();
-
-        assertTrue("bz2 file not found", found);
+        });
+        
+        assertTrue("bz2 file not found", found.get());
     }
 
     public void testNoCompression() throws Exception {
@@ -271,33 +244,14 @@ public final class DebAntTaskTestCase extends TestCase {
         File deb = new File("target/test-classes/test.deb");
         assertTrue("package not build", deb.exists());
 
-        boolean found = false;
-
-        ArArchiveInputStream in = new ArArchiveInputStream(new FileInputStream(deb));
-        ArArchiveEntry entry;
-        while ((entry = in.getNextArEntry()) != null) {
-            if (entry.getName().equals("data.tar")) {
-                found = true;
-
-                TarInputStream tar = new TarInputStream(new NonClosingInputStream(in));
-                while ((tar.getNextEntry()) != null) {
-                    ;
-                }
-                tar.close();
-            } else {
-                // skip to the next entry
-                long skip = entry.getLength();
-                while (skip > 0) {
-                    long skipped = in.skip(skip);
-                    if (skipped == -1) {
-                        throw new IOException("Failed to skip");
-                    }
-                    skip -= skipped;
-                }
+        final AtomicBoolean found = new AtomicBoolean(false); 
+        
+        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
+            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
+                found.set(true);
             }
-        }
-        in.close();
+        }, Compression.NONE);
 
-        assertTrue("tar file not found", found);
+        assertTrue("tar file not found", found.get());
     }
 }

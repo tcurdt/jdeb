@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
 
 import junit.framework.TestCase;
-import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
-import org.apache.commons.compress.archivers.ar.ArArchiveInputStream;
-import org.apache.tools.tar.TarEntry;
-import org.apache.tools.tar.TarInputStream;
-import org.vafer.jdeb.ar.NonClosingInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
@@ -58,38 +54,14 @@ public final class DataProducerTestCase extends TestCase {
 
         assertTrue(packageDescriptor.isValid());
 
-        final Map<String, TarEntry> filesInDeb = new HashMap<String, TarEntry>();
-
-        final ArArchiveInputStream ar = new ArArchiveInputStream(new FileInputStream(deb));
-        while (true) {
-            final ArArchiveEntry arEntry = ar.getNextArEntry();
-            if (arEntry == null) {
-                break;
+        final Map<String, TarArchiveEntry> filesInDeb = new HashMap<String, TarArchiveEntry>();
+        
+        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
+            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
+                filesInDeb.put(entry.getName(), entry);
             }
-
-            if ("data.tar.gz".equals(arEntry.getName())) {
-
-                final TarInputStream tar = new TarInputStream(new GZIPInputStream(new NonClosingInputStream(ar)));
-
-                while (true) {
-                    final TarEntry tarEntry = tar.getNextEntry();
-                    if (tarEntry == null) {
-                        break;
-                    }
-
-                    filesInDeb.put(tarEntry.getName(), tarEntry);
-                }
-
-                tar.close();
-                break;
-            }
-            for (int i = 0; i < arEntry.getLength(); i++) {
-                ar.read();
-            }
-        }
-
-        ar.close();
-
+        }, Compression.GZIP);
+        
         assertTrue("testfile wasn't found in the package", filesInDeb.containsKey("./test/testfile"));
         assertTrue("testfile2 wasn't found in the package", filesInDeb.containsKey("./test/testfile2"));
         assertTrue("testfile3 wasn't found in the package", filesInDeb.containsKey("./test/testfile3"));
