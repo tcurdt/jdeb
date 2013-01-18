@@ -32,8 +32,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
@@ -41,6 +43,7 @@ import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.tools.ant.DirectoryScanner;
 import org.vafer.jdeb.changes.ChangeSet;
@@ -63,8 +66,11 @@ import org.vafer.jdeb.utils.VariableResolver;
  */
 public class Processor {
 
-    /** The name of the control files subject to token substitution */
-    private static final List<String> CONFIGURATION_FILENAMES = Arrays.asList("conffiles", "preinst", "postinst", "prerm", "postrm");
+    /** The name of the package maintainer scripts */
+    private static final Set<String> MAINTAINER_SCRIPTS = new HashSet<String>(Arrays.asList("preinst", "postinst", "prerm", "postrm"));
+
+    /** The name of the other control files subject to token substitution */
+    private static final Set<String> CONFIGURATION_FILENAMES = new HashSet<String>(Arrays.asList("conffiles", "config", "templates", "triggers"));
 
     private final Console console;
     private final VariableResolver resolver;
@@ -291,98 +297,107 @@ public class Processor {
         for (File file : pControlFiles) {
             if (file.isDirectory()) {
                 // warn about the misplaced directory, except for directories ignored by default (.svn, cvs, etc)
-                boolean isDefaultExcludes = false;
-                for (String pattern : DirectoryScanner.getDefaultExcludes()) {
-                    isDefaultExcludes = DirectoryScanner.match(pattern, file.getAbsolutePath().replace("\\", "/"));
-                    if (isDefaultExcludes) {
-                        break;
-                    }
-                }
-
-                if (!isDefaultExcludes) {
+                if (!isDefaultExcludes(file)) {
                     console.info("Found directory '" + file + "' in the control directory. Maybe you are pointing to wrong dir?");
                 }
                 continue;
             }
 
-            final TarArchiveEntry entry = new TarArchiveEntry(file);
-            final String name = file.getName();
-
-            entry.setName("./" + name);
-            entry.setNames("root", "root");
-            entry.setMode(PermMapper.toMode("755"));
-
-            if (CONFIGURATION_FILENAMES.contains(name)) {
-
+            if (CONFIGURATION_FILENAMES.contains(file.getName()) || MAINTAINER_SCRIPTS.contains(file.getName())) {
                 FilteredConfigurationFile configurationFile = new FilteredConfigurationFile(file.getName(), new FileInputStream(file), resolver);
                 configurationFiles.add(configurationFile);
 
-            } else if ("control".equals(name)) {
-
-                packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
-
-                if (packageDescriptor.get("Date") == null) {
-                    // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
-                    SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
-                    packageDescriptor.set("Date", fmt.format(new Date()));
-                }
-
-                if (packageDescriptor.get("Distribution") == null) {
-                    packageDescriptor.set("Distribution", "unknown");
-                }
-
-                if (packageDescriptor.get("Urgency") == null) {
-                    packageDescriptor.set("Urgency", "low");
-                }
-
-                packageDescriptor.set("Installed-Size", pDataSize.divide(BigInteger.valueOf(1024)).toString());
-
-                final String debFullName = System.getenv("DEBFULLNAME");
-                final String debEmail = System.getenv("DEBEMAIL");
-
-                if (debFullName != null && debEmail != null) {
-                    final String maintainer = debFullName + " <" + debEmail + ">";
-                    packageDescriptor.set("Maintainer", maintainer);
-                    console.info("Using maintainer '" + maintainer + "' from the environment variables.");
-                }
+            } else if ("control".equals(file.getName())) {
+                packageDescriptor = createPackageDescriptor(file, pDataSize);
 
             } else {
-
+                // initialize the information stream to guess the type of the file
                 InformationInputStream infoStream = new InformationInputStream(new FileInputStream(file));
                 Utils.copy(infoStream, NullOutputStream.NULL_OUTPUT_STREAM);
                 infoStream.close();
 
+                // fix line endings for shell scripts
                 InputStream in = new FileInputStream(file);
-                if (infoStream.isShell()) {
-                    if(!infoStream.hasUnixLineEndings()) {
-                        // fix the line endings automatically
-                        byte[] buf = Utils.toUnixLineEndings(in);
-                        entry.setSize(buf.length);
-                        in = new ByteArrayInputStream(buf);
-                    }
-                } else {
-                    // entry.setMode(PermMapper.toMode("644"));
+                if (infoStream.isShell() && !infoStream.hasUnixLineEndings()) {
+                    byte[] buf = Utils.toUnixLineEndings(in);
+                    in = new ByteArrayInputStream(buf);
                 }
-
-                outputStream.putArchiveEntry(entry);
-                Utils.copy(in, outputStream);
-                outputStream.closeArchiveEntry();
+                
+                addControlEntry(file.getName(), IOUtils.toString(in), outputStream);
+                
                 in.close();
             }
         }
 
         if (packageDescriptor == null) {
-            throw new FileNotFoundException("No 'control' found in " + Arrays.toString(pControlFiles));
+            throw new FileNotFoundException("No 'control' file found in " + Arrays.toString(pControlFiles));
         }
 
         for (FilteredConfigurationFile configurationFile : configurationFiles) {
             addControlEntry(configurationFile.getName(), configurationFile.toString(), outputStream);
         }
-        addEntry("control", packageDescriptor.toString(), outputStream);
-        addEntry("md5sums", pChecksums.toString(), outputStream);
+        addControlEntry("control", packageDescriptor.toString(), outputStream);
+        addControlEntry("md5sums", pChecksums.toString(), outputStream);
 
         outputStream.close();
 
+        return packageDescriptor;
+    }
+
+    /**
+     * Tells if the specified directory is ignored by default (.svn, cvs, etc)
+     * 
+     * @param directory
+     */
+    private boolean isDefaultExcludes(File directory) {
+        for (String pattern : DirectoryScanner.getDefaultExcludes()) {
+            if (DirectoryScanner.match(pattern, directory.getAbsolutePath().replace("\\", "/"))) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Creates a package descriptor from the specified control file and adds the
+     * <tt>Date</tt>, <tt>Distribution</tt> and <tt>Urgency</tt> fields if missing.
+     * The <tt>Installed-Size</tt> field is also initialized to the actual size of
+     * the package. The <tt>Maintainer</tt> field is overridden by the <tt>DEBEMAIL</tt>
+     * and <tt>DEBFULLNAME</tt> environment variables if defined.
+     * 
+     * @param file       the control file
+     * @param pDataSize  the size of the installed package
+     */
+    private PackageDescriptor createPackageDescriptor(File file, BigInteger pDataSize) throws IOException, ParseException {
+        PackageDescriptor packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
+
+        if (packageDescriptor.get("Date") == null) {
+            // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
+            SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
+            packageDescriptor.set("Date", fmt.format(new Date()));
+        }
+
+        if (packageDescriptor.get("Distribution") == null) {
+            packageDescriptor.set("Distribution", "unknown");
+        }
+
+        if (packageDescriptor.get("Urgency") == null) {
+            packageDescriptor.set("Urgency", "low");
+        }
+
+        packageDescriptor.set("Installed-Size", pDataSize.divide(BigInteger.valueOf(1024)).toString());
+
+        // override the Maintainer field if the DEBFULLNAME and DEBEMAIL environment variables are defined
+        final String debFullName = System.getenv("DEBFULLNAME");
+        final String debEmail = System.getenv("DEBEMAIL");
+
+        if (debFullName != null && debEmail != null) {
+            final String maintainer = debFullName + " <" + debEmail + ">";
+            packageDescriptor.set("Maintainer", maintainer);
+            console.info("Using maintainer '" + maintainer + "' from the environment variables.");
+        }
+        
         return packageDescriptor;
     }
 
@@ -578,29 +593,21 @@ public class Processor {
         return dataSize.count;
     }
 
-    private static void addEntry( final String pName, final String pContent, final TarArchiveOutputStream pOutput ) throws IOException {
+    private static void addControlEntry(final String pName, final String pContent, final TarArchiveOutputStream pOutput) throws IOException {
         final byte[] data = pContent.getBytes("UTF-8");
 
         final TarArchiveEntry entry = new TarArchiveEntry("./" + pName, true);
         entry.setSize(data.length);
         entry.setNames("root", "root");
-
+        
+        if (MAINTAINER_SCRIPTS.contains(pName)) {
+            entry.setMode(PermMapper.toMode("755"));
+        } else {
+            entry.setMode(PermMapper.toMode("644"));
+        }
+        
         pOutput.putArchiveEntry(entry);
         pOutput.write(data);
         pOutput.closeArchiveEntry();
     }
-
-    private static void addControlEntry( final String pName, final String pContent, final TarArchiveOutputStream pOutput ) throws IOException {
-        final byte[] data = pContent.getBytes("UTF-8");
-
-        final TarArchiveEntry entry = new TarArchiveEntry("./" + pName, true);
-        entry.setSize(data.length);
-        entry.setNames("root", "root");
-        entry.setMode(PermMapper.toMode("755"));
-
-        pOutput.putArchiveEntry(entry);
-        pOutput.write(data);
-        pOutput.closeArchiveEntry();
-    }
-
 }
