@@ -244,14 +244,11 @@ public final class DebAntTaskTestCase extends TestCase {
         File deb = new File("target/test-classes/test.deb");
         assertTrue("package not build", deb.exists());
 
-        final AtomicBoolean found = new AtomicBoolean(false); 
-        
-        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
+        boolean found = ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
             public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                found.set(true);
             }
         }, Compression.NONE);
 
-        assertTrue("tar file not found", found.get());
+        assertTrue("tar file not found", found);
     }
 }

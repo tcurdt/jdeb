@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -57,23 +58,20 @@ public class ArchiveWalker {
         }
     }
 
-    public static void walkControlFiles(File deb, final ArchiveVisitor<TarArchiveEntry> visitor) throws IOException {
-        ArArchiveInputStream in = new ArArchiveInputStream(new FileInputStream(deb));
-        ArchiveWalker.walk(in, new ArchiveVisitor<ArArchiveEntry>() {
-            public void visit(ArArchiveEntry entry, byte[] content) throws IOException {
-                if (entry.getName().equals("control.tar.gz")) {
-                    TarArchiveInputStream tar = new TarArchiveInputStream(new GZIPInputStream(new ByteArrayInputStream(content)));
-                    ArchiveWalker.walk(tar, visitor);
-                }
-            }
-        });
+    public static boolean walkControl(File deb, final ArchiveVisitor<TarArchiveEntry> visitor) throws IOException {
+        return walkEmbedded(deb, "control.tar", visitor, Compression.GZIP);
     }
 
-    public static void walkData(File deb, final ArchiveVisitor<TarArchiveEntry> visitor, final Compression compression) throws IOException {
+    public static boolean walkData(File deb, final ArchiveVisitor<TarArchiveEntry> visitor, final Compression compression) throws IOException {
+        return walkEmbedded(deb, "data.tar", visitor, compression);
+    }
+
+    public static boolean walkEmbedded(File deb, final String name, final ArchiveVisitor<TarArchiveEntry> visitor, final Compression compression) throws IOException {
+        final AtomicBoolean found = new AtomicBoolean(false);
         ArArchiveInputStream in = new ArArchiveInputStream(new FileInputStream(deb));
         ArchiveWalker.walk(in, new ArchiveVisitor<ArArchiveEntry>() {
             public void visit(ArArchiveEntry entry, byte[] content) throws IOException {
-                if (entry.getName().equals("data.tar" + compression.getExtension())) {
+                if (entry.getName().equals(name + compression.getExtension())) {
                     InputStream in = new ByteArrayInputStream(content);
                     if (compression == Compression.GZIP) {
                         in = new GZIPInputStream(in);
@@ -81,9 +79,15 @@ public class ArchiveWalker {
                         in = new BZip2CompressorInputStream(in);
                     }
                     
-                    ArchiveWalker.walk(new TarArchiveInputStream(in), visitor);
+                    ArchiveWalker.walk(new TarArchiveInputStream(in), new ArchiveVisitor<TarArchiveEntry>() {
+                        public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
+                            found.set(true);
+                            visitor.visit(entry, content);
+                        }
+                    });
                 }
             }
         });
+        return found.get();
     }
 }

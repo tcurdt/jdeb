@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import junit.framework.TestCase;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -75,12 +74,8 @@ public class ProcessorTestCase extends TestCase {
         // now reopen the package and check the control files
         assertTrue("package not build", deb.exists());
         
-        final AtomicBoolean controlFound = new AtomicBoolean(false);
-        
-        ArchiveWalker.walkControlFiles(deb, new ArchiveVisitor<TarArchiveEntry>() {
+        boolean found = ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
             public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                controlFound.set(true);
-                
                 assertFalse("directory found in the control archive", entry.isDirectory());
                 assertTrue("prefix", entry.getName().startsWith("./"));
                 
@@ -100,7 +95,7 @@ public class ProcessorTestCase extends TestCase {
             }
         });
         
-        assertTrue("Control files not found in the package", controlFound.get());
+        assertTrue("Control files not found in the package", found);
     }
 
     public void testControlFilesVariables() throws Exception {
@@ -123,12 +118,8 @@ public class ProcessorTestCase extends TestCase {
         // now reopen the package and check the control files
         assertTrue("package not build", deb.exists());
                 
-        final AtomicBoolean controlFound = new AtomicBoolean(false);
-        
-        ArchiveWalker.walkControlFiles(deb, new ArchiveVisitor<TarArchiveEntry>() {
+        boolean found = ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
             public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                controlFound.set(true);
-                
                 if (entry.getName().contains("postinst") || entry.getName().contains("prerm")) {
                     String body = new String(content, "ISO-8859-1");
                     assertFalse("Variables not replaced in the control file " + entry.getName(), body.contains("[[name]] [[version]]"));
@@ -137,6 +128,6 @@ public class ProcessorTestCase extends TestCase {
             }
         });
         
-        assertTrue("Control files not found in the package", controlFound.get());
+        assertTrue("Control files not found in the package", found);
     }
 }
