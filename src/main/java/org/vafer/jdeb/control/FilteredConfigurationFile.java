@@ -51,7 +51,11 @@ public class FilteredConfigurationFile {
             br = new BufferedReader(new InputStreamReader(pInputStream));
             String line;
             while ((line = br.readLine()) != null) {
-                lines.add(Utils.replaceVariables(pResolver, line, openToken, closeToken));
+                if (pResolver != null) {
+                    lines.add(Utils.replaceVariables(pResolver, line, openToken, closeToken));
+                } else {
+                    lines.add(line);
+                }
             }
         } finally {
             if (br != null) {
