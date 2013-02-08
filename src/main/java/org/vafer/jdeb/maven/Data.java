@@ -87,7 +87,7 @@ public final class Data implements DataProducer {
     /**
      * @parameter expression="${linkName}"
      */
-    public void setLinkPath(String linkName) {
+    public void setLinkName(String linkName) {
         this.linkName = linkName;
     }
 
