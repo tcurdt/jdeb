@@ -1,3 +1,6 @@
+## Version 1.0.1, released 18.02.2013
+* [FIX]
+
 ## Version 1.0, released 10.01.2013
 
 * [ADD] Support for symbolic links (Maven only)
