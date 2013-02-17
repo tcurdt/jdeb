@@ -20,6 +20,7 @@ package org.vafer.jdeb.utils;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Date;
 
 import junit.framework.TestCase;
 
@@ -84,5 +85,11 @@ public class UtilsTestCase extends TestCase {
         // mixed valid and unknown variables
         result = Utils.replaceVariables(resolver, "[[name]] [[test]]", "[[", "]]");
         assertEquals("jdeb [[test]]", result);
+    }
+
+    public void testVersionConversion() {
+        assertEquals("should match", "1.0", Utils.convertToDebianVersion("1.0", null));
+        assertEquals("should match", "1.0~SNAPSHOT", Utils.convertToDebianVersion("1.0+SNAPSHOT", null));
+        assertEquals("should match", "1.0~20130217215714", Utils.convertToDebianVersion("1.0+SNAPSHOT", new Date(1361134634000L)));
     }
 }

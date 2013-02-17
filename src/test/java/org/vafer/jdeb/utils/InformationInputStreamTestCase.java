@@ -28,6 +28,15 @@ public class InformationInputStreamTestCase extends TestCase {
         return getClass().getClassLoader().getResourceAsStream("org/vafer/jdeb/utils/" + file);
     }
 
+    public void testUTF8CRLF() throws Exception {
+        InformationInputStream informationStream = new InformationInputStream(getStream("utf8-crlf.txt"));
+        Utils.copy(informationStream, new ByteArrayOutputStream());
+        assertTrue("Should be windows line endings", !informationStream.hasUnixLineEndings());
+        assertTrue("Shebang not detected", informationStream.isShell());
+        assertTrue("BOM detected", !informationStream.hasBom());
+        assertEquals("Encoding", null, informationStream.getEncoding());
+    }
+
     public void testUTF8() throws Exception {
         InformationInputStream informationStream = new InformationInputStream(getStream("utf8-lf.txt"));
         Utils.copy(informationStream, new ByteArrayOutputStream());

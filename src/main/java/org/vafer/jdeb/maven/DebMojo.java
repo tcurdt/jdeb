@@ -17,7 +17,6 @@ package org.vafer.jdeb.maven;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -250,11 +249,13 @@ public class DebMojo extends AbstractPluginMojo {
 
     public void setOpenReplaceToken( String openReplaceToken ) {
         this.openReplaceToken = openReplaceToken;
+        // FIXME yuck!
         AbstractDescriptor.setOpenToken(openReplaceToken);
     }
 
     public void setCloseReplaceToken( String closeReplaceToken ) {
         this.closeReplaceToken = closeReplaceToken;
+        // FIXME yuck!
         AbstractDescriptor.setCloseToken(closeReplaceToken);
     }
 
@@ -292,15 +293,7 @@ public class DebMojo extends AbstractPluginMojo {
      * @return the Maven project version
      */
     private String getProjectVersion() {
-        String version = getProject().getVersion().replace('-', '+');
-
-        if (this.timestamped && version.endsWith("+SNAPSHOT")) {            
-            version = version.substring(0, version.length() - "+SNAPSHOT".length());
-            version += "~";
-            version += new SimpleDateFormat("yyyyMMdd.HHmmss").format(session.getStartTime());
-        }
-
-        return version;
+        return Utils.convertToDebianVersion(getProject().getVersion(), this.timestamped ? session.getStartTime() : null);
     }
 
     /**

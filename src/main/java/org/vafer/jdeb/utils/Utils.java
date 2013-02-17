@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 import org.apache.tools.ant.filters.FixCrLfFilter;
 import org.apache.tools.ant.util.ReaderInputStream;
@@ -163,5 +165,23 @@ public final class Utils {
         Utils.copy(new ReaderInputStream(filter, encoding), filteredFile);
 
         return filteredFile.toByteArray();
+    }
+
+    /**
+     * convert to debian version format
+     */
+    public static String convertToDebianVersion( String version, Date timestamp ) {
+        version = version.replace('-', '+');
+        if (version.endsWith("+SNAPSHOT")) {
+            version = version.substring(0, version.length() - "+SNAPSHOT".length());
+            version += "~";
+
+            if (timestamp != null) {
+                version += new SimpleDateFormat("yyyyMMddHHmmss").format(timestamp);
+            } else {
+                version += "SNAPSHOT";
+            }
+        }
+        return version;
     }
 }

@@ -1,11 +1,14 @@
-## Version 1.0.1, released 18.02.2013
-* [FIX]
+## Version 1.0.1, released ??.02.2013
+
+* [ADD] Override version via environment variable DEBVERSION
+* [FIX] Use the joint copyright
+* [FIX] Fixed the maven to debian version mapping
 
 ## Version 1.0, released 10.01.2013
 
 * [ADD] Support for symbolic links (Maven only)
 * [FIX] Unresolved variables in package maintainer scripts no longer break the build
-* [CHG] use "_all" as architecture postfix by default
+* [CHG] Use "_all" as architecture postfix by default
 
 
 ## Version 0.11, released 14.07.2012
@@ -15,7 +18,7 @@
 * [ADD] Expand variables in configuration files "conffiles", "preinst", "postinst", "prerm", "postrm"
 * [ADD] Added a "template" data type to create dirs
 * [ADD] Added "missingSrc" maven config to control behavior on missing files/folders
-* [CHG] use "~" instead of "+" when converting from a SNAPSHOT version
+* [CHG] Use "~" instead of "+" when converting from a SNAPSHOT version
 * [REM] Deprecated PrefixMapper was removed (use PermMapper instead)
 
 
