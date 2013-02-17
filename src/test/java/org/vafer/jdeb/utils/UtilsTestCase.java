@@ -20,7 +20,8 @@ package org.vafer.jdeb.utils;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Date;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import junit.framework.TestCase;
 
@@ -88,8 +89,9 @@ public class UtilsTestCase extends TestCase {
     }
 
     public void testVersionConversion() {
+        Calendar cal = new GregorianCalendar(2013, 02-1, 17);
         assertEquals("should match", "1.0", Utils.convertToDebianVersion("1.0", null));
         assertEquals("should match", "1.0~SNAPSHOT", Utils.convertToDebianVersion("1.0+SNAPSHOT", null));
-        assertEquals("should match", "1.0~20130217215714", Utils.convertToDebianVersion("1.0+SNAPSHOT", new Date(1361134634000L)));
+        assertEquals("should match", "1.0~20130217000000", Utils.convertToDebianVersion("1.0+SNAPSHOT", cal.getTime()));
     }
 }
