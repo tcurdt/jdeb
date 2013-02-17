@@ -388,6 +388,14 @@ public class Processor {
 
         packageDescriptor.set("Installed-Size", pDataSize.divide(BigInteger.valueOf(1024)).toString());
 
+        // override the Version if the DEBVERSION environment variable is defined
+        final String debVersion = System.getenv("DEBVERSION");
+        if (debVersion != null) {
+            packageDescriptor.set("Version", debVersion);
+            console.info("Using version'" + debVersion + "' from the environment variables.");
+        }
+
+
         // override the Maintainer field if the DEBFULLNAME and DEBEMAIL environment variables are defined
         final String debFullName = System.getenv("DEBFULLNAME");
         final String debEmail = System.getenv("DEBEMAIL");
