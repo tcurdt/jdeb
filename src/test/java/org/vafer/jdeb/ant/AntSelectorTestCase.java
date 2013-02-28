@@ -21,17 +21,10 @@ import org.apache.tools.ant.types.selectors.SelectorUtils;
 
 public final class AntSelectorTestCase extends TestCase {
 
-    private boolean isExcluded( String name, String[] excludes ) {
-        for (String exclude : excludes) {
-            if (SelectorUtils.matchPath(exclude, name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void testExclusion() throws Exception {
-      assertTrue("should be excluded", isExcluded("/some/bin/stuff", new String[]{ "**/bin/**" }));
-      assertTrue("should not be excluded", !isExcluded("/some/stuff", new String[]{ "**/bin/**" }));
+        assertTrue("should match",
+            SelectorUtils.matchPath("**/bin/**", "/some/bin/stuff"));
+        assertFalse("should not match",
+            SelectorUtils.matchPath("**/bin/**", "/some/stuff"));
     }
 }
