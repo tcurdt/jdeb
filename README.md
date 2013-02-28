@@ -11,8 +11,8 @@ easily be adopted for other areas as well.
 Check the documentation on how to use it with [maven](http://github.com/tcurdt/jdeb/blob/master/docs/maven.md)
 or [ant](http://github.com/tcurdt/jdeb/blob/master/docs/ant.md). Especially don't forget to check out the
 [examples](http://github.com/tcurdt/jdeb/blob/master/src/examples/). Current
-[javadocs](http://tcurdt.github.com/jdeb/release/1.0/apidocs/) and a source
-[xref](http://tcurdt.github.com/jdeb/release/1.0/xref/) is also available.
+[javadocs](http://tcurdt.github.com/jdeb/release/1.0.1/apidocs/) and a source
+[xref](http://tcurdt.github.com/jdeb/release/1.0.1/xref/) is also available.
 
 
 ## Where to get it

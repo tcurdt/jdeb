@@ -1,4 +1,4 @@
-## Version 1.0.1, released ??.02.2013
+## Version 1.0.1, released 28.02.2013
 
 * [ADD] Override version via environment variable DEBVERSION
 * [FIX] Use the joint copyright
