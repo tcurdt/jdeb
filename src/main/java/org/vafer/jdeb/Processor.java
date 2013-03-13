@@ -492,7 +492,7 @@ public class Processor {
                 pChecksums.append(md5).append(" ").append(entry.getName()).append('\n');
             }
 
-            public void onEachLink(String path, String linkName, boolean symlink, String user, int uid, String group, int gid) throws IOException {
+            public void onEachLink(String path, String linkName, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
                 path = fixPath(path);
 
                 createParentDirectories((new File(path)).getParent(), user, uid, group, gid);
@@ -500,11 +500,23 @@ public class Processor {
                 final TarArchiveEntry entry = new TarArchiveEntry(path, symlink ? TarArchiveEntry.LF_SYMLINK : TarArchiveEntry.LF_LINK);
                 entry.setLinkName(linkName);
 
+                entry.setUserName(user);
+                entry.setUserId(uid);
+                entry.setGroupName(group);
+                entry.setGroupId(gid);
+                entry.setMode(mode);
+
                 tarOutputStream.putArchiveEntry(entry);
                 tarOutputStream.closeArchiveEntry();
 
                 console.info(
-                    "link:" + entry.getName() + " linkname:" + entry.getLinkName()
+                    "link:" + entry.getName() +
+                    " mode:" + entry.getMode() +
+                    " linkname:" + entry.getLinkName() +
+                    " username:" + entry.getUserName() +
+                    " userid:" + entry.getUserId() +
+                    " groupname:" + entry.getGroupName() +
+                    " groupid:" + entry.getGroupId()
                  );
             }
 

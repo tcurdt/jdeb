@@ -84,7 +84,7 @@ public class DataProducerPathTemplateTestCase extends TestCase {
         }
 
         @Override
-        public void onEachLink(String path, String linkName, boolean symlink, String user, int uid, String group, int gid) throws IOException {
+        public void onEachLink(String path, String linkName, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
         }
 
         private class Invocation {

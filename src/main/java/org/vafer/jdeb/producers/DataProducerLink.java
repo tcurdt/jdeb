@@ -17,6 +17,7 @@ package org.vafer.jdeb.producers;
 
 import java.io.IOException;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
@@ -25,7 +26,7 @@ import org.vafer.jdeb.mapping.Mapper;
  * DataProducer representing a single file
  * For cross-platform permissions and ownerships you probably want to use a Mapper, too.
  *
- * @author Thomas Mortagne <thomas.mortagne@gmail.com>
+ * @author Thomas Mortagne
  */
 public final class DataProducerLink extends AbstractDataProducer implements DataProducer {
 
@@ -40,8 +41,20 @@ public final class DataProducerLink extends AbstractDataProducer implements Data
         this.linkName = linkName;
     }
 
+    @Override
     public void produce( final DataConsumer pReceiver ) throws IOException {
-        pReceiver.onEachLink(path, linkName, symlink, "root", 0, "root", 0);
+        TarArchiveEntry entry = new TarArchiveEntry(path, symlink ? TarArchiveEntry.LF_SYMLINK : TarArchiveEntry.LF_LINK);
+        entry.setLinkName(linkName);
+
+        entry.setUserId(0);
+        entry.setUserName("root");
+        entry.setGroupId(0);
+        entry.setGroupName("root");
+        entry.setMode(TarArchiveEntry.DEFAULT_FILE_MODE);
+
+        entry = map(entry);
+
+        pReceiver.onEachLink(path, linkName, symlink, entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode());
     }
 
 }
