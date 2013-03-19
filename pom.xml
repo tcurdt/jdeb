@@ -95,16 +95,32 @@
                         <configuration>
                             <!-- <dependencyReducedPomLocation>${basedir}/target/dependency-reduced-pom.xml</dependencyReducedPomLocation> -->
                             <minimizeJar>true</minimizeJar>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                             <artifactSet>
                                 <includes>
                                     <include>org.apache.commons:commons-compress</include>
                                     <include>commons-io:commons-io</include>
+                                    <include>org.bouncycastle:bcpg-jdk15on</include>
+                                    <include>org.bouncycastle:bcprov-jdk15on</include>
                                 </includes>
                             </artifactSet>
                             <relocations>
                                 <relocation>
                                     <pattern>org.apache.commons</pattern>
                                     <shadedPattern>org.vafer.jdeb.shaded.compress</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.bouncycastle</pattern>
+                                    <shadedPattern>org.vafer.jdeb.shaded.bc</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

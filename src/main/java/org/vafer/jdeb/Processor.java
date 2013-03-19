@@ -46,6 +46,7 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.tools.ant.DirectoryScanner;
+import org.bouncycastle.openpgp.PGPSignatureGenerator;
 import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.ChangesProvider;
 import org.vafer.jdeb.control.FilteredConfigurationFile;
@@ -55,6 +56,7 @@ import org.vafer.jdeb.mapping.PermMapper;
 import org.vafer.jdeb.signing.SigningUtils;
 import org.vafer.jdeb.utils.InformationInputStream;
 import org.vafer.jdeb.utils.InformationOutputStream;
+import org.vafer.jdeb.utils.PGPSignatureOutputStream;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
@@ -112,6 +114,20 @@ public class Processor {
         pOutput.closeArchiveEntry();
     }
 
+    private void addTo( final PGPSignatureOutputStream pOutput, final String pContent ) throws IOException {
+        final byte[] content = pContent.getBytes();
+        pOutput.write(content);
+    }
+
+    private void addTo( final PGPSignatureOutputStream pOutput, final File pContent ) throws IOException {
+        final InputStream input = new FileInputStream(pContent);
+        try {
+            Utils.copy(input, pOutput);
+        } finally {
+            input.close();
+        }
+    }
+
     /**
      * Create the debian archive with from the provided control files and data producers.
      *
@@ -123,7 +139,20 @@ public class Processor {
      * @throws PackagingException
      */
     public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput, Compression compression ) throws PackagingException {
+        return createSignedDeb(pControlFiles, pData, pOutput, compression, null);
+    }
 
+    /**
+     * Create the debian archive with from the provided control files and data producers.
+     *
+     * @param pControlFiles
+     * @param pData
+     * @param pOutput
+     * @param compression   the compression method used for the data file (gzip, bzip2 or anything else for no compression)
+     * @return PackageDescriptor
+     * @throws PackagingException
+     */
+     public PackageDescriptor createSignedDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput, Compression compression, final PGPSignatureGenerator signatureGenerator ) throws PackagingException {
         File tempData = null;
         File tempControl = null;
 
@@ -155,6 +184,14 @@ public class Processor {
             addTo(ar, "debian-binary", "2.0\n");
             addTo(ar, "control.tar.gz", tempControl);
             addTo(ar, "data.tar" + compression.getExtension(), tempData);
+
+            if (signatureGenerator != null) {
+                PGPSignatureOutputStream sigStream = new PGPSignatureOutputStream(signatureGenerator);
+                addTo(sigStream, "2.0\n");
+                addTo(sigStream, tempControl);
+                addTo(sigStream, tempData);
+                addTo(ar, "_gpgorigin", sigStream.generateASCIISignature());
+            }
 
             ar.close();
 
@@ -289,9 +326,9 @@ public class Processor {
 
         final TarArchiveOutputStream outputStream = new TarArchiveOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
         outputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
-        
+
         List<FilteredConfigurationFile> configurationFiles = new ArrayList<FilteredConfigurationFile>();
-        
+
         // create a descriptor out of the "control" file, copy all other files, ignore directories
         PackageDescriptor packageDescriptor = null;
         for (File file : pControlFiles) {
@@ -322,9 +359,9 @@ public class Processor {
                     byte[] buf = Utils.toUnixLineEndings(in);
                     in = new ByteArrayInputStream(buf);
                 }
-                
+
                 addControlEntry(file.getName(), IOUtils.toString(in), outputStream);
-                
+
                 in.close();
             }
         }
@@ -346,7 +383,7 @@ public class Processor {
 
     /**
      * Tells if the specified directory is ignored by default (.svn, cvs, etc)
-     * 
+     *
      * @param directory
      */
     private boolean isDefaultExcludes(File directory) {
@@ -355,17 +392,17 @@ public class Processor {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Creates a package descriptor from the specified control file and adds the
      * <tt>Date</tt>, <tt>Distribution</tt> and <tt>Urgency</tt> fields if missing.
      * The <tt>Installed-Size</tt> field is also initialized to the actual size of
      * the package. The <tt>Maintainer</tt> field is overridden by the <tt>DEBEMAIL</tt>
      * and <tt>DEBFULLNAME</tt> environment variables if defined.
-     * 
+     *
      * @param file       the control file
      * @param pDataSize  the size of the installed package
      */
@@ -405,7 +442,7 @@ public class Processor {
             packageDescriptor.set("Maintainer", maintainer);
             console.info("Using maintainer '" + maintainer + "' from the environment variables.");
         }
-        
+
         return packageDescriptor;
     }
 
@@ -619,13 +656,13 @@ public class Processor {
         final TarArchiveEntry entry = new TarArchiveEntry("./" + pName, true);
         entry.setSize(data.length);
         entry.setNames("root", "root");
-        
+
         if (MAINTAINER_SCRIPTS.contains(pName)) {
             entry.setMode(PermMapper.toMode("755"));
         } else {
             entry.setMode(PermMapper.toMode("644"));
         }
-        
+
         pOutput.putArchiveEntry(entry);
         pOutput.write(data);
         pOutput.closeArchiveEntry();
