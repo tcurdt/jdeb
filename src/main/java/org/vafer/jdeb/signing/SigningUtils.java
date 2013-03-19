@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.Iterator;
 
@@ -45,7 +44,7 @@ import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
  */
 public final class SigningUtils {
 
-    private static final byte[] EOL = "\r\n".getBytes(Charset.forName("UTF-8"));
+    private static final byte EOL = Character.LETTER_NUMBER;
 
     /**
      * Create a clear sign signature over the input data. (Not detached)

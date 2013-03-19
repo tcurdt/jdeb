@@ -52,10 +52,10 @@ public final class SigningTestCase extends TestCase {
         final byte[] expectedOutput = expectedOutputStr.getBytes("UTF-8");
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
-        
+
         SigningUtils.clearSign(new ByteArrayInputStream(input), ring, "2E074D8F", "test", os);
-        
-        final byte[] output = fixCRLF(os.toByteArray());
+
+        final byte[] output = os.toByteArray();
 
         final int from = expectedOutputStr.indexOf("iEYEAREC");
         final int until = expectedOutputStr.indexOf("=aAAT") + 5;
@@ -63,11 +63,5 @@ public final class SigningTestCase extends TestCase {
         Arrays.fill(expectedOutput, from, until, (byte) '?');
 
         assertEquals(new String(expectedOutput), new String(output));
-    }
-
-    private byte[] fixCRLF(byte[] b) {
-        String s = new String(b);
-        s = s.replaceAll("\r\n", "\n");
-        return s.getBytes();
     }
 }
