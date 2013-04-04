@@ -67,10 +67,10 @@ import org.vafer.jdeb.utils.VariableResolver;
 public class Processor {
 
     /** The name of the package maintainer scripts */
-    private static final Set<String> MAINTAINER_SCRIPTS = new HashSet<String>(Arrays.asList("preinst", "postinst", "prerm", "postrm"));
+    private static final Set<String> MAINTAINER_SCRIPTS = new HashSet<String>(Arrays.asList("preinst", "postinst", "prerm", "postrm", "config"));
 
     /** The name of the other control files subject to token substitution */
-    private static final Set<String> CONFIGURATION_FILENAMES = new HashSet<String>(Arrays.asList("conffiles", "config", "templates", "triggers"));
+    private static final Set<String> CONFIGURATION_FILENAMES = new HashSet<String>(Arrays.asList("conffiles", "templates", "triggers"));
 
     private final Console console;
     private final VariableResolver resolver;
