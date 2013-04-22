@@ -51,7 +51,7 @@ import org.vafer.jdeb.changes.ChangesProvider;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 import org.vafer.jdeb.debian.ChangesFile;
 import org.vafer.jdeb.mapping.PermMapper;
-import org.vafer.jdeb.signing.SigningUtils;
+import org.vafer.jdeb.signing.PGPSigner;
 import org.vafer.jdeb.utils.FilteredFile;
 import org.vafer.jdeb.utils.InformationInputStream;
 import org.vafer.jdeb.utils.InformationOutputStream;
@@ -258,7 +258,8 @@ public class Processor {
         final InputStream input = new ByteArrayInputStream(changesBytes);
 
         try {
-            SigningUtils.clearSign(input, pRing, pKey, pPassphrase, pOutput);
+            PGPSigner signer = new PGPSigner(pRing, pKey, pPassphrase);
+            signer.clearSign(input, pOutput);
         } catch (Exception e) {
             e.printStackTrace();
         }
