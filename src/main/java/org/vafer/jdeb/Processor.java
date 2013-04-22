@@ -140,7 +140,7 @@ public class Processor {
 
             if (!packageDescriptor.isValid()) {
                 throw new PackagingException("Control file fields are invalid " + packageDescriptor.invalidFields() +
-                    ". The following keys are mandatory " + Arrays.toString(PackageDescriptor.MANDATORY_FIELDS) +
+                    ". The following fields are mandatory: " + packageDescriptor.getMandatoryFields() +
                     ". Please check your pom.xml/build.xml and your control file.");
             }
 
@@ -240,7 +240,7 @@ public class Processor {
 
         if (!changesDescriptor.isValid()) {
             throw new PackagingException("Changes file fields are invalid " + changesDescriptor.invalidFields() +
-                ". The following keys are mandatory " + Arrays.toString(ChangesDescriptor.MANDATORY_FIELDS) +
+                ". The following fields are mandatory: " + changesDescriptor.getMandatoryFields() +
                 ". Please check your pom.xml/build.xml and your control file.");
         }
 

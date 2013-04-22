@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.descriptors;
 
 import org.vafer.jdeb.changes.ChangeSet;
@@ -25,40 +26,23 @@ import org.vafer.jdeb.changes.ChangeSet;
  */
 public final class ChangesDescriptor extends AbstractDescriptor {
 
-    private static final String[] FIELDS = {
-        "Format",
-        "Date",
-        "Source",
-        "Binary",
-        "Architecture",
-        "Version",
-        "Distribution",
-        "Urgency",
-        "Maintainer",
-        "Changed-By",
-        "Description",
-        "Changes",
-        "Closes",
-        "Checksums-Sha1",
-        "Checksums-Sha256",
-        "Files"
-    };
-
-    public static final String[] MANDATORY_FIELDS = {
-        "Format",
-        "Date",
-        "Source",
-        "Binary",
-        "Architecture",
-        "Version",
-        "Distribution",
-        "Urgency",
-        "Maintainer",
-        "Description",
-        "Changes",
-        "Checksums-Sha1",
-        "Checksums-Sha256",
-        "Files"
+    private static final ControlField[] FIELDS = {
+            new ControlField("Format", true),
+            new ControlField("Date", true),
+            new ControlField("Source", true),
+            new ControlField("Binary", true),
+            new ControlField("Architecture", true),
+            new ControlField("Version", true),
+            new ControlField("Distribution", true),
+            new ControlField("Urgency", true),
+            new ControlField("Maintainer", true),
+            new ControlField("Changed-By"),
+            new ControlField("Description", true, ControlField.Type.MULTILINE),
+            new ControlField("Changes", true, ControlField.Type.MULTILINE),
+            new ControlField("Closes"),
+            new ControlField("Checksums-Sha1", true, ControlField.Type.MULTILINE),
+            new ControlField("Checksums-Sha256", true, ControlField.Type.MULTILINE),
+            new ControlField("Files", true, ControlField.Type.MULTILINE)
     };
 
     public ChangesDescriptor( final AbstractDescriptor pDescriptor, final ChangeSet[] changeSets ) {
@@ -79,11 +63,8 @@ public final class ChangesDescriptor extends AbstractDescriptor {
         set("Changes", sb.toString());
     }
 
-    public String[] getMandatoryFields() {
-        return MANDATORY_FIELDS;
-    }
-
-    public String toString() {
-        return toString(FIELDS);
+    @Override
+    protected ControlField[] getFields() {
+        return FIELDS;
     }
 }

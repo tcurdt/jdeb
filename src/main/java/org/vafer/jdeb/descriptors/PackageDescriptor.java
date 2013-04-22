@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.descriptors;
 
 import java.io.IOException;
@@ -29,37 +30,27 @@ import org.vafer.jdeb.utils.VariableResolver;
  */
 public final class PackageDescriptor extends AbstractDescriptor {
 
-    private static final String[] FIELDS = {
-        "Package",
-        "Source",
-        "Version",
-        "Section",
-        "Priority",
-        "Architecture",
-        "Essential",
-        "Depends",
-        "Pre-Depends",
-        "Recommends",
-        "Suggests",
-        "Breaks",
-        "Enhances",
-        "Conflicts",
-        "Provides",
-        "Replaces",
-        "Installed-Size",
-        "Maintainer",
-        "Description",
-        "Homepage",
-    };
-
-    public static final String[] MANDATORY_FIELDS = {
-        "Package",
-        "Version",
-        "Section",
-        "Priority",
-        "Architecture",
-        "Maintainer",
-        "Description"
+    private static final ControlField[] FIELDS = {
+            new ControlField("Package", true),
+            new ControlField("Source"),
+            new ControlField("Version", true),
+            new ControlField("Section", true),
+            new ControlField("Priority", true),
+            new ControlField("Architecture", true),
+            new ControlField("Essential"),
+            new ControlField("Depends"),
+            new ControlField("Pre-Depends"),
+            new ControlField("Recommends"),
+            new ControlField("Suggests"),
+            new ControlField("Breaks"),
+            new ControlField("Enhances"),
+            new ControlField("Conflicts"),
+            new ControlField("Provides"),
+            new ControlField("Replaces"),
+            new ControlField("Installed-Size"),
+            new ControlField("Maintainer", true),
+            new ControlField("Description", true, ControlField.Type.MULTILINE),
+            new ControlField("Homepage")
     };
 
     public PackageDescriptor() {
@@ -75,12 +66,8 @@ public final class PackageDescriptor extends AbstractDescriptor {
         parse(pInput);
     }
 
-    public String[] getMandatoryFields() {
-        return MANDATORY_FIELDS;
+    @Override
+    protected ControlField[] getFields() {
+        return FIELDS;
     }
-
-    public String toString() {
-        return toString(FIELDS);
-    }
-
 }

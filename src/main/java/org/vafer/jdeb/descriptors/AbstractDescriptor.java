@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.descriptors;
 
 import java.io.BufferedReader;
@@ -21,8 +22,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -122,34 +125,46 @@ public abstract class AbstractDescriptor {
         values.put(pKey, value);
     }
 
-    public String get( String field ) {
+    public String get(String field) {
         return values.get(field);
     }
 
-    public abstract String[] getMandatoryFields();
+    protected abstract ControlField[] getFields();
+
+    public List<String> getMandatoryFields() {
+        List<String> fields = new ArrayList<String>();
+
+        for (ControlField field : getFields()) {
+            if (field.isMandatory()) {
+                fields.add(field.getName());
+            }
+        }
+        
+        return fields;
+    }
 
     public boolean isValid() {
         return invalidFields().size() == 0;
     }
 
     public Set<String> invalidFields() {
-        final Set<String> invalid = new HashSet<String>();
+        Set<String> invalid = new HashSet<String>();
         
-        for (String mandatoryField : getMandatoryFields()) {
-            if (get(mandatoryField) == null) {
-                invalid.add(mandatoryField);
+        for (ControlField field : getFields()) {
+            if (field.isMandatory() && get(field.getName()) == null) {
+                invalid.add(field.getName());
             }
         }
 
         return invalid;
     }
 
-    public String toString( final String[] fields ) {
+    public String toString(ControlField[] fields) {
         StringBuilder s = new StringBuilder();
-        for (String field : fields) {
-            String value = values.get(field);
+        for (ControlField field : fields) {
+            String value = values.get(field.getName());
             if (value != null) {
-                s.append(field).append(":");
+                s.append(field.getName()).append(":");
 
                 try {
                     BufferedReader reader = new BufferedReader(new StringReader(value));
@@ -167,5 +182,9 @@ public abstract class AbstractDescriptor {
             }
         }
         return s.toString();
+    }
+
+    public String toString() {
+        return toString(getFields());
     }
 }
