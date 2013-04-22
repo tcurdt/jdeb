@@ -1,15 +1,15 @@
 [![Build Status](https://secure.travis-ci.org/tcurdt/jdeb.png)](http://travis-ci.org/tcurdt/jdeb)
 
-# Debian packages in java
+# Debian packages in Java
 
 This library provides an Ant task and a Maven plugin to create Debian packages
 from Java builds in a truly cross platform manner. Build your Debian packages
-on any platform that has Java support. Windows, Linux - it does not require
-additional native tools installed. The API underneath is well abstracted can
-easily be adopted for other areas as well.
+on any platform that has Java support. Windows, Linux, OS X - it doesn't require
+additional native tools installed. The API underneath is well abstracted and
+can easily be adopted for other areas as well.
 
-Check the documentation on how to use it with [maven](http://github.com/tcurdt/jdeb/blob/master/docs/maven.md)
-or [ant](http://github.com/tcurdt/jdeb/blob/master/docs/ant.md). Especially don't forget to check out the
+Check the documentation on how to use it with [Maven](http://github.com/tcurdt/jdeb/blob/master/docs/maven.md)
+or [Ant](http://github.com/tcurdt/jdeb/blob/master/docs/ant.md). Especially don't forget to check out the
 [examples](http://github.com/tcurdt/jdeb/blob/master/src/examples/). Current
 [javadocs](http://tcurdt.github.com/jdeb/release/1.0.1/apidocs/) and a source
 [xref](http://tcurdt.github.com/jdeb/release/1.0.1/xref/) is also available.
@@ -17,7 +17,7 @@ or [ant](http://github.com/tcurdt/jdeb/blob/master/docs/ant.md). Especially don'
 
 ## Where to get it
 
-The jars are available on [maven central](http://repo1.maven.org/maven2/org/vafer/jdeb/).
+The jars are available in the [Maven central repository](http://repo1.maven.org/maven2/org/vafer/jdeb/).
 The source releases you can get in the [download section](http://github.com/tcurdt/jdeb/downloads).
 
 If feel adventures or want to help out feel free to get the latest code
