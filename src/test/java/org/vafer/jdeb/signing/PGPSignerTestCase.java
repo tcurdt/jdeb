@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.signing;
 
 import java.io.ByteArrayInputStream;
@@ -22,7 +23,7 @@ import java.util.Arrays;
 
 import junit.framework.TestCase;
 
-public final class SigningTestCase extends TestCase {
+public final class PGPSignerTestCase extends TestCase {
 
     public void testClearSign() throws Exception {
 
@@ -30,8 +31,7 @@ public final class SigningTestCase extends TestCase {
 
         assertNotNull(ring);
 
-        final String inputStr = "TEST1 \n-TEST2 \n  \nTEST3 \n";
-        final byte[] input = inputStr.getBytes("UTF-8");
+        String input = "TEST1 \n-TEST2 \n  \nTEST3 \n";
 
         final String expectedOutputStr =
             "-----BEGIN PGP SIGNED MESSAGE-----\n" +
@@ -53,7 +53,8 @@ public final class SigningTestCase extends TestCase {
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        SigningUtils.clearSign(new ByteArrayInputStream(input), ring, "2E074D8F", "test", os);
+        PGPSigner signer = new PGPSigner(ring, "2E074D8F", "test");
+        signer.clearSign(input, os);
         
         final byte[] output = fixCRLF(os.toByteArray());
 
