@@ -61,7 +61,7 @@ public abstract class AbstractDescriptor {
     }
 
     protected void parse( final InputStream pInput ) throws IOException, ParseException {
-        final BufferedReader br = new BufferedReader(new InputStreamReader(pInput));
+        final BufferedReader br = new BufferedReader(new InputStreamReader(pInput, "UTF-8"));
         StringBuilder buffer = new StringBuilder();
         String key = null;
         int linenr = 0;
