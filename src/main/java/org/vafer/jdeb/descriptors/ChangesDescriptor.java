@@ -25,7 +25,7 @@ import org.vafer.jdeb.changes.ChangeSet;
  */
 public final class ChangesDescriptor extends AbstractDescriptor {
 
-    private static final String[] KEYS = {
+    private static final String[] FIELDS = {
         "Format",
         "Date",
         "Source",
@@ -44,7 +44,7 @@ public final class ChangesDescriptor extends AbstractDescriptor {
         "Files"
     };
 
-    public static final String[] MANDATORY_KEYS = {
+    public static final String[] MANDATORY_FIELDS = {
         "Format",
         "Date",
         "Source",
@@ -79,11 +79,11 @@ public final class ChangesDescriptor extends AbstractDescriptor {
         set("Changes", sb.toString());
     }
 
-    public String[] getMandatoryKeys() {
-        return MANDATORY_KEYS;
+    public String[] getMandatoryFields() {
+        return MANDATORY_FIELDS;
     }
 
     public String toString() {
-        return toString(KEYS);
+        return toString(FIELDS);
     }
 }

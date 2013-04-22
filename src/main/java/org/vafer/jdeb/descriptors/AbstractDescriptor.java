@@ -63,15 +63,15 @@ public abstract class AbstractDescriptor {
     protected void parse( final InputStream pInput ) throws IOException, ParseException {
         final BufferedReader br = new BufferedReader(new InputStreamReader(pInput, "UTF-8"));
         StringBuilder buffer = new StringBuilder();
-        String key = null;
+        String field = null;
         int linenr = 0;
         while (true) {
             final String line = br.readLine();
 
             if (line == null) {
                 if (buffer.length() > 0) {
-                    // flush value of previous key
-                    set(key, buffer.toString());
+                    // flush value of the previous field
+                    set(field, buffer.toString());
                     buffer = null;
                 }
                 break;
@@ -86,11 +86,11 @@ public abstract class AbstractDescriptor {
             final char first = line.charAt(0);
             if (Character.isLetter(first)) {
 
-                // new key
+                // new field
 
                 if (buffer.length() > 0) {
-                    // flush value of previous key
-                    set(key, buffer.toString());
+                    // flush value of the previous field
+                    set(field, buffer.toString());
                     buffer = new StringBuilder();
                 }
 
@@ -101,7 +101,7 @@ public abstract class AbstractDescriptor {
                     throw new ParseException("Line misses ':' delimiter", linenr);
                 }
 
-                key = line.substring(0, i);
+                field = line.substring(0, i);
                 buffer.append(line.substring(i + 1).trim());
 
                 continue;
@@ -122,34 +122,34 @@ public abstract class AbstractDescriptor {
         values.put(pKey, value);
     }
 
-    public String get( String key ) {
-        return values.get(key);
+    public String get( String field ) {
+        return values.get(field);
     }
 
-    public abstract String[] getMandatoryKeys();
+    public abstract String[] getMandatoryFields();
 
     public boolean isValid() {
-        return invalidKeys().size() == 0;
+        return invalidFields().size() == 0;
     }
 
-    public Set<String> invalidKeys() {
+    public Set<String> invalidFields() {
         final Set<String> invalid = new HashSet<String>();
         
-        for (String aMk : getMandatoryKeys()) {
-            if (get(aMk) == null) {
-                invalid.add(aMk);
+        for (String mandatoryField : getMandatoryFields()) {
+            if (get(mandatoryField) == null) {
+                invalid.add(mandatoryField);
             }
         }
 
         return invalid;
     }
 
-    public String toString( final String[] keys ) {
+    public String toString( final String[] fields ) {
         StringBuilder s = new StringBuilder();
-        for (String key : keys) {
-            String value = values.get(key);
+        for (String field : fields) {
+            String value = values.get(field);
             if (value != null) {
-                s.append(key).append(":");
+                s.append(field).append(":");
 
                 try {
                     BufferedReader reader = new BufferedReader(new StringReader(value));

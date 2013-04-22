@@ -139,8 +139,8 @@ public class Processor {
             final PackageDescriptor packageDescriptor = buildControl(pControlFiles, size, md5s, tempControl);
 
             if (!packageDescriptor.isValid()) {
-                throw new PackagingException("Control file descriptor keys are invalid " + packageDescriptor.invalidKeys() +
-                    ". The following keys are mandatory " + Arrays.toString(PackageDescriptor.MANDATORY_KEYS) +
+                throw new PackagingException("Control file fields are invalid " + packageDescriptor.invalidFields() +
+                    ". The following keys are mandatory " + Arrays.toString(PackageDescriptor.MANDATORY_FIELDS) +
                     ". Please check your pom.xml/build.xml and your control file.");
             }
 
@@ -239,8 +239,8 @@ public class Processor {
         changesDescriptor.set("Files", files.toString());
 
         if (!changesDescriptor.isValid()) {
-            throw new PackagingException("Changes file descriptor keys are invalid " + changesDescriptor.invalidKeys() +
-                ". The following keys are mandatory " + Arrays.toString(ChangesDescriptor.MANDATORY_KEYS) +
+            throw new PackagingException("Changes file fields are invalid " + changesDescriptor.invalidFields() +
+                ". The following keys are mandatory " + Arrays.toString(ChangesDescriptor.MANDATORY_FIELDS) +
                 ". Please check your pom.xml/build.xml and your control file.");
         }
 
