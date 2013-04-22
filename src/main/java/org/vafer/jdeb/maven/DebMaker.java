@@ -27,7 +27,7 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.PackagingException;
 import org.vafer.jdeb.Processor;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
-import org.vafer.jdeb.descriptors.PackageDescriptor;
+import org.vafer.jdeb.debian.BinaryPackageControlFile;
 import org.vafer.jdeb.utils.VariableResolver;
 
 /**
@@ -235,12 +235,12 @@ public class DebMaker {
 
         final Processor processor = new Processor(console, variableResolver);
 
-        final PackageDescriptor packageDescriptor;
+        final BinaryPackageControlFile packageControlFile;
         try {
 
             console.info("Creating debian package: " + deb);
 
-            packageDescriptor = processor.createDeb(controlFiles, data, deb, Compression.toEnum(compression));
+            packageControlFile = processor.createDeb(controlFiles, data, deb, Compression.toEnum(compression));
 
         } catch (Exception e) {
             throw new PackagingException("Failed to create debian package " + deb, e);
@@ -256,9 +256,9 @@ public class DebMaker {
             console.info("Creating changes file: " + changesOut);
 
             // for now only support reading the changes form a textfile provider
-            changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
+            changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile);
 
-            processor.createChanges(packageDescriptor, changesProvider,
+            processor.createChanges(packageControlFile, changesProvider,
                 (keyring != null) ? new FileInputStream(keyring) : null,
                 key, passphrase, new FileOutputStream(changesOut));
 

@@ -23,7 +23,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.vafer.jdeb.descriptors.PackageDescriptor;
+import org.vafer.jdeb.debian.BinaryPackageControlFile;
 import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
 import org.vafer.jdeb.producers.DataProducerLink;
@@ -50,9 +50,9 @@ public final class DataProducerTestCase extends TestCase {
 
         final File deb = File.createTempFile("jdeb", ".deb");
 
-        final PackageDescriptor packageDescriptor = processor.createDeb(new File[] { control }, data, deb, Compression.GZIP);
+        BinaryPackageControlFile packageControlFile = processor.createDeb(new File[] { control }, data, deb, Compression.GZIP);
 
-        assertTrue(packageDescriptor.isValid());
+        assertTrue(packageControlFile.isValid());
 
         final Map<String, TarArchiveEntry> filesInDeb = new HashMap<String, TarArchiveEntry>();
         

@@ -30,7 +30,7 @@ import org.vafer.jdeb.Compression;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Processor;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
-import org.vafer.jdeb.descriptors.PackageDescriptor;
+import org.vafer.jdeb.debian.BinaryPackageControlFile;
 import org.vafer.jdeb.producers.DataProducerFileSet;
 
 /**
@@ -222,12 +222,12 @@ public class DebAntTask extends MatchingTask {
 
         final Processor processor = new Processor(new TaskConsole(this, verbose), null);
 
-        final PackageDescriptor packageDescriptor;
+        final BinaryPackageControlFile packageControlFile;
         try {
 
             log("Creating debian package: " + deb);
 
-            packageDescriptor = processor.createDeb(controlFiles, data, deb, Compression.toEnum(compression));
+            packageControlFile = processor.createDeb(controlFiles, data, deb, Compression.toEnum(compression));
 
         } catch (Exception e) {
             // what the fuck ant? why are you not printing the exception chain?
@@ -245,9 +245,9 @@ public class DebAntTask extends MatchingTask {
             log("Creating changes file: " + changesOut);
 
             // for now only support reading the changes form a textfile provider
-            changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
+            changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile);
 
-            processor.createChanges(packageDescriptor, changesProvider, (keyring != null) ? new FileInputStream(keyring) : null, key, passphrase, new FileOutputStream(changesOut));
+            processor.createChanges(packageControlFile, changesProvider, (keyring != null) ? new FileInputStream(keyring) : null, key, passphrase, new FileOutputStream(changesOut));
 
         } catch (Exception e) {
             throw new BuildException("Failed to create debian changes file " + changesOut, e);

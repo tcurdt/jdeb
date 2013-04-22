@@ -37,7 +37,6 @@ import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.PackagingException;
 import org.vafer.jdeb.control.FilteredConfigurationFile;
-import org.vafer.jdeb.descriptors.AbstractDescriptor;
 import org.vafer.jdeb.utils.MapVariableResolver;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;

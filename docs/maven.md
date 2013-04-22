@@ -37,8 +37,7 @@ At least the one main control file is required to control the creation of the
 debian package. This required control file should be found in the control
 directory. By default the control file name is also 'control' which gives a
 path of 'src/deb/control/control' by default. This control file contains the
-information for the Debian package descriptor. Usually it will look something
-along the lines of
+metadata about the Debian package. Usually it will look something along the lines of
 
     Package: [[name]]
     Version: [[version]]

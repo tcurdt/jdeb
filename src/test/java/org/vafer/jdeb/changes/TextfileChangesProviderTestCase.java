@@ -18,7 +18,7 @@ package org.vafer.jdeb.changes;
 import java.io.ByteArrayInputStream;
 
 import junit.framework.TestCase;
-import org.vafer.jdeb.descriptors.PackageDescriptor;
+import org.vafer.jdeb.debian.BinaryPackageControlFile;
 
 public final class TextfileChangesProviderTestCase extends TestCase {
 
@@ -34,13 +34,13 @@ public final class TextfileChangesProviderTestCase extends TestCase {
                 " * change1\n" +
                 " * change2\n";
 
-        final PackageDescriptor descriptor = new PackageDescriptor();
-        descriptor.set("Package", "package");
-        descriptor.set("Version", "version");
-        descriptor.set("Distribution", "distribution");
-        descriptor.set("Date", "Mon, 20 Aug 2007 15:25:57 +0200");
+        BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile();
+        packageControlFile.set("Package", "package");
+        packageControlFile.set("Version", "version");
+        packageControlFile.set("Distribution", "distribution");
+        packageControlFile.set("Date", "Mon, 20 Aug 2007 15:25:57 +0200");
 
-        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes("UTF-8")), descriptor);
+        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes("UTF-8")), packageControlFile);
         final ChangeSet[] changeSets = provider.getChangesSets();
 
         assertNotNull(changeSets);
@@ -60,12 +60,12 @@ public final class TextfileChangesProviderTestCase extends TestCase {
                 " * change1\n" +
                 " * change2\n";
 
-        final PackageDescriptor descriptor = new PackageDescriptor();
-        descriptor.set("Package", "package");
-        descriptor.set("Version", "version");
-        descriptor.set("Date", "Mon, 20 Aug 2007 15:25:57 +0200");
+        BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile();
+        packageControlFile.set("Package", "package");
+        packageControlFile.set("Version", "version");
+        packageControlFile.set("Date", "Mon, 20 Aug 2007 15:25:57 +0200");
 
-        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes("UTF-8")), descriptor);
+        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes("UTF-8")), packageControlFile);
         final ChangeSet[] changeSets = provider.getChangesSets();
 
         assertNotNull(changeSets);

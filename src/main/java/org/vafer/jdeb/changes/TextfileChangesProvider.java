@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
 
-import org.vafer.jdeb.descriptors.PackageDescriptor;
+import org.vafer.jdeb.debian.BinaryPackageControlFile;
 
 /**
  * Gets the changes from a changes file. The first entry are the current changes.
@@ -47,19 +47,19 @@ public final class TextfileChangesProvider implements ChangesProvider {
 
     private final ChangeSet[] changeSets;
 
-    public TextfileChangesProvider( final InputStream pInput, final PackageDescriptor pDescriptor ) throws IOException, ParseException {
+    public TextfileChangesProvider( final InputStream pInput, final BinaryPackageControlFile packageControlFile ) throws IOException, ParseException {
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
 
         final DateFormat tdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // RFC 2822 format
         final DateFormat sdf = ChangeSet.createDateForma();
 
-        String packageName = pDescriptor.get("Package");
-        String version = pDescriptor.get("Version");
-        Date date = tdf.parse(pDescriptor.get("Date"));
-        String distribution = pDescriptor.get("Distribution");
-        String urgency = pDescriptor.get("Urgency");
-        String changedBy = pDescriptor.get("Maintainer");
+        String packageName = packageControlFile.get("Package");
+        String version = packageControlFile.get("Version");
+        Date date = tdf.parse(packageControlFile.get("Date"));
+        String distribution = packageControlFile.get("Distribution");
+        String urgency = packageControlFile.get("Urgency");
+        String changedBy = packageControlFile.get("Maintainer");
         Collection<String> changesColl = new ArrayList<String>();
         Collection<ChangeSet> changeSetColl = new ArrayList<ChangeSet>();
 

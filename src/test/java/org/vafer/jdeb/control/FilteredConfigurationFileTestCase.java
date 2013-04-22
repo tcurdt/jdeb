@@ -23,7 +23,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 import org.apache.tools.ant.util.ReaderInputStream;
-import org.vafer.jdeb.descriptors.PackageDescriptor;
+import org.vafer.jdeb.debian.BinaryPackageControlFile;
 import org.vafer.jdeb.utils.MapVariableResolver;
 import org.vafer.jdeb.utils.VariableResolver;
 
@@ -69,7 +69,7 @@ public class FilteredConfigurationFileTestCase extends TestCase {
 
         FilteredConfigurationFile filteredFile = new FilteredConfigurationFile("control", new ByteArrayInputStream(controlFile.getBytes()), new MapVariableResolver(map));
         
-        PackageDescriptor d = new PackageDescriptor(filteredFile.toString());
+        BinaryPackageControlFile d = new BinaryPackageControlFile(filteredFile.toString());
         
         assertEquals("1.2", d.get("Version"));
         assertEquals("Torsten Curdt <tcurdt@vafer.org>", d.get("Maintainer"));

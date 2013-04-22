@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.vafer.jdeb.descriptors;
+package org.vafer.jdeb.debian;
 
 import java.text.ParseException;
 
 import junit.framework.TestCase;
 
-public final class PackageDescriptorTestCase extends TestCase {
+public final class PackageControlFileTestCase extends TestCase {
 
     public void testParse() throws Exception {
         String input =
@@ -30,7 +30,7 @@ public final class PackageDescriptorTestCase extends TestCase {
                 " Value2.2\n" +
                 "Key3: Value3\n";
         
-        PackageDescriptor d = new PackageDescriptor(input);
+        BinaryPackageControlFile d = new BinaryPackageControlFile(input);
         assertFalse(d.isValid());
 
         assertEquals("key 1", "Value1", d.get("Key1"));
@@ -39,17 +39,17 @@ public final class PackageDescriptorTestCase extends TestCase {
     }
 
     public void testToString() throws Exception {
-        PackageDescriptor descriptor = new PackageDescriptor();
-        descriptor.set("Package", "test-package");
-        descriptor.set("Description", "This is\na description\non several lines");
-        descriptor.set("Version", "1.0");
-
-        String s = descriptor.toString();
+        BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile();
+        packageControlFile.set("Package", "test-package");
+        packageControlFile.set("Description", "This is\na description\non several lines");
+        packageControlFile.set("Version", "1.0");
         
-        PackageDescriptor descriptor2 = new PackageDescriptor(s);
-        assertEquals("Package", descriptor.get("Package"), descriptor2.get("Package"));
-        assertEquals("Description", descriptor.get("Description"), descriptor2.get("Description"));
-        assertEquals("Version 3", descriptor.get("Version"), descriptor2.get("Version"));
+        String s = packageControlFile.toString();
+        
+        BinaryPackageControlFile packageControlFile2 = new BinaryPackageControlFile(s);
+        assertEquals("Package", packageControlFile.get("Package"), packageControlFile2.get("Package"));
+        assertEquals("Description", packageControlFile.get("Description"), packageControlFile2.get("Description"));
+        assertEquals("Version 3", packageControlFile.get("Version"), packageControlFile2.get("Version"));
     }
 
     public void testEmptyLines() throws Exception {
@@ -58,7 +58,7 @@ public final class PackageDescriptorTestCase extends TestCase {
                 "Key2: Value2\n" +
                 "\n";
         try {
-            new PackageDescriptor(input);
+            new BinaryPackageControlFile(input);
             fail("Should throw a ParseException");
         } catch (ParseException e) {
         }

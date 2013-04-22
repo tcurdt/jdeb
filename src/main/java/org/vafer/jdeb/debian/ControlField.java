@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.vafer.jdeb.descriptors;
+package org.vafer.jdeb.debian;
 
 /**
  * A field of a control file.

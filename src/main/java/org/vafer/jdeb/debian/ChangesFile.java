@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.vafer.jdeb.descriptors;
+package org.vafer.jdeb.debian;
 
 import org.vafer.jdeb.changes.ChangeSet;
 
@@ -24,7 +24,7 @@ import org.vafer.jdeb.changes.ChangeSet;
  * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-debianchangesfiles">Debian Policy Manual - Debian changes files</a>
  * @author Torsten Curdt
  */
-public final class ChangesDescriptor extends AbstractDescriptor {
+public final class ChangesFile extends ControlFile {
 
     private static final ControlField[] FIELDS = {
             new ControlField("Format", true),
@@ -45,10 +45,10 @@ public final class ChangesDescriptor extends AbstractDescriptor {
             new ControlField("Files", true, ControlField.Type.MULTILINE)
     };
 
-    public ChangesDescriptor( final AbstractDescriptor pDescriptor, final ChangeSet[] changeSets ) {
-        super(pDescriptor);
-
-        final StringBuilder sb = new StringBuilder();
+    public ChangesFile(ControlFile controlFile, ChangeSet[] changeSets) {
+        super(controlFile);
+        
+        StringBuilder sb = new StringBuilder();
 
         if (changeSets.length > 0) {
             final ChangeSet latestChangeSet = changeSets[0];

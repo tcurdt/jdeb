@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.vafer.jdeb.descriptors;
+package org.vafer.jdeb.debian;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -31,20 +31,19 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A descriptor holds the usual key value pairs.
+ * A control file as specified by the <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html">Debian policy</a>.
  *
  * @author Torsten Curdt
- * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html">Debian Policy Manual - Control files and their fields</a>
  */
-public abstract class AbstractDescriptor {
+public abstract class ControlFile {
 
     protected final Map<String, String> values = new LinkedHashMap<String, String>();
 
-    protected AbstractDescriptor() {
+    protected ControlFile() {
     }
 
-    public AbstractDescriptor( final AbstractDescriptor pDescriptor ) {
-        values.putAll(pDescriptor.values);
+    public ControlFile(final ControlFile controlFile) {
+        values.putAll(controlFile.values);
     }
 
     protected void parse(String input) throws IOException, ParseException {

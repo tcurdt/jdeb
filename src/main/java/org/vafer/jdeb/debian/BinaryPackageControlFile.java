@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package org.vafer.jdeb.descriptors;
+package org.vafer.jdeb.debian;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 
 /**
- * Reflecting the package control file
+ * Binary package control file.
  *
  * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-binarycontrolfiles">Debian Policy Manual - Binary package control files</a>
  * @author Torsten Curdt
  */
-public final class PackageDescriptor extends AbstractDescriptor {
+public final class BinaryPackageControlFile extends ControlFile {
 
     private static final ControlField[] FIELDS = {
             new ControlField("Package", true),
@@ -51,14 +51,14 @@ public final class PackageDescriptor extends AbstractDescriptor {
             new ControlField("Homepage")
     };
 
-    public PackageDescriptor() {
+    public BinaryPackageControlFile() {
     }
 
-    public PackageDescriptor(String input) throws IOException, ParseException {
+    public BinaryPackageControlFile(String input) throws IOException, ParseException {
         parse(input);
     }
 
-    public PackageDescriptor(InputStream input) throws IOException, ParseException {
+    public BinaryPackageControlFile(InputStream input) throws IOException, ParseException {
         parse(input);
     }
 

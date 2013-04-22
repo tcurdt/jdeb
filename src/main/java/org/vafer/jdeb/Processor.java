@@ -48,9 +48,9 @@ import org.apache.commons.io.output.NullOutputStream;
 import org.apache.tools.ant.DirectoryScanner;
 import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.ChangesProvider;
+import org.vafer.jdeb.debian.ChangesFile;
 import org.vafer.jdeb.control.FilteredConfigurationFile;
-import org.vafer.jdeb.descriptors.ChangesDescriptor;
-import org.vafer.jdeb.descriptors.PackageDescriptor;
+import org.vafer.jdeb.debian.BinaryPackageControlFile;
 import org.vafer.jdeb.mapping.PermMapper;
 import org.vafer.jdeb.signing.SigningUtils;
 import org.vafer.jdeb.utils.InformationInputStream;
@@ -119,10 +119,10 @@ public class Processor {
      * @param pData
      * @param pOutput
      * @param compression   the compression method used for the data file
-     * @return PackageDescriptor
+     * @return BinaryPackageControlFile
      * @throws PackagingException
      */
-    public PackageDescriptor createDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput, Compression compression ) throws PackagingException {
+    public BinaryPackageControlFile createDeb( final File[] pControlFiles, final DataProducer[] pData, final File pOutput, Compression compression ) throws PackagingException {
 
         File tempData = null;
         File tempControl = null;
@@ -136,11 +136,11 @@ public class Processor {
             final BigInteger size = buildData(pData, tempData, md5s, compression);
 
             console.info("Building control");
-            final PackageDescriptor packageDescriptor = buildControl(pControlFiles, size, md5s, tempControl);
+            final BinaryPackageControlFile packageControlFile = buildControl(pControlFiles, size, md5s, tempControl);
 
-            if (!packageDescriptor.isValid()) {
-                throw new PackagingException("Control file fields are invalid " + packageDescriptor.invalidFields() +
-                    ". The following fields are mandatory: " + packageDescriptor.getMandatoryFields() +
+            if (!packageControlFile.isValid()) {
+                throw new PackagingException("Control file fields are invalid " + packageControlFile.invalidFields() +
+                    ". The following fields are mandatory: " + packageControlFile.getMandatoryFields() +
                     ". Please check your pom.xml/build.xml and your control file.");
             }
 
@@ -159,13 +159,13 @@ public class Processor {
             ar.close();
 
             // intermediate values
-            packageDescriptor.set("MD5", md5output.getHexDigest());
-            packageDescriptor.set("SHA1", sha1output.getHexDigest());
-            packageDescriptor.set("SHA256", sha256output.getHexDigest());
-            packageDescriptor.set("Size", "" + md5output.getSize());
-            packageDescriptor.set("File", pOutput.getName());
+            packageControlFile.set("MD5", md5output.getHexDigest());
+            packageControlFile.set("SHA1", sha1output.getHexDigest());
+            packageControlFile.set("SHA256", sha256output.getHexDigest());
+            packageControlFile.set("Size", "" + md5output.getSize());
+            packageControlFile.set("File", pOutput.getName());
 
-            return packageDescriptor;
+            return packageControlFile;
 
         } catch (Exception e) {
             throw new PackagingException("Could not create deb package", e);
@@ -184,73 +184,73 @@ public class Processor {
     }
 
     /**
-     * Create changes file based on the provided PackageDescriptor.
+     * Create changes file based on the provided BinaryPackageControlFile.
      * If pRing, pKey and pPassphrase are provided the changes file will also be signed.
-     * It returns a ChangesDescriptor reflecting the changes
+     * It returns a ChangesFile reflecting the changes
      *
-     * @param pPackageDescriptor
+     * @param packageControlFile
      * @param pChangesProvider
      * @param pRing
      * @param pKey
      * @param pPassphrase
      * @param pOutput
-     * @return ChangesDescriptor
+     * @return ChangesFile
      * @throws IOException
      * @throws PackagingException
      */
-    public ChangesDescriptor createChanges( final PackageDescriptor pPackageDescriptor, final ChangesProvider pChangesProvider, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException, PackagingException {
+    public ChangesFile createChanges( final BinaryPackageControlFile packageControlFile, final ChangesProvider pChangesProvider, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException, PackagingException {
 
         final ChangeSet[] changeSets = pChangesProvider.getChangesSets();
-        final ChangesDescriptor changesDescriptor = new ChangesDescriptor(pPackageDescriptor, changeSets);
+        final ChangesFile changesFile = new ChangesFile(packageControlFile, changeSets);
 
-        changesDescriptor.set("Format", "1.8");
+        changesFile.set("Format", "1.8");
 
-        if (changesDescriptor.get("Binary") == null) {
-            changesDescriptor.set("Binary", changesDescriptor.get("Package"));
+        if (changesFile.get("Binary") == null) {
+            changesFile.set("Binary", changesFile.get("Package"));
         }
 
-        if (changesDescriptor.get("Source") == null) {
-            changesDescriptor.set("Source", changesDescriptor.get("Package"));
+        if (changesFile.get("Source") == null) {
+            changesFile.set("Source", changesFile.get("Package"));
         }
 
         final StringBuilder checksumsSha1 = new StringBuilder("\n");
         // Checksums-Sha1:
         // 56ef4c6249dc3567fd2967f809c42d1f9b61adf7 45964 jdeb.deb
-        checksumsSha1.append(' ').append(changesDescriptor.get("SHA1"));
-        checksumsSha1.append(' ').append(changesDescriptor.get("Size"));
-        checksumsSha1.append(' ').append(changesDescriptor.get("File"));
-        changesDescriptor.set("Checksums-Sha1", checksumsSha1.toString());
+        checksumsSha1.append(' ').append(changesFile.get("SHA1"));
+        checksumsSha1.append(' ').append(changesFile.get("Size"));
+        checksumsSha1.append(' ').append(changesFile.get("File"));
+        changesFile.set("Checksums-Sha1", checksumsSha1.toString());
 
         final StringBuilder checksumsSha256 = new StringBuilder("\n");
         // Checksums-Sha256:
         // 38c6fa274eb9299a69b739bcbdbd05c7ffd1d8d6472f4245ed732a25c0e5d616 45964 jdeb.deb
-        checksumsSha256.append(' ').append(changesDescriptor.get("SHA256"));
-        checksumsSha256.append(' ').append(changesDescriptor.get("Size"));
-        checksumsSha256.append(' ').append(changesDescriptor.get("File"));
-        changesDescriptor.set("Checksums-Sha256", checksumsSha256.toString());
+        checksumsSha256.append(' ').append(changesFile.get("SHA256"));
+        checksumsSha256.append(' ').append(changesFile.get("Size"));
+        checksumsSha256.append(' ').append(changesFile.get("File"));
+        changesFile.set("Checksums-Sha256", checksumsSha256.toString());
 
 
         final StringBuilder files = new StringBuilder("\n");
-        files.append(' ').append(changesDescriptor.get("MD5"));
-        files.append(' ').append(changesDescriptor.get("Size"));
-        files.append(' ').append(changesDescriptor.get("Section"));
-        files.append(' ').append(changesDescriptor.get("Priority"));
-        files.append(' ').append(changesDescriptor.get("File"));
-        changesDescriptor.set("Files", files.toString());
+        files.append(' ').append(changesFile.get("MD5"));
+        files.append(' ').append(changesFile.get("Size"));
+        files.append(' ').append(changesFile.get("Section"));
+        files.append(' ').append(changesFile.get("Priority"));
+        files.append(' ').append(changesFile.get("File"));
+        changesFile.set("Files", files.toString());
 
-        if (!changesDescriptor.isValid()) {
-            throw new PackagingException("Changes file fields are invalid " + changesDescriptor.invalidFields() +
-                ". The following fields are mandatory: " + changesDescriptor.getMandatoryFields() +
+        if (!changesFile.isValid()) {
+            throw new PackagingException("Changes file fields are invalid " + changesFile.invalidFields() +
+                ". The following fields are mandatory: " + changesFile.getMandatoryFields() +
                 ". Please check your pom.xml/build.xml and your control file.");
         }
 
-        final String changes = changesDescriptor.toString();
+        final String changes = changesFile.toString();
         final byte[] changesBytes = changes.getBytes("UTF-8");
 
         if (pRing == null || pKey == null || pPassphrase == null) {
             pOutput.write(changesBytes);
             pOutput.close();
-            return changesDescriptor;
+            return changesFile;
         }
 
         console.info("Signing changes with key " + pKey);
@@ -265,7 +265,7 @@ public class Processor {
 
         pOutput.close();
 
-        return changesDescriptor;
+        return changesFile;
     }
 
     /**
@@ -280,7 +280,7 @@ public class Processor {
      * @throws IOException
      * @throws ParseException
      */
-    private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuilder pChecksums, final File pOutput ) throws IOException, ParseException {
+    private BinaryPackageControlFile buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuilder pChecksums, final File pOutput ) throws IOException, ParseException {
 
         final File dir = pOutput.getParentFile();
         if (dir != null && (!dir.exists() || !dir.isDirectory())) {
@@ -292,8 +292,8 @@ public class Processor {
         
         List<FilteredConfigurationFile> configurationFiles = new ArrayList<FilteredConfigurationFile>();
         
-        // create a descriptor out of the "control" file, copy all other files, ignore directories
-        PackageDescriptor packageDescriptor = null;
+        // create the final package control file out of the "control" file, copy all other files, ignore the directories
+        BinaryPackageControlFile packageControlFile = null;
         for (File file : pControlFiles) {
             if (file.isDirectory()) {
                 // warn about the misplaced directory, except for directories ignored by default (.svn, cvs, etc)
@@ -309,7 +309,7 @@ public class Processor {
 
             } else if ("control".equals(file.getName())) {
                 FilteredConfigurationFile controlFile = new FilteredConfigurationFile(file.getName(), new FileInputStream(file), resolver);
-                packageDescriptor = createPackageDescriptor(file, pDataSize);
+                packageControlFile = createPackageControlFile(file, pDataSize);
 
             } else {
                 // initialize the information stream to guess the type of the file
@@ -330,19 +330,19 @@ public class Processor {
             }
         }
 
-        if (packageDescriptor == null) {
+        if (packageControlFile == null) {
             throw new FileNotFoundException("No 'control' file found in " + Arrays.toString(pControlFiles));
         }
 
         for (FilteredConfigurationFile configurationFile : configurationFiles) {
             addControlEntry(configurationFile.getName(), configurationFile.toString(), outputStream);
         }
-        addControlEntry("control", packageDescriptor.toString(), outputStream);
+        addControlEntry("control", packageControlFile.toString(), outputStream);
         addControlEntry("md5sums", pChecksums.toString(), outputStream);
 
         outputStream.close();
 
-        return packageDescriptor;
+        return packageControlFile;
     }
 
     /**
@@ -361,7 +361,7 @@ public class Processor {
     }
     
     /**
-     * Creates a package descriptor from the specified control file and adds the
+     * Creates a package control file from the specified file and adds the
      * <tt>Date</tt>, <tt>Distribution</tt> and <tt>Urgency</tt> fields if missing.
      * The <tt>Installed-Size</tt> field is also initialized to the actual size of
      * the package. The <tt>Maintainer</tt> field is overridden by the <tt>DEBEMAIL</tt>
@@ -370,30 +370,30 @@ public class Processor {
      * @param file       the control file
      * @param pDataSize  the size of the installed package
      */
-    private PackageDescriptor createPackageDescriptor(File file, BigInteger pDataSize) throws IOException, ParseException {
+    private BinaryPackageControlFile createPackageControlFile(File file, BigInteger pDataSize) throws IOException, ParseException {
         FilteredConfigurationFile controlFile = new FilteredConfigurationFile(file.getName(), new FileInputStream(file), resolver);
-        PackageDescriptor packageDescriptor = new PackageDescriptor(controlFile.toString());
+        BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile(controlFile.toString());
         
-        if (packageDescriptor.get("Date") == null) {
+        if (packageControlFile.get("Date") == null) {
             // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
             SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
-            packageDescriptor.set("Date", fmt.format(new Date()));
+            packageControlFile.set("Date", fmt.format(new Date()));
         }
 
-        if (packageDescriptor.get("Distribution") == null) {
-            packageDescriptor.set("Distribution", "unknown");
+        if (packageControlFile.get("Distribution") == null) {
+            packageControlFile.set("Distribution", "unknown");
         }
 
-        if (packageDescriptor.get("Urgency") == null) {
-            packageDescriptor.set("Urgency", "low");
+        if (packageControlFile.get("Urgency") == null) {
+            packageControlFile.set("Urgency", "low");
         }
 
-        packageDescriptor.set("Installed-Size", pDataSize.divide(BigInteger.valueOf(1024)).toString());
+        packageControlFile.set("Installed-Size", pDataSize.divide(BigInteger.valueOf(1024)).toString());
 
         // override the Version if the DEBVERSION environment variable is defined
         final String debVersion = System.getenv("DEBVERSION");
         if (debVersion != null) {
-            packageDescriptor.set("Version", debVersion);
+            packageControlFile.set("Version", debVersion);
             console.info("Using version'" + debVersion + "' from the environment variables.");
         }
 
@@ -404,11 +404,11 @@ public class Processor {
 
         if (debFullName != null && debEmail != null) {
             final String maintainer = debFullName + " <" + debEmail + ">";
-            packageDescriptor.set("Maintainer", maintainer);
+            packageControlFile.set("Maintainer", maintainer);
             console.info("Using maintainer '" + maintainer + "' from the environment variables.");
         }
         
-        return packageDescriptor;
+        return packageControlFile;
     }
 
     /**
