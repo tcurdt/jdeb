@@ -372,7 +372,7 @@ public class Processor {
      */
     private PackageDescriptor createPackageDescriptor(File file, BigInteger pDataSize) throws IOException, ParseException {
         FilteredConfigurationFile controlFile = new FilteredConfigurationFile(file.getName(), new FileInputStream(file), resolver);
-        PackageDescriptor packageDescriptor = new PackageDescriptor(new ByteArrayInputStream(controlFile.toString().getBytes()));
+        PackageDescriptor packageDescriptor = new PackageDescriptor(controlFile.toString());
         
         if (packageDescriptor.get("Date") == null) {
             // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)

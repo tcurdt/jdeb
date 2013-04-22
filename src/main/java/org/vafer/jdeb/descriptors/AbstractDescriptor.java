@@ -17,6 +17,7 @@
 package org.vafer.jdeb.descriptors;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -46,8 +47,12 @@ public abstract class AbstractDescriptor {
         values.putAll(pDescriptor.values);
     }
 
-    protected void parse( final InputStream pInput ) throws IOException, ParseException {
-        final BufferedReader br = new BufferedReader(new InputStreamReader(pInput, "UTF-8"));
+    protected void parse(String input) throws IOException, ParseException {
+        parse(new ByteArrayInputStream(input.getBytes("UTF-8")));
+    }
+
+    protected void parse(InputStream input) throws IOException, ParseException {
+        final BufferedReader br = new BufferedReader(new InputStreamReader(input, "UTF-8"));
         StringBuilder buffer = new StringBuilder();
         String field = null;
         int linenr = 0;

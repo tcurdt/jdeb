@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 
-import org.vafer.jdeb.utils.VariableResolver;
-
 /**
  * Reflecting the package control file
  *
@@ -56,8 +54,12 @@ public final class PackageDescriptor extends AbstractDescriptor {
     public PackageDescriptor() {
     }
 
-    public PackageDescriptor(InputStream pInput) throws IOException, ParseException {
-        parse(pInput);
+    public PackageDescriptor(String input) throws IOException, ParseException {
+        parse(input);
+    }
+
+    public PackageDescriptor(InputStream input) throws IOException, ParseException {
+        parse(input);
     }
 
     @Override

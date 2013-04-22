@@ -69,7 +69,7 @@ public class FilteredConfigurationFileTestCase extends TestCase {
 
         FilteredConfigurationFile filteredFile = new FilteredConfigurationFile("control", new ByteArrayInputStream(controlFile.getBytes()), new MapVariableResolver(map));
         
-        PackageDescriptor d = new PackageDescriptor(new ByteArrayInputStream(filteredFile.toString().getBytes()));
+        PackageDescriptor d = new PackageDescriptor(filteredFile.toString());
         
         assertEquals("1.2", d.get("Version"));
         assertEquals("Torsten Curdt <tcurdt@vafer.org>", d.get("Maintainer"));

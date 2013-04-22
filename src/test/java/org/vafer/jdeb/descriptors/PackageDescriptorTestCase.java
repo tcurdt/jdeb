@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.descriptors;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.text.ParseException;
 
 import junit.framework.TestCase;
@@ -24,15 +23,14 @@ import junit.framework.TestCase;
 public final class PackageDescriptorTestCase extends TestCase {
 
     public void testParse() throws Exception {
-
-        final InputStream is = new ByteArrayInputStream(
-            ("Key1: Value1\n" +
-             "Key2: Value2\n" +
-              " Value2.1\n" +
-              " Value2.2\n" +
-              "Key3: Value3\n").getBytes());
-
-        PackageDescriptor d = new PackageDescriptor(is);
+        String input =
+                "Key1: Value1\n" +
+                "Key2: Value2\n" +
+                " Value2.1\n" +
+                " Value2.2\n" +
+                "Key3: Value3\n";
+        
+        PackageDescriptor d = new PackageDescriptor(input);
         assertFalse(d.isValid());
 
         assertEquals("key 1", "Value1", d.get("Key1"));
@@ -47,20 +45,20 @@ public final class PackageDescriptorTestCase extends TestCase {
         descriptor.set("Version", "1.0");
 
         String s = descriptor.toString();
-
-        PackageDescriptor descriptor2 = new PackageDescriptor(new ByteArrayInputStream(s.getBytes()));
+        
+        PackageDescriptor descriptor2 = new PackageDescriptor(s);
         assertEquals("Package", descriptor.get("Package"), descriptor2.get("Package"));
         assertEquals("Description", descriptor.get("Description"), descriptor2.get("Description"));
         assertEquals("Version 3", descriptor.get("Version"), descriptor2.get("Version"));
     }
 
     public void testEmptyLines() throws Exception {
-        final InputStream is = new ByteArrayInputStream(
-            ("Key1: Value1\n" +
+        String input =
+                "Key1: Value1\n" +
                 "Key2: Value2\n" +
-                "\n").getBytes());
+                "\n";
         try {
-            new PackageDescriptor(is);
+            new PackageDescriptor(input);
             fail("Should throw a ParseException");
         } catch (ParseException e) {
         }
