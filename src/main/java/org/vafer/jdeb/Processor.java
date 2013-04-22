@@ -48,11 +48,11 @@ import org.apache.commons.io.output.NullOutputStream;
 import org.apache.tools.ant.DirectoryScanner;
 import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.ChangesProvider;
-import org.vafer.jdeb.debian.ChangesFile;
-import org.vafer.jdeb.control.FilteredConfigurationFile;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
+import org.vafer.jdeb.debian.ChangesFile;
 import org.vafer.jdeb.mapping.PermMapper;
 import org.vafer.jdeb.signing.SigningUtils;
+import org.vafer.jdeb.utils.FilteredFile;
 import org.vafer.jdeb.utils.InformationInputStream;
 import org.vafer.jdeb.utils.InformationOutputStream;
 import org.vafer.jdeb.utils.Utils;
@@ -290,8 +290,6 @@ public class Processor {
         final TarArchiveOutputStream outputStream = new TarArchiveOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
         outputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
         
-        List<FilteredConfigurationFile> configurationFiles = new ArrayList<FilteredConfigurationFile>();
-        
         // create the final package control file out of the "control" file, copy all other files, ignore the directories
         BinaryPackageControlFile packageControlFile = null;
         for (File file : pControlFiles) {
@@ -304,11 +302,10 @@ public class Processor {
             }
 
             if (CONFIGURATION_FILENAMES.contains(file.getName()) || MAINTAINER_SCRIPTS.contains(file.getName())) {
-                FilteredConfigurationFile configurationFile = new FilteredConfigurationFile(file.getName(), new FileInputStream(file), resolver);
-                configurationFiles.add(configurationFile);
+                FilteredFile configurationFile = new FilteredFile(new FileInputStream(file), resolver);
+                addControlEntry(file.getName(), configurationFile.toString(), outputStream);
 
             } else if ("control".equals(file.getName())) {
-                FilteredConfigurationFile controlFile = new FilteredConfigurationFile(file.getName(), new FileInputStream(file), resolver);
                 packageControlFile = createPackageControlFile(file, pDataSize);
 
             } else {
@@ -333,10 +330,7 @@ public class Processor {
         if (packageControlFile == null) {
             throw new FileNotFoundException("No 'control' file found in " + Arrays.toString(pControlFiles));
         }
-
-        for (FilteredConfigurationFile configurationFile : configurationFiles) {
-            addControlEntry(configurationFile.getName(), configurationFile.toString(), outputStream);
-        }
+        
         addControlEntry("control", packageControlFile.toString(), outputStream);
         addControlEntry("md5sums", pChecksums.toString(), outputStream);
 
@@ -371,7 +365,7 @@ public class Processor {
      * @param pDataSize  the size of the installed package
      */
     private BinaryPackageControlFile createPackageControlFile(File file, BigInteger pDataSize) throws IOException, ParseException {
-        FilteredConfigurationFile controlFile = new FilteredConfigurationFile(file.getName(), new FileInputStream(file), resolver);
+        FilteredFile controlFile = new FilteredFile(new FileInputStream(file), resolver);
         BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile(controlFile.toString());
         
         if (packageControlFile.get("Date") == null) {

@@ -36,7 +36,7 @@ import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.PackagingException;
-import org.vafer.jdeb.control.FilteredConfigurationFile;
+import org.vafer.jdeb.utils.FilteredFile;
 import org.vafer.jdeb.utils.MapVariableResolver;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
@@ -250,13 +250,13 @@ public class DebMojo extends AbstractPluginMojo {
     public void setOpenReplaceToken( String openReplaceToken ) {
         this.openReplaceToken = openReplaceToken;
         // FIXME yuck!
-        FilteredConfigurationFile.setOpenToken(openReplaceToken);
+        FilteredFile.setOpenToken(openReplaceToken);
     }
 
     public void setCloseReplaceToken( String closeReplaceToken ) {
         this.closeReplaceToken = closeReplaceToken;
         // FIXME yuck!
-        FilteredConfigurationFile.setCloseToken(closeReplaceToken);
+        FilteredFile.setCloseToken(closeReplaceToken);
     }
 
     protected void setData( Data[] dataSet ) {

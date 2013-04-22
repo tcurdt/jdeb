@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.vafer.jdeb.control;
+package org.vafer.jdeb.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -24,14 +24,10 @@ import java.util.Map;
 import junit.framework.TestCase;
 import org.apache.tools.ant.util.ReaderInputStream;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
-import org.vafer.jdeb.utils.MapVariableResolver;
-import org.vafer.jdeb.utils.VariableResolver;
 
-public class FilteredConfigurationFileTestCase extends TestCase {
+public class FilteredFileTestCase extends TestCase {
 
     private VariableResolver variableResolver;
-
-    private FilteredConfigurationFile placeHolder;
 
     protected void setUp() throws Exception {
         Map<String, String> map = new HashMap<String, String>();
@@ -42,18 +38,12 @@ public class FilteredConfigurationFileTestCase extends TestCase {
     }
 
     public void testTokenSubstitution() throws Exception {
-        InputStream inputStream = new ReaderInputStream(new StringReader("#!/bin/sh\ncat [[artifactId]][[myProperty1]] \necho '[[myProperty2]]'\n"));
+        InputStream in = new ReaderInputStream(new StringReader("#!/bin/sh\ncat [[artifactId]][[myProperty1]] \necho '[[myProperty2]]'\n"));
 
-        placeHolder = new FilteredConfigurationFile("", inputStream, variableResolver);
+        FilteredFile placeHolder = new FilteredFile(in, variableResolver);
 
         String actual = placeHolder.toString();
         assertEquals("#!/bin/sh\ncat jdebcustom1 \necho 'custom2'\n", actual);
-    }
-
-    public void testName() throws Exception {
-        InputStream inputStream = new ReaderInputStream(new StringReader(""));
-        placeHolder = new FilteredConfigurationFile("myName", inputStream, variableResolver);
-        assertEquals("myName", placeHolder.getName());
     }
 
     public void testVariableSubstitution() throws Exception {
@@ -67,7 +57,7 @@ public class FilteredConfigurationFileTestCase extends TestCase {
                 + "NoResolve1: test[[test\n"
                 + "NoResolve2: [[test]]\n";
 
-        FilteredConfigurationFile filteredFile = new FilteredConfigurationFile("control", new ByteArrayInputStream(controlFile.getBytes()), new MapVariableResolver(map));
+        FilteredFile filteredFile = new FilteredFile(new ByteArrayInputStream(controlFile.getBytes()), new MapVariableResolver(map));
         
         BinaryPackageControlFile d = new BinaryPackageControlFile(filteredFile.toString());
         

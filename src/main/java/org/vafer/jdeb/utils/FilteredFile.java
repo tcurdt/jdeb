@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.vafer.jdeb.control;
+
+package org.vafer.jdeb.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,44 +23,39 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.vafer.jdeb.utils.Utils;
-import org.vafer.jdeb.utils.VariableResolver;
-
-public class FilteredConfigurationFile {
+public class FilteredFile {
 
     private static String openToken = "[[";
     private static String closeToken = "]]";
     private List<String> lines = new ArrayList<String>();
-    private String name;
 
-    public FilteredConfigurationFile( String name, InputStream pInputStream, VariableResolver pResolver ) throws IOException {
-        this.name = name;
-        parse(pInputStream, pResolver);
+    public FilteredFile(InputStream in, VariableResolver resolver) throws IOException {
+        parse(in, resolver);
     }
 
-    public static void setOpenToken( final String pToken ) {
-        openToken = pToken;
+    public static void setOpenToken(String token) {
+        openToken = token;
     }
 
-    public static void setCloseToken( final String pToken ) {
-        closeToken = pToken;
+    public static void setCloseToken(String token) {
+        closeToken = token;
     }
 
-    private void parse( InputStream pInputStream, VariableResolver pResolver ) throws IOException {
-        BufferedReader br = null;
+    private void parse(InputStream in, VariableResolver resolver) throws IOException {
+        BufferedReader reader = null;
         try {
-            br = new BufferedReader(new InputStreamReader(pInputStream));
+            reader = new BufferedReader(new InputStreamReader(in));
             String line;
-            while ((line = br.readLine()) != null) {
-                if (pResolver != null) {
-                    lines.add(Utils.replaceVariables(pResolver, line, openToken, closeToken));
+            while ((line = reader.readLine()) != null) {
+                if (resolver != null) {
+                    lines.add(Utils.replaceVariables(resolver, line, openToken, closeToken));
                 } else {
                     lines.add(line);
                 }
             }
         } finally {
-            if (br != null) {
-                br.close();
+            if (reader != null) {
+                reader.close();
             }
         }
     }
@@ -71,9 +67,4 @@ public class FilteredConfigurationFile {
         }
         return builder.toString();
     }
-
-    public String getName() {
-        return name;
-    }
-
 }
