@@ -18,11 +18,8 @@ package org.vafer.jdeb.descriptors;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
 
 import junit.framework.TestCase;
-import org.vafer.jdeb.utils.MapVariableResolver;
 
 public final class PackageDescriptorTestCase extends TestCase {
 
@@ -30,12 +27,12 @@ public final class PackageDescriptorTestCase extends TestCase {
 
         final InputStream is = new ByteArrayInputStream(
             ("Key1: Value1\n" +
-                "Key2: Value2\n" +
-                " Value2.1\n" +
-                " Value2.2\n" +
-                "Key3: Value3\n").getBytes());
+             "Key2: Value2\n" +
+              " Value2.1\n" +
+              " Value2.2\n" +
+              "Key3: Value3\n").getBytes());
 
-        final PackageDescriptor d = new PackageDescriptor(is, null);
+        PackageDescriptor d = new PackageDescriptor(is);
         assertFalse(d.isValid());
 
         assertEquals("key 1", "Value1", d.get("Key1"));
@@ -51,28 +48,10 @@ public final class PackageDescriptorTestCase extends TestCase {
 
         String s = descriptor.toString();
 
-        PackageDescriptor descriptor2 = new PackageDescriptor(new ByteArrayInputStream(s.getBytes()), null);
+        PackageDescriptor descriptor2 = new PackageDescriptor(new ByteArrayInputStream(s.getBytes()));
         assertEquals("Package", descriptor.get("Package"), descriptor2.get("Package"));
         assertEquals("Description", descriptor.get("Description"), descriptor2.get("Description"));
         assertEquals("Version 3", descriptor.get("Version"), descriptor2.get("Version"));
-    }
-
-    public void testVariableSubstitution() {
-
-        final Map<String, String> map = new HashMap<String, String>();
-        map.put("VERSION", "1.2");
-        map.put("MAINTAINER", "Torsten Curdt <tcurdt@vafer.org>");
-
-        final PackageDescriptor d = new PackageDescriptor(new MapVariableResolver(map));
-        d.set("Version", "[[VERSION]]");
-        d.set("Maintainer", "[[MAINTAINER]]");
-        d.set("NoResolve1", "test[[test");
-        d.set("NoResolve2", "[[test]]");
-
-        assertEquals("1.2", d.get("Version"));
-        assertEquals("Torsten Curdt <tcurdt@vafer.org>", d.get("Maintainer"));
-        assertEquals("test[[test", d.get("NoResolve1"));
-        assertEquals("[[test]]", d.get("NoResolve2"));
     }
 
     public void testEmptyLines() throws Exception {
@@ -81,7 +60,7 @@ public final class PackageDescriptorTestCase extends TestCase {
                 "Key2: Value2\n" +
                 "\n").getBytes());
         try {
-            new PackageDescriptor(is, null);
+            new PackageDescriptor(is);
             fail("Should throw a ParseException");
         } catch (ParseException e) {
         }

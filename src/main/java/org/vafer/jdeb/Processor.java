@@ -308,6 +308,7 @@ public class Processor {
                 configurationFiles.add(configurationFile);
 
             } else if ("control".equals(file.getName())) {
+                FilteredConfigurationFile controlFile = new FilteredConfigurationFile(file.getName(), new FileInputStream(file), resolver);
                 packageDescriptor = createPackageDescriptor(file, pDataSize);
 
             } else {
@@ -370,8 +371,9 @@ public class Processor {
      * @param pDataSize  the size of the installed package
      */
     private PackageDescriptor createPackageDescriptor(File file, BigInteger pDataSize) throws IOException, ParseException {
-        PackageDescriptor packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
-
+        FilteredConfigurationFile controlFile = new FilteredConfigurationFile(file.getName(), new FileInputStream(file), resolver);
+        PackageDescriptor packageDescriptor = new PackageDescriptor(new ByteArrayInputStream(controlFile.toString().getBytes()));
+        
         if (packageDescriptor.get("Date") == null) {
             // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
             SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH);

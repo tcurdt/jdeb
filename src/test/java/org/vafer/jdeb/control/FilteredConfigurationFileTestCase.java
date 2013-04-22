@@ -15,6 +15,7 @@
  */
 package org.vafer.jdeb.control;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 import org.apache.tools.ant.util.ReaderInputStream;
+import org.vafer.jdeb.descriptors.PackageDescriptor;
 import org.vafer.jdeb.utils.MapVariableResolver;
 import org.vafer.jdeb.utils.VariableResolver;
 
@@ -54,4 +56,24 @@ public class FilteredConfigurationFileTestCase extends TestCase {
         assertEquals("myName", placeHolder.getName());
     }
 
+    public void testVariableSubstitution() throws Exception {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("VERSION", "1.2");
+        map.put("MAINTAINER", "Torsten Curdt <tcurdt@vafer.org>");
+        
+        String controlFile = 
+                "Version: [[VERSION]]\n"
+                + "Maintainer: [[MAINTAINER]]\n"
+                + "NoResolve1: test[[test\n"
+                + "NoResolve2: [[test]]\n";
+
+        FilteredConfigurationFile filteredFile = new FilteredConfigurationFile("control", new ByteArrayInputStream(controlFile.getBytes()), new MapVariableResolver(map));
+        
+        PackageDescriptor d = new PackageDescriptor(new ByteArrayInputStream(filteredFile.toString().getBytes()));
+        
+        assertEquals("1.2", d.get("Version"));
+        assertEquals("Torsten Curdt <tcurdt@vafer.org>", d.get("Maintainer"));
+        assertEquals("test[[test", d.get("NoResolve1"));
+        assertEquals("[[test]]", d.get("NoResolve2"));
+    }
 }

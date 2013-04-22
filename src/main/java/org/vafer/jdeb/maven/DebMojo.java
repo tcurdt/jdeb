@@ -251,14 +251,12 @@ public class DebMojo extends AbstractPluginMojo {
     public void setOpenReplaceToken( String openReplaceToken ) {
         this.openReplaceToken = openReplaceToken;
         // FIXME yuck!
-        AbstractDescriptor.setOpenToken(openReplaceToken);
         FilteredConfigurationFile.setOpenToken(openReplaceToken);
     }
 
     public void setCloseReplaceToken( String closeReplaceToken ) {
         this.closeReplaceToken = closeReplaceToken;
         // FIXME yuck!
-        AbstractDescriptor.setCloseToken(closeReplaceToken);
         FilteredConfigurationFile.setCloseToken(closeReplaceToken);
     }
 

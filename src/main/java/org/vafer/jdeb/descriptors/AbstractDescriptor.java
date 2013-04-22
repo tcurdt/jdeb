@@ -29,9 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.vafer.jdeb.utils.Utils;
-import org.vafer.jdeb.utils.VariableResolver;
-
 /**
  * A descriptor holds the usual key value pairs.
  *
@@ -41,26 +38,12 @@ import org.vafer.jdeb.utils.VariableResolver;
 public abstract class AbstractDescriptor {
 
     protected final Map<String, String> values = new LinkedHashMap<String, String>();
-    protected final VariableResolver resolver;
 
-    private static String openToken = "[[";
-    private static String closeToken = "]]";
-
-    public AbstractDescriptor( final VariableResolver pResolver ) {
-        resolver = pResolver;
+    protected AbstractDescriptor() {
     }
 
     public AbstractDescriptor( final AbstractDescriptor pDescriptor ) {
-        this(pDescriptor.resolver);
         values.putAll(pDescriptor.values);
-    }
-
-    public static void setOpenToken( final String pToken ) {
-        openToken = pToken;
-    }
-
-    public static void setCloseToken( final String pToken ) {
-        closeToken = pToken;
     }
 
     protected void parse( final InputStream pInput ) throws IOException, ParseException {
@@ -117,12 +100,10 @@ public abstract class AbstractDescriptor {
 
     }
 
-    public void set(final String pKey, final String pValue) {
-        String value = Utils.replaceVariables(resolver, pValue, openToken, closeToken);
-        if ("".equals(value)) {
-            value = null;
+    public void set(final String field, final String value) {
+        if (!"".equals(value)) {
+            values.put(field, value);
         }
-        values.put(pKey, value);
     }
 
     public String get(String field) {

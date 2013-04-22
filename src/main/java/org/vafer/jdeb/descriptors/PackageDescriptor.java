@@ -54,15 +54,9 @@ public final class PackageDescriptor extends AbstractDescriptor {
     };
 
     public PackageDescriptor() {
-        this(null);
     }
 
-    public PackageDescriptor( final VariableResolver pResolver ) {
-        super(pResolver);
-    }
-
-    public PackageDescriptor( final InputStream pInput, final VariableResolver pResolver ) throws IOException, ParseException {
-        this(pResolver);
+    public PackageDescriptor(InputStream pInput) throws IOException, ParseException {
         parse(pInput);
     }
 
