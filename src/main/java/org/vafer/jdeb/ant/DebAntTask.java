@@ -26,12 +26,19 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.apache.tools.ant.taskdefs.Tar;
 import org.apache.tools.ant.types.FileSet;
+import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.PGPSignature;
+import org.bouncycastle.openpgp.PGPSignatureGenerator;
+import org.bouncycastle.openpgp.PGPUtil;
+import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
 import org.vafer.jdeb.Compression;
 import org.vafer.jdeb.DataProducer;
+import org.vafer.jdeb.PackagingException;
 import org.vafer.jdeb.Processor;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
 import org.vafer.jdeb.producers.DataProducerFileSet;
+import org.vafer.jdeb.signing.SigningUtils;
 
 /**
  * TODO generalize with DebMaker
@@ -93,6 +100,11 @@ public class DebAntTask extends MatchingTask {
      */
     private boolean verbose;
 
+    /**
+     * Whether to generate a signature when creating the package.
+     */
+    private boolean signPackage;
+
     private Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
 
 
@@ -134,6 +146,10 @@ public class DebAntTask extends MatchingTask {
 
     public void setVerbose( boolean verbose ) {
         this.verbose = verbose;
+    }
+
+    public void setSignPackage( boolean signPackage ) {
+        this.signPackage = signPackage;
     }
 
     public void addFileSet( FileSet fileset ) {
@@ -191,7 +207,8 @@ public class DebAntTask extends MatchingTask {
             }
         }
 
-        if (Compression.toEnum(compression) == null) {
+        Compression compressionType = Compression.toEnum(compression);
+        if (compressionType == null) {
             throw new BuildException("The compression method '" + compression + "' is not supported (expected 'none', 'gzip' or 'bzip2')");
         }
 
@@ -210,7 +227,7 @@ public class DebAntTask extends MatchingTask {
                 }
             }
         }
-        
+
         if (deb == null) {
             throw new BuildException("You need to point the 'destfile' attribute to where the deb is supposed to be created.");
         }
@@ -224,11 +241,37 @@ public class DebAntTask extends MatchingTask {
 
         final PackageDescriptor packageDescriptor;
         try {
-
             log("Creating debian package: " + deb);
 
-            packageDescriptor = processor.createDeb(controlFiles, data, deb, Compression.toEnum(compression));
+            if (signPackage) {
+                if (keyring == null || !keyring.exists()) {
+                    throw new PackagingException("Signing requested, but no keyring supplied");
+                }
 
+                if (key == null) {
+                    throw new PackagingException("Signing requested, but no key supplied");
+                }
+
+                if (passphrase == null) {
+                    throw new PackagingException("Signing requested, but no passphrase supplied");
+                }
+
+                FileInputStream keyRingInput = new FileInputStream(keyring);
+                PGPSecretKey secretKey = null;
+                try {
+                    secretKey = SigningUtils.getSecretKey(keyRingInput, key);
+                } finally {
+                    keyRingInput.close();
+                }
+
+                PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(
+                        new BcPGPContentSignerBuilder(secretKey.getPublicKey().getAlgorithm(), PGPUtil.SHA1));
+                signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, SigningUtils.getPrivateKey(secretKey, passphrase));
+
+                packageDescriptor = processor.createSignedDeb(controlFiles, data, deb, compressionType, signatureGenerator);
+            } else {
+                packageDescriptor = processor.createDeb(controlFiles, data, deb, compressionType);
+            }
         } catch (Exception e) {
             // what the fuck ant? why are you not printing the exception chain?
             e.printStackTrace();

@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.Iterator;
 
@@ -45,7 +44,7 @@ import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
  */
 public final class SigningUtils {
 
-    private static final byte[] EOL = "\r\n".getBytes(Charset.forName("UTF-8"));
+    private static final byte EOL = Character.LETTER_NUMBER;
 
     /**
      * Create a clear sign signature over the input data. (Not detached)
@@ -58,7 +57,7 @@ public final class SigningUtils {
      */
     public static void clearSign(InputStream input, InputStream keyring, String keyId, String passphrase, OutputStream output) throws IOException, PGPException, GeneralSecurityException {
         PGPSecretKey secretKey = getSecretKey(keyring, keyId);
-        PGPPrivateKey privateKey = secretKey.extractPrivateKey(new BcPBESecretKeyDecryptorBuilder(new BcPGPDigestCalculatorProvider()).build(passphrase.toCharArray()));
+        PGPPrivateKey privateKey = getPrivateKey(secretKey, passphrase);
 
         int digest = PGPUtil.SHA1;
 
@@ -90,13 +89,17 @@ public final class SigningUtils {
         armoredOutput.close();
     }
 
+    public static PGPPrivateKey getPrivateKey(PGPSecretKey secretKey, String passphrase) throws PGPException {
+        return secretKey.extractPrivateKey(new BcPBESecretKeyDecryptorBuilder(new BcPGPDigestCalculatorProvider()).build(passphrase.toCharArray()));
+    }
+
     /**
      * Returns the secret key matching the specified identifier.
-     * 
+     *
      * @param input the input stream containing the keyring collection
      * @param keyId the 4 bytes identifier of the key
      */
-    private static PGPSecretKey getSecretKey(InputStream input, String keyId) throws IOException, PGPException {
+    public static PGPSecretKey getSecretKey(InputStream input, String keyId) throws IOException, PGPException {
         PGPSecretKeyRingCollection keyrings = new PGPSecretKeyRingCollection(PGPUtil.getDecoderStream(input));
 
         Iterator rIt = keyrings.getKeyRings();
@@ -119,7 +122,7 @@ public final class SigningUtils {
 
     /**
      * Trim the trailing spaces.
-     * 
+     *
      * @param line
      */
     private static String trim(String line) {

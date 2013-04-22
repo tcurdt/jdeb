@@ -21,6 +21,11 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.PGPSignature;
+import org.bouncycastle.openpgp.PGPSignatureGenerator;
+import org.bouncycastle.openpgp.PGPUtil;
+import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
 import org.vafer.jdeb.Compression;
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataProducer;
@@ -28,6 +33,7 @@ import org.vafer.jdeb.PackagingException;
 import org.vafer.jdeb.Processor;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
+import org.vafer.jdeb.signing.SigningUtils;
 import org.vafer.jdeb.utils.VariableResolver;
 
 /**
@@ -94,6 +100,12 @@ public class DebMaker {
      */
     private String compression = "gzip";
 
+    /**
+     * Whether to sign the package that is created
+     */
+    private boolean signPackage;
+
+
     private final VariableResolver variableResolver;
 
 
@@ -153,6 +165,10 @@ public class DebMaker {
 
     public void setCompression( String compression ) {
         this.compression = compression;
+    }
+
+    public void setSignPackage( boolean signPackage ) {
+        this.signPackage = signPackage;
     }
 
     /**
@@ -219,7 +235,8 @@ public class DebMaker {
             }
         }
 
-        if (Compression.toEnum(compression) == null) {
+        Compression compressionType = Compression.toEnum(compression);
+        if (compressionType == null) {
             throw new PackagingException("The compression method '" + compression + "' is not supported (expected 'none', 'gzip' or 'bzip2')");
         }
 
@@ -237,11 +254,37 @@ public class DebMaker {
 
         final PackageDescriptor packageDescriptor;
         try {
-
             console.info("Creating debian package: " + deb);
 
-            packageDescriptor = processor.createDeb(controlFiles, data, deb, Compression.toEnum(compression));
+            if (signPackage) {
+                if (keyring == null || !keyring.exists()) {
+                    throw new PackagingException("Signing requested, but no keyring supplied");
+                }
 
+                if (key == null) {
+                    throw new PackagingException("Signing requested, but no key supplied");
+                }
+
+                if (passphrase == null) {
+                    throw new PackagingException("Signing requested, but no passphrase supplied");
+                }
+
+                FileInputStream keyRingInput = new FileInputStream(keyring);
+                PGPSecretKey secretKey = null;
+                try {
+                    secretKey = SigningUtils.getSecretKey(keyRingInput, key);
+                } finally {
+                    keyRingInput.close();
+                }
+
+                PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(
+                        new BcPGPContentSignerBuilder(secretKey.getPublicKey().getAlgorithm(), PGPUtil.SHA1));
+                signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, SigningUtils.getPrivateKey(secretKey, passphrase));
+
+                packageDescriptor = processor.createSignedDeb(controlFiles, data, deb, compressionType, signatureGenerator);
+            } else {
+                packageDescriptor = processor.createDeb(controlFiles, data, deb, compressionType);
+            }
         } catch (Exception e) {
             throw new PackagingException("Failed to create debian package " + deb, e);
         }
