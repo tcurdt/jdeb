@@ -52,6 +52,8 @@ public final class BinaryPackageControlFile extends ControlFile {
     };
 
     public BinaryPackageControlFile() {
+        set("Architecture", "all");
+        set("Priority", "optional");
     }
 
     public BinaryPackageControlFile(String input) throws IOException, ParseException {
