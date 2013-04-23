@@ -40,6 +40,7 @@ import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.tools.ant.DirectoryScanner;
@@ -140,26 +141,16 @@ public class Processor {
             }
 
             pOutput.getParentFile().mkdirs();
-
-            // pass through stream chain to calculate all the different digests
-            final InformationOutputStream md5output = new InformationOutputStream(new FileOutputStream(pOutput), MessageDigest.getInstance("MD5"));
-            final InformationOutputStream sha1output = new InformationOutputStream(md5output, MessageDigest.getInstance("SHA1"));
-            final InformationOutputStream sha256output = new InformationOutputStream(sha1output, MessageDigest.getInstance("SHA-256"));
-            final ArArchiveOutputStream ar = new ArArchiveOutputStream(sha256output);
-
+            
+            
+            ArArchiveOutputStream ar = new ArArchiveOutputStream(new FileOutputStream(pOutput));
+            
             addTo(ar, "debian-binary", "2.0\n");
             addTo(ar, "control.tar.gz", tempControl);
             addTo(ar, "data.tar" + compression.getExtension(), tempData);
 
             ar.close();
-
-            // intermediate values
-            packageControlFile.set("MD5", md5output.getHexDigest());
-            packageControlFile.set("SHA1", sha1output.getHexDigest());
-            packageControlFile.set("SHA256", sha256output.getHexDigest());
-            packageControlFile.set("Size", "" + md5output.getSize());
-            packageControlFile.set("File", pOutput.getName());
-
+            
             return packageControlFile;
 
         } catch (Exception e) {
@@ -184,7 +175,7 @@ public class Processor {
      * @param packageControlFile
      * @param changesProvider
      */
-    public ChangesFile createChanges(BinaryPackageControlFile packageControlFile, ChangesProvider changesProvider) throws IOException, PackagingException {
+    public ChangesFile createChanges(BinaryPackageControlFile packageControlFile, File binaryPackage, ChangesProvider changesProvider) throws IOException, PackagingException {
         ChangesFile changesFile = new ChangesFile(packageControlFile);
         changesFile.setChanges(changesProvider.getChangesSets());
         
@@ -193,36 +184,43 @@ public class Processor {
         if (changesFile.get("Binary") == null) {
             changesFile.set("Binary", changesFile.get("Package"));
         }
-
-        if (changesFile.get("Source") == null) {
-            changesFile.set("Source", changesFile.get("Package"));
+        
+        try {
+            // compute the checksums of the binary package
+            InformationOutputStream md5output = new InformationOutputStream(new NullOutputStream(), MessageDigest.getInstance("MD5"));
+            InformationOutputStream sha1output = new InformationOutputStream(md5output, MessageDigest.getInstance("SHA1"));
+            InformationOutputStream sha256output = new InformationOutputStream(sha1output, MessageDigest.getInstance("SHA-256"));
+            
+            FileUtils.copyFile(binaryPackage, sha256output);
+            
+            final StringBuilder checksumsSha1 = new StringBuilder("\n");
+            // Checksums-Sha1:
+            // 56ef4c6249dc3567fd2967f809c42d1f9b61adf7 45964 jdeb.deb
+            checksumsSha1.append(' ').append(sha1output.getHexDigest());
+            checksumsSha1.append(' ').append(binaryPackage.length());
+            checksumsSha1.append(' ').append(binaryPackage.getName());
+            changesFile.set("Checksums-Sha1", checksumsSha1.toString());
+            
+            final StringBuilder checksumsSha256 = new StringBuilder("\n");
+            // Checksums-Sha256:
+            // 38c6fa274eb9299a69b739bcbdbd05c7ffd1d8d6472f4245ed732a25c0e5d616 45964 jdeb.deb
+            checksumsSha256.append(' ').append(sha256output.getHexDigest());
+            checksumsSha256.append(' ').append(binaryPackage.length());
+            checksumsSha256.append(' ').append(binaryPackage.getName());
+            changesFile.set("Checksums-Sha256", checksumsSha256.toString());
+            
+            final StringBuilder files = new StringBuilder("\n");
+            files.append(' ').append(md5output.getHexDigest());
+            files.append(' ').append(binaryPackage.length());
+            files.append(' ').append(changesFile.get("Section"));
+            files.append(' ').append(changesFile.get("Priority"));
+            files.append(' ').append(binaryPackage.getName());
+            changesFile.set("Files", files.toString());
+            
+        } catch (NoSuchAlgorithmException e) {
+            throw new PackagingException("Unable to compute the checksums for " + binaryPackage, e);
         }
-
-        final StringBuilder checksumsSha1 = new StringBuilder("\n");
-        // Checksums-Sha1:
-        // 56ef4c6249dc3567fd2967f809c42d1f9b61adf7 45964 jdeb.deb
-        checksumsSha1.append(' ').append(changesFile.get("SHA1"));
-        checksumsSha1.append(' ').append(changesFile.get("Size"));
-        checksumsSha1.append(' ').append(changesFile.get("File"));
-        changesFile.set("Checksums-Sha1", checksumsSha1.toString());
-
-        final StringBuilder checksumsSha256 = new StringBuilder("\n");
-        // Checksums-Sha256:
-        // 38c6fa274eb9299a69b739bcbdbd05c7ffd1d8d6472f4245ed732a25c0e5d616 45964 jdeb.deb
-        checksumsSha256.append(' ').append(changesFile.get("SHA256"));
-        checksumsSha256.append(' ').append(changesFile.get("Size"));
-        checksumsSha256.append(' ').append(changesFile.get("File"));
-        changesFile.set("Checksums-Sha256", checksumsSha256.toString());
-
-
-        final StringBuilder files = new StringBuilder("\n");
-        files.append(' ').append(changesFile.get("MD5"));
-        files.append(' ').append(changesFile.get("Size"));
-        files.append(' ').append(changesFile.get("Section"));
-        files.append(' ').append(changesFile.get("Priority"));
-        files.append(' ').append(changesFile.get("File"));
-        changesFile.set("Files", files.toString());
-
+        
         if (!changesFile.isValid()) {
             throw new PackagingException("Changes file fields are invalid " + changesFile.invalidFields() +
                 ". The following fields are mandatory: " + changesFile.getMandatoryFields() +

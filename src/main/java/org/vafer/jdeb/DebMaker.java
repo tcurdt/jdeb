@@ -204,7 +204,7 @@ public class DebMaker {
             // for now only support reading the changes form a textfile provider
             changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile);
             
-            ChangesFile changesFile = processor.createChanges(packageControlFile, changesProvider);
+            ChangesFile changesFile = processor.createChanges(packageControlFile, deb, changesProvider);
             
             if (keyring != null && key != null && passphrase != null) {
                 console.info("Signing the changes file with the key " + key);
