@@ -5,5 +5,8 @@ Priority: optional
 Architecture: i386
 Depends: some-package
 Maintainer: John Doe <john@doe.org>
-Description: revision @REVISION@, test package
 Distribution: development
+Description: revision @REVISION@, test package
+ This is a sample package control file.
+ .
+ Use for testing purposes only.

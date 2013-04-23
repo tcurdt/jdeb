@@ -43,12 +43,12 @@ public final class ChangesFile extends ControlFile {
             new ControlField("Urgency", true),
             new ControlField("Maintainer", true),
             new ControlField("Changed-By"),
-            new ControlField("Description", true, ControlField.Type.MULTILINE),
-            new ControlField("Changes", true, ControlField.Type.MULTILINE),
+            new ControlField("Description", true, ControlField.Type.MULTILINE, true),
+            new ControlField("Changes", true, ControlField.Type.MULTILINE, true),
             new ControlField("Closes"),
-            new ControlField("Checksums-Sha1", true, ControlField.Type.MULTILINE),
-            new ControlField("Checksums-Sha256", true, ControlField.Type.MULTILINE),
-            new ControlField("Files", true, ControlField.Type.MULTILINE)
+            new ControlField("Checksums-Sha1", true, ControlField.Type.MULTILINE, true),
+            new ControlField("Checksums-Sha256", true, ControlField.Type.MULTILINE, true),
+            new ControlField("Files", true, ControlField.Type.MULTILINE, true)
     };
 
     public ChangesFile() {

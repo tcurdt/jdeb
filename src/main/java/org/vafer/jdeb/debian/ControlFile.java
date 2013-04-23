@@ -21,7 +21,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -39,23 +38,22 @@ public abstract class ControlFile {
 
     protected final Map<String, String> values = new LinkedHashMap<String, String>();
 
-    protected void parse(String input) throws IOException, ParseException {
+    public void parse(String input) throws IOException, ParseException {
         parse(new ByteArrayInputStream(input.getBytes("UTF-8")));
     }
 
-    protected void parse(InputStream input) throws IOException, ParseException {
-        final BufferedReader br = new BufferedReader(new InputStreamReader(input, "UTF-8"));
+    public void parse(InputStream input) throws IOException, ParseException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
         StringBuilder buffer = new StringBuilder();
         String field = null;
         int linenr = 0;
         while (true) {
-            final String line = br.readLine();
+            final String line = reader.readLine();
 
             if (line == null) {
                 if (buffer.length() > 0) {
                     // flush value of the previous field
                     set(field, buffer.toString());
-                    buffer = null;
                 }
                 break;
             }
@@ -90,10 +88,13 @@ public abstract class ControlFile {
                 continue;
             }
 
-            // continuing old value
-            buffer.append('\n').append(line.substring(1));
+            // continuing old value, lines with only a dot are ignored
+            buffer.append('\n');
+            if (!".".equals(line.substring(1).trim())) {
+                buffer.append(line.substring(1));
+            }
         }
-        br.close();
+        reader.close();
 
     }
 
@@ -137,27 +138,11 @@ public abstract class ControlFile {
         return invalid;
     }
 
-    public String toString(ControlField[] fields) {
+    public String toString(ControlField... fields) {
         StringBuilder s = new StringBuilder();
         for (ControlField field : fields) {
             String value = values.get(field.getName());
-            if (value != null) {
-                s.append(field.getName()).append(":");
-
-                try {
-                    BufferedReader reader = new BufferedReader(new StringReader(value));
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        if (line.length() != 0 && !Character.isWhitespace(line.charAt(0))) {
-                            s.append(' ');
-                        }
-
-                        s.append(line).append('\n');
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            s.append(field.format(value));
         }
         return s.toString();
     }

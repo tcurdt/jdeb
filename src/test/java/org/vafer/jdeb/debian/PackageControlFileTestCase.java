@@ -16,6 +16,7 @@
 
 package org.vafer.jdeb.debian;
 
+import java.io.FileInputStream;
 import java.text.ParseException;
 
 import junit.framework.TestCase;
@@ -72,5 +73,19 @@ public final class PackageControlFileTestCase extends TestCase {
         packageControlFile.set("Description", "This is the short description\nThis is the loooooong description");
         
         assertEquals("short description", "This is the short description", packageControlFile.getShortDescription());
+        
+        packageControlFile.set("Description", "\nThere is no short description");
+        
+        assertEquals("short description", "", packageControlFile.getShortDescription());
+    }
+
+    public void testGetDescription() throws Exception {
+        BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile();
+        packageControlFile.parse(new FileInputStream("target/test-classes/org/vafer/jdeb/deb/control/control"));
+        
+        assertEquals("Description", "revision @REVISION@, test package\n" +
+                "This is a sample package control file.\n\n" +
+                "Use for testing purposes only.",
+                packageControlFile.get("Description"));
     }
 }

@@ -190,24 +190,15 @@ public class Processor {
             
             FileUtils.copyFile(binaryPackage, sha256output);
             
-            final StringBuilder checksumsSha1 = new StringBuilder("\n");
             // Checksums-Sha1:
-            // 56ef4c6249dc3567fd2967f809c42d1f9b61adf7 45964 jdeb.deb
-            checksumsSha1.append(' ').append(sha1output.getHexDigest());
-            checksumsSha1.append(' ').append(binaryPackage.length());
-            checksumsSha1.append(' ').append(binaryPackage.getName());
-            changesFile.set("Checksums-Sha1", checksumsSha1.toString());
+            //  56ef4c6249dc3567fd2967f809c42d1f9b61adf7 45964 jdeb.deb
+            changesFile.set("Checksums-Sha1", sha1output.getHexDigest() + " " + binaryPackage.length() + " " + binaryPackage.getName());
             
-            final StringBuilder checksumsSha256 = new StringBuilder("\n");
             // Checksums-Sha256:
-            // 38c6fa274eb9299a69b739bcbdbd05c7ffd1d8d6472f4245ed732a25c0e5d616 45964 jdeb.deb
-            checksumsSha256.append(' ').append(sha256output.getHexDigest());
-            checksumsSha256.append(' ').append(binaryPackage.length());
-            checksumsSha256.append(' ').append(binaryPackage.getName());
-            changesFile.set("Checksums-Sha256", checksumsSha256.toString());
+            //  38c6fa274eb9299a69b739bcbdbd05c7ffd1d8d6472f4245ed732a25c0e5d616 45964 jdeb.deb
+            changesFile.set("Checksums-Sha256", sha256output.getHexDigest() + " " + binaryPackage.length() + " " + binaryPackage.getName());
             
-            final StringBuilder files = new StringBuilder("\n");
-            files.append(' ').append(md5output.getHexDigest());
+            StringBuilder files = new StringBuilder(md5output.getHexDigest());
             files.append(' ').append(binaryPackage.length());
             files.append(' ').append(changesFile.get("Section"));
             files.append(' ').append(changesFile.get("Priority"));
