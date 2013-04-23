@@ -51,9 +51,23 @@ public final class ChangesFile extends ControlFile {
             new ControlField("Files", true, ControlField.Type.MULTILINE)
     };
 
-    public ChangesFile(ControlFile controlFile) {
-        super(controlFile);
+    public ChangesFile() {
         set("Format", "1.8");
+    }
+
+    /**
+     * Initializes the fields on the changes file with the values of the specified
+     * binary package control file.
+     * 
+     * @param packageControlFile
+     */
+    public void initialize(BinaryPackageControlFile packageControlFile) {
+        set("Binary",       packageControlFile.get("Package"));
+        set("Architecture", packageControlFile.get("Architecture"));
+        set("Version",      packageControlFile.get("Version"));
+        set("Maintainer",   packageControlFile.get("Maintainer"));
+        set("Changed-By",   packageControlFile.get("Maintainer"));
+        set("Description",  packageControlFile.get("Description"));
     }
 
     public void setChanges(ChangeSet[] changeSets) {

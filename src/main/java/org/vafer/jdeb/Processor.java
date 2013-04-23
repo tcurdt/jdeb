@@ -176,14 +176,11 @@ public class Processor {
      * @param changesProvider
      */
     public ChangesFile createChanges(BinaryPackageControlFile packageControlFile, File binaryPackage, ChangesProvider changesProvider) throws IOException, PackagingException {
-        ChangesFile changesFile = new ChangesFile(packageControlFile);
+        ChangesFile changesFile = new ChangesFile();
         changesFile.setChanges(changesProvider.getChangesSets());
-        
+        changesFile.initialize(packageControlFile);
+
         changesFile.set("Date", ChangesFile.DATE_FORMAT.format(new Date()));
-        
-        if (changesFile.get("Binary") == null) {
-            changesFile.set("Binary", changesFile.get("Package"));
-        }
         
         try {
             // compute the checksums of the binary package

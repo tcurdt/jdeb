@@ -27,9 +27,10 @@ public final class ChangesFileTestCase extends TestCase {
         packageControlFile.set("Description", "This is\na description\non several lines");
         packageControlFile.set("Version", "1.0");
         
-        ChangesFile changes = new ChangesFile(packageControlFile);
+        ChangesFile changes = new ChangesFile();
         changes.setChanges(new ChangeSet[0]);
-
+        changes.initialize(packageControlFile);
+        
         assertEquals("1.0", changes.get("Version"));
     }
 }

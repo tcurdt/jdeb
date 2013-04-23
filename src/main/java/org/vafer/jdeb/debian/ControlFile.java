@@ -39,13 +39,6 @@ public abstract class ControlFile {
 
     protected final Map<String, String> values = new LinkedHashMap<String, String>();
 
-    protected ControlFile() {
-    }
-
-    public ControlFile(final ControlFile controlFile) {
-        values.putAll(controlFile.values);
-    }
-
     protected void parse(String input) throws IOException, ParseException {
         parse(new ByteArrayInputStream(input.getBytes("UTF-8")));
     }
