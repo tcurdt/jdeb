@@ -19,20 +19,27 @@ package org.vafer.jdeb;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
+import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 import org.vafer.jdeb.debian.ChangesFile;
 import org.vafer.jdeb.signing.PGPSigner;
+import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
 /**
  * A generic class for creating Debian archives. Even supports signed changes
  * files.
  *
+ * @author Torsten Curdt
  * @author Bryan Sant
  */
 public class DebMaker {
@@ -169,26 +176,21 @@ public class DebMaker {
     public void makeDeb() throws PackagingException {
         final File[] controlFiles = control.listFiles();
 
-        final DataProducer[] data = new DataProducer[dataProducers.size()];
-        dataProducers.toArray(data);
-
-        final Processor processor = new Processor(console, variableResolver);
-
         final BinaryPackageControlFile packageControlFile;
         try {
 
             console.info("Creating debian package: " + deb);
 
-            packageControlFile = processor.createDeb(controlFiles, data, deb, Compression.toEnum(compression));
+            packageControlFile = createDeb(controlFiles, deb, Compression.toEnum(compression));
 
         } catch (Exception e) {
             throw new PackagingException("Failed to create debian package " + deb, e);
         }
         
-        makeChangesFiles(processor, packageControlFile);
+        makeChangesFiles(packageControlFile);
     }
 
-    private void makeChangesFiles(Processor processor, BinaryPackageControlFile packageControlFile) throws PackagingException {
+    private void makeChangesFiles(BinaryPackageControlFile packageControlFile) throws PackagingException {
         if (changesOut == null) {
             return;
         }
@@ -204,7 +206,8 @@ public class DebMaker {
             // for now only support reading the changes form a textfile provider
             changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile);
             
-            ChangesFile changesFile = processor.createChanges(packageControlFile, deb, changesProvider);
+            ChangesFileBuilder builder = new ChangesFileBuilder();
+            ChangesFile changesFile = builder.createChanges(packageControlFile, deb, changesProvider);
             
             if (keyring != null && key != null && passphrase != null) {
                 console.info("Signing the changes file with the key " + key);
@@ -233,5 +236,88 @@ public class DebMaker {
         } catch (Exception e) {
             throw new PackagingException("Failed to save debian changes file " + changesSave, e);
         }
+    }
+    
+    /**
+     * Create the debian archive with from the provided control files and data producers.
+     *
+     * @param pControlFiles
+     * @param pData
+     * @param pOutput
+     * @param compression   the compression method used for the data file
+     * @return BinaryPackageControlFile
+     * @throws PackagingException
+     */
+    public BinaryPackageControlFile createDeb( final File[] pControlFiles, final File pOutput, Compression compression ) throws PackagingException {
+
+        File tempData = null;
+        File tempControl = null;
+
+        try {
+            tempData = File.createTempFile("deb", "data");
+            tempControl = File.createTempFile("deb", "control");
+
+            console.info("Building data");
+            DataBuilder dataBuilder = new DataBuilder(console);
+            final StringBuilder md5s = new StringBuilder();
+            final BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, compression);
+
+            console.info("Building control");
+            ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver);
+            final BinaryPackageControlFile packageControlFile = controlBuilder.buildControl(pControlFiles, size, md5s, tempControl);
+            
+            if (!packageControlFile.isValid()) {
+                throw new PackagingException("Control file fields are invalid " + packageControlFile.invalidFields() +
+                    ". The following fields are mandatory: " + packageControlFile.getMandatoryFields() +
+                    ". Please check your pom.xml/build.xml and your control file.");
+            }
+
+            pOutput.getParentFile().mkdirs();
+            
+            
+            ArArchiveOutputStream ar = new ArArchiveOutputStream(new FileOutputStream(pOutput));
+            
+            addTo(ar, "debian-binary", "2.0\n");
+            addTo(ar, "control.tar.gz", tempControl);
+            addTo(ar, "data.tar" + compression.getExtension(), tempData);
+
+            ar.close();
+            
+            return packageControlFile;
+
+        } catch (Exception e) {
+            throw new PackagingException("Could not create deb package", e);
+        } finally {
+            if (tempData != null) {
+                if (!tempData.delete()) {
+                    console.warn("Could not delete the temporary file " + tempData);
+                }
+            }
+            if (tempControl != null) {
+                if (!tempControl.delete()) {
+                    console.warn("Could not delete the temporary file " + tempControl);
+                }
+            }
+        }
+    }
+
+    private void addTo(ArArchiveOutputStream pOutput, String pName, String pContent) throws IOException {
+        final byte[] content = pContent.getBytes();
+        pOutput.putArchiveEntry(new ArArchiveEntry(pName, content.length));
+        pOutput.write(content);
+        pOutput.closeArchiveEntry();
+    }
+
+    private void addTo(ArArchiveOutputStream pOutput, String pName, File pContent) throws IOException {
+        pOutput.putArchiveEntry(new ArArchiveEntry(pName, pContent.length()));
+
+        final InputStream input = new FileInputStream(pContent);
+        try {
+            Utils.copy(input, pOutput);
+        } finally {
+            input.close();
+        }
+
+        pOutput.closeArchiveEntry();
     }
 }

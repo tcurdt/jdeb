@@ -19,7 +19,8 @@ package org.vafer.jdeb;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,35 +28,56 @@ import junit.framework.TestCase;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.types.FileSet;
-import org.vafer.jdeb.producers.DataProducerFileSet;
+import org.vafer.jdeb.debian.BinaryPackageControlFile;
+import org.vafer.jdeb.producers.DataProducerArchive;
+import org.vafer.jdeb.producers.DataProducerDirectory;
+import org.vafer.jdeb.producers.DataProducerLink;
 import org.vafer.jdeb.utils.InformationInputStream;
 import org.vafer.jdeb.utils.MapVariableResolver;
 
-public class ProcessorTestCase extends TestCase {
+public class DebMakerTestCase extends TestCase {
 
-    /**
-     * Checks if the file paths in the md5sums file use only unix file separators
-     * (this test can only fail on Windows)
-     */
-    public void testBuildDataWithFileSet() throws Exception {
-        Processor processor = new Processor(new NullConsole(), null);
+    public void testCreation() throws Exception {
 
-        Project project = new Project();
-        project.setCoreLoader(getClass().getClassLoader());
-        project.init();
+        File control = new File(getClass().getResource("deb/control/control").toURI());
+        File archive1 = new File(getClass().getResource("deb/data.tgz").toURI());
+        File archive2 = new File(getClass().getResource("deb/data.tar.bz2").toURI());
+        File archive3 = new File(getClass().getResource("deb/data.zip").toURI());
+        File directory = new File(getClass().getResource("deb/data").toURI());
 
-        FileSet fileset = new FileSet();
-        fileset.setDir(new File(getClass().getResource("deb/data").toURI()));
-        fileset.setIncludes("**/*");
-        fileset.setProject(project);
+        DataProducer[] data = new DataProducer[] {
+            new DataProducerArchive(archive1, null, null, null),
+            new DataProducerArchive(archive2, null, null, null),
+            new DataProducerArchive(archive3, null, null, null),
+            new DataProducerDirectory(directory, null, new String[] { "**/.svn/**" }, null),
+            new DataProducerLink("/link/path-element.ext", "/link/target-element.ext", true, null, null, null)
+        };
 
-        StringBuilder md5s = new StringBuilder();
-        processor.buildData(new DataProducer[] { new DataProducerFileSet(fileset) }, new File("target/data.tar"), md5s, Compression.GZIP);
+        File deb = File.createTempFile("jdeb", ".deb");
 
-        assertTrue("empty md5 file", md5s.length() > 0);
-        assertFalse("windows path separator found", md5s.indexOf("\\") != -1);
+        DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data));
+        maker.setDeb(deb);
+        
+        BinaryPackageControlFile packageControlFile = maker.createDeb(new File[] { control }, deb, Compression.GZIP);
+
+        assertTrue(packageControlFile.isValid());
+
+        final Map<String, TarArchiveEntry> filesInDeb = new HashMap<String, TarArchiveEntry>();
+        
+        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
+            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
+                filesInDeb.put(entry.getName(), entry);
+            }
+        }, Compression.GZIP);
+        
+        assertTrue("testfile wasn't found in the package", filesInDeb.containsKey("./test/testfile"));
+        assertTrue("testfile2 wasn't found in the package", filesInDeb.containsKey("./test/testfile2"));
+        assertTrue("testfile3 wasn't found in the package", filesInDeb.containsKey("./test/testfile3"));
+        assertTrue("testfile4 wasn't found in the package", filesInDeb.containsKey("./test/testfile4"));
+        assertTrue("/link/path-element.ext wasn't found in the package", filesInDeb.containsKey("./link/path-element.ext"));
+        assertEquals("/link/path-element.ext has wrong link target", "/link/target-element.ext", filesInDeb.get("./link/path-element.ext").getLinkName());
+
+        assertTrue("Cannot delete the file " + deb, deb.delete());
     }
 
     public void testControlFilesPermissions() throws Exception {
@@ -64,12 +86,12 @@ public class ProcessorTestCase extends TestCase {
             fail("Couldn't delete " + deb);
         }
         
-        Processor processor = new Processor(new NullConsole(), new MapVariableResolver(Collections.<String, String>emptyMap()));
+        Collection<DataProducer> producers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
+        DebMaker maker = new DebMaker(new NullConsole(), producers);
         
         File controlDir = new File("target/test-classes/org/vafer/jdeb/deb/control");
-        DataProducer[] producers = {new EmptyDataProducer()};
         
-        processor.createDeb(controlDir.listFiles(), producers, deb, Compression.NONE);
+        maker.createDeb(controlDir.listFiles(), deb, Compression.NONE);
         
         // now reopen the package and check the control files
         assertTrue("package not build", deb.exists());
@@ -108,12 +130,13 @@ public class ProcessorTestCase extends TestCase {
         variables.put("name", "jdeb");
         variables.put("version", "1.0");
         
-        Processor processor = new Processor(new NullConsole(), new MapVariableResolver(variables));
+        Collection<DataProducer> producers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
+        DebMaker maker = new DebMaker(new NullConsole(), producers);
+        maker.setResolver(new MapVariableResolver(variables));
         
         File controlDir = new File("target/test-classes/org/vafer/jdeb/deb/control");
-        DataProducer[] producers = {new EmptyDataProducer()};
         
-        processor.createDeb(controlDir.listFiles(), producers, deb, Compression.NONE);
+        maker.createDeb(controlDir.listFiles(), deb, Compression.NONE);
         
         // now reopen the package and check the control files
         assertTrue("package not build", deb.exists());
