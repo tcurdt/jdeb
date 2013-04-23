@@ -174,14 +174,11 @@ public class DebMaker {
     }
 
     public void makeDeb() throws PackagingException {
-        final File[] controlFiles = control.listFiles();
-
-        final BinaryPackageControlFile packageControlFile;
+        BinaryPackageControlFile packageControlFile;
         try {
-
             console.info("Creating debian package: " + deb);
 
-            packageControlFile = createDeb(controlFiles, deb, Compression.toEnum(compression));
+            packageControlFile = createDeb(Compression.toEnum(compression));
 
         } catch (Exception e) {
             throw new PackagingException("Failed to create debian package " + deb, e);
@@ -243,12 +240,12 @@ public class DebMaker {
      *
      * @param pControlFiles
      * @param pData
-     * @param pOutput
+     * @param deb
      * @param compression   the compression method used for the data file
      * @return BinaryPackageControlFile
      * @throws PackagingException
      */
-    public BinaryPackageControlFile createDeb( final File[] pControlFiles, final File pOutput, Compression compression ) throws PackagingException {
+    public BinaryPackageControlFile createDeb(Compression compression) throws PackagingException {
 
         File tempData = null;
         File tempControl = null;
@@ -264,7 +261,7 @@ public class DebMaker {
 
             console.info("Building control");
             ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver);
-            final BinaryPackageControlFile packageControlFile = controlBuilder.buildControl(pControlFiles, size, md5s, tempControl);
+            final BinaryPackageControlFile packageControlFile = controlBuilder.buildControl(control.listFiles(), size, md5s, tempControl);
             
             if (!packageControlFile.isValid()) {
                 throw new PackagingException("Control file fields are invalid " + packageControlFile.invalidFields() +
@@ -272,10 +269,10 @@ public class DebMaker {
                     ". Please check your pom.xml/build.xml and your control file.");
             }
 
-            pOutput.getParentFile().mkdirs();
+            deb.getParentFile().mkdirs();
             
             
-            ArArchiveOutputStream ar = new ArArchiveOutputStream(new FileOutputStream(pOutput));
+            ArArchiveOutputStream ar = new ArArchiveOutputStream(new FileOutputStream(deb));
             
             addTo(ar, "debian-binary", "2.0\n");
             addTo(ar, "control.tar.gz", tempControl);

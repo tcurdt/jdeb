@@ -56,10 +56,11 @@ public class DebMakerTestCase extends TestCase {
         File deb = File.createTempFile("jdeb", ".deb");
 
         DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data));
+        maker.setControl(new File(getClass().getResource("deb/control").toURI()));
         maker.setDeb(deb);
         
-        BinaryPackageControlFile packageControlFile = maker.createDeb(new File[] { control }, deb, Compression.GZIP);
-
+        BinaryPackageControlFile packageControlFile = maker.createDeb(Compression.GZIP);
+        
         assertTrue(packageControlFile.isValid());
 
         final Map<String, TarArchiveEntry> filesInDeb = new HashMap<String, TarArchiveEntry>();
@@ -88,10 +89,10 @@ public class DebMakerTestCase extends TestCase {
         
         Collection<DataProducer> producers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
         DebMaker maker = new DebMaker(new NullConsole(), producers);
+        maker.setDeb(deb);
+        maker.setControl(new File("target/test-classes/org/vafer/jdeb/deb/control"));
         
-        File controlDir = new File("target/test-classes/org/vafer/jdeb/deb/control");
-        
-        maker.createDeb(controlDir.listFiles(), deb, Compression.NONE);
+        maker.createDeb(Compression.NONE);
         
         // now reopen the package and check the control files
         assertTrue("package not build", deb.exists());
@@ -132,11 +133,11 @@ public class DebMakerTestCase extends TestCase {
         
         Collection<DataProducer> producers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
         DebMaker maker = new DebMaker(new NullConsole(), producers);
+        maker.setDeb(deb);
+        maker.setControl(new File("target/test-classes/org/vafer/jdeb/deb/control"));
         maker.setResolver(new MapVariableResolver(variables));
         
-        File controlDir = new File("target/test-classes/org/vafer/jdeb/deb/control");
-        
-        maker.createDeb(controlDir.listFiles(), deb, Compression.NONE);
+        maker.createDeb(Compression.NONE);
         
         // now reopen the package and check the control files
         assertTrue("package not build", deb.exists());
