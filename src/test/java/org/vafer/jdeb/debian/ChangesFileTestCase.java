@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.debian;
 
 import junit.framework.TestCase;
 import org.vafer.jdeb.changes.ChangeSet;
-import org.vafer.jdeb.debian.BinaryPackageControlFile;
-import org.vafer.jdeb.debian.ChangesFile;
 
 public final class ChangesFileTestCase extends TestCase {
 
@@ -27,10 +26,10 @@ public final class ChangesFileTestCase extends TestCase {
         packageControlFile.set("Package", "test-package");
         packageControlFile.set("Description", "This is\na description\non several lines");
         packageControlFile.set("Version", "1.0");
-
-        final ChangesFile changes = new ChangesFile(packageControlFile, new ChangeSet[0]);
+        
+        ChangesFile changes = new ChangesFile(packageControlFile);
+        changes.setChanges(new ChangeSet[0]);
 
         assertEquals("1.0", changes.get("Version"));
     }
-
 }

@@ -51,16 +51,19 @@ public final class ChangesFile extends ControlFile {
             new ControlField("Files", true, ControlField.Type.MULTILINE)
     };
 
-    public ChangesFile(ControlFile controlFile, ChangeSet[] changeSets) {
+    public ChangesFile(ControlFile controlFile) {
         super(controlFile);
-        
+        set("Format", "1.8");
+    }
+
+    public void setChanges(ChangeSet[] changeSets) {
         StringBuilder sb = new StringBuilder();
 
         if (changeSets.length > 0) {
-            final ChangeSet latestChangeSet = changeSets[0];
-            set("Urgency", latestChangeSet.getUrgency());
-            set("Changed-By", latestChangeSet.getChangedBy());
-
+            final ChangeSet mostRecentChangeSet = changeSets[0];
+            set("Urgency", mostRecentChangeSet.getUrgency());
+            set("Changed-By", mostRecentChangeSet.getChangedBy());
+            
             for (ChangeSet changeSet : changeSets) {
                 sb.append(changeSet.toString());
             }

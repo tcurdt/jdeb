@@ -43,7 +43,6 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.tools.ant.DirectoryScanner;
-import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.ChangesProvider;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 import org.vafer.jdeb.debian.ChangesFile;
@@ -183,13 +182,12 @@ public class Processor {
      * Create changes file based on the provided BinaryPackageControlFile.
      *
      * @param packageControlFile
-     * @param pChangesProvider
+     * @param changesProvider
      */
-    public ChangesFile createChanges(BinaryPackageControlFile packageControlFile, ChangesProvider pChangesProvider) throws IOException, PackagingException {
-        final ChangeSet[] changeSets = pChangesProvider.getChangesSets();
-        final ChangesFile changesFile = new ChangesFile(packageControlFile, changeSets);
-
-        changesFile.set("Format", "1.8");
+    public ChangesFile createChanges(BinaryPackageControlFile packageControlFile, ChangesProvider changesProvider) throws IOException, PackagingException {
+        ChangesFile changesFile = new ChangesFile(packageControlFile);
+        changesFile.setChanges(changesProvider.getChangesSets());
+        
         changesFile.set("Date", ChangesFile.DATE_FORMAT.format(new Date()));
         
         if (changesFile.get("Binary") == null) {
