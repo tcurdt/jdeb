@@ -17,84 +17,56 @@
 package org.vafer.jdeb.ant;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.apache.tools.ant.taskdefs.Tar;
 import org.apache.tools.ant.types.FileSet;
-import org.vafer.jdeb.Compression;
+import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataProducer;
-import org.vafer.jdeb.Processor;
-import org.vafer.jdeb.changes.TextfileChangesProvider;
-import org.vafer.jdeb.debian.BinaryPackageControlFile;
-import org.vafer.jdeb.debian.ChangesFile;
+import org.vafer.jdeb.DebMaker;
+import org.vafer.jdeb.PackagingException;
 import org.vafer.jdeb.producers.DataProducerFileSet;
-import org.vafer.jdeb.signing.PGPSigner;
 
 /**
- * TODO generalize with DebMaker
- *
  * AntTask for creating debian archives.
- * Even supports signed changes files.
  *
  * @author Torsten Curdt
  */
 public class DebAntTask extends MatchingTask {
 
-    /**
-     * The Debian package produced
-     */
+    /** The Debian package produced */
     private File deb;
 
-    /**
-     * The directory containing the control files to build the package
-     */
+    /** The directory containing the control files to build the package */
     private File control;
 
-    /**
-     * The file containing the PGP keys
-     */
+    /** The file containing the PGP keys */
     private File keyring;
 
-    /**
-     * The key to use in the keyring
-     */
+    /** The key to use in the keyring */
     private String key;
 
-    /**
-     * The passphrase for the key to sign the changes file
-     */
+    /** The passphrase for the key to sign the changes file */
     private String passphrase;
 
-    /**
-     * The file to read the changes from
-     */
+    /** The file to read the changes from */
     private File changesIn;
 
-    /**
-     * The file where to write the changes to
-     */
+    /** The file where to write the changes to */
     private File changesOut;
 
-    /**
-     * The file where to write the changes of the changes input to
-     */
+    /** The file where to write the changes of the changes input to */
     private File changesSave;
 
-    /**
-     * The compression method used for the data file (none, gzip or bzip2)
-     */
+    /** The compression method used for the data file (none, gzip or bzip2) */
     private String compression = "gzip";
 
-    /**
-     * Trigger the verbose mode detailing all operations
-     */
+    /** Trigger the verbose mode detailing all operations */
     private boolean verbose;
 
     private Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
@@ -152,58 +124,8 @@ public class DebAntTask extends MatchingTask {
         dataProducers.add(data);
     }
 
-    private boolean isPossibleOutput( File file ) {
-
-        if (file == null) {
-            return false;
-        }
-
-        if (file.exists()) {
-            return file.isFile() && file.canWrite();
-        }
-
-        return true;
-    }
-
     public void execute() {
-
-        if (control == null || !control.isDirectory()) {
-            throw new BuildException("You need to point the 'control' attribute to the control directory.");
-        }
-
-        if (changesIn != null) {
-
-            if (!changesIn.isFile() || !changesIn.canRead()) {
-                throw new BuildException("The 'changesIn' attribute needs to point to a readable file. " + changesIn + " was not found/readable.");
-            }
-
-            if (changesOut == null) {
-                throw new BuildException("A 'changesIn' without a 'changesOut' does not make much sense.");
-            }
-
-            if (!isPossibleOutput(changesOut)) {
-                throw new BuildException("Cannot write the output for 'changesOut' to " + changesOut);
-            }
-
-            if (changesSave != null && !isPossibleOutput(changesSave)) {
-                throw new BuildException("Cannot write the output for 'changesSave' to " + changesSave);
-            }
-
-        } else {
-            if (changesOut != null || changesSave != null) {
-                throw new BuildException("The 'changesOut' or 'changesSave' attributes may only be used when there is a 'changesIn' specified.");
-            }
-        }
-
-        if (Compression.toEnum(compression) == null) {
-            throw new BuildException("The compression method '" + compression + "' is not supported (expected 'none', 'gzip' or 'bzip2')");
-        }
-
-        if (dataProducers.size() == 0) {
-            throw new BuildException("You need to provide at least one reference to a tgz or directory with data.");
-        }
-
-        // validation of the type of the <data> elements
+        // validate the type of the <data> elements
         for (DataProducer dataProducer : dataProducers) {
             if (dataProducer instanceof Data) {
                 Data data = (Data) dataProducer;
@@ -215,77 +137,26 @@ public class DebAntTask extends MatchingTask {
             }
         }
         
-        if (deb == null) {
-            throw new BuildException("You need to point the 'destfile' attribute to where the deb is supposed to be created.");
-        }
-
-        final File[] controlFiles = control.listFiles();
-
-        final DataProducer[] data = new DataProducer[dataProducers.size()];
-        dataProducers.toArray(data);
-
-        final Processor processor = new Processor(new TaskConsole(this, verbose), null);
-
-        final BinaryPackageControlFile packageControlFile;
-        try {
-
-            log("Creating debian package: " + deb);
-
-            packageControlFile = processor.createDeb(controlFiles, data, deb, Compression.toEnum(compression));
-
-        } catch (Exception e) {
-            // what the fuck ant? why are you not printing the exception chain?
-            e.printStackTrace();
-            throw new BuildException("Failed to create debian package " + deb, e);
-        }
+        Console console = new TaskConsole(this, verbose);
         
-        makeChangesFiles(processor, packageControlFile);
-    }
-
-    private void makeChangesFiles(Processor processor, BinaryPackageControlFile packageControlFile) throws BuildException {
-        if (changesOut == null) {
-            return;
-        }
-        
-        TextfileChangesProvider changesProvider;
-        FileOutputStream out = null;
+        DebMaker debMaker = new DebMaker(console, dataProducers);
+        debMaker.setDeb(deb);
+        debMaker.setControl(control);
+        debMaker.setChangesIn(changesIn);
+        debMaker.setChangesOut(changesOut);
+        debMaker.setChangesSave(changesSave);
+        debMaker.setKeyring(keyring);
+        debMaker.setKey(key);
+        debMaker.setPassphrase(passphrase);
+        debMaker.setCompression(compression);
         
         try {
-            log("Creating changes file: " + changesOut);
+            debMaker.validate();
+            debMaker.makeDeb();
             
-            out = new FileOutputStream(changesOut);
-            
-            // for now only support reading the changes form a textfile provider
-            changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile);
-            
-            ChangesFile changesFile = processor.createChanges(packageControlFile, changesProvider);
-            
-            if (keyring != null && key != null && passphrase != null) {
-                log("Signing the changes file with the key " + key);
-                PGPSigner signer = new PGPSigner(new FileInputStream(keyring), key, passphrase);
-                signer.clearSign(changesFile.toString(), out);
-            } else {
-                out.write(changesFile.toString().getBytes("UTF-8"));
-            }
-            out.flush();
-
-        } catch (Exception e) {
-            throw new BuildException("Failed to create the Debian changes file " + changesOut, e);
-        } finally {
-            IOUtils.closeQuietly(out);
-        }
-        
-        if (changesSave == null) {
-            return;
-        }
-        
-        try {
-            log("Saving changes to file: " + changesSave);
-
-            changesProvider.save(new FileOutputStream(changesSave));
-
-        } catch (Exception e) {
-            throw new BuildException("Failed to save debian changes file " + changesSave, e);
+        } catch (PackagingException e) {
+            log("Failed to create the Debian package " + deb, e, Project.MSG_ERR);
+            throw new BuildException("Failed to create the Debian package " + deb, e);
         }
     }
 }

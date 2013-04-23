@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.maven;
 
 import java.io.File;
@@ -35,6 +36,7 @@ import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
+import org.vafer.jdeb.DebMaker;
 import org.vafer.jdeb.PackagingException;
 import org.vafer.jdeb.utils.FilteredFile;
 import org.vafer.jdeb.utils.MapVariableResolver;
@@ -330,7 +332,7 @@ public class DebMojo extends AbstractPluginMojo {
 
         setData(dataSet);
 
-        Console infoConsole = new MojoConsole(getLog(), verbose);
+        Console console = new MojoConsole(getLog(), verbose);
 
         final VariableResolver resolver = initializeVariableResolver(new HashMap<String, String>());
 
@@ -369,7 +371,7 @@ public class DebMojo extends AbstractPluginMojo {
                     artifacts.add(artifact);
                 }
 
-                for(Artifact artifact : artifacts) {
+                for (Artifact artifact : artifacts) {
                     final File file = artifact.getFile();
                     if (file != null) {
                         dataProducers.add(new DataProducer() {
@@ -396,16 +398,15 @@ public class DebMojo extends AbstractPluginMojo {
         }
 
         try {
-
-            DebMaker debMaker = new DebMaker(infoConsole, debFile, controlDirFile, dataProducers, resolver);
-
-            if (changesInFile.exists() && changesInFile.canRead()) {
-                debMaker.setChangesIn(changesInFile);
-                debMaker.setChangesOut(changesOutFile);
-                debMaker.setChangesSave(changesSaveFile);
-            }
-
+            DebMaker debMaker = new DebMaker(console, dataProducers);
+            debMaker.setDeb(debFile);
+            debMaker.setControl(controlDirFile);
+            debMaker.setChangesIn(changesInFile);
+            debMaker.setChangesOut(changesOutFile);
+            debMaker.setChangesSave(changesSaveFile);
             debMaker.setCompression(compression);
+            debMaker.setResolver(resolver);
+            debMaker.validate();
             debMaker.makeDeb();
 
             // Always attach unless explicitly set to false

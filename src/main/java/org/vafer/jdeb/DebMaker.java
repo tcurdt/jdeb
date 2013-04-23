@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.vafer.jdeb.maven;
+package org.vafer.jdeb;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,11 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.commons.io.IOUtils;
-import org.vafer.jdeb.Compression;
-import org.vafer.jdeb.Console;
-import org.vafer.jdeb.DataProducer;
-import org.vafer.jdeb.PackagingException;
-import org.vafer.jdeb.Processor;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 import org.vafer.jdeb.debian.ChangesFile;
@@ -35,185 +30,126 @@ import org.vafer.jdeb.signing.PGPSigner;
 import org.vafer.jdeb.utils.VariableResolver;
 
 /**
- * TODO generalize with DebAntTask
- *
- * A generic class for creating debian archives. Even supports signed changes
+ * A generic class for creating Debian archives. Even supports signed changes
  * files.
  *
- * This class is largely based on the DebAntTask class, and provides the same
- * featues to maven developers that the ant task provides to ant developers.
- *
  * @author Bryan Sant
- * @see org.vafer.jdeb.ant.DebAntTask
  */
 public class DebMaker {
 
-    /**
-     * A console to output log message with
-     */
+    /** A console to output log message with */
     private Console console;
 
-    /**
-     * The Debian package produced
-     */
+    /** The Debian package produced */
     private File deb;
 
-    /**
-     * The directory containing the control files to build the package
-     */
+    /** The directory containing the control files to build the package */
     private File control;
 
-    /**
-     * The file containing the PGP keys
-     */
+    /** The file containing the PGP keys */
     private File keyring;
 
-    /**
-     * The key to use in the keyring
-     */
+    /** The key to use in the keyring */
     private String key;
 
-    /**
-     * The passphrase for the key to sign the changes file
-     */
+    /** The passphrase for the key to sign the changes file */
     private String passphrase;
 
-    /**
-     * The file to read the changes from
-     */
+    /** The file to read the changes from */
     private File changesIn;
 
-    /**
-     * The file where to write the changes to
-     */
+    /** The file where to write the changes to */
     private File changesOut;
 
-    /**
-     * The file where to write the changes of the changes input to
-     */
+    /** The file where to write the changes of the changes input to */
     private File changesSave;
 
-    /**
-     * The compression method used for the data file (none, gzip or bzip2)
-     */
+    /** The compression method used for the data file (none, gzip or bzip2) */
     private String compression = "gzip";
 
-    private final VariableResolver variableResolver;
+    private VariableResolver variableResolver;
+
+    private final Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
 
 
-    private final Collection<DataProducer> dataProducers;
-
-    public DebMaker( Console console, VariableResolver variableResolver ) {
-        this(console, null, null, null, variableResolver);
-    }
-
-    public DebMaker( Console console, File deb, File controlDir, VariableResolver variableResolver ) {
-        this(console, deb, controlDir, null, variableResolver);
-    }
-
-    public DebMaker( Console console, File deb, File controlDir, Collection<DataProducer> dataProducers, VariableResolver variableResolver ) {
+    public DebMaker(Console console, Collection<DataProducer> dataProducers) {
         this.console = console;
-        this.deb = deb;
-        this.control = controlDir;
-        this.variableResolver = variableResolver;
-        if (dataProducers != null) {
-            this.dataProducers = dataProducers;
-        } else {
-            this.dataProducers = new ArrayList<DataProducer>();
-        }
+        this.dataProducers.addAll(dataProducers);
     }
 
-    public void setDeb( File deb ) {
+    public void setDeb(File deb) {
         this.deb = deb;
     }
 
-    public void setControl( File control ) {
+    public void setControl(File control) {
         this.control = control;
     }
 
-    public void setChangesIn( File changes ) {
+    public void setChangesIn(File changes) {
         this.changesIn = changes;
     }
 
-    public void setChangesOut( File changes ) {
+    public void setChangesOut(File changes) {
         this.changesOut = changes;
     }
 
-    public void setChangesSave( File changes ) {
+    public void setChangesSave(File changes) {
         this.changesSave = changes;
     }
 
-    public void setKeyring( File keyring ) {
+    public void setKeyring(File keyring) {
         this.keyring = keyring;
     }
 
-    public void setKey( String key ) {
+    public void setKey(String key) {
         this.key = key;
     }
 
-    public void setPassphrase( String passphrase ) {
+    public void setPassphrase(String passphrase) {
         this.passphrase = passphrase;
     }
 
-    public void setCompression( String compression ) {
+    public void setCompression(String compression) {
         this.compression = compression;
     }
 
+    public void setResolver(VariableResolver variableResolver) {
+        this.variableResolver = variableResolver;
+    }
+
+    private boolean isWritableFile(File file) {
+        return file.isFile() && file.canWrite();
+    }
+
     /**
-     * Adds a new data source to the deb. The new data source may point to a
-     * single file, a directory, or a tarball.
-     *
-     * @param file The data source to add
+     * Validates the input parameters.
      */
-    public void addData( File file ) {
-        final Data data = new Data();
-        data.setSrc(file);
-        dataProducers.add(data);
-    }
-
-    public void addData( Data data ) {
-        dataProducers.add(data);
-    }
-
-    private boolean isPossibleOutput( File file ) {
-
-        if (file.exists()) {
-            return file.isFile() && file.canWrite();
-        }
-
-        return true;
-    }
-
-    public void makeDeb() throws PackagingException {
-
+    public void validate() throws PackagingException {
         if (control == null || !control.isDirectory()) {
-            throw new PackagingException("\"" + control + "\" is not a valid 'control' directory)");
+            throw new PackagingException("The 'control' attribute doesn't point to a directory.");
         }
 
         if (changesIn != null) {
 
             if (!changesIn.isFile() || !changesIn.canRead()) {
-                throw new PackagingException(
-                    "The 'changesIn' setting needs to point to a readable file. "
-                        + changesIn + " was not found/readable.");
+                throw new PackagingException("The 'changesIn' setting needs to point to a readable file. " + changesIn + " was not found/readable.");
             }
 
             if (changesOut == null) {
                 throw new PackagingException("A 'changesIn' without a 'changesOut' does not make much sense.");
             }
 
-            if (!isPossibleOutput(changesOut)) {
+            if (!isWritableFile(changesOut)) {
                 throw new PackagingException("Cannot write the output for 'changesOut' to " + changesOut);
             }
 
-            if (changesSave != null && !isPossibleOutput(changesSave)) {
+            if (changesSave != null && !isWritableFile(changesSave)) {
                 throw new PackagingException("Cannot write the output for 'changesSave' to " + changesSave);
             }
 
         } else {
             if (changesOut != null || changesSave != null) {
-                throw new PackagingException(
-                    "The 'changesOut' or 'changesSave' settings may only be used when there is a 'changesIn' specified.");
+                throw new PackagingException("The 'changesOut' or 'changesSave' settings may only be used when there is a 'changesIn' specified.");
             }
         }
 
@@ -224,7 +160,13 @@ public class DebMaker {
         if (deb == null) {
             throw new PackagingException("You need to specify where the deb file is supposed to be created.");
         }
+        
+        if (dataProducers.size() == 0) {
+            throw new PackagingException("You need to provide at least one reference to a tgz or directory with data.");
+        }
+    }
 
+    public void makeDeb() throws PackagingException {
         final File[] controlFiles = control.listFiles();
 
         final DataProducer[] data = new DataProducer[dataProducers.size()];
