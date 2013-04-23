@@ -56,6 +56,9 @@ public class DebMaker {
     /** The name of the package. Default value if not specified in the control file */
     private String packageName;
 
+    /** The dependencies of the package. Default value if not specified in the control file */
+    private String depends = "default-jre | java6-runtime";
+
     /** The description of the package. Default value if not specified in the control file */
     private String description;
 
@@ -103,6 +106,10 @@ public class DebMaker {
 
     public void setPackage(String packageName) {
         this.packageName = packageName;
+    }
+
+    public void setDepends(String depends) {
+        this.depends = depends;
     }
 
     public void setDescription(String description) {
@@ -285,6 +292,9 @@ public class DebMaker {
             BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size);
             if (packageControlFile.get("Package") == null) {
                 packageControlFile.set("Package", packageName);
+            }
+            if (packageControlFile.get("Depends") == null) {
+                packageControlFile.set("Depends", depends);
             }
             if (packageControlFile.get("Description") == null) {
                 packageControlFile.set("Description", description);
