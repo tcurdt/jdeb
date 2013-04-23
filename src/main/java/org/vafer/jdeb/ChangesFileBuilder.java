@@ -60,8 +60,8 @@ class ChangesFileBuilder {
             
             StringBuilder files = new StringBuilder(md5output.getHexDigest());
             files.append(' ').append(binaryPackage.length());
-            files.append(' ').append(changesFile.get("Section"));
-            files.append(' ').append(changesFile.get("Priority"));
+            files.append(' ').append(packageControlFile.get("Section"));
+            files.append(' ').append(packageControlFile.get("Priority"));
             files.append(' ').append(binaryPackage.getName());
             changesFile.set("Files", files.toString());
             
