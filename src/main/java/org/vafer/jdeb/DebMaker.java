@@ -24,10 +24,13 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
+import org.vafer.jdeb.changes.ChangeSet;
+import org.vafer.jdeb.changes.ChangesProvider;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 import org.vafer.jdeb.debian.ChangesFile;
@@ -55,6 +58,9 @@ public class DebMaker {
 
     /** The name of the package. Default value if not specified in the control file */
     private String packageName;
+
+    /** The section of the package. Default value if not specified in the control file */
+    private String section = "java";
 
     /** The dependencies of the package. Default value if not specified in the control file */
     private String depends = "default-jre | java6-runtime";
@@ -106,6 +112,10 @@ public class DebMaker {
 
     public void setPackage(String packageName) {
         this.packageName = packageName;
+    }
+
+    public void setSection(String section) {
+        this.section = section;
     }
 
     public void setDepends(String depends) {
@@ -215,21 +225,34 @@ public class DebMaker {
         makeChangesFiles(packageControlFile);
     }
 
-    private void makeChangesFiles(BinaryPackageControlFile packageControlFile) throws PackagingException {
+    private void makeChangesFiles(final BinaryPackageControlFile packageControlFile) throws PackagingException {
         if (changesOut == null) {
-            return;
+            changesOut = new File(deb.getParentFile(), deb.getName().replace(".deb", ".changes"));
         }
         
-        TextfileChangesProvider changesProvider;
+        ChangesProvider changesProvider;
         FileOutputStream out = null;
         
         try {
             console.info("Creating changes file: " + changesOut);
             
             out = new FileOutputStream(changesOut);
-
-            // for now only support reading the changes form a textfile provider
-            changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile);
+            
+            if (changesIn != null) {
+                // read the changes form a textfile provider
+                changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile);
+            } else {
+                // create an empty changelog
+                changesProvider = new ChangesProvider() {
+                    @Override
+                    public ChangeSet[] getChangesSets() {
+                        return new ChangeSet[] {
+                                new ChangeSet(packageControlFile.get("Package"), packageControlFile.get("Version"), new Date(),
+                                        "stable", "low", packageControlFile.get("Maintainer"), new String[0])
+                        };
+                    }
+                };
+            }
             
             ChangesFileBuilder builder = new ChangesFileBuilder();
             ChangesFile changesFile = builder.createChanges(packageControlFile, deb, changesProvider);
@@ -249,14 +272,14 @@ public class DebMaker {
             IOUtils.closeQuietly(out);
         }
         
-        if (changesSave == null) {
+        if (changesSave == null || changesIn == null) {
             return;
         }
         
         try {
             console.info("Saving changes to file: " + changesSave);
 
-            changesProvider.save(new FileOutputStream(changesSave));
+            ((TextfileChangesProvider) changesProvider).save(new FileOutputStream(changesSave));
 
         } catch (Exception e) {
             throw new PackagingException("Failed to save debian changes file " + changesSave, e);
@@ -274,7 +297,6 @@ public class DebMaker {
      * @throws PackagingException
      */
     public BinaryPackageControlFile createDeb(Compression compression) throws PackagingException {
-
         File tempData = null;
         File tempControl = null;
 
@@ -295,6 +317,9 @@ public class DebMaker {
             }
             if (packageControlFile.get("Depends") == null) {
                 packageControlFile.set("Depends", depends);
+            }
+            if (packageControlFile.get("Section") == null) {
+                packageControlFile.set("Section", section);
             }
             if (packageControlFile.get("Description") == null) {
                 packageControlFile.set("Description", description);
