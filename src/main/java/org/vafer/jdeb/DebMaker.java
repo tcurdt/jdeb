@@ -163,7 +163,7 @@ public class DebMaker {
     }
 
     private boolean isWritableFile(File file) {
-        return file.isFile() && file.canWrite();
+        return !file.exists() || file.isFile() && file.canWrite();
     }
 
     /**
@@ -176,15 +176,11 @@ public class DebMaker {
 
         if (changesIn != null) {
 
-            if (!changesIn.isFile() || !changesIn.canRead()) {
+            if (changesIn.exists() && (!changesIn.isFile() || !changesIn.canRead())) {
                 throw new PackagingException("The 'changesIn' setting needs to point to a readable file. " + changesIn + " was not found/readable.");
             }
-
-            if (changesOut == null) {
-                throw new PackagingException("A 'changesIn' without a 'changesOut' does not make much sense.");
-            }
-
-            if (!isWritableFile(changesOut)) {
+            
+            if (changesOut != null && !isWritableFile(changesOut)) {
                 throw new PackagingException("Cannot write the output for 'changesOut' to " + changesOut);
             }
 
@@ -238,7 +234,7 @@ public class DebMaker {
             
             out = new FileOutputStream(changesOut);
             
-            if (changesIn != null) {
+            if (changesIn != null && changesIn.exists()) {
                 // read the changes form a textfile provider
                 changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile);
             } else {
@@ -272,7 +268,7 @@ public class DebMaker {
             IOUtils.closeQuietly(out);
         }
         
-        if (changesSave == null || changesIn == null) {
+        if (changesSave == null || !(changesProvider instanceof TextfileChangesProvider)) {
             return;
         }
         
