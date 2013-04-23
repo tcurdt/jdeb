@@ -67,7 +67,14 @@ public final class ChangesFile extends ControlFile {
         set("Version",      packageControlFile.get("Version"));
         set("Maintainer",   packageControlFile.get("Maintainer"));
         set("Changed-By",   packageControlFile.get("Maintainer"));
-        set("Description",  packageControlFile.get("Description"));
+        
+        StringBuilder description = new StringBuilder();
+        description.append(packageControlFile.get("Package"));
+        if (packageControlFile.get("Description") != null) {
+            description.append(" - ");
+            description.append(packageControlFile.getShortDescription());
+        }
+        set("Description",  description.toString());
     }
 
     public void setChanges(ChangeSet[] changeSets) {

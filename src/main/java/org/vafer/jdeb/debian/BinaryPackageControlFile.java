@@ -66,4 +66,18 @@ public final class BinaryPackageControlFile extends ControlFile {
     protected ControlField[] getFields() {
         return FIELDS;
     }
+
+    /**
+     * Returns the short description of the package. The short description
+     * consists in the first line of the Description field.
+     * 
+     * @return
+     */
+    public String getShortDescription() {
+        if (get("Description") == null) {
+            return null;
+        }
+        
+        return get("Description").split("\n")[0];
+    }
 }

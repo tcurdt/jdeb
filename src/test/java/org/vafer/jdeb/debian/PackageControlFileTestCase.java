@@ -63,4 +63,14 @@ public final class PackageControlFileTestCase extends TestCase {
         } catch (ParseException e) {
         }
     }
+    
+    public void testGetShortDescription() {
+        BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile();
+        
+        assertNull(packageControlFile.getShortDescription());
+        
+        packageControlFile.set("Description", "This is the short description\nThis is the loooooong description");
+        
+        assertEquals("short description", "This is the short description", packageControlFile.getShortDescription());
+    }
 }
