@@ -86,12 +86,20 @@ public final class ChangeSet {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         
-        sb.append(" ").append(getPackage()).append(" (").append(getVersion()).append(") ");
-        sb.append(getDistribution()).append("; urgency=").append(getUrgency());
+        sb.append(getTitle()).append('\n');
+        
+        if (changes.length > 0) {
+            sb.append("\n");
+        }
+        
         for (String change : changes) {
-            sb.append('\n').append(" * ").append(change);
+            sb.append("  * ").append(change).append('\n');
         }
 
         return sb.toString();
+    }
+
+    private String getTitle() {
+        return getPackage() + " (" + getVersion() + ")" + getDistribution() + "; urgency=" + getUrgency();
     }
 }
