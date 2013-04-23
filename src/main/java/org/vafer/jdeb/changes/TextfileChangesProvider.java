@@ -52,7 +52,7 @@ public final class TextfileChangesProvider implements ChangesProvider {
         final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
 
         final DateFormat tdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // RFC 2822 format
-        final DateFormat sdf = ChangeSet.createDateForma();
+        final DateFormat sdf = ChangeSet.createDateFormat();
 
         String packageName = packageControlFile.get("Package");
         String version = packageControlFile.get("Version");
@@ -119,7 +119,7 @@ public final class TextfileChangesProvider implements ChangesProvider {
     public void save( final OutputStream pOutput ) throws IOException {
         final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(pOutput));
 
-        final DateFormat df = ChangeSet.createDateForma();
+        final DateFormat df = ChangeSet.createDateFormat();
 
         for (ChangeSet changeSet : changeSets) {
             writer.write("release ");

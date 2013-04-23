@@ -55,7 +55,7 @@ public final class ChangeSet {
       -- maintainer name <email address>[two spaces]  date
     */
 
-    public static DateFormat createDateForma() {
+    public static DateFormat createDateFormat() {
         return new SimpleDateFormat("HH:mm dd.MM.yyyy");
     }
 
