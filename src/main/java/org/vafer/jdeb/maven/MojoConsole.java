@@ -13,29 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.maven;
 
 import org.apache.maven.plugin.logging.Log;
 import org.vafer.jdeb.Console;
 
-public final class MojoConsole implements Console {
+/**
+ * Console implementation for Maven plugins.
+ */
+class MojoConsole implements Console {
 
     private final Log log;
     private final boolean verbose;
 
-    public MojoConsole( Log log, boolean verbose ) {
+    public MojoConsole(Log log, boolean verbose) {
         this.log = log;
         this.verbose = verbose;
     }
 
-    public void info( String s ) {
+    public void info(String s) {
         if (verbose) {
             log.info(s);
         }
     }
 
-    public void warn( String s ) {
+    public void warn(String s) {
         log.warn(s);
     }
-
 }

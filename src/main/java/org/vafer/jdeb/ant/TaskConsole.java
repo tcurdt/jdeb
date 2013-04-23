@@ -13,28 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.ant;
 
 import org.apache.tools.ant.Task;
 import org.vafer.jdeb.Console;
 
-public final class TaskConsole implements Console {
+/**
+ * Console implementation for Ant tasks.
+ */
+class TaskConsole implements Console {
 
     private final Task task;
     private final boolean verbose;
 
-    public TaskConsole( Task task, boolean verbose ) {
+    public TaskConsole(Task task, boolean verbose) {
         this.task = task;
         this.verbose = verbose;
     }
 
-    public void info( String message ) {
+    public void info(String message) {
         if (verbose) {
             task.log(message);
         }
     }
 
-    public void warn( String message ) {
+    public void warn(String message) {
         task.log(message);
     }
 
