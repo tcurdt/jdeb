@@ -64,17 +64,17 @@ class ControlBuilder {
     /**
      * Build control archive of the deb
      *
-     * @param controlFiles
-     * @param dataSize
-     * @param checksums
+     * @param packageControlFile the package control file
+     * @param controlFiles the other control information files (maintainer scripts, etc)
+     * @param dataSize  the size of the installed package
+     * @param checksums the md5 checksums of the files in the data archive
      * @param output
      * @return
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      * @throws java.text.ParseException
      */
-    BinaryPackageControlFile buildControl(File[] controlFiles, BigInteger dataSize, StringBuilder checksums, File output) throws IOException, ParseException {
-
+    void buildControl(BinaryPackageControlFile packageControlFile, File[] controlFiles, StringBuilder checksums, File output) throws IOException, ParseException {
         final File dir = output.getParentFile();
         if (dir != null && (!dir.exists() || !dir.isDirectory())) {
             throw new IOException("Cannot write control file at '" + output.getAbsolutePath() + "'");
@@ -84,7 +84,6 @@ class ControlBuilder {
         outputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
         
         // create the final package control file out of the "control" file, copy all other files, ignore the directories
-        BinaryPackageControlFile packageControlFile = null;
         for (File file : controlFiles) {
             if (file.isDirectory()) {
                 // warn about the misplaced directory, except for directories ignored by default (.svn, cvs, etc)
@@ -98,10 +97,7 @@ class ControlBuilder {
                 FilteredFile configurationFile = new FilteredFile(new FileInputStream(file), resolver);
                 addControlEntry(file.getName(), configurationFile.toString(), outputStream);
 
-            } else if ("control".equals(file.getName())) {
-                packageControlFile = createPackageControlFile(file, dataSize);
-
-            } else {
+            } else if (!"control".equals(file.getName())) {
                 // initialize the information stream to guess the type of the file
                 InformationInputStream infoStream = new InformationInputStream(new FileInputStream(file));
                 Utils.copy(infoStream, NullOutputStream.NULL_OUTPUT_STREAM);
@@ -128,8 +124,6 @@ class ControlBuilder {
         addControlEntry("md5sums", checksums.toString(), outputStream);
 
         outputStream.close();
-
-        return packageControlFile;
     }
     
     
@@ -143,7 +137,7 @@ class ControlBuilder {
      * @param file       the control file
      * @param pDataSize  the size of the installed package
      */
-    private BinaryPackageControlFile createPackageControlFile(File file, BigInteger pDataSize) throws IOException, ParseException {
+    public BinaryPackageControlFile createPackageControlFile(File file, BigInteger pDataSize) throws IOException, ParseException {
         FilteredFile controlFile = new FilteredFile(new FileInputStream(file), resolver);
         BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile(controlFile.toString());
         

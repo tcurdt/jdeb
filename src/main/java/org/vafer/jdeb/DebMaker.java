@@ -53,6 +53,12 @@ public class DebMaker {
     /** The directory containing the control files to build the package */
     private File control;
 
+    /** The description of the package. Overrides the description from the control file if specified */
+    private String description;
+
+    /** The homepage of the application. Overrides the homepage from the control file if specified */
+    private String homepage;
+
     /** The file containing the PGP keys */
     private File keyring;
 
@@ -90,6 +96,14 @@ public class DebMaker {
 
     public void setControl(File control) {
         this.control = control;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setHomepage(String homepage) {
+        this.homepage = homepage;
     }
 
     public void setChangesIn(File changes) {
@@ -256,12 +270,20 @@ public class DebMaker {
 
             console.info("Building data");
             DataBuilder dataBuilder = new DataBuilder(console);
-            final StringBuilder md5s = new StringBuilder();
-            final BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, compression);
-
+            StringBuilder md5s = new StringBuilder();
+            BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, compression);
+            
             console.info("Building control");
             ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver);
-            final BinaryPackageControlFile packageControlFile = controlBuilder.buildControl(control.listFiles(), size, md5s, tempControl);
+            BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size);
+            if (packageControlFile.get("Description") == null) {
+                packageControlFile.set("Description", description);
+            }
+            if (packageControlFile.get("Homepage") == null) {
+                packageControlFile.set("Homepage", homepage);
+            }
+            
+            controlBuilder.buildControl(packageControlFile, control.listFiles(), md5s, tempControl);
             
             if (!packageControlFile.isValid()) {
                 throw new PackagingException("Control file fields are invalid " + packageControlFile.invalidFields() +
