@@ -100,6 +100,6 @@ public final class ChangeSet {
     }
 
     private String getTitle() {
-        return getPackage() + " (" + getVersion() + ")" + getDistribution() + "; urgency=" + getUrgency();
+        return getPackage() + " (" + getVersion() + ") " + getDistribution() + "; urgency=" + getUrgency();
     }
 }
