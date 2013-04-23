@@ -27,13 +27,11 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
@@ -192,7 +190,8 @@ public class Processor {
         final ChangesFile changesFile = new ChangesFile(packageControlFile, changeSets);
 
         changesFile.set("Format", "1.8");
-
+        changesFile.set("Date", ChangesFile.DATE_FORMAT.format(new Date()));
+        
         if (changesFile.get("Binary") == null) {
             changesFile.set("Binary", changesFile.get("Package"));
         }
@@ -335,12 +334,6 @@ public class Processor {
         FilteredFile controlFile = new FilteredFile(new FileInputStream(file), resolver);
         BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile(controlFile.toString());
         
-        if (packageControlFile.get("Date") == null) {
-            // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
-            SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
-            packageControlFile.set("Date", fmt.format(new Date()));
-        }
-
         if (packageControlFile.get("Distribution") == null) {
             packageControlFile.set("Distribution", "unknown");
         }

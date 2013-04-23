@@ -13,17 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.changes;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-
 
 /**
  * A ChangeSet basically reflect a release as defined in the changes file.
  *
+ * <pre>
+ * package (version) distribution(s); urgency=urgency
+ *        [optional blank line(s), stripped]
+ *   * change details
+ *     more change details
+ *        [blank line(s), included in output of dpkg-parsechangelog]
+ *   * even more change details
+ *        [optional blank line(s), stripped]
+ *  -- maintainer name <email address>[two spaces]  date
+ * </pre>
+ * 
  * @author Torsten Curdt
+ * @see <a href="http://www.debian.org/doc/debian-policy/ch-source.html#s-dpkgchangelog">Debian Policy Manual - Debian changelog</a>
  */
 public final class ChangeSet {
 
@@ -35,28 +45,14 @@ public final class ChangeSet {
     private final String changedBy;
     private final String[] changes;
 
-    public ChangeSet( String pPackageName, String pVersion, Date pDate, String pDistribution, String pUrgency, String pChangedBy, final String[] pChanges ) {
-        changes = pChanges;
-        packageName = pPackageName;
-        version = pVersion;
-        date = pDate;
-        distribution = pDistribution;
-        urgency = pUrgency;
-        changedBy = pChangedBy;
-    }
-    /*
-     package (version) distribution(s); urgency=urgency
-            [optional blank line(s), stripped]
-       * change details
-         more change details
-            [blank line(s), included in output of dpkg-parsechangelog]
-       * even more change details
-            [optional blank line(s), stripped]
-      -- maintainer name <email address>[two spaces]  date
-    */
-
-    public static DateFormat createDateFormat() {
-        return new SimpleDateFormat("HH:mm dd.MM.yyyy");
+    public ChangeSet(String packageName, String version, Date date, String distribution, String urgency, String changedBy, String[] changes) {
+        this.packageName = packageName;
+        this.version = version;
+        this.date = date;
+        this.distribution = distribution;
+        this.urgency = urgency;
+        this.changedBy = changedBy;
+        this.changes = changes;
     }
 
     public String getPackage() {
@@ -88,8 +84,8 @@ public final class ChangeSet {
     }
 
     public String toString() {
-        final StringBuilder sb = new StringBuilder();
-
+        StringBuilder sb = new StringBuilder();
+        
         sb.append(" ").append(getPackage()).append(" (").append(getVersion()).append(") ");
         sb.append(getDistribution()).append("; urgency=").append(getUrgency());
         for (String change : changes) {

@@ -16,6 +16,10 @@
 
 package org.vafer.jdeb.debian;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import org.vafer.jdeb.changes.ChangeSet;
 
 /**
@@ -25,6 +29,8 @@ import org.vafer.jdeb.changes.ChangeSet;
  * @author Torsten Curdt
  */
 public final class ChangesFile extends ControlFile {
+
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // RFC 2822 format
 
     private static final ControlField[] FIELDS = {
             new ControlField("Format", true),

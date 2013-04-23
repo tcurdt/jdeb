@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.changes;
 
 import java.io.BufferedReader;
@@ -28,7 +29,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Locale;
 
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 
@@ -46,17 +46,16 @@ import org.vafer.jdeb.debian.BinaryPackageControlFile;
 public final class TextfileChangesProvider implements ChangesProvider {
 
     private final ChangeSet[] changeSets;
+    
+    private DateFormat fmt = new SimpleDateFormat("HH:mm dd.MM.yyyy");
 
     public TextfileChangesProvider( final InputStream pInput, final BinaryPackageControlFile packageControlFile ) throws IOException, ParseException {
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
-
-        final DateFormat tdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // RFC 2822 format
-        final DateFormat sdf = ChangeSet.createDateFormat();
-
+        
         String packageName = packageControlFile.get("Package");
         String version = packageControlFile.get("Version");
-        Date date = tdf.parse(packageControlFile.get("Date"));
+        Date date = new Date();
         String distribution = packageControlFile.get("Distribution");
         String urgency = packageControlFile.get("Urgency");
         String changedBy = packageControlFile.get("Maintainer");
@@ -93,7 +92,7 @@ public final class TextfileChangesProvider implements ChangesProvider {
                     } else if ("by".equals(key)) {
                         changedBy = value;
                     } else if ("date".equals(key)) {
-                        date = sdf.parse(value);
+                        date = fmt.parse(value);
                     } else if ("version".equals(key)) {
                         version = value;
                     } else if ("distribution".equals(key)) {
@@ -116,14 +115,12 @@ public final class TextfileChangesProvider implements ChangesProvider {
         changeSets = changeSetColl.toArray(new ChangeSet[changeSetColl.size()]);
     }
 
-    public void save( final OutputStream pOutput ) throws IOException {
-        final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(pOutput));
-
-        final DateFormat df = ChangeSet.createDateFormat();
+    public void save(OutputStream pOutput) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(pOutput));
 
         for (ChangeSet changeSet : changeSets) {
             writer.write("release ");
-            writer.write("date=" + df.format(changeSet.getDate()) + ",");
+            writer.write("date=" + fmt.format(changeSet.getDate()) + ",");
             writer.write("version=" + changeSet.getVersion() + ",");
             writer.write("urgency=" + changeSet.getUrgency() + ",");
             writer.write("by=" + changeSet.getChangedBy() + ",");
