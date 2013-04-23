@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.maven;
 
 import java.io.File;
@@ -21,6 +22,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.commons.io.IOUtils;
 import org.vafer.jdeb.Compression;
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataProducer;
@@ -28,6 +30,8 @@ import org.vafer.jdeb.PackagingException;
 import org.vafer.jdeb.Processor;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
+import org.vafer.jdeb.debian.ChangesFile;
+import org.vafer.jdeb.signing.PGPSigner;
 import org.vafer.jdeb.utils.VariableResolver;
 
 /**
@@ -183,8 +187,7 @@ public class DebMaker {
     public void makeDeb() throws PackagingException {
 
         if (control == null || !control.isDirectory()) {
-            throw new PackagingException(
-                "\"" + control + "\" is not a valid 'control' directory)");
+            throw new PackagingException("\"" + control + "\" is not a valid 'control' directory)");
         }
 
         if (changesIn != null) {
@@ -196,20 +199,15 @@ public class DebMaker {
             }
 
             if (changesOut == null) {
-                throw new PackagingException(
-                    "A 'changesIn' without a 'changesOut' does not make much sense.");
+                throw new PackagingException("A 'changesIn' without a 'changesOut' does not make much sense.");
             }
 
             if (!isPossibleOutput(changesOut)) {
-                throw new PackagingException(
-                    "Cannot write the output for 'changesOut' to "
-                        + changesOut);
+                throw new PackagingException("Cannot write the output for 'changesOut' to " + changesOut);
             }
 
             if (changesSave != null && !isPossibleOutput(changesSave)) {
-                throw new PackagingException(
-                    "Cannot write the output for 'changesSave' to "
-                        + changesSave);
+                throw new PackagingException("Cannot write the output for 'changesSave' to " + changesSave);
             }
 
         } else {
@@ -224,8 +222,7 @@ public class DebMaker {
         }
 
         if (deb == null) {
-            throw new PackagingException(
-                "You need to specify where the deb file is supposed to be created.");
+            throw new PackagingException("You need to specify where the deb file is supposed to be created.");
         }
 
         final File[] controlFiles = control.listFiles();
@@ -245,33 +242,48 @@ public class DebMaker {
         } catch (Exception e) {
             throw new PackagingException("Failed to create debian package " + deb, e);
         }
+        
+        makeChangesFiles(processor, packageControlFile);
+    }
 
-        final TextfileChangesProvider changesProvider;
-
+    private void makeChangesFiles(Processor processor, BinaryPackageControlFile packageControlFile) throws PackagingException {
+        if (changesOut == null) {
+            return;
+        }
+        
+        TextfileChangesProvider changesProvider;
+        FileOutputStream out = null;
+        
         try {
-            if (changesOut == null) {
-                return;
-            }
-
             console.info("Creating changes file: " + changesOut);
+            
+            out = new FileOutputStream(changesOut);
 
             // for now only support reading the changes form a textfile provider
             changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile);
-
-            processor.createChanges(packageControlFile, changesProvider,
-                (keyring != null) ? new FileInputStream(keyring) : null,
-                key, passphrase, new FileOutputStream(changesOut));
+            
+            ChangesFile changesFile = processor.createChanges(packageControlFile, changesProvider);
+            
+            if (keyring != null && key != null && passphrase != null) {
+                console.info("Signing the changes file with the key " + key);
+                PGPSigner signer = new PGPSigner(new FileInputStream(keyring), key, passphrase);
+                signer.clearSign(changesFile.toString(), out);
+            } else {
+                out.write(changesFile.toString().getBytes("UTF-8"));
+            }
+            out.flush();
 
         } catch (Exception e) {
-            throw new PackagingException(
-                "Failed to create debian changes file " + changesOut, e);
+            throw new PackagingException("Failed to create the Debian changes file " + changesOut, e);
+        } finally {
+            IOUtils.closeQuietly(out);
         }
-
+        
+        if (changesSave == null) {
+            return;
+        }
+        
         try {
-            if (changesSave == null) {
-                return;
-            }
-
             console.info("Saving changes to file: " + changesSave);
 
             changesProvider.save(new FileOutputStream(changesSave));
@@ -279,6 +291,5 @@ public class DebMaker {
         } catch (Exception e) {
             throw new PackagingException("Failed to save debian changes file " + changesSave, e);
         }
-
     }
 }

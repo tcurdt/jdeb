@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.ant;
 
 import java.io.File;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.MatchingTask;
 import org.apache.tools.ant.taskdefs.Tar;
@@ -31,7 +33,9 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.Processor;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
+import org.vafer.jdeb.debian.ChangesFile;
 import org.vafer.jdeb.producers.DataProducerFileSet;
+import org.vafer.jdeb.signing.PGPSigner;
 
 /**
  * TODO generalize with DebMaker
@@ -234,30 +238,48 @@ public class DebAntTask extends MatchingTask {
             e.printStackTrace();
             throw new BuildException("Failed to create debian package " + deb, e);
         }
+        
+        makeChangesFiles(processor, packageControlFile);
+    }
 
-        final TextfileChangesProvider changesProvider;
-
+    private void makeChangesFiles(Processor processor, BinaryPackageControlFile packageControlFile) throws BuildException {
+        if (changesOut == null) {
+            return;
+        }
+        
+        TextfileChangesProvider changesProvider;
+        FileOutputStream out = null;
+        
         try {
-            if (changesOut == null) {
-                return;
-            }
-
             log("Creating changes file: " + changesOut);
-
+            
+            out = new FileOutputStream(changesOut);
+            
             // for now only support reading the changes form a textfile provider
             changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile);
-
-            processor.createChanges(packageControlFile, changesProvider, (keyring != null) ? new FileInputStream(keyring) : null, key, passphrase, new FileOutputStream(changesOut));
+            
+            ChangesFile changesFile = processor.createChanges(packageControlFile, changesProvider);
+            
+            if (keyring != null && key != null && passphrase != null) {
+                log("Signing the changes file with the key " + key);
+                PGPSigner signer = new PGPSigner(new FileInputStream(keyring), key, passphrase);
+                signer.clearSign(changesFile.toString(), out);
+            } else {
+                out.write(changesFile.toString().getBytes("UTF-8"));
+            }
+            out.flush();
 
         } catch (Exception e) {
-            throw new BuildException("Failed to create debian changes file " + changesOut, e);
+            throw new BuildException("Failed to create the Debian changes file " + changesOut, e);
+        } finally {
+            IOUtils.closeQuietly(out);
         }
-
+        
+        if (changesSave == null) {
+            return;
+        }
+        
         try {
-            if (changesSave == null) {
-                return;
-            }
-
             log("Saving changes to file: " + changesSave);
 
             changesProvider.save(new FileOutputStream(changesSave));
@@ -265,6 +287,5 @@ public class DebAntTask extends MatchingTask {
         } catch (Exception e) {
             throw new BuildException("Failed to save debian changes file " + changesSave, e);
         }
-
     }
 }

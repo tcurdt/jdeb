@@ -185,21 +185,11 @@ public class Processor {
 
     /**
      * Create changes file based on the provided BinaryPackageControlFile.
-     * If pRing, pKey and pPassphrase are provided the changes file will also be signed.
-     * It returns a ChangesFile reflecting the changes
      *
      * @param packageControlFile
      * @param pChangesProvider
-     * @param pRing
-     * @param pKey
-     * @param pPassphrase
-     * @param pOutput
-     * @return ChangesFile
-     * @throws IOException
-     * @throws PackagingException
      */
-    public ChangesFile createChanges( final BinaryPackageControlFile packageControlFile, final ChangesProvider pChangesProvider, final InputStream pRing, final String pKey, final String pPassphrase, final OutputStream pOutput ) throws IOException, PackagingException {
-
+    public ChangesFile createChanges(BinaryPackageControlFile packageControlFile, ChangesProvider pChangesProvider) throws IOException, PackagingException {
         final ChangeSet[] changeSets = pChangesProvider.getChangesSets();
         final ChangesFile changesFile = new ChangesFile(packageControlFile, changeSets);
 
@@ -243,29 +233,7 @@ public class Processor {
                 ". The following fields are mandatory: " + changesFile.getMandatoryFields() +
                 ". Please check your pom.xml/build.xml and your control file.");
         }
-
-        final String changes = changesFile.toString();
-        final byte[] changesBytes = changes.getBytes("UTF-8");
-
-        if (pRing == null || pKey == null || pPassphrase == null) {
-            pOutput.write(changesBytes);
-            pOutput.close();
-            return changesFile;
-        }
-
-        console.info("Signing changes with key " + pKey);
-
-        final InputStream input = new ByteArrayInputStream(changesBytes);
-
-        try {
-            PGPSigner signer = new PGPSigner(pRing, pKey, pPassphrase);
-            signer.clearSign(input, pOutput);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        pOutput.close();
-
+        
         return changesFile;
     }
 
