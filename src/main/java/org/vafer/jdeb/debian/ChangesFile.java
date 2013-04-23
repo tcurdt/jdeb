@@ -53,6 +53,7 @@ public final class ChangesFile extends ControlFile {
 
     public ChangesFile() {
         set("Format", "1.8");
+        set("Distribution", "stable");
     }
 
     /**
