@@ -401,6 +401,7 @@ public class DebMojo extends AbstractPluginMojo {
             DebMaker debMaker = new DebMaker(console, dataProducers);
             debMaker.setDeb(debFile);
             debMaker.setControl(controlDirFile);
+            debMaker.setPackage(getProject().getArtifactId());
             debMaker.setDescription(getProject().getDescription());
             debMaker.setHomepage(getProject().getUrl());
             debMaker.setChangesIn(changesInFile);

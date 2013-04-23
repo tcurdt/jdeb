@@ -53,10 +53,13 @@ public class DebMaker {
     /** The directory containing the control files to build the package */
     private File control;
 
-    /** The description of the package. Overrides the description from the control file if specified */
+    /** The name of the package. Default value if not specified in the control file */
+    private String packageName;
+
+    /** The description of the package. Default value if not specified in the control file */
     private String description;
 
-    /** The homepage of the application. Overrides the homepage from the control file if specified */
+    /** The homepage of the application. Default value if not specified in the control file */
     private String homepage;
 
     /** The file containing the PGP keys */
@@ -96,6 +99,10 @@ public class DebMaker {
 
     public void setControl(File control) {
         this.control = control;
+    }
+
+    public void setPackage(String packageName) {
+        this.packageName = packageName;
     }
 
     public void setDescription(String description) {
@@ -276,6 +283,9 @@ public class DebMaker {
             console.info("Building control");
             ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver);
             BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size);
+            if (packageControlFile.get("Package") == null) {
+                packageControlFile.set("Package", packageName);
+            }
             if (packageControlFile.get("Description") == null) {
                 packageControlFile.set("Description", description);
             }
