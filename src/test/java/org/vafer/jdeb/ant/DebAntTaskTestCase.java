@@ -30,6 +30,7 @@ import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
@@ -236,6 +237,37 @@ public final class DebAntTaskTestCase extends TestCase {
         });
         
         assertTrue("bz2 file not found", found.get());
+    }
+
+    public void testXZCompression() throws Exception {
+        project.executeTarget("xz-compression");
+
+        File deb = new File("target/test-classes/test.deb");
+        assertTrue("package not build", deb.exists());
+
+        final AtomicBoolean found = new AtomicBoolean(false); 
+        
+        ArArchiveInputStream in = new ArArchiveInputStream(new FileInputStream(deb));
+        ArchiveWalker.walk(in, new ArchiveVisitor<ArArchiveEntry>() {
+            public void visit(ArArchiveEntry entry, byte[] content) throws IOException {
+                if (entry.getName().equals("data.tar.xz")) {
+                    found.set(true);
+                    
+                    assertEquals("header 0", (byte) 0xFD, content[0]);
+                    assertEquals("header 1", (byte) '7', content[1]);
+                    assertEquals("header 2", (byte) 'z', content[2]);
+                    assertEquals("header 3", (byte) 'X', content[3]);
+                    assertEquals("header 4", (byte) 'Z', content[4]);
+                    assertEquals("header 5", (byte) '\0', content[5]);
+                    
+                    TarInputStream tar = new TarInputStream(new XZCompressorInputStream(new ByteArrayInputStream(content)));
+                    while ((tar.getNextEntry()) != null) ;
+                    tar.close();
+                }
+            }
+        });
+        
+        assertTrue("xz file not found", found.get());
     }
 
     public void testNoCompression() throws Exception {

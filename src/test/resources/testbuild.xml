@@ -92,6 +92,12 @@
     </deb>
   </target>
 
+  <target name="xz-compression">
+    <deb destfile="test.deb" control="org/vafer/jdeb/deb/control" compression="xz">
+      <fileset dir="org/vafer/jdeb/deb/data"/>
+    </deb>
+  </target>
+
   <target name="no-compression">
     <deb destfile="test.deb" control="org/vafer/jdeb/deb/control" compression="none">
       <fileset dir="org/vafer/jdeb/deb/data"/>

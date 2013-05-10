@@ -31,6 +31,7 @@ import org.apache.commons.compress.archivers.ar.ArArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 
 /**
  * Support class for inspecting the content of an archive.
@@ -75,6 +76,8 @@ public class ArchiveWalker {
                     InputStream in = new ByteArrayInputStream(content);
                     if (compression == Compression.GZIP) {
                         in = new GZIPInputStream(in);
+                    } else if (compression == Compression.XZ) {
+                        in = new XZCompressorInputStream(in);
                     } else if (compression == Compression.BZIP2) {
                         in = new BZip2CompressorInputStream(in);
                     }

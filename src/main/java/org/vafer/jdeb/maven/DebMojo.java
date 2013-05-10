@@ -103,7 +103,7 @@ public class DebMojo extends AbstractPluginMojo {
     private String changesSave;
 
     /**
-     * The compression method used for the data file (none, gzip or bzip2)
+     * The compression method used for the data file (none, gzip, bzip2 or xz)
      *
      * @parameter default-value="gzip"
      */

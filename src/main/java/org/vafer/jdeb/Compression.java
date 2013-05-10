@@ -30,7 +30,8 @@ public enum Compression {
 
     NONE(""),
     GZIP(".gz"),
-    BZIP2(".bz2");
+    BZIP2(".bz2"),
+    XZ(".xz");
 
     private String extension;
 
@@ -51,6 +52,8 @@ public enum Compression {
                 return new CompressorStreamFactory().createCompressorOutputStream("gz", out);
             case BZIP2:
                 return new CompressorStreamFactory().createCompressorOutputStream("bzip2", out);
+            case XZ:
+                return new CompressorStreamFactory().createCompressorOutputStream("xz", out);
             default:
                 return out;
         }
@@ -68,6 +71,8 @@ public enum Compression {
             return GZIP;
         } else if ("bzip2".equalsIgnoreCase(name) || "bz2".equalsIgnoreCase(name)) {
             return BZIP2;
+        } else if ("xz".equalsIgnoreCase(name)) {
+            return XZ;
         } else if ("none".equalsIgnoreCase(name)) {
             return NONE;
         } else {

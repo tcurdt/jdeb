@@ -1,3 +1,7 @@
+## Version 1.1, released ?
+
+* [ADD] xz compression support
+
 ## Version 1.0.1, released 28.02.2013
 
 * [ADD] Override version via environment variable DEBVERSION

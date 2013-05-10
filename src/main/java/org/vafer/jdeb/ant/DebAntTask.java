@@ -63,7 +63,7 @@ public class DebAntTask extends MatchingTask {
     /** The file where to write the changes of the changes input to */
     private File changesSave;
 
-    /** The compression method used for the data file (none, gzip or bzip2) */
+    /** The compression method used for the data file (none, gzip, bzip2 or xz) */
     private String compression = "gzip";
 
     /** Trigger the verbose mode detailing all operations */

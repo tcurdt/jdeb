@@ -7,7 +7,7 @@
     *---------------+------------------------------------------------------------------------------+-----------------------------+
     | control       | The directory containing the control files                                   | Yes                         |
     *---------------+------------------------------------------------------------------------------+-----------------------------+
-    | compression   | Compression method for the data file ('gzip', 'bzip2' or 'none')             | No; defaults to 'gzip'      |
+    | compression   | Compression method for the data file ('gzip', 'bzip2', 'xz' or 'none')       | No; defaults to 'gzip'      |
     *---------------+------------------------------------------------------------------------------+-----------------------------+
     | verbose       | Print detailed info during the package generation                            | No; defaults to 'false'>    |
     *---------------+------------------------------------------------------------------------------+-----------------------------+
