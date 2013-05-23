@@ -65,9 +65,16 @@ public class DataBuilderTestCase extends TestCase {
         builder.buildData(Arrays.asList(producer), archive, new StringBuilder(), Compression.NONE);
         
         int count = 0;
-        TarArchiveInputStream in = new TarArchiveInputStream(new FileInputStream(archive));
-        while (in.getNextTarEntry() != null) {
-            count++;
+        TarArchiveInputStream in = null;
+        try {
+            in = new TarArchiveInputStream(new FileInputStream(archive));
+            while (in.getNextTarEntry() != null) {
+                count++;
+            }
+        } finally {
+            if (in != null) {
+                in.close();
+            }
         }
         
         assertEquals("entries", 4, count);
