@@ -1,12 +1,15 @@
 ## Version 1.1, released ?
 
 * [ADD] xz compression support
+* [FIX] On Windows, parent directories are now created automatically when adding files to the data archive
+
 
 ## Version 1.0.1, released 28.02.2013
 
 * [ADD] Override version via environment variable DEBVERSION
 * [FIX] Use the joint copyright
 * [FIX] Fixed the maven to debian version mapping
+
 
 ## Version 1.0, released 10.01.2013
 

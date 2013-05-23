@@ -87,7 +87,7 @@ class DataBuilder {
             public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 dirname = fixPath(dirname);
 
-                createParentDirectories((new File(dirname)).getParent(), user, uid, group, gid);
+                createParentDirectories(dirname, user, uid, group, gid);
 
                 // The directory passed in explicitly by the caller also gets the passed-in mode.  (Unlike
                 // the parent directories for now.  See related comments at "int mode =" in
@@ -100,7 +100,7 @@ class DataBuilder {
             public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 filename = fixPath(filename);
 
-                createParentDirectories((new File(filename)).getParent(), user, uid, group, gid);
+                createParentDirectories(filename, user, uid, group, gid);
 
                 final TarArchiveEntry entry = new TarArchiveEntry(filename, true);
 
@@ -142,7 +142,7 @@ class DataBuilder {
             public void onEachLink(String path, String linkName, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
                 path = fixPath(path);
 
-                createParentDirectories((new File(path)).getParent(), user, uid, group, gid);
+                createParentDirectories(path, user, uid, group, gid);
 
                 final TarArchiveEntry entry = new TarArchiveEntry(path, symlink ? TarArchiveEntry.LF_SYMLINK : TarArchiveEntry.LF_LINK);
                 entry.setLinkName(linkName);
@@ -192,7 +192,9 @@ class DataBuilder {
                 }
             }
         
-            private void createParentDirectories( String dirname, String user, int uid, String group, int gid ) throws IOException {
+            private void createParentDirectories( String filename, String user, int uid, String group, int gid ) throws IOException {
+                String dirname = fixPath(new File(filename).getParent());
+                
                 // Debian packages must have parent directories created
                 // before sub-directories or files can be installed.
                 // For example, if an entry of ./usr/lib/foo/bar existed
@@ -206,7 +208,7 @@ class DataBuilder {
         
                 // The loop below will create entries for all parent directories
                 // to ensure that .deb packages will install correctly.
-                String[] pathParts = dirname.split("\\/");
+                String[] pathParts = dirname.split("/");
                 String parentDir = "./";
                 for (int i = 1; i < pathParts.length; i++) {
                     parentDir += pathParts[i] + "/";
@@ -246,10 +248,14 @@ class DataBuilder {
     }
 
     private String fixPath( String path ) {
+        if (path == null || path.equals(".")) {
+            return path;
+        }
+        
         // If we're receiving directory names from Windows, then we'll convert to use slash
         // This does eliminate the ability to use of a backslash in a directory name on *NIX,
         // but in practice, this is a non-issue
-        if (path.indexOf('\\') > -1) {
+        if (path.contains("\\")) {
             path = path.replace('\\', '/');
         }
         // ensure the path is like : ./foo/bar

@@ -191,7 +191,7 @@ public final class DebAntTaskTestCase extends TestCase {
 
         ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
             public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                assertTrue("prefix", entry.getName().startsWith("./foo/"));
+                assertTrue("prefix: " + entry.getName(), entry.getName().startsWith("./foo/"));
                 if (entry.isDirectory()) {
                     assertEquals("directory mode (" + entry.getName() + ")", 040700, entry.getMode());
                 } else {

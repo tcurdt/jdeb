@@ -17,11 +17,14 @@
 package org.vafer.jdeb;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.util.Arrays;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 import junit.framework.TestCase;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileSet;
+import org.vafer.jdeb.producers.DataProducerFile;
 import org.vafer.jdeb.producers.DataProducerFileSet;
 
 public class DataBuilderTestCase extends TestCase {
@@ -43,9 +46,30 @@ public class DataBuilderTestCase extends TestCase {
         fileset.setProject(project);
 
         StringBuilder md5s = new StringBuilder();
-        builder.buildData(Arrays.asList(new DataProducer[]{new DataProducerFileSet(fileset)}), new File("target/data.tar"), md5s, Compression.GZIP);
+        builder.buildData(Arrays.asList((DataProducer) new DataProducerFileSet(fileset)), new File("target/data.tar"), md5s, Compression.GZIP);
 
         assertTrue("empty md5 file", md5s.length() > 0);
         assertFalse("windows path separator found", md5s.indexOf("\\") != -1);
+    }
+    
+    public void testCreateParentDirectories() throws Exception {
+        File archive = new File("target/data.tar");
+        if (archive.exists()) {
+            archive.delete();
+        }
+        
+        DataBuilder builder = new DataBuilder(new NullConsole());
+        
+        DataProducer producer = new DataProducerFile(new File("pom.xml"), "/usr/share/myapp/pom.xml", null, null, null); 
+        
+        builder.buildData(Arrays.asList(producer), archive, new StringBuilder(), Compression.NONE);
+        
+        int count = 0;
+        TarArchiveInputStream in = new TarArchiveInputStream(new FileInputStream(archive));
+        while (in.getNextTarEntry() != null) {
+            count++;
+        }
+        
+        assertEquals("entries", 4, count);
     }
 }
