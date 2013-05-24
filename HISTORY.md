@@ -2,6 +2,7 @@
 
 * [ADD] xz compression support
 * [FIX] On Windows, parent directories are now created automatically when adding files to the data archive
+* [CHG] Links are now symbolic by default
 
 
 ## Version 1.0.1, released 28.02.2013

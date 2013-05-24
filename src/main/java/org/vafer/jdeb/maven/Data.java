@@ -100,7 +100,7 @@ public final class Data implements DataProducer {
         this.linkTarget = linkTarget;
     }
 
-    private boolean symlink;
+    private boolean symlink = true;
 
     /**
      * @parameter expression="${symlink}"
