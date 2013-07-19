@@ -273,6 +273,21 @@ public class DebMojo extends AbstractPluginMojo {
      */
     private String passphrase; 
 
+    /**
+     * The prefix to use when reading signing variables
+     * from settings.
+     * 
+     * @parameter default-value="jdeb."
+     */
+    private String signParameterPrefix;
+
+    /**
+     * The settings.
+     * 
+     * @parameter expression="${settings}"
+     */
+    private Settings settings;
+
     /* end of parameters */
 
     private String openReplaceToken = "[[";
@@ -361,6 +376,22 @@ public class DebMojo extends AbstractPluginMojo {
         }
 
         setData(dataSet);
+
+        // Read missing signing parameters from settings
+        Map<String, String> properties = Utils.readPropertiesFromActiveProfiles(signParameterPrefix, settings, "key", "keyring", "passphrase");
+
+        if(key == null)
+        {
+            key = properties.get("key");
+        }
+        if(keyring == null)
+        {
+            keyring = properties.get("keyring");
+        }
+        if(passphrase == null)
+        {
+            passphrase = properties.get("passphrase");
+        }
 
         Console console = new MojoConsole(getLog(), verbose);
 

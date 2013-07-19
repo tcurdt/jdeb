@@ -20,9 +20,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.maven.settings.Profile;
+import org.apache.maven.settings.Settings;
 import org.apache.tools.ant.filters.FixCrLfFilter;
 import org.apache.tools.ant.util.ReaderInputStream;
 
@@ -85,6 +91,45 @@ public final class Utils {
             return s.substring(1);
         }
         return s;
+    }
+
+    /**
+     * Read properties from the active profiles.
+     * 
+     * Goes through all active profiles (in the order the
+     * profiles are defined in settings.xml) and extracts
+     * the desired properties (if present). The prefix is
+     * used when looking up properties in the profile but
+     * not in the returned map.
+     * 
+     * @param prefix The prefix to use or null if no prefix should be used
+     * @param settings The Settings to read from
+     * @param properties The properties to read
+     * 
+     * @return A map containing the values for the properties that were found
+     */
+    public static Map<String, String> readPropertiesFromActiveProfiles(String prefix, Settings settings, String... properties) {
+        Map<String, String> map = new HashMap<String, String>();
+        Set<String> activeProfiles = new HashSet<String>(settings.getActiveProfiles());
+
+    	// Iterate over all active profiles in order
+		for(Profile profile : settings.getProfiles()) {
+
+			// Check if the profile is active
+			if(activeProfiles.contains(profile.getId())) {
+
+				// Check all desired properties
+				for(String property : properties) {
+					String value = profile.getProperties().getProperty(prefix != null ? prefix + property : property);
+					if(value != null)
+					{
+						map.put(property, value);
+					}
+				}
+			}
+		}
+
+        return map;
     }
 
 
