@@ -225,22 +225,25 @@ public class DebMaker {
         try {
             console.info("Creating debian package: " + deb);
 
-            if (signPackage) {
-                if (keyring == null || !keyring.exists()) {
-                    throw new PackagingException(
-                        "Signing requested, but no keyring supplied");
-                }
+            // If we should sign the package
+            boolean doSign = signPackage;
 
-                if (key == null) {
-                    throw new PackagingException(
-                        "Signing requested, but no key supplied");
-                }
+            if (keyring == null || !keyring.exists()) {
+                doSign = false;
+                console.warn("Signing requested, but no keyring supplied");
+            }
 
-                if (passphrase == null) {
-                    throw new PackagingException(
-                        "Signing requested, but no passphrase supplied");
-                }
+            if (key == null) {
+                doSign = false;
+                console.warn("Signing requested, but no key supplied");
+            }
 
+            if (passphrase == null) {
+                doSign = false;
+                console.warn("Signing requested, but no passphrase supplied");
+            }
+
+            if (doSign) {
                 FileInputStream keyRingInput = new FileInputStream(keyring);
                 PGPSigner signer = null;
                 try {
