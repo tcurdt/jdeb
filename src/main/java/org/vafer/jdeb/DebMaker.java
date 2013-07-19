@@ -402,6 +402,7 @@ public class DebMaker {
             addTo(ar, "data.tar" + compression.getExtension(), tempData);
 
             if (signatureGenerator != null) {
+                console.info("Signing package with key " + key);
                 PGPSignatureOutputStream sigStream = new PGPSignatureOutputStream(signatureGenerator);
                 addTo(sigStream, "2.0\n");
                 addTo(sigStream, tempControl);
