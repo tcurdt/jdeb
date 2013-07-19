@@ -29,12 +29,18 @@ import java.util.Date;
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
+import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.PGPSignature;
+import org.bouncycastle.openpgp.PGPSignatureGenerator;
+import org.bouncycastle.openpgp.PGPUtil;
+import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
 import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.ChangesProvider;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 import org.vafer.jdeb.debian.ChangesFile;
 import org.vafer.jdeb.signing.PGPSigner;
+import org.vafer.jdeb.utils.PGPSignatureOutputStream;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
@@ -92,6 +98,9 @@ public class DebMaker {
     /** The compression method used for the data file (none, gzip, bzip2 or xz) */
     private String compression = "gzip";
 
+    /** Whether to sign the package that is created */
+    private boolean signPackage;
+
     private VariableResolver variableResolver;
 
     private final Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
@@ -140,6 +149,10 @@ public class DebMaker {
 
     public void setChangesSave(File changes) {
         this.changesSave = changes;
+    }
+
+    public void setSignPackage(boolean signPackage) {
+        this.signPackage = signPackage;
     }
 
     public void setKeyring(File keyring) {
@@ -212,7 +225,42 @@ public class DebMaker {
         try {
             console.info("Creating debian package: " + deb);
 
-            packageControlFile = createDeb(Compression.toEnum(compression));
+            // If we should sign the package
+            boolean doSign = signPackage;
+
+            if (keyring == null || !keyring.exists()) {
+                doSign = false;
+                console.warn("Signing requested, but no keyring supplied");
+            }
+
+            if (key == null) {
+                doSign = false;
+                console.warn("Signing requested, but no key supplied");
+            }
+
+            if (passphrase == null) {
+                doSign = false;
+                console.warn("Signing requested, but no passphrase supplied");
+            }
+
+            if (doSign) {
+                FileInputStream keyRingInput = new FileInputStream(keyring);
+                PGPSigner signer = null;
+                try {
+                    signer = new PGPSigner(new FileInputStream(keyring), key, passphrase);
+                } finally {
+                    keyRingInput.close();
+                }
+
+                int digest = PGPUtil.SHA1;
+
+                PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(signer.getSecretKey().getPublicKey().getAlgorithm(), digest));
+                signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, signer.getPrivateKey());
+
+                packageControlFile = createSignedDeb(Compression.toEnum(compression), signatureGenerator);
+            } else {
+                packageControlFile = createDeb(Compression.toEnum(compression));
+            }
 
         } catch (Exception e) {
             throw new PackagingException("Failed to create debian package " + deb, e);
@@ -293,6 +341,18 @@ public class DebMaker {
      * @throws PackagingException
      */
     public BinaryPackageControlFile createDeb(Compression compression) throws PackagingException {
+        return createSignedDeb(compression, null);
+    }
+    /**
+     * Create the debian archive with from the provided control files and data producers.
+     *
+     * @param compression   the compression method used for the data file (gzip, bzip2 or anything else for no compression)
+     * @param signatureGenerator   the signature generator
+     * 
+     * @return PackageDescriptor
+     * @throws PackagingException
+     */
+    public BinaryPackageControlFile createSignedDeb(Compression compression, final PGPSignatureGenerator signatureGenerator ) throws PackagingException {
         File tempData = null;
         File tempControl = null;
 
@@ -341,6 +401,15 @@ public class DebMaker {
             addTo(ar, "control.tar.gz", tempControl);
             addTo(ar, "data.tar" + compression.getExtension(), tempData);
 
+            if (signatureGenerator != null) {
+                console.info("Signing package with key " + key);
+                PGPSignatureOutputStream sigStream = new PGPSignatureOutputStream(signatureGenerator);
+                addTo(sigStream, "2.0\n");
+                addTo(sigStream, tempControl);
+                addTo(sigStream, tempData);
+                addTo(ar, "_gpgorigin", sigStream.generateASCIISignature());
+            }
+
             ar.close();
             
             return packageControlFile;
@@ -380,4 +449,18 @@ public class DebMaker {
 
         pOutput.closeArchiveEntry();
     }
+
+    private void addTo(final PGPSignatureOutputStream pOutput, final String pContent) throws IOException {
+        final byte[] content = pContent.getBytes();
+        pOutput.write(content);
+    }
+
+    private void addTo(final PGPSignatureOutputStream pOutput, final File pContent) throws IOException {
+        final InputStream input = new FileInputStream(pContent);
+        try {
+            Utils.copy(input, pOutput);
+        } finally {
+            input.close();
+        }
+    } 
 }
