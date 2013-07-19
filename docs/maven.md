@@ -268,14 +268,14 @@ If you don't want to store your key information in the POM you can store this is
         <profile>
             <id>jdeb-signing</id>
             <properties>
-            	<jdeb.keyring>/home/user/.gnupg/secring.gpg</jdeb.keyring>
-            	<jdeb.key>8306FE21</jdeb.key>
-            	<jdeb.passphrase>abcdef</jdeb.passphrase>
+                <jdeb.keyring>/home/user/.gnupg/secring.gpg</jdeb.keyring>
+                <jdeb.key>8306FE21</jdeb.key>
+                <jdeb.passphrase>abcdef</jdeb.passphrase>
             </properties>
         </profile>
     </profiles>
     <activeProfiles>
-    	<activeProfile>jdeb-signing</activeProfile>
+        <activeProfile>jdeb-signing</activeProfile>
 	</activeProfiles>
 </settings>
 
