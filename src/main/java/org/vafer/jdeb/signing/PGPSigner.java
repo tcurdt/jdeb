@@ -55,6 +55,10 @@ public class PGPSigner {
 
     public PGPSigner(InputStream keyring, String keyId, String passphrase) throws IOException, PGPException {
         secretKey = getSecretKey(keyring, keyId);
+        if(secretKey == null)
+        {
+            throw new PGPException(String.format("Specified key %s does not exist in key ring %s", keyId, keyring));
+        }
         privateKey = secretKey.extractPrivateKey(new BcPBESecretKeyDecryptorBuilder(new BcPGPDigestCalculatorProvider()).build(passphrase.toCharArray()));
     }
 
