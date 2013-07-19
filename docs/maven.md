@@ -263,6 +263,7 @@ include a directory, a tarball, and a file in your deb package and then sign it 
     </build>
 
 If you don't want to store your key information in the POM you can store this is your settings.xml, here's an example settings.xml:
+
     <settings>
         <profiles>
             <profile>
