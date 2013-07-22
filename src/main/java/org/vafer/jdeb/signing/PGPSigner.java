@@ -50,10 +50,15 @@ public class PGPSigner {
 
     private static final byte[] EOL = "\r\n".getBytes(Charset.forName("UTF-8"));
 
+    private PGPSecretKey secretKey;
     private PGPPrivateKey privateKey;
 
     public PGPSigner(InputStream keyring, String keyId, String passphrase) throws IOException, PGPException {
-        PGPSecretKey secretKey = getSecretKey(keyring, keyId);
+        secretKey = getSecretKey(keyring, keyId);
+        if(secretKey == null)
+        {
+            throw new PGPException(String.format("Specified key %s does not exist in key ring %s", keyId, keyring));
+        }
         privateKey = secretKey.extractPrivateKey(new BcPBESecretKeyDecryptorBuilder(new BcPGPDigestCalculatorProvider()).build(passphrase.toCharArray()));
     }
 
@@ -104,6 +109,22 @@ public class PGPSigner {
         armoredOutput.close();
     }
     
+    /**
+     * Returns the secret key.
+     */
+    public PGPSecretKey getSecretKey()
+    {
+        return secretKey;
+    }
+
+    /**
+     * Returns the private key.
+     */
+    public PGPPrivateKey getPrivateKey()
+    {
+        return privateKey;
+    }
+
     /**
      * Returns the secret key matching the specified identifier.
      * 

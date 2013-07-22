@@ -72,43 +72,47 @@ configuration options provide the same features available in the jdeb ant
 task. To configure the jdeb maven plugin, populate the jdeb configuration
 section with any of the following options:
 
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    ||   Element    || Description                                                                 || Required                                                       ||
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | deb           | The debian package to be generated                                           | No; defaults to '${buildDirectory}/${artifactId}_${version}.deb' |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | type          | Artifact type                                                                | No; defaults to 'deb'                                            |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | classifier    | Artifact classifier                                                          | No; defaults to ''                                               |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | controlDir    | The directory containing the control files                                   | No; defaults to 'src/deb/control'                                |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | installDir    | The default directory for the project artifact if no data section is present | No; defaults to '/opt/${artifactId}'                             |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | dataSet       | A list of directories, tarballs, or files to include in the deb package      | No; defaults to include your maven artifact                      |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | changesIn     | The changes to add                                                           | No                                                               |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | changesOut    | The changes file generated                                                   | No                                                               |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | changesSave   | (NYI) The merged changes file                                                | No                                                               |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | compression   | (NYI) Compression method for the data file ('gzip', 'bzip2', 'xz' or 'none') | No; defaults to 'gzip'                                           |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | keyring       | (NYI) The file containing the PGP keys                                       | No                                                               |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | key           | (NYI) The name of the key to be used in the keyring                          | No                                                               |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | passphrase    | (NYI) The passphrase to use the key                                          | No                                                               |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | attach        | Attach artifact to project                                                   | No; defaults to 'true'                                           |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | submodules    | Execute the goal on all sub-modules                                          | No; defaults to 'true'                                           |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | timestamped   | Turn SNAPSHOT into timestamps                                                | No; defaults to 'false'                                          |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | verbose       | Verbose logging                                                              | No; defaults to 'true', will be 'false' in the future            |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    ||   Element          || Description                                                                 || Required                                                       ||
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | deb                 | The debian package to be generated                                           | No; defaults to '${buildDirectory}/${artifactId}_${version}.deb' |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | type                | Artifact type                                                                | No; defaults to 'deb'                                            |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | classifier          | Artifact classifier                                                          | No; defaults to ''                                               |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | controlDir          | The directory containing the control files                                   | No; defaults to 'src/deb/control'                                |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | installDir          | The default directory for the project artifact if no data section is present | No; defaults to '/opt/${artifactId}'                             |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | dataSet             | A list of directories, tarballs, or files to include in the deb package      | No; defaults to include your maven artifact                      |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | changesIn           | The changes to add                                                           | No                                                               |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | changesOut          | The changes file generated                                                   | No                                                               |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | changesSave         | (NYI) The merged changes file                                                | No                                                               |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | compression         | (NYI) Compression method for the data file ('gzip', 'bzip2', 'xz' or 'none') | No; defaults to 'gzip'                                           |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | signPackage         | If the debian package should be signed                                       | No                                                               |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | signParameterPrefix | Prefix for when reading keyring, key and passphrase from settings.xml        | No; defaults to 'jdeb.'                                          |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | keyring             | The file containing the PGP keys                                             | No                                                               |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | key                 | The name of the key to be used in the keyring                                | No                                                               |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | passphrase          | The passphrase to use the key                                                | No                                                               |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | attach              | Attach artifact to project                                                   | No; defaults to 'true'                                           |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | submodules          | Execute the goal on all sub-modules                                          | No; defaults to 'true'                                           |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | timestamped         | Turn SNAPSHOT into timestamps                                                | No; defaults to 'false'                                          |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+    | verbose             | Verbose logging                                                              | No; defaults to 'true', will be 'false' in the future            |
+    *---------------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
 
 If you use the 'dataSet' element, you'll need to populate it with a one or
 more 'data' elements. A 'data' element is used to specify a 'directory', a
@@ -165,7 +169,7 @@ There are different kinds of mappers that can be selected via the `type` argumen
     *---------------+-------------------------------------------------------+------------------------+
 
 Below is an example of how you could configure your jdeb maven plugin to
-include a directory, a tarball, and a file in your deb package:
+include a directory, a tarball, and a file in your deb package and then sign it with the key 8306FE21 in /home/user/.gnupg/secring.gpg:
 
     <build>
         <plugins>
@@ -180,6 +184,10 @@ include a directory, a tarball, and a file in your deb package:
                             <goal>jdeb</goal>
                         </goals>
                         <configuration>
+                        	<signPackage>true</signPackage>
+                        	<keyring>/home/user/.gnupg/secring.gpg</keyring>
+                        	<key>8306FE21</key>
+                        	<passphrase>abcdef</passphrase>
 
                             <dataSet>
 
@@ -253,3 +261,23 @@ include a directory, a tarball, and a file in your deb package:
             </plugin>
         </plugins>
     </build>
+
+If you don't want to store your key information in the POM you can store this is your settings.xml, here's an example settings.xml:
+
+    <settings>
+        <profiles>
+            <profile>
+                <id>jdeb-signing</id>
+                <properties>
+                    <jdeb.keyring>/home/user/.gnupg/secring.gpg</jdeb.keyring>
+                    <jdeb.key>8306FE21</jdeb.key>
+                    <jdeb.passphrase>abcdef</jdeb.passphrase>
+                </properties>
+            </profile>
+        </profiles>
+        <activeProfiles>
+            <activeProfile>jdeb-signing</activeProfile>
+	    </activeProfiles>
+    </settings>
+
+keyring, key and passphrase can then be omitted from the POM entirely.

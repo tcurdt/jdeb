@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +33,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.settings.Settings;
 import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataConsumer;
@@ -243,6 +245,50 @@ public class DebMojo extends AbstractPluginMojo {
      */
     private boolean verbose;
 
+    /**
+     * If signPackage is true then a origin signature will be placed
+     * in the generated package.
+     *
+     * @parameter expression="${signPackage}" default-value="false"
+     */
+    private boolean signPackage;
+
+    /**
+     * The keyring to use for signing operations.
+     * 
+     * @parameter
+     */
+    private String keyring;
+
+    /**
+     * The key to use for signing operations.
+     * 
+     * @parameter
+     */
+    private String key;
+
+    /**
+     * The passphrase to use for signing operations.
+     * 
+     * @parameter
+     */
+    private String passphrase; 
+
+    /**
+     * The prefix to use when reading signing variables
+     * from settings.
+     * 
+     * @parameter default-value="jdeb."
+     */
+    private String signParameterPrefix;
+
+    /**
+     * The settings.
+     * 
+     * @parameter expression="${settings}"
+     */
+    private Settings settings;
+
     /* end of parameters */
 
     private String openReplaceToken = "[[";
@@ -334,6 +380,48 @@ public class DebMojo extends AbstractPluginMojo {
 
         Console console = new MojoConsole(getLog(), verbose);
 
+        // Read missing signing parameters from settings
+        Map<String, String> properties = Utils.readPropertiesFromActiveProfiles(signParameterPrefix, settings, "key", "keyring", "passphrase");
+
+        if(key == null)
+        {
+            key = properties.get("key");
+        }
+        if(keyring == null)
+        {
+            keyring = properties.get("keyring");
+            if(keyring == null) {
+                // If the keyring is still null, try to locate it
+                Collection<String> possibleLocations = Utils.getPossiblePGPSecureRingLocations();
+                for(String location : possibleLocations) {
+                    if (new File(location).exists())
+                    {
+                        console.info("Located keyring in " + location);
+                        keyring = location;
+                        break;
+                    }
+                }
+                if(keyring == null) {
+                    // If it's still null, alert the user that we could not find it
+                    StringBuilder message = new StringBuilder("Could not locate secure keyring, locations tried: ");
+                    Iterator<String> it = possibleLocations.iterator();
+                    while(it.hasNext())
+                    {
+                        message.append(it.next());
+                        if(it.hasNext())
+                        {
+                            message.append(", ");
+                        }
+                    }
+                    console.info(message.toString());
+                }
+            }
+        }
+        if(passphrase == null)
+        {
+            passphrase = properties.get("passphrase");
+        }
+
         final VariableResolver resolver = initializeVariableResolver(new HashMap<String, String>());
 
         final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken));
@@ -342,6 +430,7 @@ public class DebMojo extends AbstractPluginMojo {
         final File changesInFile = new File(Utils.replaceVariables(resolver, changesIn, openReplaceToken, closeReplaceToken));
         final File changesOutFile = new File(Utils.replaceVariables(resolver, changesOut, openReplaceToken, closeReplaceToken));
         final File changesSaveFile = new File(Utils.replaceVariables(resolver, changesSave, openReplaceToken, closeReplaceToken));
+        final File keyringFile = keyring == null ? null : new File(Utils.replaceVariables(resolver, keyring, openReplaceToken, closeReplaceToken));
 
         // if there are no producers defined we try to use the artifacts
         if (dataProducers.isEmpty()) {
@@ -408,6 +497,10 @@ public class DebMojo extends AbstractPluginMojo {
             debMaker.setChangesOut(changesOutFile);
             debMaker.setChangesSave(changesSaveFile);
             debMaker.setCompression(compression);
+            debMaker.setKeyring(keyringFile);
+            debMaker.setKey(key);
+            debMaker.setPassphrase(passphrase);
+            debMaker.setSignPackage(signPackage);
             debMaker.setResolver(resolver);
             debMaker.validate();
             debMaker.makeDeb();
