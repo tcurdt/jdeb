@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -377,6 +378,8 @@ public class DebMojo extends AbstractPluginMojo {
 
         setData(dataSet);
 
+        Console console = new MojoConsole(getLog(), verbose);
+
         // Read missing signing parameters from settings
         Map<String, String> properties = Utils.readPropertiesFromActiveProfiles(signParameterPrefix, settings, "key", "keyring", "passphrase");
 
@@ -387,13 +390,37 @@ public class DebMojo extends AbstractPluginMojo {
         if(keyring == null)
         {
             keyring = properties.get("keyring");
+            if(keyring == null) {
+                // If the keyring is still null, try to locate it
+                Collection<String> possibleLocations = Utils.getPossiblePGPSecureRingLocations();
+                for(String location : possibleLocations) {
+                    if (new File(location).exists())
+                    {
+                        console.info("Located keyring in " + location);
+                        keyring = location;
+                        break;
+                    }
+                }
+                if(keyring == null) {
+                    // If it's still null, alert the user that we could not find it
+                    StringBuilder message = new StringBuilder("Could not locate secure keyring, locations tried: ");
+                    Iterator<String> it = possibleLocations.iterator();
+                    while(it.hasNext())
+                    {
+                        message.append(it.next());
+                        if(it.hasNext())
+                        {
+                            message.append(", ");
+                        }
+                    }
+                    console.info(message.toString());
+                }
+            }
         }
         if(passphrase == null)
         {
             passphrase = properties.get("passphrase");
         }
-
-        Console console = new MojoConsole(getLog(), verbose);
 
         final VariableResolver resolver = initializeVariableResolver(new HashMap<String, String>());
 

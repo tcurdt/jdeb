@@ -16,14 +16,19 @@
 package org.vafer.jdeb.utils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -228,5 +233,78 @@ public final class Utils {
             }
         }
         return version;
+    }
+    
+    /**
+     * Get the possible locations where the secure keyring can be located.
+     * Looks through known locations of the GNU PG secure keyring.
+     * 
+     * @return The location of the PGP secure keyring if it was found,
+     *         null otherwise
+     */
+    public static Collection<String> getPossiblePGPSecureRingLocations()
+    {
+        LinkedHashSet<String> locations = new LinkedHashSet<String>();
+
+        // The user's roaming profile on Windows, via environment
+        String windowsRoaming = System.getenv("APPDATA");
+        if(windowsRoaming != null) {
+            locations.add(joinPaths(windowsRoaming, "gnupg", "secring.gpg"));
+        }
+
+        // The user's local profile on Windows, via environment
+        String windowsLocal = System.getenv("LOCALAPPDATA");
+        if(windowsLocal != null) {
+            locations.add(joinPaths(windowsLocal, "gnupg", "secring.gpg"));
+        }
+
+        // The user's home directory
+        String home = System.getProperty("user.home");
+        if(home != null) {
+            // *nix, including OS X
+            locations.add(joinPaths(home, ".gnupg", "secring.gpg"));
+
+            // These are for various flavours of Windows if the environment variables above should fail
+            locations.add(joinPaths(home, "AppData", "Roaming", "gnupg", "secring.gpg")); // Roaming profile on Vista and later
+            locations.add(joinPaths(home, "AppData", "Local", "gnupg", "secring.gpg")); // Local profile on Vista and later
+            locations.add(joinPaths(home, "Application Data", "gnupg", "secring.gpg")); // Roaming profile on 2000 and XP
+            locations.add(joinPaths(home, "Local Settings", "Application Data", "gnupg", "secring.gpg")); // Local profile on 2000 and XP
+        }
+
+        // The Windows installation directory
+        String windir = System.getProperty("WINDIR");
+        if(windir != null) {
+            // Local Profile on Windows 98 and ME
+            locations.add(joinPaths(windir, "Application Data", "gnupg", "secring.gpg"));
+        }
+
+        return locations;
+    }
+
+    /**
+     * Join together path elements with File.separator. Filters out null
+     * elements.
+     * 
+     * @param elements The path elements to join
+     * @return elements concatenated together with File.separator
+     */
+    public static String joinPaths(String... elements) {
+        StringBuilder builder = new StringBuilder();
+        boolean first = true;
+        for(int i = 0; i < elements.length; i++) {
+            // Skip null elements
+            if(elements[i] == null)
+            {
+                // This won't change the value of first if we skip elements
+                // in the beginning of the array
+                continue;
+            }
+            if(!first) {
+                builder.append(File.separatorChar);
+            }
+            builder.append(elements[i]);
+            first = false;
+        }
+        return builder.toString();
     }
 }
