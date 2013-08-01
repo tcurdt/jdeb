@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -30,6 +31,9 @@ import java.util.List;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+import org.apache.commons.compress.archivers.tar.TarConstants;
+import org.apache.commons.compress.archivers.zip.ZipEncoding;
+import org.apache.commons.compress.archivers.zip.ZipEncodingHelper;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.vafer.jdeb.utils.Utils;
 
@@ -39,6 +43,8 @@ import org.vafer.jdeb.utils.Utils;
 class DataBuilder {
 
     private Console console;
+    
+    private ZipEncoding encoding;
     
     private static final class Total {
         private BigInteger count = BigInteger.valueOf(0);
@@ -54,6 +60,16 @@ class DataBuilder {
 
     DataBuilder(Console console) {
         this.console = console;
+        this.encoding = ZipEncodingHelper.getZipEncoding(null);
+    }
+
+    private void checkField(String name, int length) throws IOException {
+        if (name != null) {
+            ByteBuffer b = encoding.encode(name);
+            if (b.limit() > length) {
+                throw new IllegalArgumentException("Field '" + name + "' too long, maximum is " + length);
+            }
+        }
     }
 
     /**
@@ -85,6 +101,13 @@ class DataBuilder {
         final List<String> addedDirectories = new ArrayList<String>();
         final DataConsumer receiver = new DataConsumer() {
             public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+                // Check link name
+                checkField(linkname, TarConstants.NAMELEN);
+                // Check user name
+                checkField(user, TarConstants.UNAMELEN);
+                // Check group name
+                checkField(group, TarConstants.GNAMELEN);
+
                 dirname = fixPath(dirname);
 
                 createParentDirectories(dirname, user, uid, group, gid);
@@ -98,6 +121,13 @@ class DataBuilder {
             }
 
             public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+                // Check link name
+                checkField(linkname, TarConstants.NAMELEN);
+                // Check user name
+                checkField(user, TarConstants.UNAMELEN);
+                // Check group name
+                checkField(group, TarConstants.GNAMELEN);
+
                 filename = fixPath(filename);
 
                 createParentDirectories(filename, user, uid, group, gid);
@@ -139,13 +169,20 @@ class DataBuilder {
                 checksums.append(md5).append(" ").append(entry.getName()).append('\n');
             }
 
-            public void onEachLink(String path, String linkName, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
+            public void onEachLink(String path, String linkname, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
+                // Check link name
+                checkField(linkname, TarConstants.NAMELEN);
+                // Check user name
+                checkField(user, TarConstants.UNAMELEN);
+                // Check group name
+                checkField(group, TarConstants.GNAMELEN);
+
                 path = fixPath(path);
 
                 createParentDirectories(path, user, uid, group, gid);
 
                 final TarArchiveEntry entry = new TarArchiveEntry(path, symlink ? TarArchiveEntry.LF_SYMLINK : TarArchiveEntry.LF_LINK);
-                entry.setLinkName(linkName);
+                entry.setLinkName(linkname);
 
                 entry.setUserName(user);
                 entry.setUserId(uid);
