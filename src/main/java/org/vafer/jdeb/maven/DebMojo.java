@@ -16,32 +16,21 @@
 
 package org.vafer.jdeb.maven;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.tar.TarEntry;
-import org.vafer.jdeb.Console;
-import org.vafer.jdeb.DataConsumer;
-import org.vafer.jdeb.DataProducer;
-import org.vafer.jdeb.DebMaker;
-import org.vafer.jdeb.PackagingException;
+import org.vafer.jdeb.*;
 import org.vafer.jdeb.utils.FilteredFile;
 import org.vafer.jdeb.utils.MapVariableResolver;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.*;
 
 /**
  * Creates deb archive
@@ -55,7 +44,7 @@ public class DebMojo extends AbstractPluginMojo {
      * @component
      */
     private MavenProjectHelper projectHelper;
-    
+
     /**
      * Defines the name of deb package.
      *
@@ -68,7 +57,7 @@ public class DebMojo extends AbstractPluginMojo {
      * substitutions are [[baseDir]] [[buildDir]] [[artifactId]] [[version]]
      * [[extension]] and [[groupId]].
      *
-     * @parameter default-value="[[buildDir]]/[[artifactId]]_[[version]]_all.[[extension]]"
+     * @parameter default-value="[[buildDir]]/[[name]]_[[version]]_all.[[extension]]"
      */
     private String deb;
 
@@ -90,7 +79,7 @@ public class DebMojo extends AbstractPluginMojo {
     /**
      * Explicitly define the file where to write the changes to.
      *
-     * @parameter default-value="[[buildDir]]/[[artifactId]]_[[version]]_all.changes"
+     * @parameter default-value="[[buildDir]]/[[name]]_[[version]]_all.changes"
      */
     private String changesOut;
 
@@ -272,7 +261,14 @@ public class DebMojo extends AbstractPluginMojo {
     protected VariableResolver initializeVariableResolver( Map<String, String> variables ) {
         ((Map) variables).putAll(getProject().getProperties());
         ((Map) variables).putAll(System.getProperties());
-        variables.put("name", name != null ? name : getProject().getName());
+
+        if (name == null)
+            if (getProject().getName() != null)
+                name = getProject().getName();
+            else
+                name = getProject().getArtifactId();
+
+        variables.put("name", name);
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
         variables.put("version", getProjectVersion());
@@ -354,8 +350,8 @@ public class DebMojo extends AbstractPluginMojo {
                     getLog().warn("Creating empty debian package.");
                 } else {
                     throw new MojoExecutionException(
-                        "Nothing to include into the debian package. " +
-                            "Did you maybe forget to add a <data> tag or call the plugin directly?");
+                            "Nothing to include into the debian package. " +
+                                    "Did you maybe forget to add a <data> tag or call the plugin directly?");
                 }
 
             } else {
@@ -380,12 +376,12 @@ public class DebMojo extends AbstractPluginMojo {
                             public void produce( final DataConsumer receiver ) {
                                 try {
                                     receiver.onEachFile(
-                                        new FileInputStream(file),
-                                        new File(installDirFile, file.getName()).getAbsolutePath(),
-                                        "",
-                                        "root", 0, "root", 0,
-                                        TarEntry.DEFAULT_FILE_MODE,
-                                        file.length());
+                                            new FileInputStream(file),
+                                            new File(installDirFile, file.getName()).getAbsolutePath(),
+                                            "",
+                                            "root", 0, "root", 0,
+                                            TarEntry.DEFAULT_FILE_MODE,
+                                            file.length());
                                 } catch (Exception e) {
                                     getLog().error(e);
                                 }
