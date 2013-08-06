@@ -3,35 +3,37 @@
 Generating a default Debian package with maven is particular easy. Just add
 the plugin to your POM like this
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>jdeb</artifactId>
-                <groupId>org.vafer</groupId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jdeb</goal>
-                        </goals>
-                        <configuration>
-                            <dataSet>
-                                <data>
-                                    <src>${project.build.directory}/${project.build.finalName}.jar</src>
-                                    <type>file</type>
-                                    <mapper>
-                                      <type>perm</type>
-                                      <prefix>/usr/share/jdeb/lib</prefix>
-                                    </mapper>
-                                </data>
-                            </dataSet>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+```xml
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>jdeb</artifactId>
+        <groupId>org.vafer</groupId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>jdeb</goal>
+            </goals>
+            <configuration>
+              <dataSet>
+                <data>
+                  <src>${project.build.directory}/${project.build.finalName}.jar</src>
+                  <type>file</type>
+                  <mapper>
+                    <type>perm</type>
+                    <prefix>/usr/share/jdeb/lib</prefix>
+                  </mapper>
+                </data>
+              </dataSet>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+```
 
 At least the one main control file is required to control the creation of the
 debian package. This required control file should be found in the control
@@ -128,89 +130,91 @@ strip         | Strip n path components from the original file        | No; defa
 Below is an example of how you could configure your jdeb maven plugin to
 include a directory, a tarball, and a file in your deb package:
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>jdeb</artifactId>
-                <groupId>org.vafer</groupId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jdeb</goal>
-                        </goals>
-                        <configuration>
+```xml
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>jdeb</artifactId>
+        <groupId>org.vafer</groupId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>jdeb</goal>
+            </goals>
+            <configuration>
 
-                            <dataSet>
+              <dataSet>
 
-                                <!-- Tarball example -->
-                                <data>
-                                    <src>${project.basedir}/target/my_archive.tar.gz</src>
-                                    <type>archive</type>
-                                    <includes>...</includes>
-                                    <excludes>...</excludes>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <strip>1</strip>
-                                        <prefix>/somewhere/else</prefix>
-                                        <user>tcurdt</user>
-                                        <group>tcurdt</group>
-                                        <filemode>600</filemode>
-                                    </mapper>
-                                </data>
+                <!-- Tarball example -->
+                <data>
+                  <src>${project.basedir}/target/my_archive.tar.gz</src>
+                  <type>archive</type>
+                  <includes>...</includes>
+                  <excludes>...</excludes>
+                  <mapper>
+                    <type>perm</type>
+                    <strip>1</strip>
+                    <prefix>/somewhere/else</prefix>
+                    <user>tcurdt</user>
+                    <group>tcurdt</group>
+                    <filemode>600</filemode>
+                  </mapper>
+                </data>
 
-                                <!-- Directory example -->
-                                <data>
-                                    <src>${project.build.directory}/data</src>
-                                    <type>directory</type>
-                                    <includes />
-                                    <excludes>**/.svn</excludes>
-                                    <mapper>
-                                        <type>ls</type>
-                                        <src>mapping.txt</src>
-                                    </mapper>
-                                </data>
+                <!-- Directory example -->
+                <data>
+                  <src>${project.build.directory}/data</src>
+                  <type>directory</type>
+                  <includes/>
+                  <excludes>**/.svn</excludes>
+                  <mapper>
+                    <type>ls</type>
+                    <src>mapping.txt</src>
+                  </mapper>
+                </data>
 
-                                <!-- File example -->
-                                <data>
-                                    <src>${project.basedir}/README.txt</src>
-                                    <dst>README</dst>
-                                    <type>file</type>
-                                    <missingSrc>ignore</missingSrc>
-                                </data>
+                <!-- File example -->
+                <data>
+                  <src>${project.basedir}/README.txt</src>
+                  <dst>README</dst>
+                  <type>file</type>
+                  <missingSrc>ignore</missingSrc>
+                </data>
 
-                                <!-- Template example -->
-                                <data>
-                                    <type>template</type>
-                                    <paths>
-                                        <path>/etc/${artifactId}</path>
-                                        <path>/var/lib/${artifactId}</path>
-                                        <path>/var/log/${artifactId}</path>
-                                        <path>/var/run/${artifactId}</path>
-                                    </paths>
-                                </data>
+                <!-- Template example -->
+                <data>
+                  <type>template</type>
+                  <paths>
+                    <path>/etc/${artifactId}</path>
+                    <path>/var/lib/${artifactId}</path>
+                    <path>/var/log/${artifactId}</path>
+                    <path>/var/run/${artifactId}</path>
+                  </paths>
+                </data>
 
-                                <!-- Hard link example -->
-                                <data>
-                                    <type>link</type>
-                                    <linkName>/a/path/on/the/target/fs</linkName>
-                                    <linkTarget>/a/link/to/the/scr/file</linkTarget>
-                                    <symlink>false</symlink>
-                                </data>
+                <!-- Hard link example -->
+                <data>
+                  <type>link</type>
+                  <linkName>/a/path/on/the/target/fs</linkName>
+                  <linkTarget>/a/link/to/the/scr/file</linkTarget>
+                  <symlink>false</symlink>
+                </data>
 
-                                <!-- Symbolic link example -->
-                                <data>
-                                    <type>link</type>
-                                    <linkName>/a/path/on/the/target/fs</linkName>
-                                    <linkTarget>/a/sym/link/to/the/scr/file</linkTarget>
-                                    <symlink>true</symlink>
-                                </data>
-                            </dataSet>
+                <!-- Symbolic link example -->
+                <data>
+                  <type>link</type>
+                  <linkName>/a/path/on/the/target/fs</linkName>
+                  <linkTarget>/a/sym/link/to/the/scr/file</linkTarget>
+                  <symlink>true</symlink>
+                </data>
+              </dataSet>
 
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+```

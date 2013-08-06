@@ -18,6 +18,7 @@ provide the control files defining meta information about the package (except
 the `md5sums` which gets created automatically). It creates the archive
 and if you want even a signed changes file.
 
+```xml
     <target name="package">
       <taskdef name="deb" classname="org.vafer.jdeb.ant.DebAntTask"/>
       <copy todir="${deb}/control">
@@ -33,28 +34,33 @@ and if you want even a signed changes file.
         </data>
       </deb>
     </target>
+```
 
 For cross platform builds it might be important to retain permissions,
 ownerships and links. When you provide the original tar as input the meta data
 will be kept intact gets included directly into the deb. You can apply simple
 modifications like prefixing or stripping of paths though.
 
+```xml
     <deb destfile="jdeb.deb" control="${deb}/control">
       <data src="src/release.tgz" type="archive">
         <mapper type="perm" strip="1" prefix="/somewhere/else"/>
         <exclude name="**/.svn"/>
       </data>
     </deb>
+```
 
 For more complex permission and ownership adjustments you can use a "ls"
 mapper. It allows you to define permissions and ownerships in a text file and
 even under Windows you will be able to build your debian package.
 
+```xml
     <deb destfile="jdeb.deb" control="${deb}/control">
       <data src="src/release.tgz" type="archive">
         <mapper type="ls" src="mapping.txt" />
       </data>
     </deb>
+```
 
 The mapper will apply the output of an "ls -laR > mapping.txt" command
 that should look like this
@@ -70,6 +76,7 @@ that should look like this
 It's also possible to use a `fileset` or even a `tarfileset` to
 specify the set of files to include with their permissions :
 
+```xml
     <deb destfile="jdeb.deb" control="${deb}/control">
       <tarfileset dir="src/main/resources/deb/data"
                prefix="/somewhere/else"
@@ -77,6 +84,7 @@ specify the set of files to include with their permissions :
              username="tcurdt"
                 group="tcurdt"/>
     </deb>
+```
 
 ## Changes file
 
@@ -93,16 +101,19 @@ When you do a release jdeb will add (or complete!) the release line and create
 a debian format standard changes file for you. (Don't forget to commit changes
 jdeb did to the file.) From Ant you have to call jdeb like this
 
+```xml
     <deb destfile="jdeb.deb"
           control="${deb}/control"
         changesIn="changes.txt"
        changesOut="jdeb.changes">
       <data src="some/dir"/>
     </deb>
+```
 
 If you also provide a `changesSave` attribute the jdeb will add release
 information to the original input and write out the new file.
 
+```xml
     <deb destfile="jdeb.deb"
           control="${deb}/control"
         changesIn="changes.txt"
@@ -110,6 +121,7 @@ information to the original input and write out the new file.
       changesSave="changes.txt">
       <data src="some/dir"/>
     </deb>
+```
 
 ## Signing changes
 
@@ -118,6 +130,7 @@ To have the changes be signed, make sure you have the
 classpath (just copy it into the `$ANT_HOME/lib` folder - next to jdeb).
 Then you can sign your changes file with:
 
+```xml
     <deb destfile="jdeb.deb"
           control="${deb}/control"
         changesIn="changes.txt"
@@ -127,6 +140,7 @@ Then you can sign your changes file with:
           keyring="/Users/tcurdt/.gnupg/secring.gpg">
       <data src="some/dir"/>
     </deb>
+```
 
 <b>Security Note</b>: Hard coding the passphrase in the `<deb>` task can be a serious
 security hole. Consider using variable substitution and asking the passphrase
