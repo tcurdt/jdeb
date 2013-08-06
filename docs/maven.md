@@ -37,8 +37,8 @@ the plugin to your POM like this
 
 At least the one main control file is required to control the creation of the
 debian package. This required control file should be found in the control
-directory. By default the control file name is also 'control' which gives a
-path of 'src/deb/control/control' by default. This control file contains the
+directory. By default the control file name is also `control` which gives a
+path of `src/deb/control/control` by default. This control file contains the
 metadata about the Debian package. Usually it will look something along the lines of
 
     Package: [[name]]
@@ -52,10 +52,10 @@ metadata about the Debian package. Usually it will look something along the line
     Distribution: development
 
 
-If the environment variables 'DEBEMAIL' and 'DEBFULLNAME' are both set this
-will overrule the 'Maintainer' field set in there. The 'Installed-Size' will
-also be injected. If a changes file is used, the 'Distribution' usually comes
-from that file. The default changes file is called 'CHANGES.txt'. See below
+If the environment variables `DEBEMAIL` and `DEBFULLNAME` are both set this
+will overrule the `Maintainer` field set in there. The `Installed-Size` will
+also be injected. If a changes file is used, the `Distribution` usually comes
+from that file. The default changes file is called `CHANGES.txt`. See below
 for the syntax of the content of the changes file.
 
 Property replacement will also occur in any of the standard debian control
@@ -65,7 +65,7 @@ configuration of the form:
     /etc/[[artifactId]]/[[artifactId]].properties
     /etc/[[artifactId]]/log4j.xml
 
-If you now do a 'mvn clean install', the 'deb' goal will be called and
+If you now do a `mvn clean install`, the `deb` goal will be called and
 artifacts consisting of the deb and potentially the changes file will
 automatically be attached to the project.
 
@@ -76,53 +76,53 @@ section with any of the following options:
 
 Element       | Description                                                                  | Required
 ------------- | ---------------------------------------------------------------------------- | -----------------------------------------------------------------
-deb           | The debian package to be generated                                           | No; defaults to '${buildDirectory}/${artifactId}_${version}.deb'
-type          | Artifact type                                                                | No; defaults to 'deb'
+deb           | The debian package to be generated                                           | No; defaults to `${buildDirectory}/${artifactId}_${version}.deb`
+type          | Artifact type                                                                | No; defaults to `deb`
 classifier    | Artifact classifier                                                          | No; defaults to ''
-controlDir    | The directory containing the control files                                   | No; defaults to 'src/deb/control'
-installDir    | The default directory for the project artifact if no data section is present | No; defaults to '/opt/${artifactId}'
+controlDir    | The directory containing the control files                                   | No; defaults to `src/deb/control`
+installDir    | The default directory for the project artifact if no data section is present | No; defaults to `/opt/${artifactId}`
 dataSet       | A list of directories, tarballs, or files to include in the deb package      | No; defaults to include your maven artifact
 changesIn     | The changes to add                                                           | No
 changesOut    | The changes file generated                                                   | No
 changesSave   | (NYI) The merged changes file                                                | No
-compression   | (NYI) Compression method for the data file ('gzip', 'bzip2', 'xz' or 'none') | No; defaults to 'gzip'
+compression   | (NYI) Compression method for the data file (`gzip`, `bzip2`, `xz` or `none`) | No; defaults to `gzip`
 keyring       | (NYI) The file containing the PGP keys                                       | No
 key           | (NYI) The name of the key to be used in the keyring                          | No
 passphrase    | (NYI) The passphrase to use the key                                          | No
-attach        | Attach artifact to project                                                   | No; defaults to 'true'
-submodules    | Execute the goal on all sub-modules                                          | No; defaults to 'true'
-timestamped   | Turn SNAPSHOT into timestamps                                                | No; defaults to 'false'
-verbose       | Verbose logging                                                              | No; defaults to 'true', will be 'false' in the future
+attach        | Attach artifact to project                                                   | No; defaults to `true`
+submodules    | Execute the goal on all sub-modules                                          | No; defaults to `true`
+timestamped   | Turn SNAPSHOT into timestamps                                                | No; defaults to `false`
+verbose       | Verbose logging                                                              | No; defaults to `true`, will be `false` in the future
 
-If you use the 'dataSet' element, you'll need to populate it with a one or
-more 'data' elements. A 'data' element is used to specify a 'directory', a
-'tarball' archive, or a 'file'. You can add as many 'data'
-elements to your 'dataSet' as you'd like. The 'data' element has the
+If you use the `dataSet` element, you'll need to populate it with a one or
+more `data` elements. A `data` element is used to specify a directory, a
+tarball archive, or a file. You can add as many data
+elements to your dataSet as you'd like. The `data` element has the
 following options:
 
 Element          | Description                                                                  | Required
 ---------------- | ---------------------------------------------------------------------------- | ------------------------------------
 src              | The directory, tarball, file to include in the package                       | Yes
-dst              | New filename at destination (type must be 'file')                            | No
-linkName         | The path of the link (type must be 'link')                                   | Yes for link
-linkTarget       | The target of the link (type must be 'link')                                 | Yes for link
+dst              | New filename at destination (type must be `file`)                            | No
+linkName         | The path of the link (type must be `link`)                                   | Yes for link
+linkTarget       | The target of the link (type must be `link`)                                 | Yes for link
 type             | Type of the data source. (archive, directory, file, link or template)        | No; but will be Yes in the future
-missingSrc       | Fail if src file/folder is missing (ignore or fail)                          | No; defaults to 'fail'
+missingSrc       | Fail if src file/folder is missing (ignore or fail)                          | No; defaults to `fail`
 includes         | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files
 excludes         | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions
 mapper           | The files to exclude from the directory or tarball                           | No
-paths/(path..)   | One or more string literal paths that will created in the package            | No; Yes for type 'template'
+paths/(path..)   | One or more string literal paths that will created in the package            | No; Yes for type `template`
 
 There are different kinds of mappers that can be selected via the `type` argument. The most common one is the 'perm' mapper.
 
 Element       | Description                                           | Required
 ------------- | ----------------------------------------------------- | -----------------------
 type          | 'perm'                                                | Yes
-prefix        | Add this prefix to the files                          | No; defaults to ''
+prefix        | Add this prefix to the files                          | No; defaults to ""
 uid           | Numerical uid                                         | No; defaults to 0
 gid           | Numerical gid                                         | No; defaults to 0
-user          | User name                                             | No; defaults to 'root'
-group         | User group                                            | No; defaults to 'root'
+user          | User name                                             | No; defaults to "root"
+group         | User group                                            | No; defaults to "root"
 filemode      | File permissions as octet                             | No; deftauls to 644
 dirmode       | Dir permissions as octet                              | No; defaults to 755
 strip         | Strip n path components from the original file        | No; defaults to 0
