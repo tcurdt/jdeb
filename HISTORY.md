@@ -1,7 +1,8 @@
 ## Version 1.1, released ?
 
 * [ADD] xz compression support
-* [ADD] suport permission in (hard) link setup
+* [ADD] Added link support to the Ant task
+* [ADD] Support permission in (hard) link setup
 * [FIX] On Windows, parent directories are now created automatically when adding files to the data archive
 * [CHG] Links are now symbolic by default
 

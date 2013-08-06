@@ -203,6 +203,28 @@ public final class DebAntTaskTestCase extends TestCase {
         }, Compression.GZIP);
     }
 
+    public void testLink() throws Exception {
+        project.executeTarget("link");
+        
+        File deb = new File("target/test-classes/test.deb");
+        assertTrue("package not build", deb.exists());
+        
+        final AtomicBoolean linkFound = new AtomicBoolean(false);
+        
+        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
+            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
+                if (entry.isSymbolicLink()) {
+                    linkFound.set(true);
+                    assertEquals("link mode (" + entry.getName() + ")", 0120755, entry.getMode());
+                }
+                assertEquals("user", "ebourg", entry.getUserName());
+                assertEquals("group", "ebourg", entry.getGroupName());
+            }
+        }, Compression.GZIP);
+        
+        assertTrue("Link not found", linkFound.get());
+    }
+
     public void testUnkownCompression() throws Exception {
         try {
             project.executeTarget("unknown-compression");

@@ -80,6 +80,13 @@
     </deb>
   </target>
 
+  <target name="link">
+    <deb destfile="test.deb" control="org/vafer/jdeb/deb/control">
+      <tarfileset dir="org/vafer/jdeb/deb/data" prefix="foo" dirmode="700" filemode="600" username="ebourg" group="ebourg"/>
+      <link name="/usr/share/java/foo.jar" target="/usr/share/java/foo-1.0.jar" username="ebourg" group="ebourg" mode="755"/>
+    </deb>
+  </target>
+
   <target name="unknown-compression">
     <deb destfile="test.deb" control="org/vafer/jdeb/deb/control" compression="rar">
       <fileset dir="org/vafer/jdeb/deb/data"/>

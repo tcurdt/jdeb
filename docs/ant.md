@@ -86,6 +86,27 @@ specify the set of files to include with their permissions :
     </deb>
 ```
 
+Links can be added by specifying a `link` element:
+
+```xml
+    <deb destfile="jdeb.deb" control="${deb}/control">
+      <link name="/usr/share/java/foo.jar" target="/usr/share/java/foo-1.0.jar"/>
+    </deb>
+```
+
+Here are the supported attributes on the `link` element:
+
+Attribute     | Description                                            | Required
+------------- | ------------------------------------------------------ | -----------------------
+name          | The path of the link                                   | Yes
+target        | The target of the link                                 | Yes
+symbolic      | The type of the link (`true`: symbolic, `false`: hard) | No; defaults to `true`
+uid           | Numerical uid                                          | No; defaults to 0
+gid           | Numerical gid                                          | No; defaults to 0
+user          | User name                                              | No; defaults to "root"
+group         | User group                                             | No; defaults to "root"
+mode          | Permissions as octet                                   | No; deftauls to 777
+
 ## Changes file
 
 In order to also create a changes file you will need to provide the input and

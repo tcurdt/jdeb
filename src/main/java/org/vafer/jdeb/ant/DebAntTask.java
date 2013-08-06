@@ -69,6 +69,8 @@ public class DebAntTask extends MatchingTask {
     /** Trigger the verbose mode detailing all operations */
     private boolean verbose;
 
+    private Collection<Link> links = new ArrayList<Link>();
+
     private Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
 
 
@@ -124,7 +126,16 @@ public class DebAntTask extends MatchingTask {
         dataProducers.add(data);
     }
 
+    public void addLink( Link link ) {
+        links.add(link);
+    }
+
     public void execute() {
+        // add the data producers for the links
+        for (Link link : links) {
+            dataProducers.add(link.toDataProducer());
+        }
+        
         // validate the type of the <data> elements
         for (DataProducer dataProducer : dataProducers) {
             if (dataProducer instanceof Data) {
