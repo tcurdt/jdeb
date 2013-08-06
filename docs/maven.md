@@ -72,43 +72,25 @@ configuration options provide the same features available in the jdeb ant
 task. To configure the jdeb maven plugin, populate the jdeb configuration
 section with any of the following options:
 
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    ||   Element    || Description                                                                 || Required                                                       ||
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | deb           | The debian package to be generated                                           | No; defaults to '${buildDirectory}/${artifactId}_${version}.deb' |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | type          | Artifact type                                                                | No; defaults to 'deb'                                            |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | classifier    | Artifact classifier                                                          | No; defaults to ''                                               |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | controlDir    | The directory containing the control files                                   | No; defaults to 'src/deb/control'                                |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | installDir    | The default directory for the project artifact if no data section is present | No; defaults to '/opt/${artifactId}'                             |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | dataSet       | A list of directories, tarballs, or files to include in the deb package      | No; defaults to include your maven artifact                      |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | changesIn     | The changes to add                                                           | No                                                               |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | changesOut    | The changes file generated                                                   | No                                                               |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | changesSave   | (NYI) The merged changes file                                                | No                                                               |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | compression   | (NYI) Compression method for the data file ('gzip', 'bzip2', 'xz' or 'none') | No; defaults to 'gzip'                                           |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | keyring       | (NYI) The file containing the PGP keys                                       | No                                                               |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | key           | (NYI) The name of the key to be used in the keyring                          | No                                                               |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | passphrase    | (NYI) The passphrase to use the key                                          | No                                                               |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | attach        | Attach artifact to project                                                   | No; defaults to 'true'                                           |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | submodules    | Execute the goal on all sub-modules                                          | No; defaults to 'true'                                           |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | timestamped   | Turn SNAPSHOT into timestamps                                                | No; defaults to 'false'                                          |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
-    | verbose       | Verbose logging                                                              | No; defaults to 'true', will be 'false' in the future            |
-    *---------------+------------------------------------------------------------------------------+------------------------------------------------------------------+
+Element       | Description                                                                  | Required
+------------- | ---------------------------------------------------------------------------- | -----------------------------------------------------------------
+deb           | The debian package to be generated                                           | No; defaults to '${buildDirectory}/${artifactId}_${version}.deb'
+type          | Artifact type                                                                | No; defaults to 'deb'
+classifier    | Artifact classifier                                                          | No; defaults to ''
+controlDir    | The directory containing the control files                                   | No; defaults to 'src/deb/control'
+installDir    | The default directory for the project artifact if no data section is present | No; defaults to '/opt/${artifactId}'
+dataSet       | A list of directories, tarballs, or files to include in the deb package      | No; defaults to include your maven artifact
+changesIn     | The changes to add                                                           | No
+changesOut    | The changes file generated                                                   | No
+changesSave   | (NYI) The merged changes file                                                | No
+compression   | (NYI) Compression method for the data file ('gzip', 'bzip2', 'xz' or 'none') | No; defaults to 'gzip'
+keyring       | (NYI) The file containing the PGP keys                                       | No
+key           | (NYI) The name of the key to be used in the keyring                          | No
+passphrase    | (NYI) The passphrase to use the key                                          | No
+attach        | Attach artifact to project                                                   | No; defaults to 'true'
+submodules    | Execute the goal on all sub-modules                                          | No; defaults to 'true'
+timestamped   | Turn SNAPSHOT into timestamps                                                | No; defaults to 'false'
+verbose       | Verbose logging                                                              | No; defaults to 'true', will be 'false' in the future
 
 If you use the 'dataSet' element, you'll need to populate it with a one or
 more 'data' elements. A 'data' element is used to specify a 'directory', a
@@ -116,29 +98,18 @@ more 'data' elements. A 'data' element is used to specify a 'directory', a
 elements to your 'dataSet' as you'd like. The 'data' element has the
 following options:
 
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    ||   Element       || Description                                                                 || Required                                  ||
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | src              | The directory, tarball, file to include in the package                       | Yes                                         |
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | dst              | New filename at destination (type must be 'file')                            | No                                          |
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | linkName         | The path of the link (type must be 'link')                                   | Yes for link                                |
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | linkTarget       | The target of the link (type must be 'link')                                 | Yes for link                                |
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | type             | Type of the data source. (archive|directory|file|link|template)              | No; but will be Yes in the future           |
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | missingSrc       | Fail if src file/folder is missing (ignore|fail)                             | No; defaults to 'fail'                      |
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | includes         | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files                   |
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | excludes         | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions               |
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | mapper           | The files to exclude from the directory or tarball                           | No                                          |
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | paths/(path..)   | One or more string literal paths that will created in the package            | No; Yes for type 'template'                 |
-    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+Element          | Description                                                                  | Required
+---------------- | ---------------------------------------------------------------------------- | ------------------------------------
+src              | The directory, tarball, file to include in the package                       | Yes
+dst              | New filename at destination (type must be 'file')                            | No
+linkName         | The path of the link (type must be 'link')                                   | Yes for link
+linkTarget       | The target of the link (type must be 'link')                                 | Yes for link
+type             | Type of the data source. (archive|directory|file|link|template)              | No; but will be Yes in the future
+missingSrc       | Fail if src file/folder is missing (ignore|fail)                             | No; defaults to 'fail'
+includes         | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files
+excludes         | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions
+mapper           | The files to exclude from the directory or tarball                           | No
+paths/(path..)   | One or more string literal paths that will created in the package            | No; Yes for type 'template'
 
 There are different kinds of mappers that can be selected via the `type` argument. The most common one is the 'perm' mapper.
 
