@@ -5,7 +5,7 @@ Attribute     | Description                                                     
 destfile      | The debian package to be generated                                           | Yes
 control       | The directory containing the control files                                   | Yes
 compression   | Compression method for the data file ('gzip', 'bzip2', 'xz' or 'none')       | No; defaults to 'gzip'
-verbose       | Print detailed info during the package generation                            | No; defaults to 'false'>
+verbose       | Print detailed info during the package generation                            | No; defaults to 'false'
 keyring       | The file containing the PGP keys                                             | No
 key           | The name of the key to be used in the keyring                                | No
 passphrase    | The passphrase to use the key                                                | No
