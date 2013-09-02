@@ -27,6 +27,7 @@ import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
@@ -74,7 +75,7 @@ class ControlBuilder {
      * @throws java.io.IOException
      * @throws java.text.ParseException
      */
-    void buildControl(BinaryPackageControlFile packageControlFile, File[] controlFiles, StringBuilder checksums, File output) throws IOException, ParseException {
+    void buildControl(BinaryPackageControlFile packageControlFile, File[] controlFiles, List<String> conffiles, StringBuilder checksums, File output) throws IOException, ParseException {
         final File dir = output.getParentFile();
         if (dir != null && (!dir.exists() || !dir.isDirectory())) {
             throw new IOException("Cannot write control file at '" + output.getAbsolutePath() + "'");
@@ -82,6 +83,8 @@ class ControlBuilder {
 
         final TarArchiveOutputStream outputStream = new TarArchiveOutputStream(new GZIPOutputStream(new FileOutputStream(output)));
         outputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
+        
+        boolean foundConffiles = false;
         
         // create the final package control file out of the "control" file, copy all other files, ignore the directories
         for (File file : controlFiles) {
@@ -93,6 +96,10 @@ class ControlBuilder {
                 continue;
             }
 
+            if ("conffiles".equals(file.getName())) {
+            	foundConffiles = true;
+            }
+            
             if (CONFIGURATION_FILENAMES.contains(file.getName()) || MAINTAINER_SCRIPTS.contains(file.getName())) {
                 FilteredFile configurationFile = new FilteredFile(new FileInputStream(file), resolver);
                 addControlEntry(file.getName(), configurationFile.toString(), outputStream);
@@ -115,15 +122,37 @@ class ControlBuilder {
                 in.close();
             }
         }
+        
+        if (conffiles.size() > 0) {
+        	if (foundConffiles) {
+        		console.info("Found file 'conffiles' in the control directory. Skipping conffiles generation.");
+        	} else {
+	            addControlEntry("conffiles", createPackageConffilesFile(conffiles), outputStream);
+	        }
+        }
 
         if (packageControlFile == null) {
-            throw new FileNotFoundException("No 'control' file found in " + Arrays.toString(controlFiles));
+            throw new FileNotFoundException("No 'control' file found in " + controlFiles.toString());
         }
         
         addControlEntry("control", packageControlFile.toString(), outputStream);
         addControlEntry("md5sums", checksums.toString(), outputStream);
 
         outputStream.close();
+    }
+    
+    private String createPackageConffilesFile(final List<String> conffiles) {
+        StringBuilder content = new StringBuilder();
+    	
+    	if (conffiles != null && !conffiles.isEmpty()) {
+            for (String nextFileName : conffiles) {
+                content.append(nextFileName);
+                content.append("\n");
+                //content.append(System.getProperty("line.separator"));
+            }
+        }
+
+        return content.toString();
     }
     
     

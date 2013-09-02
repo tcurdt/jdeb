@@ -108,6 +108,15 @@ public final class Data implements DataProducer {
     public void setSymlink(boolean symlink) {
         this.symlink = symlink;
     }
+    
+    private boolean conffile = false;
+
+    /**
+     * @parameter expression="${conffile}"
+     */
+    public void setConffile(boolean conffile) {
+        this.conffile = conffile;
+    }
 
     private String[] includePatterns;
 
@@ -207,7 +216,7 @@ public final class Data implements DataProducer {
         }
 
         if ("directory".equalsIgnoreCase(type)) {
-            new DataProducerDirectory(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            new DataProducerDirectory(src, conffile, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 

@@ -46,7 +46,7 @@ public class DataBuilderTestCase extends TestCase {
         fileset.setProject(project);
 
         StringBuilder md5s = new StringBuilder();
-        builder.buildData(Arrays.asList((DataProducer) new DataProducerFileSet(fileset)), new File("target/data.tar"), md5s, Compression.GZIP);
+        builder.buildData(Arrays.asList((DataProducer) new DataProducerFileSet(fileset)), new File("target/data.tar"), md5s, Compression.GZIP, null);
 
         assertTrue("empty md5 file", md5s.length() > 0);
         assertFalse("windows path separator found", md5s.indexOf("\\") != -1);
@@ -62,7 +62,7 @@ public class DataBuilderTestCase extends TestCase {
         
         DataProducer producer = new DataProducerFile(new File("pom.xml"), "/usr/share/myapp/pom.xml", null, null, null); 
         
-        builder.buildData(Arrays.asList(producer), archive, new StringBuilder(), Compression.NONE);
+        builder.buildData(Arrays.asList(producer), archive, new StringBuilder(), Compression.NONE, null);
         
         int count = 0;
         TarArchiveInputStream in = null;

@@ -49,7 +49,7 @@ public class DebMakerTestCase extends TestCase {
             new DataProducerArchive(archive1, null, null, null),
             new DataProducerArchive(archive2, null, null, null),
             new DataProducerArchive(archive3, null, null, null),
-            new DataProducerDirectory(directory, null, new String[] { "**/.svn/**" }, null),
+            new DataProducerDirectory(directory, false, null, new String[] { "**/.svn/**" }, null),
             new DataProducerLink("/link/path-element.ext", "/link/target-element.ext", true, null, null, null)
         };
 

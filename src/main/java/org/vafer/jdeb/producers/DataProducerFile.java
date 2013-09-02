@@ -64,7 +64,7 @@ public final class DataProducerFile extends AbstractDataProducer implements Data
 
         final InputStream inputStream = new FileInputStream(file);
         try {
-            pReceiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+            pReceiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize(), false);
         } finally {
             inputStream.close();
         }

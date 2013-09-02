@@ -25,6 +25,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
@@ -295,6 +296,7 @@ public class DebMaker {
     public BinaryPackageControlFile createDeb(Compression compression) throws PackagingException {
         File tempData = null;
         File tempControl = null;
+        List<String> tempConffiles = new ArrayList<String>();
 
         try {
             tempData = File.createTempFile("deb", "data");
@@ -303,7 +305,7 @@ public class DebMaker {
             console.info("Building data");
             DataBuilder dataBuilder = new DataBuilder(console);
             StringBuilder md5s = new StringBuilder();
-            BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, compression);
+            BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, compression, tempConffiles);
             
             console.info("Building control");
             ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver);
@@ -324,7 +326,7 @@ public class DebMaker {
                 packageControlFile.set("Homepage", homepage);
             }
             
-            controlBuilder.buildControl(packageControlFile, control.listFiles(), md5s, tempControl);
+            controlBuilder.buildControl(packageControlFile, control.listFiles(), tempConffiles , md5s, tempControl);
             
             if (!packageControlFile.isValid()) {
                 throw new PackagingException("Control file fields are invalid " + packageControlFile.invalidFields() +

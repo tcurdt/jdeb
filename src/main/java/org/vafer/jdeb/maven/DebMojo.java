@@ -385,7 +385,8 @@ public class DebMojo extends AbstractPluginMojo {
                                         "",
                                         "root", 0, "root", 0,
                                         TarEntry.DEFAULT_FILE_MODE,
-                                        file.length());
+                                        file.length(),
+                                        false);
                                 } catch (Exception e) {
                                     getLog().error(e);
                                 }

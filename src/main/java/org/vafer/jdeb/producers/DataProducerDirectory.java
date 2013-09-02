@@ -37,13 +37,17 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
 
     private final DirectoryScanner scanner = new DirectoryScanner();
 
-    public DataProducerDirectory( final File pDir, final String[] pIncludes, final String[] pExcludes, final Mapper[] pMappers ) {
+    private final boolean conffile;
+
+    public DataProducerDirectory( final File pDir, final boolean conffile, final String[] pIncludes, final String[] pExcludes, final Mapper[] pMappers ) {
         super(pIncludes, pExcludes, pMappers);
         scanner.setBasedir(pDir);
         scanner.setIncludes(pIncludes);
         scanner.setExcludes(pExcludes);
         scanner.setCaseSensitive(true);
         scanner.setFollowSymlinks(true);
+        
+        this.conffile = conffile;
     }
 
     public void produce( final DataConsumer pReceiver ) throws IOException {
@@ -112,7 +116,7 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
 
             final InputStream inputStream = new FileInputStream(file);
             try {
-                pReceiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+                pReceiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize(), conffile);
             } finally {
                 inputStream.close();
             }
