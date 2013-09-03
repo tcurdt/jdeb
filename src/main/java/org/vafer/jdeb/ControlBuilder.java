@@ -123,12 +123,14 @@ class ControlBuilder {
             }
         }
         
-        if (conffiles.size() > 0) {
+        if ((conffiles != null) && (conffiles.size() > 0)) {
         	if (foundConffiles) {
         		console.info("Found file 'conffiles' in the control directory. Skipping conffiles generation.");
         	} else {
 	            addControlEntry("conffiles", createPackageConffilesFile(conffiles), outputStream);
 	        }
+        } else if ((conffiles != null) && (conffiles.size() == 0)) {
+        	console.info("Skipping 'conffiles' generation. No entries provided.");
         }
 
         if (packageControlFile == null) {
@@ -146,9 +148,7 @@ class ControlBuilder {
     	
     	if (conffiles != null && !conffiles.isEmpty()) {
             for (String nextFileName : conffiles) {
-                content.append(nextFileName);
-                content.append("\n");
-                //content.append(System.getProperty("line.separator"));
+                content.append(nextFileName).append("\n");
             }
         }
 
