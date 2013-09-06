@@ -65,6 +65,11 @@ public final class BinaryPackageControlFile extends ControlFile {
     }
 
     @Override
+   public void set(final String field, final String value) {
+        super.set(field, value);
+    }
+
+    @Override
     protected ControlField[] getFields() {
         return FIELDS;
     }
@@ -72,14 +77,20 @@ public final class BinaryPackageControlFile extends ControlFile {
     /**
      * Returns the short description of the package. The short description
      * consists in the first line of the Description field.
-     * 
+     *
      * @return
      */
     public String getShortDescription() {
         if (get("Description") == null) {
             return null;
         }
-        
+
         return get("Description").split("\n")[0];
+    }
+
+
+    @Override
+    protected char getUserDefinedFieldLetter() {
+        return 'B';
     }
 }

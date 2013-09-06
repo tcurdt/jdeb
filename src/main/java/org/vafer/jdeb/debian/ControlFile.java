@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -37,6 +38,8 @@ import java.util.Set;
 public abstract class ControlFile {
 
     protected final Map<String, String> values = new LinkedHashMap<String, String>();
+    protected final Map<String, String> userDefinedFields = new LinkedHashMap<String, String>();
+    protected final Set<ControlField> userDefinedFieldNames = new HashSet<ControlField>();
 
     public void parse(String input) throws IOException, ParseException {
         parse(new ByteArrayInputStream(input.getBytes("UTF-8")));
@@ -98,9 +101,23 @@ public abstract class ControlFile {
 
     }
 
-    public void set(final String field, final String value) {
+    public void set(String field, final String value) {
         if (!"".equals(value)) {
-            values.put(field, value);
+
+            if (isUserDefinedField(field)) {
+                userDefinedFields.put(field, value);
+                String fieldName = getUserDefinedFieldName(field);
+
+                if (fieldName != null) {
+                    userDefinedFieldNames.add(new ControlField(fieldName));
+                }
+
+                field = fieldName;
+            }
+
+            if (field != null) {
+                values.put(field, value);
+            }
         }
     }
 
@@ -110,6 +127,14 @@ public abstract class ControlFile {
 
     protected abstract ControlField[] getFields();
 
+    protected Map<String, String> getUserDefinedFields() {
+        return userDefinedFields;
+    }
+
+    protected Set<ControlField> getUserDefinedFieldNames() {
+        return userDefinedFieldNames;
+    }
+
     public List<String> getMandatoryFields() {
         List<String> fields = new ArrayList<String>();
 
@@ -118,7 +143,7 @@ public abstract class ControlFile {
                 fields.add(field.getName());
             }
         }
-        
+
         return fields;
     }
 
@@ -128,7 +153,7 @@ public abstract class ControlFile {
 
     public Set<String> invalidFields() {
         Set<String> invalid = new HashSet<String>();
-        
+
         for (ControlField field : getFields()) {
             if (field.isMandatory() && get(field.getName()) == null) {
                 invalid.add(field.getName());
@@ -148,6 +173,32 @@ public abstract class ControlFile {
     }
 
     public String toString() {
-        return toString(getFields());
+        List<ControlField> fields = new ArrayList<ControlField>();
+        fields.addAll(Arrays.asList(getFields()));
+        fields.addAll(getUserDefinedFieldNames());
+        return toString(fields.toArray(new ControlField[0]));
+    }
+
+    protected abstract char getUserDefinedFieldLetter();
+
+    protected boolean isUserDefinedField(String field) {
+
+        // User-defined fields must begin with an 'X', followed by one or more
+        // letters that specify the output file and a hyphen.
+        return field.startsWith("X") && field.indexOf("-") > 0;
+    }
+
+    protected String getUserDefinedFieldName(String field) {
+        int index = field.indexOf('-');
+        char letter = getUserDefinedFieldLetter();
+
+        for (int i = 0; i < index; ++i) {
+
+            if (field.charAt(i) == letter) {
+                return field.substring(index + 1);
+            }
+        }
+
+        return null;
     }
 }
