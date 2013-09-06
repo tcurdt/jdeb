@@ -19,6 +19,7 @@ package org.vafer.jdeb.debian;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.Map.Entry;
 
 import org.vafer.jdeb.changes.ChangeSet;
 
@@ -59,7 +60,7 @@ public final class ChangesFile extends ControlFile {
     /**
      * Initializes the fields on the changes file with the values of the specified
      * binary package control file.
-     * 
+     *
      * @param packageControlFile
      */
     public void initialize(BinaryPackageControlFile packageControlFile) {
@@ -69,7 +70,11 @@ public final class ChangesFile extends ControlFile {
         set("Version",      packageControlFile.get("Version"));
         set("Maintainer",   packageControlFile.get("Maintainer"));
         set("Changed-By",   packageControlFile.get("Maintainer"));
-        
+
+        for (Entry<String, String> entry : packageControlFile.getUserDefinedFields().entrySet()) {
+            set(entry.getKey(), entry.getValue());
+        }
+
         StringBuilder description = new StringBuilder();
         description.append(packageControlFile.get("Package"));
         if (packageControlFile.get("Description") != null) {
@@ -86,7 +91,7 @@ public final class ChangesFile extends ControlFile {
             final ChangeSet mostRecentChangeSet = changeSets[0];
             set("Urgency", mostRecentChangeSet.getUrgency());
             set("Changed-By", mostRecentChangeSet.getChangedBy());
-            
+
             for (ChangeSet changeSet : changeSets) {
                 sb.append(changeSet.toString());
             }
@@ -98,5 +103,10 @@ public final class ChangesFile extends ControlFile {
     @Override
     protected ControlField[] getFields() {
         return FIELDS;
+    }
+
+    @Override
+    protected char getUserDefinedFieldLetter() {
+        return 'C';
     }
 }
