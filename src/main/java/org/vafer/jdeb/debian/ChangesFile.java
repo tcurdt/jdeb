@@ -53,7 +53,6 @@ public final class ChangesFile extends ControlFile {
 
     public ChangesFile() {
         set("Format", "1.8");
-        set("Distribution", "stable");
     }
 
     /**
@@ -69,6 +68,7 @@ public final class ChangesFile extends ControlFile {
         set("Version",      packageControlFile.get("Version"));
         set("Maintainer",   packageControlFile.get("Maintainer"));
         set("Changed-By",   packageControlFile.get("Maintainer"));
+        set("Distribution", packageControlFile.get("Distribution") == null ? "stable": packageControlFile.get("Distribution"));
         
         StringBuilder description = new StringBuilder();
         description.append(packageControlFile.get("Package"));
