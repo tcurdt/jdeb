@@ -243,6 +243,14 @@ public class DebMojo extends AbstractPluginMojo {
      */
     private boolean verbose;
 
+    /**
+     * Indicates if the execution should be disabled. If <code>true</code>, nothing will occur during execution.
+     * 
+     * @parameter expression="${verbose}" default-value="false"
+     * @since 1.0.2
+     */
+    private boolean disabled;
+
     /* end of parameters */
 
     private String openReplaceToken = "[[";
@@ -325,6 +333,11 @@ public class DebMojo extends AbstractPluginMojo {
     public void execute() throws MojoExecutionException {
 
         final MavenProject project = getProject();
+
+        if (disabled){
+            getLog().info("skipping execution");
+            return;
+        }
 
         if (isSubmodule() && !submodules) {
             getLog().info("skipping sub module: jdeb executing at top-level only");
