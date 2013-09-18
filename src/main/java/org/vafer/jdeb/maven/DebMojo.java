@@ -247,7 +247,7 @@ public class DebMojo extends AbstractPluginMojo {
      * Indicates if the execution should be disabled. If <code>true</code>, nothing will occur during execution.
      * 
      * @parameter default-value="false"
-     * @since 1.0.2
+     * @since 1.1
      */
     private boolean disabled;
 
