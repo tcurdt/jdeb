@@ -10,3 +10,4 @@ Description: revision @REVISION@, test package
  This is a sample package control file.
  .
  Use for testing purposes only.
+XB-UserDefinedField: This is a user defined field.

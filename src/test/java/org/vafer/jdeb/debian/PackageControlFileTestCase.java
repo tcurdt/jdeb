@@ -30,7 +30,7 @@ public final class PackageControlFileTestCase extends TestCase {
                 " Value2.1\n" +
                 " Value2.2\n" +
                 "Key3: Value3\n";
-        
+
         BinaryPackageControlFile d = new BinaryPackageControlFile(input);
         assertFalse(d.isValid());
 
@@ -44,9 +44,9 @@ public final class PackageControlFileTestCase extends TestCase {
         packageControlFile.set("Package", "test-package");
         packageControlFile.set("Description", "This is\na description\non several lines");
         packageControlFile.set("Version", "1.0");
-        
+
         String s = packageControlFile.toString();
-        
+
         BinaryPackageControlFile packageControlFile2 = new BinaryPackageControlFile(s);
         assertEquals("Package", packageControlFile.get("Package"), packageControlFile2.get("Package"));
         assertEquals("Description", packageControlFile.get("Description"), packageControlFile2.get("Description"));
@@ -64,28 +64,34 @@ public final class PackageControlFileTestCase extends TestCase {
         } catch (ParseException e) {
         }
     }
-    
+
     public void testGetShortDescription() {
         BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile();
-        
+
         assertNull(packageControlFile.getShortDescription());
-        
+
         packageControlFile.set("Description", "This is the short description\nThis is the loooooong description");
-        
+
         assertEquals("short description", "This is the short description", packageControlFile.getShortDescription());
-        
+
         packageControlFile.set("Description", "\nThere is no short description");
-        
+
         assertEquals("short description", "", packageControlFile.getShortDescription());
     }
 
     public void testGetDescription() throws Exception {
         BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile();
         packageControlFile.parse(new FileInputStream("target/test-classes/org/vafer/jdeb/deb/control/control"));
-        
+
         assertEquals("Description", "revision @REVISION@, test package\n" +
                 "This is a sample package control file.\n\n" +
                 "Use for testing purposes only.",
                 packageControlFile.get("Description"));
+    }
+
+    public void testGetUserDefinedFields() throws Exception {
+        BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile();
+        packageControlFile.parse(new FileInputStream("target/test-classes/org/vafer/jdeb/deb/control/control"));
+        assertEquals("UserDefinedField", "This is a user defined field.",  packageControlFile.get("UserDefinedField"));
     }
 }

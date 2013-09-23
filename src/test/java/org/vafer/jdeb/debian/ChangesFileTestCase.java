@@ -26,11 +26,13 @@ public final class ChangesFileTestCase extends TestCase {
         packageControlFile.set("Package", "test-package");
         packageControlFile.set("Description", "This is\na description\non several lines");
         packageControlFile.set("Version", "1.0");
+        packageControlFile.set("XC-UserDefinedField", "This is a user defined field.");
         
         ChangesFile changes = new ChangesFile();
         changes.setChanges(new ChangeSet[0]);
         changes.initialize(packageControlFile);
         
         assertEquals("1.0", changes.get("Version"));
+        assertEquals("This is a user defined field.", changes.get("UserDefinedField"));
     }
 }
