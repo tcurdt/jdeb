@@ -176,24 +176,52 @@ public abstract class ControlFile {
         List<ControlField> fields = new ArrayList<ControlField>();
         fields.addAll(Arrays.asList(getFields()));
         fields.addAll(getUserDefinedFieldNames());
-        return toString(fields.toArray(new ControlField[0]));
+        return toString(fields.toArray(new ControlField[fields.size()]));
     }
 
+    /**
+     * Returns the letter expected in the prefix of a user defined field
+     * in order to include the field in this control file.
+     *
+     * @return The letter returned is:
+     * <ul>
+     *   <li>B: for a binary package</li>
+     *   <li>S: for a source package</li>
+     *   <li>C: for a changes file</li>
+     * </ul>
+     * 
+     * @since 1.1
+     * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html#s5.7">Debian Policy - User-defined fields</a>
+     */
     protected abstract char getUserDefinedFieldLetter();
 
+    /**
+     * Tells if the specified field name is a user defined field.
+     * User-defined fields must begin with an 'X', followed by one or more
+     * letters that specify the output file and a hyphen.
+     * 
+     * @param field the name of the field
+     *
+     * @since 1.1
+     * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html#s5.7">Debian Policy - User-defined fields</a>
+     */
     protected boolean isUserDefinedField(String field) {
-
-        // User-defined fields must begin with an 'X', followed by one or more
-        // letters that specify the output file and a hyphen.
         return field.startsWith("X") && field.indexOf("-") > 0;
     }
 
+    /**
+     * Returns the user defined field without its prefix.
+     * 
+     * @param field the name of the user defined field
+     * @return the user defined field without the prefix, or null if the fields
+     *         doesn't apply to this control file.
+     * @since 1.1
+     */
     protected String getUserDefinedFieldName(String field) {
         int index = field.indexOf('-');
         char letter = getUserDefinedFieldLetter();
 
         for (int i = 0; i < index; ++i) {
-
             if (field.charAt(i) == letter) {
                 return field.substring(index + 1);
             }
