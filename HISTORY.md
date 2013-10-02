@@ -2,6 +2,7 @@
 
 * [ADD] xz compression support
 * [ADD] Added link support to the Ant task
+* [ADD] Added support for system properties in parsed files (Thanks to David Sauer)
 * [ADD] Support permission in (hard) link setup
 * [ADD] User defined fields in the control file are now supported (Thanks to Marco Soeima)
 * [ADD] Added the ability to disable an execution during Maven build (Thanks to  barjovial)
