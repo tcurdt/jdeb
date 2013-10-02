@@ -93,6 +93,7 @@ attach        | Attach artifact to project                                      
 submodules    | Execute the goal on all sub-modules                                          | No; defaults to `true`
 timestamped   | Turn SNAPSHOT into timestamps                                                | No; defaults to `false`
 verbose       | Verbose logging                                                              | No; defaults to `true`, will be `false` in the future
+disabled      | Indicates if an execution should be disabled                                 | No; defaults to `false`
 
 If you use the `dataSet` element, you'll need to populate it with a one or
 more `data` elements. A `data` element is used to specify a directory, a
