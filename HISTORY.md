@@ -5,7 +5,7 @@
 * [ADD] Added support for system properties in parsed files (Thanks to David Sauer)
 * [ADD] Support permission in (hard) link setup
 * [ADD] User defined fields in the control file are now supported (Thanks to Marco Soeima)
-* [ADD] Added the ability to disable an execution during Maven build (Thanks to  barjovial)
+* [ADD] Added the ability to disable an execution during Maven build (Thanks to  Jonathan Piron)
 * [FIX] On Windows, parent directories are now created automatically when adding files to the data archive
 * [CHG] Links are now symbolic by default
 
