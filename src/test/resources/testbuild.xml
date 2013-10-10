@@ -87,6 +87,14 @@
     </deb>
   </target>
 
+  <target name="perm-mapper">
+    <deb destfile="test.deb" control="org/vafer/jdeb/deb/control">
+      <data src="org/vafer/jdeb/deb/data" type="directory">
+        <mapper type="perm" filemode="700" prefix="/usr/share/foo"/>
+      </data>
+    </deb>
+  </target>
+
   <target name="unknown-compression">
     <deb destfile="test.deb" control="org/vafer/jdeb/deb/control" compression="rar">
       <fileset dir="org/vafer/jdeb/deb/data"/>

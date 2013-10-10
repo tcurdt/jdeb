@@ -39,8 +39,8 @@ public final class Mapper {
     private int gid = -1;
     private String user;
     private String group;
-    private int fileMode = -1;
-    private int dirMode = -1;
+    private String fileMode;
+    private String dirMode;
 
     public void setType( final String pType ) {
         mapperType = pType;
@@ -76,11 +76,11 @@ public final class Mapper {
         group = pGroup;
     }
 
-    public void setFileMode( final int pFileMode ) {
+    public void setFileMode( final String pFileMode ) {
         fileMode = pFileMode;
     }
 
-    public void setDirMode( int pDirMode ) {
+    public void setDirMode( final String pDirMode ) {
         dirMode = pDirMode;
     }
 
