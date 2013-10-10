@@ -225,6 +225,21 @@ public final class DebAntTaskTestCase extends TestCase {
         assertTrue("Link not found", linkFound.get());
     }
 
+    public void testMapper() throws Exception {
+        project.executeTarget("perm-mapper");
+
+        File deb = new File("target/test-classes/test.deb");
+        assertTrue("package not build", deb.exists());
+
+        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
+            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
+                if (entry.isFile()) {
+                    assertEquals("file mode (" + entry.getName() + ")", 0700, entry.getMode());
+                }
+            }
+        }, Compression.GZIP);
+    }
+
     public void testUnkownCompression() throws Exception {
         try {
             project.executeTarget("unknown-compression");
