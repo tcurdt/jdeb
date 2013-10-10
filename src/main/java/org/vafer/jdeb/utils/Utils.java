@@ -22,6 +22,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.tools.ant.filters.FixCrLfFilter;
 import org.apache.tools.ant.util.ReaderInputStream;
@@ -168,20 +170,34 @@ public final class Utils {
     }
 
     /**
-     * convert to debian version format
+     * Convert the project version to a version suitable for a Debian package.
+     * -SNAPSHOT suffixes are replaced with a timestamp (~yyyyMMddHHmmss).
+     * The separator before a rc, alpha or beta version is replaced with '~'
+     * such that the version is always ordered before the final or GA release.
+     * 
+     * @param version the project version to convert to a Debian package version
+     * @param timestamp the date used as the timestamp to replace the SNAPSHOT suffix
      */
     public static String convertToDebianVersion( String version, Date timestamp ) {
-        version = version.replace('-', '+');
-        if (version.endsWith("+SNAPSHOT")) {
-            version = version.substring(0, version.length() - "+SNAPSHOT".length());
-            version += "~";
-
+        Pattern pattern1 = Pattern.compile("(.*)[\\-\\+]SNAPSHOT");
+        Matcher matcher = pattern1.matcher(version);
+        if (matcher.matches()) {
+            version = matcher.group(1) + "~";
             if (timestamp != null) {
                 version += new SimpleDateFormat("yyyyMMddHHmmss").format(timestamp);
             } else {
                 version += "SNAPSHOT";
             }
         }
+        
+        Pattern pattern2 = Pattern.compile("(.*?)([\\.\\-_]?)(alpha|beta|rc)(.*)", Pattern.CASE_INSENSITIVE);
+        matcher = pattern2.matcher(version);
+        if (matcher.matches()) {
+            version = matcher.group(1) + "~" + matcher.group(3) + matcher.group(4);
+        }
+        
+        version = version.replace('-', '+');
+        
         return version;
     }
 }
