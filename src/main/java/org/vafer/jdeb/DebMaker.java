@@ -339,7 +339,6 @@ public class DebMaker {
     public BinaryPackageControlFile createDeb(Compression compression) throws PackagingException {
         File tempData = null;
         File tempControl = null;
-        List<String> tempConffiles = new ArrayList<String>();
 
         try {
             tempData = File.createTempFile("deb", "data");
@@ -351,7 +350,7 @@ public class DebMaker {
             BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, compression);
 
             console.info("Building conffiles");
-            tempConffiles = populateConffiles(conffilesProducers);
+            List<String> tempConffiles = populateConffiles(conffilesProducers);
             
             console.info("Building control");
             ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver);
