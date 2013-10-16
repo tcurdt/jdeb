@@ -167,16 +167,6 @@ class DataBuilder {
 
                 // append to file md5 list
                 checksums.append(md5).append(" ").append(entry.getName()).append('\n');
-                
-                /*
-                if ((addedConffiles != null) && addToConffiles) {
-                    String tempConffileItem = entry.getName();
-                    if (tempConffileItem.startsWith(".")) {
-                        tempConffileItem = tempConffileItem.substring(1);
-                    }
-                    addedConffiles.add(tempConffileItem);
-                }
-                */
             }
 
             public void onEachLink(String path, String linkname, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
