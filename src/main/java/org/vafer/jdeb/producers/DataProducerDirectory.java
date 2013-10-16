@@ -60,11 +60,9 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
                 continue;
             }
 
-            /*
             if (!isIncluded(dirname)) {
                 continue;
             }
-            */
 
             if ('/' != File.separatorChar) {
                 dirname = dirname.replace(File.separatorChar, '/');
@@ -93,11 +91,9 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
             final File file = new File(baseDir, f);
             String filename = getFilename(baseDir, file);
 
-            /*
             if (!isIncluded(filename)) {
                 continue;
             }
-            */
 
             if ('/' != File.separatorChar) {
                 filename = filename.replace(File.separatorChar, '/');
