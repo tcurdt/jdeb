@@ -72,6 +72,7 @@ public class DebAntTask extends MatchingTask {
     private Collection<Link> links = new ArrayList<Link>();
 
     private Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
+    private Collection<DataProducer> conffilesProducers = new ArrayList<DataProducer>();
 
 
     public void setDestfile( File deb ) {
@@ -145,12 +146,15 @@ public class DebAntTask extends MatchingTask {
                 } else if (!Arrays.asList("file", "directory", "archive").contains(data.getType().toLowerCase())) {
                     throw new BuildException("The type '" + data.getType() + "' of the data element is unknown (expected 'file', 'directory' or 'archive')");
                 }
+                if (data.getConffile() != null && data.getConffile()) {
+                    conffilesProducers.add(dataProducer);
+                }
             }
         }
         
         Console console = new TaskConsole(this, verbose);
         
-        DebMaker debMaker = new DebMaker(console, dataProducers, null);
+        DebMaker debMaker = new DebMaker(console, dataProducers, conffilesProducers);
         debMaker.setDeb(deb);
         debMaker.setControl(control);
         debMaker.setChangesIn(changesIn);
