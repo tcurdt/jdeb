@@ -84,7 +84,7 @@ class DataBuilder {
      * @throws java.io.IOException
      * @throws org.apache.commons.compress.compressors.CompressorException
      */
-    BigInteger buildData(Collection<DataProducer> producers, File output, final StringBuilder checksums, Compression compression, final List<String> addedConffiles) throws NoSuchAlgorithmException, IOException, CompressorException {
+    BigInteger buildData(Collection<DataProducer> producers, File output, final StringBuilder checksums, Compression compression) throws NoSuchAlgorithmException, IOException, CompressorException {
 
         final File dir = output.getParentFile();
         if (dir != null && (!dir.exists() || !dir.isDirectory())) {
@@ -119,8 +119,8 @@ class DataBuilder {
 
                 console.info("dir: " + dirname);
             }
-
-            public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size, boolean addToConffiles ) throws IOException {
+            
+            public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 // Check link name
                 checkField(linkname, TarConstants.NAMELEN);
                 // Check user name
@@ -168,6 +168,7 @@ class DataBuilder {
                 // append to file md5 list
                 checksums.append(md5).append(" ").append(entry.getName()).append('\n');
                 
+                /*
                 if ((addedConffiles != null) && addToConffiles) {
                     String tempConffileItem = entry.getName();
                     if (tempConffileItem.startsWith(".")) {
@@ -175,6 +176,7 @@ class DataBuilder {
                     }
                     addedConffiles.add(tempConffileItem);
                 }
+                */
             }
 
             public void onEachLink(String path, String linkname, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {

@@ -49,13 +49,13 @@ public class DebMakerTestCase extends TestCase {
             new DataProducerArchive(archive1, null, null, null),
             new DataProducerArchive(archive2, null, null, null),
             new DataProducerArchive(archive3, null, null, null),
-            new DataProducerDirectory(directory, false, null, new String[] { "**/.svn/**" }, null),
+            new DataProducerDirectory(directory, null, new String[] { "**/.svn/**" }, null),
             new DataProducerLink("/link/path-element.ext", "/link/target-element.ext", true, null, null, null)
         };
 
         File deb = File.createTempFile("jdeb", ".deb");
 
-        DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data));
+        DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data), null);
         maker.setControl(new File(getClass().getResource("deb/control").toURI()));
         maker.setDeb(deb);
         
@@ -88,7 +88,8 @@ public class DebMakerTestCase extends TestCase {
         }
         
         Collection<DataProducer> producers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
-        DebMaker maker = new DebMaker(new NullConsole(), producers);
+        Collection<DataProducer> conffileProducers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
+        DebMaker maker = new DebMaker(new NullConsole(), producers, conffileProducers);
         maker.setDeb(deb);
         maker.setControl(new File("target/test-classes/org/vafer/jdeb/deb/control"));
         
@@ -132,7 +133,8 @@ public class DebMakerTestCase extends TestCase {
         variables.put("version", "1.0");
         
         Collection<DataProducer> producers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
-        DebMaker maker = new DebMaker(new NullConsole(), producers);
+        Collection<DataProducer> conffileProducers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
+        DebMaker maker = new DebMaker(new NullConsole(), producers, conffileProducers);
         maker.setDeb(deb);
         maker.setControl(new File("target/test-classes/org/vafer/jdeb/deb/control"));
         maker.setResolver(new MapVariableResolver(variables));

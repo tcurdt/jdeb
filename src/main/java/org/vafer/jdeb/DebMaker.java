@@ -64,7 +64,7 @@ public class DebMaker {
     private String section = "java";
 
     /** The dependencies of the package. Default value if not specified in the control file */
-    private String depends = "default-jre | java6-runtime";
+    private String depends = "";
 
     /** The description of the package. Default value if not specified in the control file */
     private String description;
@@ -97,10 +97,17 @@ public class DebMaker {
 
     private final Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
 
+    private final Collection<DataProducer> conffilesProducers = new ArrayList<DataProducer>();
 
-    public DebMaker(Console console, Collection<DataProducer> dataProducers) {
+
+    public DebMaker(Console console, Collection<DataProducer> dataProducers, Collection<DataProducer> conffileProducers) {
         this.console = console;
-        this.dataProducers.addAll(dataProducers);
+        if (dataProducers != null) {
+            this.dataProducers.addAll(dataProducers);
+        }
+        if (conffileProducers != null) {
+            this.conffilesProducers.addAll(conffileProducers);
+        }
     }
 
     public void setDeb(File deb) {
@@ -283,6 +290,42 @@ public class DebMaker {
         }
     }
     
+    private List<String> populateConffiles(Collection<DataProducer> producers) {
+        final List<String> result = new ArrayList<String>();
+        
+        if (producers == null || producers.isEmpty()) {
+            return result;
+        }
+        
+        final DataConsumer receiver = new DataConsumer() {
+            public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+                //
+            }
+            
+            public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+                String tempConffileItem = filename;
+                if (tempConffileItem.startsWith(".")) {
+                    tempConffileItem = tempConffileItem.substring(1);
+                }
+                result.add(tempConffileItem);
+            }
+
+            public void onEachLink(String path, String linkname, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
+                //
+            }
+        };
+
+        try {
+            for (DataProducer data : producers) {
+                data.produce(receiver);
+            }
+        } catch(Exception e) {
+            //
+        }
+        
+        return result;
+    }
+    
     /**
      * Create the debian archive with from the provided control files and data producers.
      *
@@ -305,7 +348,10 @@ public class DebMaker {
             console.info("Building data");
             DataBuilder dataBuilder = new DataBuilder(console);
             StringBuilder md5s = new StringBuilder();
-            BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, compression, tempConffiles);
+            BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, compression);
+
+            console.info("Building conffiles");
+            tempConffiles = populateConffiles(conffilesProducers);
             
             console.info("Building control");
             ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver);

@@ -98,7 +98,6 @@ public final class Data extends PatternSet implements DataProducer {
         } else if ("directory".equalsIgnoreCase(type)) {
             new DataProducerDirectory(
                 src,
-                false,
                 getIncludePatterns(getProject()),
                 getExcludePatterns(getProject()),
                 mappers

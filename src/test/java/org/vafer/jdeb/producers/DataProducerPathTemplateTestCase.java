@@ -80,7 +80,7 @@ public class DataProducerPathTemplateTestCase extends TestCase {
         }
 
         @Override
-        public void onEachFile( InputStream input, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size, boolean conffile ) throws IOException {
+        public void onEachFile( InputStream input, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
         }
 
         @Override

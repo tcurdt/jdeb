@@ -117,6 +117,10 @@ public final class Data implements DataProducer {
     public void setConffile(boolean conffile) {
         this.conffile = conffile;
     }
+    
+    public boolean getConffile() {
+        return this.conffile;
+    }
 
     private String[] includePatterns;
 
@@ -216,7 +220,7 @@ public final class Data implements DataProducer {
         }
 
         if ("directory".equalsIgnoreCase(type)) {
-            new DataProducerDirectory(src, conffile, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            new DataProducerDirectory(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 

@@ -150,7 +150,7 @@ public class DebAntTask extends MatchingTask {
         
         Console console = new TaskConsole(this, verbose);
         
-        DebMaker debMaker = new DebMaker(console, dataProducers);
+        DebMaker debMaker = new DebMaker(console, dataProducers, null);
         debMaker.setDeb(deb);
         debMaker.setControl(control);
         debMaker.setChangesIn(changesIn);

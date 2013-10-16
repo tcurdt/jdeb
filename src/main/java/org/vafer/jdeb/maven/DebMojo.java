@@ -248,6 +248,7 @@ public class DebMojo extends AbstractPluginMojo {
     private String openReplaceToken = "[[";
     private String closeReplaceToken = "]]";
     private Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
+    private Collection<DataProducer> conffileProducers = new ArrayList<DataProducer>();
 
     public void setOpenReplaceToken( String openReplaceToken ) {
         this.openReplaceToken = openReplaceToken;
@@ -264,8 +265,15 @@ public class DebMojo extends AbstractPluginMojo {
     protected void setData( Data[] dataSet ) {
         this.dataSet = dataSet;
         dataProducers.clear();
+        conffileProducers.clear();
         if (dataSet != null) {
             Collections.addAll(dataProducers, dataSet);
+            
+            for (Data item : dataSet) {
+                if (item.getConffile()) {
+                    conffileProducers.add(item);
+                }
+            }
         }
     }
 
@@ -385,8 +393,7 @@ public class DebMojo extends AbstractPluginMojo {
                                         "",
                                         "root", 0, "root", 0,
                                         TarEntry.DEFAULT_FILE_MODE,
-                                        file.length(),
-                                        false);
+                                        file.length());
                                 } catch (Exception e) {
                                     getLog().error(e);
                                 }
@@ -400,7 +407,7 @@ public class DebMojo extends AbstractPluginMojo {
         }
 
         try {
-            DebMaker debMaker = new DebMaker(console, dataProducers);
+            DebMaker debMaker = new DebMaker(console, dataProducers, conffileProducers);
             debMaker.setDeb(debFile);
             debMaker.setControl(controlDirFile);
             debMaker.setPackage(getProject().getArtifactId());
