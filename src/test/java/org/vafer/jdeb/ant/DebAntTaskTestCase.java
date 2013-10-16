@@ -305,4 +305,10 @@ public final class DebAntTaskTestCase extends TestCase {
 
         assertTrue("tar file not found", found);
     }
+
+    public void testPackageConffiles() {
+        project.executeTarget("conffiles");
+
+        assertTrue("package not build", new File("target/test-classes/test.deb").exists());
+    }
 }

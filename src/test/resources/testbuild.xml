@@ -111,4 +111,10 @@
     </deb>
   </target>
 
+  <target name="conffiles">
+    <deb destfile="test123.deb" control="org/vafer/jdeb/deb/control">
+      <data src="org/vafer/jdeb/deb/data" type="directory" conffile="true" />
+    </deb>
+  </target>
+
 </project>
