@@ -63,7 +63,7 @@ public class DebMaker {
     private String section = "java";
 
     /** The dependencies of the package. Default value if not specified in the control file */
-    private String depends = "default-jre | java6-runtime";
+    private String depends = "";
 
     /** The description of the package. Default value if not specified in the control file */
     private String description;
