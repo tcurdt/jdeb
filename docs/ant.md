@@ -166,3 +166,19 @@ Then you can sign your changes file with:
 <b>Security Note</b>: Hard coding the passphrase in the `<deb>` task can be a serious
 security hole. Consider using variable substitution and asking the passphrase
 to the user with the `<input>` task, or retrieving it from a secured `.properties` file.
+
+## Conffiles file
+
+If you package up a directory as Debian package you can also add the affected files to
+the conffiles file. You only have to set the `conffile` attribute to `true`.
+
+```xml
+    <target name="package">
+      <taskdef name="deb" classname="org.vafer.jdeb.ant.DebAntTask"/>
+      <deb destfile="jdeb.deb" control="${deb}/control">
+        <data src="src/main/resources/deb/data" type="directory" conffile="true">
+          <exclude name="**/.svn"/>
+        </data>
+      </deb>
+    </target>
+```
