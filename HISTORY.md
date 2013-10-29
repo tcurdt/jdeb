@@ -10,6 +10,7 @@
 * [CHG] Links are now symbolic by default
 * [CHG] Alpha, Beta and RC versions are transformed to a package version ordered before the final release (ex: 1.0~RC1)
 * [FIX] Permission mappers now work properly with Ant (Thanks to Christian Egli)
+* [FIX] Symbolic links longer than 100 characters are now supported
 
 ## Version 1.0.1, released 28.02.2013
 
