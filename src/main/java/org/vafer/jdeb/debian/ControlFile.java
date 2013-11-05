@@ -54,10 +54,8 @@ public abstract class ControlFile {
             final String line = reader.readLine();
 
             if (line == null) {
-                if (buffer.length() > 0) {
-                    // flush value of the previous field
-                    set(field, buffer.toString());
-                }
+                // flush value of the previous field
+                set(field, buffer.toString());
                 break;
             }
 
@@ -72,11 +70,9 @@ public abstract class ControlFile {
 
                 // new field
 
-                if (buffer.length() > 0) {
-                    // flush value of the previous field
-                    set(field, buffer.toString());
-                    buffer = new StringBuilder();
-                }
+                // flush value of the previous field
+                set(field, buffer.toString());
+                buffer = new StringBuilder();
 
 
                 final int i = line.indexOf(':');
@@ -102,22 +98,19 @@ public abstract class ControlFile {
     }
 
     public void set(String field, final String value) {
-        if (!"".equals(value)) {
+        if (field != null && isUserDefinedField(field)) {
+            userDefinedFields.put(field, value);
+            String fieldName = getUserDefinedFieldName(field);
 
-            if (isUserDefinedField(field)) {
-                userDefinedFields.put(field, value);
-                String fieldName = getUserDefinedFieldName(field);
-
-                if (fieldName != null) {
-                    userDefinedFieldNames.add(new ControlField(fieldName));
-                }
-
-                field = fieldName;
+            if (fieldName != null) {
+                userDefinedFieldNames.add(new ControlField(fieldName));
             }
 
-            if (field != null) {
-                values.put(field, value);
-            }
+            field = fieldName;
+        }
+
+        if (field != null && !"".equals(field)) {
+            values.put(field, value);
         }
     }
 
