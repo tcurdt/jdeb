@@ -20,7 +20,8 @@ import org.apache.maven.plugin.logging.Log;
 import org.vafer.jdeb.Console;
 
 /**
- * Console implementation for Maven plugins.
+ * Console implementation for Maven plugins. debug messages are only displayed
+ * when the <tt>verbose</tt> parameter is true.
  */
 class MojoConsole implements Console {
 
@@ -32,13 +33,20 @@ class MojoConsole implements Console {
         this.verbose = verbose;
     }
 
-    public void info(String s) {
+    @Override
+    public void debug(String message) {
         if (verbose) {
-            log.info(s);
+            log.info(message);
         }
     }
 
-    public void warn(String s) {
-        log.warn(s);
+    @Override
+    public void info(String message) {
+        log.info(message);
+    }
+
+    @Override
+    public void warn(String message) {
+        log.warn(message);
     }
 }

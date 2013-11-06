@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb;
 
 /**
@@ -22,8 +23,10 @@ package org.vafer.jdeb;
  */
 public interface Console {
 
-    void info( String s );
+    void debug( String message );
 
-    void warn( String s );
+    void info( String message );
+
+    void warn( String message );
 
 }

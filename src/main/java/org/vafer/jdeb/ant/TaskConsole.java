@@ -16,11 +16,13 @@
 
 package org.vafer.jdeb.ant;
 
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.vafer.jdeb.Console;
 
 /**
- * Console implementation for Ant tasks.
+ * Console implementation for Ant tasks. debug messages are only displayed
+ * when the <tt>verbose</tt> parameter is true.
  */
 class TaskConsole implements Console {
 
@@ -32,14 +34,21 @@ class TaskConsole implements Console {
         this.verbose = verbose;
     }
 
-    public void info(String message) {
+    @Override
+    public void debug(String message) {
         if (verbose) {
             task.log(message);
         }
     }
 
-    public void warn(String message) {
+    @Override
+    public void info(String message) {
         task.log(message);
+    }
+
+    @Override
+    public void warn(String message) {
+        task.log(message, Project.MSG_WARN);
     }
 
 }
