@@ -79,7 +79,7 @@
                     <configuration>
                         <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
                         <extractors>
-                            <extractor>java</extractor>
+                            <extractor>java-annotations</extractor>
                         </extractors>
                     </configuration>
                     <executions>
