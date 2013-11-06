@@ -204,7 +204,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpg-jdk15on</artifactId>
-            <version>1.48</version>
+            <version>1.49</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
