@@ -13,27 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.maven;
 
 import java.io.File;
 
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 public abstract class AbstractPluginMojo extends AbstractMojo {
 
-    /**
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
+    @Component
     private MavenProject project;
 
-    /**
-     * @parameter expression="${project.build.directory}"
-     * @required
-     * @readonly
-     */
+    @Parameter(property = "project.build.directory", required = true, readonly = true)
     protected File buildDirectory;
 
     protected MavenProject getProject() {

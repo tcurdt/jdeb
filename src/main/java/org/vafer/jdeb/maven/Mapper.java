@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.vafer.jdeb.maven;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.apache.maven.plugins.annotations.Parameter;
 import org.vafer.jdeb.mapping.LsMapper;
 import org.vafer.jdeb.mapping.NullMapper;
 import org.vafer.jdeb.mapping.PermMapper;
@@ -31,55 +33,34 @@ import org.vafer.jdeb.mapping.PermMapper;
  */
 public final class Mapper {
 
-    /**
-     * @parameter
-     * @required
-     */
+    @Parameter(required = true)
     private String type;
 
-    /**
-     * @parameter
-     */
+    @Parameter
     private int uid = -1;
 
-    /**
-     * @parameter
-     */
+    @Parameter
     private int gid = -1;
 
-    /**
-     * @parameter
-     */
+    @Parameter
     private String user;
 
-    /**
-     * @parameter
-     */
+    @Parameter
     private String group;
 
-    /**
-     * @parameter
-     */
+    @Parameter
     private String filemode;
 
-    /**
-     * @parameter
-     */
+    @Parameter
     private String dirmode;
 
-    /**
-     * @parameter
-     */
+    @Parameter
     private String prefix;
 
-    /**
-     * @parameter
-     */
+    @Parameter
     private int strip;
 
-    /**
-     * @parameter
-     */
+    @Parameter
     private File src;
 
 

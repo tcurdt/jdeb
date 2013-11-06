@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.vafer.jdeb.maven;
 
-import static org.vafer.jdeb.maven.MissingSourceBehavior.FAIL;
-import static org.vafer.jdeb.maven.MissingSourceBehavior.IGNORE;
+package org.vafer.jdeb.maven;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.apache.maven.plugins.annotations.Parameter;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.producers.DataProducerArchive;
@@ -32,6 +31,8 @@ import org.vafer.jdeb.producers.DataProducerDirectory;
 import org.vafer.jdeb.producers.DataProducerFile;
 import org.vafer.jdeb.producers.DataProducerLink;
 import org.vafer.jdeb.producers.DataProducerPathTemplate;
+
+import static org.vafer.jdeb.maven.MissingSourceBehavior.*;
 
 /**
  * Maven "data" element acting as a factory for DataProducers. So far Archive and
@@ -42,38 +43,30 @@ import org.vafer.jdeb.producers.DataProducerPathTemplate;
  */
 public final class Data implements DataProducer {
 
+    @Parameter
     private File src;
 
-    /**
-     * @parameter expression="${src}"
-     */
     public void setSrc( File src ) {
         this.src = src;
     }
 
+    @Parameter
     private String dst;
 
-    /**
-     * @parameter expression="${dst}"
-     */
     public void setDst( String dst ) {
         this.dst = dst;
     }
 
+    @Parameter
     private String type;
 
-    /**
-     * @parameter expression="${type}"
-     */
     public void setType( String type ) {
         this.type = type;
     }
 
+    @Parameter
     private MissingSourceBehavior missingSrc = FAIL;
 
-    /**
-     * @parameter expression="${missingSrc}"
-     */
     public void setMissingSrc( String missingSrc ) {
         MissingSourceBehavior value = MissingSourceBehavior.valueOf(missingSrc.trim().toUpperCase());
         if (value == null) {
@@ -82,59 +75,45 @@ public final class Data implements DataProducer {
         this.missingSrc = value;
     }
 
+    @Parameter
     private String linkName;
 
-    /**
-     * @parameter expression="${linkName}"
-     */
     public void setLinkName(String linkName) {
         this.linkName = linkName;
     }
 
+    @Parameter
     private String linkTarget;
 
-    /**
-     * @parameter expression="${linkTarget}"
-     */
     public void setLinkTarget(String linkTarget) {
         this.linkTarget = linkTarget;
     }
 
+    @Parameter
     private boolean symlink = true;
 
-    /**
-     * @parameter expression="${symlink}"
-     */
     public void setSymlink(boolean symlink) {
         this.symlink = symlink;
     }
 
+    @Parameter(alias = "includes")
     private String[] includePatterns;
 
-    /**
-     * @parameter expression="${includes}" alias="includes"
-     */
     public void setIncludes( String includes ) {
         includePatterns = splitPatterns(includes);
     }
 
+    @Parameter(alias = "excludes")
     private String[] excludePatterns;
 
-    /**
-     * @parameter expression="${excludes}" alias="excludes"
-     */
     public void setExcludes( String excludes ) {
         excludePatterns = splitPatterns(excludes);
     }
 
-    /**
-     * @parameter expression="${mapper}"
-     */
+    @Parameter
     private Mapper mapper;
 
-    /**
-     * @parameter expression="${paths}"
-     */
+    @Parameter
     private String[] paths;
 
     /* For testing only */

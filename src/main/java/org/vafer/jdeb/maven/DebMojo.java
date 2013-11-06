@@ -30,6 +30,10 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.tools.tar.TarEntry;
@@ -45,76 +49,62 @@ import org.vafer.jdeb.utils.VariableResolver;
 
 /**
  * Creates deb archive
- *
- * @goal jdeb
- * @phase package
  */
+@Mojo(name = "jdeb", defaultPhase = LifecyclePhase.PACKAGE)
 public class DebMojo extends AbstractPluginMojo {
 
-    /**
-     * @component
-     */
+    @Component
     private MavenProjectHelper projectHelper;
-    
+
     /**
      * Defines the name of deb package.
-     *
-     * @parameter
      */
+    @Parameter
     private String name;
 
     /**
      * Defines the pattern of the name of final artifacts. Possible
      * substitutions are [[baseDir]] [[buildDir]] [[artifactId]] [[version]]
      * [[extension]] and [[groupId]].
-     *
-     * @parameter default-value="[[buildDir]]/[[artifactId]]_[[version]]_all.[[extension]]"
      */
+    @Parameter(defaultValue = "[[buildDir]]/[[artifactId]]_[[version]]_all.[[extension]]")
     private String deb;
 
     /**
      * Explicitly defines the path to the control directory. At least the
      * control file is mandatory.
-     *
-     * @parameter default-value="[[baseDir]]/src/deb/control"
      */
+    @Parameter(defaultValue = "[[baseDir]]/src/deb/control")
     private String controlDir;
 
     /**
      * Explicitly define the file to read the changes from.
-     *
-     * @parameter default-value="[[baseDir]]/CHANGES.txt"
      */
+    @Parameter(defaultValue = "[[baseDir]]/CHANGES.txt")
     private String changesIn;
 
     /**
      * Explicitly define the file where to write the changes to.
-     *
-     * @parameter default-value="[[buildDir]]/[[artifactId]]_[[version]]_all.changes"
      */
+    @Parameter(defaultValue = "[[buildDir]]/[[artifactId]]_[[version]]_all.changes")
     private String changesOut;
 
     /**
-     * Explicitly define the file where to write the changes of the changes
-     * input to.
-     *
-     * @parameter default-value="[[baseDir]]/CHANGES.txt"
+     * Explicitly define the file where to write the changes of the changes input to.
      */
+    @Parameter(defaultValue = "[[baseDir]]/CHANGES.txt")
     private String changesSave;
 
     /**
      * The compression method used for the data file (none, gzip, bzip2 or xz)
-     *
-     * @parameter default-value="gzip"
      */
+    @Parameter(defaultValue = "gzip")
     private String compression;
-
 
     /**
      * Boolean option whether to attach the artifact to the project
-     *
-     * @parameter default-value="true"
      */
+    @Parameter(defaultValue = "true")
     private String attach;
 
     /**
@@ -122,51 +112,40 @@ public class DebMojo extends AbstractPluginMojo {
      * packages are installed in /opt (see the FHS here:
      * http://www.pathname.com/
      * fhs/pub/fhs-2.3.html#OPTADDONAPPLICATIONSOFTWAREPACKAGES)
-     *
-     * @parameter default-value="/opt/[[artifactId]]"
      */
+    @Parameter(defaultValue = "/opt/[[artifactId]]")
     private String installDir;
-
 
     /**
      * The type of attached artifact
-     *
-     * @parameter default-value="deb"
      */
+    @Parameter(defaultValue = "deb")
     private String type;
 
     /**
      * The project base directory
-     *
-     * @parameter default-value="${basedir}"
-     * @required
-     * @readonly
      */
+    @Parameter(defaultValue = "${basedir}", required = true, readonly = true)
     private File baseDir;
 
     /**
      * Run the plugin on all sub-modules.
      * If set to false, the plugin will be run in the same folder where the
      * mvn command was invoked
-     *
-     * @parameter expression="${submodules}" default-value="true"
      */
+    @Parameter(defaultValue = "true")
     private boolean submodules;
 
     /**
      * The Maven Session Object
-     *
-     * @parameter expression="${session}"
-     * @required
-     * @readonly
      */
+    @Component
     private MavenSession session;
 
     /**
      * The classifier of attached artifact
-     *
-     * @parameter
      */
+    @Parameter
     private String classifier;
 
     /**
@@ -221,34 +200,31 @@ public class DebMojo extends AbstractPluginMojo {
      *     </plugins>
      *   </build>
      * </pre>
-     *
-     * @parameter expression="${dataSet}"
      */
+    @Parameter
     private Data[] dataSet;
 
     /**
      * When SNAPSHOT version replace <code>SNAPSHOT</code> with current date
      * and time to make sure each build is unique.
-     *
-     * @parameter expression="${timestamped}" default-value="false"
      */
+    @Parameter(defaultValue = "false")
     private boolean timestamped;
 
     /**
      * If verbose is true info messages also get logged.
      * Will be changed to "false" in future versions.
      * Left to "true" for the transition.
-     *
-     * @parameter expression="${verbose}" default-value="true"
      */
+    @Parameter(defaultValue = "true")
     private boolean verbose;
 
     /**
      * Indicates if the execution should be disabled. If <code>true</code>, nothing will occur during execution.
      * 
-     * @parameter default-value="false"
      * @since 1.1
      */
+    @Parameter(defaultValue = "false")
     private boolean disabled;
 
     /* end of parameters */
