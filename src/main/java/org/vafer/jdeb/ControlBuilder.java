@@ -88,7 +88,7 @@ class ControlBuilder {
             if (file.isDirectory()) {
                 // warn about the misplaced directory, except for directories ignored by default (.svn, cvs, etc)
                 if (!isDefaultExcludes(file)) {
-                    console.info("Found directory '" + file + "' in the control directory. Maybe you are pointing to wrong dir?");
+                    console.warn("Found directory '" + file + "' in the control directory. Maybe you are pointing to wrong dir?");
                 }
                 continue;
             }
@@ -155,7 +155,7 @@ class ControlBuilder {
         final String debVersion = System.getenv("DEBVERSION");
         if (debVersion != null) {
             packageControlFile.set("Version", debVersion);
-            console.info("Using version'" + debVersion + "' from the environment variables.");
+            console.debug("Using version'" + debVersion + "' from the environment variables.");
         }
 
 
@@ -166,7 +166,7 @@ class ControlBuilder {
         if (debFullName != null && debEmail != null) {
             final String maintainer = debFullName + " <" + debEmail + ">";
             packageControlFile.set("Maintainer", maintainer);
-            console.info("Using maintainer '" + maintainer + "' from the environment variables.");
+            console.debug("Using maintainer '" + maintainer + "' from the environment variables.");
         }
         
         return packageControlFile;

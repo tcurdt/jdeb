@@ -48,7 +48,7 @@ import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
 /**
- * Creates deb archive
+ * Creates Debian package
  */
 @Mojo(name = "jdeb", defaultPhase = LifecyclePhase.PACKAGE)
 public class DebMojo extends AbstractPluginMojo {
@@ -212,11 +212,9 @@ public class DebMojo extends AbstractPluginMojo {
     private boolean timestamped;
 
     /**
-     * If verbose is true info messages also get logged.
-     * Will be changed to "false" in future versions.
-     * Left to "true" for the transition.
+     * If verbose is true more build messages are logged.
      */
-    @Parameter(defaultValue = "true")
+    @Parameter(defaultValue = "false")
     private boolean verbose;
 
     /**
@@ -404,7 +402,7 @@ public class DebMojo extends AbstractPluginMojo {
 
             // Always attach unless explicitly set to false
             if ("true".equalsIgnoreCase(attach)) {
-                getLog().info("Attaching created debian archive " + debFile);
+                console.info("Attaching created debian package " + debFile);
                 projectHelper.attachArtifact(project, type, classifier, debFile);
             }
 

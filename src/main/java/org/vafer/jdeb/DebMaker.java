@@ -300,12 +300,12 @@ public class DebMaker {
             tempData = File.createTempFile("deb", "data");
             tempControl = File.createTempFile("deb", "control");
 
-            console.info("Building data");
+            console.debug("Building data");
             DataBuilder dataBuilder = new DataBuilder(console);
             StringBuilder md5s = new StringBuilder();
             BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, compression);
             
-            console.info("Building control");
+            console.debug("Building control");
             ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver);
             BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size);
             if (packageControlFile.get("Package") == null) {

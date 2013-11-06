@@ -117,7 +117,7 @@ class DataBuilder {
                 // createParentDirectories, including about a possible bug.)
                 createDirectory(dirname, user, uid, group, gid, mode, 0);
 
-                console.info("dir: " + dirname);
+                console.debug("dir: " + dirname);
             }
 
             public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
@@ -152,7 +152,7 @@ class DataBuilder {
 
                 tarOutputStream.closeArchiveEntry();
 
-                console.info(
+                console.debug(
                     "file:" + entry.getName() +
                         " size:" + entry.getSize() +
                         " mode:" + entry.getMode() +
@@ -193,7 +193,7 @@ class DataBuilder {
                 tarOutputStream.putArchiveEntry(entry);
                 tarOutputStream.closeArchiveEntry();
 
-                console.info(
+                console.debug(
                     "link:" + entry.getName() +
                     " mode:" + entry.getMode() +
                     " linkname:" + entry.getLinkName() +
@@ -279,7 +279,7 @@ class DataBuilder {
             tarOutputStream.close();
         }
 
-        console.info("Total size: " + dataSize);
+        console.debug("Total size: " + dataSize);
 
         return dataSize.count;
     }
