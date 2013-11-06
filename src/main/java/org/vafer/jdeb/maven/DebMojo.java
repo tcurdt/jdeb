@@ -225,7 +225,7 @@ public class DebMojo extends AbstractPluginMojo {
      * @since 1.1
      */
     @Parameter(defaultValue = "false")
-    private boolean disabled;
+    private boolean skip;
 
     /* end of parameters */
 
@@ -310,7 +310,7 @@ public class DebMojo extends AbstractPluginMojo {
 
         final MavenProject project = getProject();
 
-        if (disabled){
+        if (skip){
             getLog().info("skipping execution");
             return;
         }
