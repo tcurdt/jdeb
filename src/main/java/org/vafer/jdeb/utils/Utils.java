@@ -106,7 +106,7 @@ public final class Utils {
         char[] watch = open;
         int w = 0;
         int openMatch = 0;
-        for (int i = 0; i < pExpression.toCharArray().length; i++) {
+        for (int i = 0; i < pExpression.length(); i++) {
             char c = pExpression.charAt(i);
             if (c == watch[w]) {
                 w++;
