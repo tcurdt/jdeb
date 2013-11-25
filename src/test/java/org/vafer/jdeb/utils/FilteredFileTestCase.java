@@ -46,6 +46,15 @@ public class FilteredFileTestCase extends TestCase {
         assertEquals("#!/bin/sh\ncat jdebcustom1 \necho 'custom2'\n", actual);
     }
 
+    public void testTokenSubstitutionWithinOpenCloseTokens() throws Exception {
+        InputStream in = new ReaderInputStream(new StringReader("#!/bin/bash\nif [[ -z \"$(grep [[artifactId]] /etc/passwd )\" ]] ; then\n"));
+
+        FilteredFile placeHolder = new FilteredFile(in, variableResolver);
+
+        String actual = placeHolder.toString();
+        assertEquals("", "#!/bin/bash\nif [[ -z \"$(grep jdeb /etc/passwd )\" ]] ; then\n", actual);
+    }
+
     public void testVariableSubstitution() throws Exception {
         Map<String, String> map = new HashMap<String, String>();
         map.put("VERSION", "1.2");
