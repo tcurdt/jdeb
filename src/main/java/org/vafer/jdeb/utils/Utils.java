@@ -37,7 +37,7 @@ import org.apache.tools.ant.util.ReaderInputStream;
  */
 public final class Utils {
 
-    public static int copy( final InputStream pInput, final OutputStream pOutput ) throws IOException {
+    public static int copy(final InputStream pInput, final OutputStream pOutput) throws IOException {
         final byte[] buffer = new byte[2048];
         int count = 0;
         int n;
@@ -48,7 +48,7 @@ public final class Utils {
         return count;
     }
 
-    public static String toHex( final byte[] bytes ) {
+    public static String toHex(final byte[] bytes) {
         final StringBuilder sb = new StringBuilder();
 
         for (byte b : bytes) {
@@ -59,7 +59,7 @@ public final class Utils {
         return sb.toString();
     }
 
-    public static String stripPath( final int p, final String s ) {
+    public static String stripPath(final int p, final String s) {
 
         if (p <= 0) {
             return s;
@@ -76,7 +76,7 @@ public final class Utils {
         return s.substring(x + 1);
     }
 
-    public static String stripLeadingSlash( final String s ) {
+    public static String stripLeadingSlash(final String s) {
         if (s == null) {
             return s;
         }
@@ -97,21 +97,24 @@ public final class Utils {
      * @param pResolver
      * @param pExpression
      */
-    public static String replaceVariables( final VariableResolver pResolver, final String pExpression, final String pOpen, final String pClose ) {
+    public static String replaceVariables(final VariableResolver pResolver, final String pExpression, final String pOpen, final String pClose) {
         final char[] open = pOpen.toCharArray();
         final char[] close = pClose.toCharArray();
-        
+
         final StringBuilder out = new StringBuilder();
         StringBuilder sb = new StringBuilder();
         char[] watch = open;
         int w = 0;
-        for (char c : pExpression.toCharArray()) {
+        int openMatch = 0;
+        for (int i = 0; i < pExpression.toCharArray().length; i++) {
+            char c = pExpression.charAt(i);
             if (c == watch[w]) {
                 w++;
                 if (watch.length == w) {
                     // found the full token to watch for
 
                     if (watch == open) {
+                        openMatch = i;
                         // found open
                         out.append(sb);
                         sb = new StringBuilder();
@@ -124,8 +127,7 @@ public final class Utils {
                             out.append(variable);
                         } else {
                             out.append(pOpen);
-                            out.append(sb);
-                            out.append(pClose);
+                            i = openMatch;
                         }
                         sb = new StringBuilder();
                         // search for open
@@ -158,7 +160,7 @@ public final class Utils {
      *
      * @param input
      */
-    public static byte[] toUnixLineEndings( InputStream input ) throws IOException {
+    public static byte[] toUnixLineEndings(InputStream input) throws IOException {
         String encoding = "ISO-8859-1";
         FixCrLfFilter filter = new FixCrLfFilter(new InputStreamReader(input, encoding));
         filter.setEol(FixCrLfFilter.CrLf.newInstance("unix"));
@@ -174,11 +176,11 @@ public final class Utils {
      * -SNAPSHOT suffixes are replaced with a timestamp (~yyyyMMddHHmmss).
      * The separator before a rc, alpha or beta version is replaced with '~'
      * such that the version is always ordered before the final or GA release.
-     * 
-     * @param version the project version to convert to a Debian package version
+     *
+     * @param version   the project version to convert to a Debian package version
      * @param timestamp the date used as the timestamp to replace the SNAPSHOT suffix
      */
-    public static String convertToDebianVersion( String version, Date timestamp ) {
+    public static String convertToDebianVersion(String version, Date timestamp) {
         Pattern pattern1 = Pattern.compile("(.*)[\\-\\+]SNAPSHOT");
         Matcher matcher = pattern1.matcher(version);
         if (matcher.matches()) {
@@ -189,15 +191,15 @@ public final class Utils {
                 version += "SNAPSHOT";
             }
         }
-        
+
         Pattern pattern2 = Pattern.compile("(.*?)([\\.\\-_]?)(alpha|beta|rc)(.*)", Pattern.CASE_INSENSITIVE);
         matcher = pattern2.matcher(version);
         if (matcher.matches()) {
             version = matcher.group(1) + "~" + matcher.group(3) + matcher.group(4);
         }
-        
+
         version = version.replace('-', '+');
-        
+
         return version;
     }
 }

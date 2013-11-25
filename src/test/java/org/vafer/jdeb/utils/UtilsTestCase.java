@@ -88,6 +88,18 @@ public class UtilsTestCase extends TestCase {
         assertEquals("jdeb [[test]]", result);
     }
 
+    public void testReplaceVariablesWithinOpenCloseTokens() throws Exception {
+        Map<String, String> variables = new HashMap<String, String>();
+        variables.put("artifactId", "jdeb");
+
+        VariableResolver resolver = new MapVariableResolver(variables);
+
+        String result = Utils.replaceVariables(resolver, "if [[ -z \"$(grep [[artifactId]] /etc/passwd )\" ]] ; then", "[[", "]]");
+
+        assertEquals("", "if [[ -z \"$(grep jdeb /etc/passwd )\" ]] ; then", result);
+
+    }
+
     public void testVersionConversion() {
         Calendar cal = new GregorianCalendar(2013, Calendar.FEBRUARY, 17);
         assertEquals("should match", "1.0", Utils.convertToDebianVersion("1.0", null));
