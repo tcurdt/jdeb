@@ -86,9 +86,11 @@ changesIn     | The changes to add                                              
 changesOut    | The changes file generated                                                   | No
 changesSave   | (NYI) The merged changes file                                                | No
 compression   | (NYI) Compression method for the data file (`gzip`, `bzip2`, `xz` or `none`) | No; defaults to `gzip`
-keyring       | (NYI) The file containing the PGP keys                                       | No
-key           | (NYI) The name of the key to be used in the keyring                          | No
-passphrase    | (NYI) The passphrase to use the key                                          | No
+signPackage   | If the debian package should be signed                                       | No
+signCfgPrefix | Prefix for when reading keyring, key and passphrase from settings.xml        | No; defaults to `jdeb.`
+keyring       | The file containing the PGP keys                                             | No
+key           | The name of the key to be used in the keyring                                | No
+passphrase    | The passphrase to use the key                                                | No
 attach        | Attach artifact to project                                                   | No; defaults to `true`
 submodules    | Execute the goal on all sub-modules                                          | No; defaults to `true`
 timestamped   | Turn SNAPSHOT into timestamps                                                | No; defaults to `false`
@@ -129,7 +131,7 @@ dirmode       | Dir permissions as octet                              | No; defa
 strip         | Strip n path components from the original file        | No; defaults to 0
 
 Below is an example of how you could configure your jdeb maven plugin to
-include a directory, a tarball, and a file in your deb package:
+include a directory, a tarball, and a file in your deb package and then sign it with the key 8306FE21 in /home/user/.gnupg/secring.gpg:
 
 ```xml
   <build>
@@ -145,6 +147,10 @@ include a directory, a tarball, and a file in your deb package:
               <goal>jdeb</goal>
             </goals>
             <configuration>
+              <signPackage>true</signPackage>
+              <keyring>/home/user/.gnupg/secring.gpg</keyring>
+              <key>8306FE21</key>
+              <passphrase>abcdef</passphrase>
 
               <dataSet>
 
@@ -219,3 +225,22 @@ include a directory, a tarball, and a file in your deb package:
     </plugins>
   </build>
 ```
+If you don't want to store your key information in the POM you can store this is your settings.xml, here's an example settings.xml:
+
+    <settings>
+        <profiles>
+            <profile>
+                <id>jdeb-signing</id>
+                <properties>
+                    <jdeb.keyring>/home/user/.gnupg/secring.gpg</jdeb.keyring>
+                    <jdeb.key>8306FE21</jdeb.key>
+                    <jdeb.passphrase>abcdef</jdeb.passphrase>
+                </properties>
+            </profile>
+        </profiles>
+        <activeProfiles>
+            <activeProfile>jdeb-signing</activeProfile>
+        </activeProfiles>
+    </settings>
+
+keyring, key and passphrase can then be omitted from the POM entirely.

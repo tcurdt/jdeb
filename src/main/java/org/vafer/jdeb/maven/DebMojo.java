@@ -18,6 +18,7 @@ package org.vafer.jdeb.maven;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,6 +37,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.settings.Profile;
+import org.apache.maven.settings.Settings;
 import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataConsumer;
@@ -47,9 +50,12 @@ import org.vafer.jdeb.utils.MapVariableResolver;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
+import static org.vafer.jdeb.utils.Utils.lookupIfEmpty;
+
 /**
  * Creates Debian package
  */
+@SuppressWarnings("unused")
 @Mojo(name = "jdeb", defaultPhase = LifecyclePhase.PACKAGE)
 public class DebMojo extends AbstractPluginMojo {
 
@@ -225,10 +231,54 @@ public class DebMojo extends AbstractPluginMojo {
     @Parameter(defaultValue = "false")
     private boolean skip;
 
+    /**
+     * If signPackage is true then a origin signature will be placed
+     * in the generated package.
+     */
+    @Parameter(defaultValue = "false")
+    private boolean signPackage;
+
+    /**
+     * The keyring to use for signing operations.
+     */
+    @Parameter
+    private String keyring;
+
+    /**
+     * The key to use for signing operations.
+     */
+    @Parameter
+    private String key;
+
+    /**
+     * The passphrase to use for signing operations.
+     */
+    @Parameter
+    private String passphrase; 
+
+    /**
+     * The prefix to use when reading signing variables
+     * from settings.
+     */
+    @Parameter(defaultValue = "jdeb.")
+    private String signCfgPrefix;
+
+    /**
+     * The settings.
+     */
+    @Parameter(defaultValue = "${settings}")
+    private Settings settings;
+
     /* end of parameters */
+
+
+    private static final String KEY = "key";
+    private static final String KEYRING = "keyring";
+    private static final String PASSPHRASE = "passphrase";
 
     private String openReplaceToken = "[[";
     private String closeReplaceToken = "]]";
+    private Console console;
     private Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
 
     public void setOpenReplaceToken( String openReplaceToken ) {
@@ -252,8 +302,13 @@ public class DebMojo extends AbstractPluginMojo {
     }
 
     protected VariableResolver initializeVariableResolver( Map<String, String> variables ) {
-        ((Map) variables).putAll(getProject().getProperties());
-        ((Map) variables).putAll(System.getProperties());
+        @SuppressWarnings("unchecked")
+        final Map<String, String> projectProperties = Map.class.cast(getProject().getProperties());
+        @SuppressWarnings("unchecked")
+        final Map<String, String> systemProperties = Map.class.cast(System.getProperties());
+
+        variables.putAll(projectProperties);
+        variables.putAll(systemProperties);
         variables.put("name", name != null ? name : getProject().getName());
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
@@ -308,7 +363,7 @@ public class DebMojo extends AbstractPluginMojo {
 
         final MavenProject project = getProject();
 
-        if (skip){
+        if (skip) {
             getLog().info("skipping execution");
             return;
         }
@@ -320,7 +375,9 @@ public class DebMojo extends AbstractPluginMojo {
 
         setData(dataSet);
 
-        Console console = new MojoConsole(getLog(), verbose);
+        console = new MojoConsole(getLog(), verbose);
+
+        initializeSignProperties();
 
         final VariableResolver resolver = initializeVariableResolver(new HashMap<String, String>());
 
@@ -330,6 +387,7 @@ public class DebMojo extends AbstractPluginMojo {
         final File changesInFile = new File(Utils.replaceVariables(resolver, changesIn, openReplaceToken, closeReplaceToken));
         final File changesOutFile = new File(Utils.replaceVariables(resolver, changesOut, openReplaceToken, closeReplaceToken));
         final File changesSaveFile = new File(Utils.replaceVariables(resolver, changesSave, openReplaceToken, closeReplaceToken));
+        final File keyringFile = keyring == null ? null : new File(Utils.replaceVariables(resolver, keyring, openReplaceToken, closeReplaceToken));
 
         // if there are no producers defined we try to use the artifacts
         if (dataProducers.isEmpty()) {
@@ -351,11 +409,17 @@ public class DebMojo extends AbstractPluginMojo {
 
                 artifacts.add(project.getArtifact());
 
-                for (Artifact artifact : (Set<Artifact>) project.getArtifacts()) {
+                @SuppressWarnings("unchecked")
+                final Set<Artifact> projectArtifacts = project.getArtifacts();
+
+                for (Artifact artifact : projectArtifacts) {
                     artifacts.add(artifact);
                 }
 
-                for (Artifact artifact : (List<Artifact>) project.getAttachedArtifacts()) {
+                @SuppressWarnings("unchecked")
+                final List<Artifact> attachedArtifacts = project.getAttachedArtifacts();
+
+                for (Artifact artifact : attachedArtifacts) {
                     artifacts.add(artifact);
                 }
 
@@ -396,6 +460,10 @@ public class DebMojo extends AbstractPluginMojo {
             debMaker.setChangesOut(changesOutFile);
             debMaker.setChangesSave(changesSaveFile);
             debMaker.setCompression(compression);
+            debMaker.setKeyring(keyringFile);
+            debMaker.setKey(key);
+            debMaker.setPassphrase(passphrase);
+            debMaker.setSignPackage(signPackage);
             debMaker.setResolver(resolver);
             debMaker.validate();
             debMaker.makeDeb();
@@ -411,4 +479,86 @@ public class DebMojo extends AbstractPluginMojo {
             throw new MojoExecutionException("Failed to create debian package " + debFile, e);
         }
     }
+
+    /**
+     * Initializes unspecified sign properties using available defaults
+     * and global settings.
+     */
+    private void initializeSignProperties() {
+        if (!signPackage) {
+            return;
+        }
+
+        if (key != null && keyring != null && passphrase != null) {
+            return;
+        }
+
+        Map<String, String> properties =
+                readPropertiesFromActiveProfiles(signCfgPrefix, KEY, KEYRING, PASSPHRASE);
+
+        key = lookupIfEmpty(key, properties, KEY);
+        keyring = lookupIfEmpty(keyring, properties, KEYRING);
+        passphrase = lookupIfEmpty(passphrase, properties, PASSPHRASE);
+
+        if (keyring == null) {
+            try {
+                keyring = Utils.guessKeyRingFile().getAbsolutePath();
+                console.info("Located keyring at " + keyring);
+            } catch (FileNotFoundException e) {
+                console.warn(e.getMessage());
+            }
+        }
+    }
+
+
+    /**
+     * Read properties from the active profiles.
+     *
+     * Goes through all active profiles (in the order the
+     * profiles are defined in settings.xml) and extracts
+     * the desired properties (if present). The prefix is
+     * used when looking up properties in the profile but
+     * not in the returned map.
+     *
+     * @param prefix The prefix to use or null if no prefix should be used
+     * @param properties The properties to read
+     *
+     * @return A map containing the values for the properties that were found
+     */
+    public Map<String, String> readPropertiesFromActiveProfiles( final String prefix,
+                                                                 final String... properties ) {
+        if (settings == null) {
+            console.debug("No maven setting injected");
+            return Collections.emptyMap();
+        }
+
+        final List<String> activeProfilesList = settings.getActiveProfiles();
+        if (activeProfilesList.isEmpty()) {
+            console.debug("No active profiles found");
+            return Collections.emptyMap();
+        }
+
+        final Map<String, String> map = new HashMap<String, String>();
+        final Set<String> activeProfiles = new HashSet<String>(activeProfilesList);
+
+        // Iterate over all active profiles in order
+        for (final Profile profile : settings.getProfiles()) {
+            // Check if the profile is active
+            final String profileId = profile.getId();
+            if (activeProfiles.contains(profileId)) {
+                console.debug("Trying active profile " + profileId);
+                for (final String property : properties) {
+                    final String propKey = prefix != null ? prefix + property : property;
+                    final String value = profile.getProperties().getProperty(propKey);
+                    if (value != null) {
+                        console.debug("Found property " + property + " in profile " + profileId);
+                        map.put(property, value);
+                    }
+                }
+            }
+        }
+
+        return map;
+    }
+
 }
