@@ -22,12 +22,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.PatternSet;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
-import org.vafer.jdeb.producers.DataProducerArchive;
-import org.vafer.jdeb.producers.DataProducerDirectory;
-import org.vafer.jdeb.producers.DataProducerFile;
+import org.vafer.jdeb.producers.*;
 
 /**
  * Ant "data" element acting as a factory for DataProducers.
@@ -72,36 +71,44 @@ public final class Data extends PatternSet implements DataProducer {
             throw new FileNotFoundException("Data source not found : " + src);
         }
 
-        org.vafer.jdeb.mapping.Mapper[] mappers = new org.vafer.jdeb.mapping.Mapper[mapperWrapper.size()];
+        final org.vafer.jdeb.mapping.Mapper[] mappers = new org.vafer.jdeb.mapping.Mapper[mapperWrapper.size()];
         final Iterator<Mapper> it = mapperWrapper.iterator();
         for (int i = 0; i < mappers.length; i++) {
             mappers[i] = it.next().createMapper();
         }
 
-        if ("file".equalsIgnoreCase(type)) {
-            new DataProducerFile(
-                src,
-                destinationName,
-                getIncludePatterns(getProject()),
-                getExcludePatterns(getProject()),
-                mappers
-            ).produce(pReceiver);
+        final Project project = getProject();
 
-        } else if ("archive".equalsIgnoreCase(type)) {
-            new DataProducerArchive(
-                src,
-                getIncludePatterns(getProject()),
-                getExcludePatterns(getProject()),
-                mappers
-            ).produce(pReceiver);
+        ProducerFactory.KnownType knownType = ProducerFactory.KnownType.forString(type);
 
-        } else if ("directory".equalsIgnoreCase(type)) {
-            new DataProducerDirectory(
-                src,
-                getIncludePatterns(getProject()),
-                getExcludePatterns(getProject()),
-                mappers
-            ).produce(pReceiver);
+        if (knownType == null) {
+            return;
         }
+
+        final DataProducer p = ProducerFactory.create(knownType, new ProducerFactory.Params() {
+            @Override
+            public File getSource() {
+                return src;
+            }
+            @Override
+            public String getDestination() {
+                return destinationName;
+            }
+            @Override
+            public String[] getIncludePatterns() {
+                return Data.this.getIncludePatterns(project);
+            }
+
+            @Override
+            public String[] getExcludePatterns() {
+                return Data.this.getExcludePatterns(project);
+            }
+
+            @Override
+            public org.vafer.jdeb.mapping.Mapper[] getMappers() {
+                return mappers;
+            }
+        });
+        p.produce(pReceiver);
     }
 }

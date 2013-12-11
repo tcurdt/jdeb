@@ -18,7 +18,6 @@ package org.vafer.jdeb.producers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.tools.ant.DirectoryScanner;
@@ -72,12 +71,7 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
                 dirname += "/";
             }
 
-            TarArchiveEntry entry = new TarArchiveEntry(dirname, true);
-            entry.setUserId(0);
-            entry.setUserName("root");
-            entry.setGroupId(0);
-            entry.setGroupName("root");
-            entry.setMode(TarArchiveEntry.DEFAULT_DIR_MODE);
+            TarArchiveEntry entry = Producers.defaultDirEntryWithName(dirname);
 
             entry = map(entry);
 
@@ -99,23 +93,13 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
                 filename = filename.replace(File.separatorChar, '/');
             }
 
-            TarArchiveEntry entry = new TarArchiveEntry(filename, true);
-            entry.setUserId(0);
-            entry.setUserName("root");
-            entry.setGroupId(0);
-            entry.setGroupName("root");
-            entry.setMode(TarArchiveEntry.DEFAULT_FILE_MODE);
+            TarArchiveEntry entry = Producers.defaultFileEntryWithName(filename);
 
             entry = map(entry);
 
             entry.setSize(file.length());
 
-            final InputStream inputStream = new FileInputStream(file);
-            try {
-                pReceiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
-            } finally {
-                inputStream.close();
-            }
+            Producers.produceInputStreamWithEntry(pReceiver, new FileInputStream(file), entry);
         }
     }
 
