@@ -40,6 +40,8 @@ import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Settings;
 import org.apache.tools.tar.TarEntry;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
@@ -61,6 +63,9 @@ public class DebMojo extends AbstractPluginMojo {
 
     @Component
     private MavenProjectHelper projectHelper;
+
+    @Component(hint = "jdeb-sec")
+    private SecDispatcher secDispatcher;
 
     /**
      * Defines the name of deb package.
@@ -506,7 +511,7 @@ public class DebMojo extends AbstractPluginMojo {
 
         key = lookupIfEmpty(key, properties, KEY);
         keyring = lookupIfEmpty(keyring, properties, KEYRING);
-        passphrase = lookupIfEmpty(passphrase, properties, PASSPHRASE);
+        passphrase = decrypt(lookupIfEmpty(passphrase, properties, PASSPHRASE));
 
         if (keyring == null) {
             try {
@@ -516,6 +521,33 @@ public class DebMojo extends AbstractPluginMojo {
                 console.warn(e.getMessage());
             }
         }
+    }
+
+    /**
+     * Decrypts given passphrase if needed using maven security dispatcher.
+     * See http://maven.apache.org/guides/mini/guide-encryption.html for details.
+     *
+     * @param maybeEncryptedPassphrase possibly encrypted passphrase
+     * @return decrypted passphrase
+     */
+    private String decrypt( final String maybeEncryptedPassphrase ) {
+        if (maybeEncryptedPassphrase == null) {
+            return null;
+        }
+
+        try {
+            final String decrypted = secDispatcher.decrypt(maybeEncryptedPassphrase);
+            if (maybeEncryptedPassphrase.equals(decrypted)) {
+                console.info("Passphrase was not encrypted");
+            } else {
+                console.info("Passphrase was successfully decrypted");
+            }
+            return decrypted;
+        } catch (SecDispatcherException e) {
+            console.warn("Unable to decrypt passphrase: " + e.getMessage());
+        }
+
+        return maybeEncryptedPassphrase;
     }
 
 
