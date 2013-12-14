@@ -25,6 +25,8 @@ import org.vafer.jdeb.mapping.Mapper;
 import org.vafer.jdeb.utils.Utils;
 
 import java.io.*;
+import java.util.zip.Deflater;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * DataProducer representing a man page entry.
@@ -89,7 +91,11 @@ public class DataProducerManPage extends AbstractDataProducer {
     private byte[] getCompressedPageBytes() throws IOException, CompressorException {
         InputStream inputStream = null;
         final ByteArrayOutputStream inMemoryOut = new ByteArrayOutputStream();
-        final OutputStream compressedOut = COMPRESSOR.toCompressedOutputStream(inMemoryOut);
+        final OutputStream compressedOut = new GZIPOutputStream(inMemoryOut) {
+            {
+                def.setLevel(Deflater.BEST_COMPRESSION);
+            }
+        };
 
         try  {
             inputStream = new BufferedInputStream(new FileInputStream(file));
@@ -99,7 +105,25 @@ public class DataProducerManPage extends AbstractDataProducer {
             IOUtils.closeQuietly(inputStream);
         }
 
-        return inMemoryOut.toByteArray();
+        // Updating compression level to avoid the lintian
+        // `manpage-not-compressed-with-max-compression` error
+        return setBestCompressionFlag(inMemoryOut.toByteArray());
+    }
+
+    /**
+     * Sets XFLAG header field to BEST COMPRESSION.
+     * See http://www.gzip.org/zlib/rfc-gzip.html for details.
+     *
+     * @param bytes compressed file bytes, must be a valid GZIP file
+     * @return augmented file bytes
+     */
+    private static byte[] setBestCompressionFlag( final byte[] bytes ) {
+
+        final int XFLAG_HEADER_INDEX = 8;
+        final byte BEST_COMPRESSION_FLAG = 2;
+
+        bytes[XFLAG_HEADER_INDEX] = BEST_COMPRESSION_FLAG;
+        return bytes;
     }
 
     static String makeDestination( final String dest, final File file ) {
