@@ -16,7 +16,6 @@
 
 package org.vafer.jdeb.signing;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +25,7 @@ import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.Iterator;
 
+import org.apache.commons.io.LineIterator;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.bcpg.BCPGOutputStream;
 import org.bouncycastle.openpgp.PGPException;
@@ -87,10 +87,11 @@ public class PGPSigner {
         ArmoredOutputStream armoredOutput = new ArmoredOutputStream(output);
         armoredOutput.beginClearText(digest);
         
-        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        LineIterator iterator = new LineIterator(new InputStreamReader(input));
         
-        String line;
-        while ((line = reader.readLine()) != null) {
+        while (iterator.hasNext()) {
+            String line = iterator.nextLine();
+            
             // trailing spaces must be removed for signature calculation (see http://tools.ietf.org/html/rfc4880#section-7.1)
             byte[] data = trim(line).getBytes("UTF-8");
             
@@ -98,7 +99,9 @@ public class PGPSigner {
             armoredOutput.write(EOL);
             
             signatureGenerator.update(data);
-            signatureGenerator.update(EOL);
+            if (iterator.hasNext()) {
+                signatureGenerator.update(EOL);
+            }
         }
 
         armoredOutput.endClearText();
