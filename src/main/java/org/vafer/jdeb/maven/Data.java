@@ -95,6 +95,19 @@ public final class Data implements DataProducer {
     public void setSymlink(boolean symlink) {
         this.symlink = symlink;
     }
+    
+    private boolean conffile = false;
+
+    /**
+     * @parameter expression="${conffile}"
+     */
+    public void setConffile(boolean conffile) {
+        this.conffile = conffile;
+    }
+    
+    public boolean getConffile() {
+        return this.conffile;
+    }
 
     @Parameter(alias = "includes")
     private String[] includePatterns;

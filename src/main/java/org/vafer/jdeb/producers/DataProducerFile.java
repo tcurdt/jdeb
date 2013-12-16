@@ -68,7 +68,6 @@ public final class DataProducerFile extends AbstractDataProducer implements Data
         } finally {
             inputStream.close();
         }
-
     }
 
 }

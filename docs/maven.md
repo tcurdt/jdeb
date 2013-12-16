@@ -113,6 +113,7 @@ type             | Type of the data source. (archive, directory, file, link or t
 missingSrc       | Fail if src file/folder is missing (ignore or fail)                          | No; defaults to `fail`
 includes         | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files
 excludes         | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions
+conffile         | A boolean value to define if the files should be included in the conffiles   | No; defaults to `false`
 mapper           | The files to exclude from the directory or tarball                           | No
 paths/(path..)   | One or more string literal paths that will created in the package            | No; Yes for type `template`
 
@@ -215,6 +216,19 @@ include a directory, a tarball, and a file in your deb package and then sign it 
                   <linkName>/a/path/on/the/target/fs</linkName>
                   <linkTarget>/a/sym/link/to/the/scr/file</linkTarget>
                   <symlink>true</symlink>
+                </data>
+
+                <!-- Conffiles example -->
+                <data>
+                  <src>${project.build.directory}/data</src>
+                  <type>directory</type>
+                  <includes/>
+                  <excludes>**/.svn</excludes>
+                  <conffile>true</conffile>
+                  <mapper>
+                    <type>ls</type>
+                    <src>mapping.txt</src>
+                  </mapper>
                 </data>
               </dataSet>
 

@@ -119,7 +119,7 @@ class DataBuilder {
 
                 console.debug("dir: " + dirname);
             }
-
+            
             public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 // Check link name
                 checkField(linkname, TarConstants.NAMELEN);
