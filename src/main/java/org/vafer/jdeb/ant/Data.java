@@ -43,6 +43,8 @@ public final class Data extends PatternSet implements DataProducer {
 
     private String type;
 
+    private Boolean conffile;
+
     private String destinationName;
 
     public void setSrc(File src) {
@@ -55,6 +57,14 @@ public final class Data extends PatternSet implements DataProducer {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public void setConffile(Boolean conffile) {
+        this.conffile = conffile;
+    }
+    
+    public Boolean getConffile() {
+        return this.conffile;
     }
 
     public void setDst(String destinationName) {

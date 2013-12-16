@@ -28,7 +28,7 @@ public interface DataConsumer {
     void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException;
 
     void onEachFile( InputStream input, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException;
-
+    
     void onEachLink( String path, String linkName, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException;
 
 }

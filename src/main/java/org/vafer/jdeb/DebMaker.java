@@ -25,6 +25,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
@@ -105,10 +106,17 @@ public class DebMaker {
 
     private final Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
 
+    private final Collection<DataProducer> conffilesProducers = new ArrayList<DataProducer>();
 
-    public DebMaker(Console console, Collection<DataProducer> dataProducers) {
+
+    public DebMaker(Console console, Collection<DataProducer> dataProducers, Collection<DataProducer> conffileProducers) {
         this.console = console;
-        this.dataProducers.addAll(dataProducers);
+        if (dataProducers != null) {
+            this.dataProducers.addAll(dataProducers);
+        }
+        if (conffileProducers != null) {
+            this.conffilesProducers.addAll(conffileProducers);
+        }
     }
 
     public void setDeb(File deb) {
@@ -330,6 +338,42 @@ public class DebMaker {
         }
     }
     
+    private List<String> populateConffiles(Collection<DataProducer> producers) {
+        final List<String> result = new ArrayList<String>();
+        
+        if (producers == null || producers.isEmpty()) {
+            return result;
+        }
+        
+        final DataConsumer receiver = new DataConsumer() {
+            public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+                //
+            }
+            
+            public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+                String tempConffileItem = filename;
+                if (tempConffileItem.startsWith(".")) {
+                    tempConffileItem = tempConffileItem.substring(1);
+                }
+                result.add(tempConffileItem);
+            }
+
+            public void onEachLink(String path, String linkname, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
+                //
+            }
+        };
+
+        try {
+            for (DataProducer data : producers) {
+                data.produce(receiver);
+            }
+        } catch(Exception e) {
+            //
+        }
+        
+        return result;
+    }
+    
     /**
      * Create the debian archive with from the provided control files and data producers.
      *
@@ -364,6 +408,9 @@ public class DebMaker {
             DataBuilder dataBuilder = new DataBuilder(console);
             StringBuilder md5s = new StringBuilder();
             BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, compression);
+
+            console.info("Building conffiles");
+            List<String> tempConffiles = populateConffiles(conffilesProducers);
             
             console.debug("Building control");
             ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver);
@@ -384,7 +431,7 @@ public class DebMaker {
                 packageControlFile.set("Homepage", homepage);
             }
             
-            controlBuilder.buildControl(packageControlFile, control.listFiles(), md5s, tempControl);
+            controlBuilder.buildControl(packageControlFile, control.listFiles(), tempConffiles , md5s, tempControl);
             
             if (!packageControlFile.isValid()) {
                 throw new PackagingException("Control file fields are invalid " + packageControlFile.invalidFields() +
