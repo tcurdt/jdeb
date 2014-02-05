@@ -18,7 +18,6 @@ or [Ant](http://github.com/tcurdt/jdeb/blob/master/docs/ant.md). Especially don'
 ## Where to get it
 
 The jars are available in the [Maven central repository](http://repo1.maven.org/maven2/org/vafer/jdeb/).
-The source releases you can get in the [download section](http://github.com/tcurdt/jdeb/downloads).
 
 If feel adventures or want to help out feel free to get the latest code
 [via git](http://github.com/tcurdt/jdeb/tree/master).
