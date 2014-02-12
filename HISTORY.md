@@ -1,5 +1,6 @@
 ## Version 1.1, released ?
 
+* [ADD] Added support of maven-encrypted passphrases
 * [ADD] xz compression support
 * [ADD] Added link support to the Ant task
 * [ADD] Added support for system properties in parsed files (Thanks to David Sauer)
