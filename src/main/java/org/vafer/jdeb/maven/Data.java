@@ -26,11 +26,7 @@ import java.util.StringTokenizer;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
-import org.vafer.jdeb.producers.DataProducerArchive;
-import org.vafer.jdeb.producers.DataProducerDirectory;
-import org.vafer.jdeb.producers.DataProducerFile;
-import org.vafer.jdeb.producers.DataProducerLink;
-import org.vafer.jdeb.producers.DataProducerPathTemplate;
+import org.vafer.jdeb.producers.*;
 
 import static org.vafer.jdeb.maven.MissingSourceBehavior.*;
 
@@ -148,62 +144,84 @@ public final class Data implements DataProducer {
     }
 
     public void produce( final DataConsumer pReceiver ) throws IOException {
-        org.vafer.jdeb.mapping.Mapper[] mappers = null;
-        if (mapper != null) {
-            mappers = new org.vafer.jdeb.mapping.Mapper[] { mapper.createMapper() };
+        final org.vafer.jdeb.mapping.Mapper[] mappers =
+                mapper == null
+                        ? null
+                        : new org.vafer.jdeb.mapping.Mapper[] { mapper.createMapper() };
+
+        ProducerFactory.KnownType knownType = ProducerFactory.KnownType.forString(type);
+
+        if (knownType == null) {
+            throw new IOException(buildUnknownTypeMessage(type, src));
         }
 
-        // link type
-
-        if ("link".equalsIgnoreCase(type)) {
-            if (linkName == null) {
-                throw new RuntimeException("linkName is not set");
-            }
-            if (linkTarget == null) {
-                throw new RuntimeException("linkTarget is not set");
-            }
-
-            new DataProducerLink(linkName, linkTarget, symlink, includePatterns, excludePatterns, mappers).produce(pReceiver);
-            return;
-        }
-
-        // template type
-
-        if ("template".equalsIgnoreCase(type)) {
-            if (paths == null || paths.length == 0) {
-                throw new RuntimeException("paths is not set");
-            }
-
-            new DataProducerPathTemplate(paths, includePatterns, excludePatterns, mappers).produce(pReceiver);
-            return;
-        }
-
-        // Types that require src to exist
-
-        if (src == null || !src.exists()) {
-            if (missingSrc == IGNORE) {
+        if (knownType.requiresSource() && (src == null || !src.exists())) {
+            if (IGNORE == missingSrc) {
                 return;
-            } else {
-                throw new FileNotFoundException("Data source not found : " + src);
             }
+            throw new FileNotFoundException("Data source not found : " + src);
         }
 
-        if ("file".equalsIgnoreCase(type)) {
-            new DataProducerFile(src, dst, includePatterns, excludePatterns, mappers).produce(pReceiver);
-            return;
-        }
+        final DataProducer p = ProducerFactory.create(knownType, new ProducerFactory.Params() {
+            @Override
+            public File getSource() {
+                return src;
+            }
+            @Override
+            public String getDestination() {
+                return dst;
+            }
+            @Override
+            public String getLink() {
+                return linkName;
+            }
+            @Override
+            public String getLinkTarget() {
+                return linkTarget;
+            }
 
-        if ("archive".equalsIgnoreCase(type)) {
-            new DataProducerArchive(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
-            return;
-        }
+            @Override
+            public boolean isSimlink() {
+                return symlink;
+            }
 
-        if ("directory".equalsIgnoreCase(type)) {
-            new DataProducerDirectory(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
-            return;
-        }
+            @Override
+            public String[] getTemplatePaths() {
+                return paths;
+            }
 
-        throw new IOException("Unknown type '" + type + "' (file|directory|archive|template|link) for " + src);
+            @Override
+            public String[] getIncludePatterns() {
+                return includePatterns;
+            }
+
+            @Override
+            public String[] getExcludePatterns() {
+                return excludePatterns;
+            }
+
+            @Override
+            public org.vafer.jdeb.mapping.Mapper[] getMappers() {
+                return mappers;
+            }
+        });
+
+        p.produce(pReceiver);
+    }
+
+    private static String buildUnknownTypeMessage( final String type,
+                                                   final File src ) {
+        final StringBuilder b = new StringBuilder("Unknown type '");
+        b.append(type).append("' (");
+        for (ProducerFactory.KnownType t : ProducerFactory.KnownType.values()) {
+            if (t.ordinal() != 0) {
+                b.append("|");
+            }
+            b.append(t.shortName());
+        }
+        b.append(") for ").append(src);
+        return b.toString();
+
     }
 
 }

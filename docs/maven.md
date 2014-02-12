@@ -103,19 +103,19 @@ tarball archive, or a file. You can add as many data
 elements to your dataSet as you'd like. The `data` element has the
 following options:
 
-Element          | Description                                                                  | Required
----------------- | ---------------------------------------------------------------------------- | ------------------------------------
-src              | The directory, tarball, file to include in the package                       | Yes
-dst              | New filename at destination (type must be `file`)                            | No
-linkName         | The path of the link (type must be `link`)                                   | Yes for link
-linkTarget       | The target of the link (type must be `link`)                                 | Yes for link
-type             | Type of the data source. (archive, directory, file, link or template)        | No; but will be Yes in the future
-missingSrc       | Fail if src file/folder is missing (ignore or fail)                          | No; defaults to `fail`
-includes         | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files
-excludes         | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions
-conffile         | A boolean value to define if the files should be included in the conffiles   | No; defaults to `false`
-mapper           | The files to exclude from the directory or tarball                           | No
-paths/(path..)   | One or more string literal paths that will created in the package            | No; Yes for type `template`
+Element          | Description                                                                     | Required
+---------------- | ------------------------------------------------------------------------------- | ------------------------------------
+src              | The directory, tarball, file, man-page to include in the package                | Yes
+dst              | New filename at destination (type must be `file` or `man-page`)                 | No
+linkName         | The path of the link (type must be `link`)                                      | Yes for link
+linkTarget       | The target of the link (type must be `link`)                                    | Yes for link
+type             | Type of the data source. (archive, directory, file, link, man-page or template) | No; but will be Yes in the future
+missingSrc       | Fail if src file/folder is missing (ignore or fail)                             | No; defaults to `fail`
+includes         | A comma seperated list of files to include from the directory or tarball        | No; defaults to all files
+excludes         | A comma seperated list of files to exclude from the directory or tarball        | No; defaults to no exclutions
+conffile         | A boolean value to define if the files should be included in the conffiles      | No; defaults to `false`
+mapper           | The files to exclude from the directory or tarball                              | No
+paths/(path..)   | One or more string literal paths that will created in the package               | No; Yes for type `template`
 
 There are different kinds of mappers that can be selected via the `type` argument. The most common one is the 'perm' mapper.
 
@@ -218,6 +218,12 @@ include a directory, a tarball, and a file in your deb package and then sign it 
                   <symlink>true</symlink>
                 </data>
 
+                <!-- Man page example -->
+                <data>
+                  <type>man-page</type>
+                  <src>/a/path/to/manpage.1</src>
+                </data>
+
                 <!-- Conffiles example -->
                 <data>
                   <src>${project.build.directory}/data</src>
@@ -241,6 +247,7 @@ include a directory, a tarball, and a file in your deb package and then sign it 
 ```
 If you don't want to store your key information in the POM you can store this is your settings.xml, here's an example settings.xml:
 
+```xml
     <settings>
         <profiles>
             <profile>
@@ -256,5 +263,6 @@ If you don't want to store your key information in the POM you can store this is
             <activeProfile>jdeb-signing</activeProfile>
         </activeProfiles>
     </settings>
+```
 
 keyring, key and passphrase can then be omitted from the POM entirely.

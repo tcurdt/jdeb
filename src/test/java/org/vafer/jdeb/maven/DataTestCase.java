@@ -20,12 +20,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import junit.framework.TestCase;
+import org.vafer.jdeb.producers.ProducerFactory;
 
 /*
  * Admittedly not the nicest way to assert that failOnMissingSrc functions. However, the best that can be done without
  * refactoring, mocking, or extending the scope of the test beyond this unit.
  */
 public class DataTestCase extends TestCase {
+
+    private static final ProducerFactory.KnownType fileType = ProducerFactory.KnownType.FILE;
 
     private Data data;
     private File missingFile;
@@ -56,6 +59,7 @@ public class DataTestCase extends TestCase {
     public void testFailOnMissingSrcDefaultFileMissing() throws IOException {
         try {
             data.setSrc(missingFile);
+            data.setType(fileType.shortName());
             data.produce(null);
             fail();
         } catch (FileNotFoundException expected) {
@@ -65,11 +69,13 @@ public class DataTestCase extends TestCase {
     public void testFailOnMissingSrcIgnoreFileMissing() throws IOException {
         data.setSrc(missingFile);
         data.setMissingSrc("ignore");
+        data.setType(fileType.shortName());
         data.produce(null);
     }
 
     public void testFailOnMissingSrcIgnoreFileMissingVaryInput() throws IOException {
         data.setSrc(missingFile);
+        data.setType(fileType.shortName());
         data.setMissingSrc(" IGNORE ");
         data.produce(null);
     }
@@ -77,6 +83,7 @@ public class DataTestCase extends TestCase {
     public void testFailOnMissingSrcFailFileMissing() throws IOException {
         try {
             data.setSrc(missingFile);
+            data.setType(fileType.shortName());
             data.setMissingSrc("fail");
             data.produce(null);
             fail();

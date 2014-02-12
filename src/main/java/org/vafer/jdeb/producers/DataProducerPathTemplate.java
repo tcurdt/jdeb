@@ -33,12 +33,7 @@ public class DataProducerPathTemplate extends AbstractDataProducer implements Da
 
     public void produce( DataConsumer pReceiver ) throws IOException {
         for (String literalPath : literalPaths) {
-            TarArchiveEntry entry = new TarArchiveEntry(literalPath, true);
-            entry.setUserId(0);
-            entry.setUserName("root");
-            entry.setGroupId(0);
-            entry.setGroupName("root");
-            entry.setMode(TarArchiveEntry.DEFAULT_DIR_MODE);
+            TarArchiveEntry entry = Producers.defaultDirEntryWithName(literalPath);
 
             entry = map(entry);
 

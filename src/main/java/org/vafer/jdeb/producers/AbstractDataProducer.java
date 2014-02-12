@@ -27,6 +27,9 @@ import org.vafer.jdeb.mapping.Mapper;
  */
 public abstract class AbstractDataProducer implements DataProducer {
 
+    protected final static int ROOT_UID = 0;
+    protected final static String ROOT_NAME = "root";
+
     private final String[] includes;
     private final String[] excludes;
     private final Mapper[] mappers;
