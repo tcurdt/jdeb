@@ -65,7 +65,7 @@ public final class BinaryPackageControlFile extends ControlFile {
     }
 
     @Override
-   public void set(final String field, final String value) {
+    public void set(final String field, final String value) {
         super.set(field, value);
     }
 
