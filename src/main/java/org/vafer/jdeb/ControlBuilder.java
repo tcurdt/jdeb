@@ -97,7 +97,7 @@ class ControlBuilder {
             }
 
             if ("conffiles".equals(file.getName())) {
-            	foundConffiles = true;
+                foundConffiles = true;
             }
             
             if (CONFIGURATION_FILENAMES.contains(file.getName()) || MAINTAINER_SCRIPTS.contains(file.getName())) {
@@ -124,13 +124,13 @@ class ControlBuilder {
         }
         
         if ((conffiles != null) && (conffiles.size() > 0)) {
-        	if (foundConffiles) {
-        		console.info("Found file 'conffiles' in the control directory. Skipping conffiles generation.");
-        	} else {
-	            addControlEntry("conffiles", createPackageConffilesFile(conffiles), outputStream);
-	        }
+            if (foundConffiles) {
+                console.info("Found file 'conffiles' in the control directory. Skipping conffiles generation.");
+            } else {
+                addControlEntry("conffiles", createPackageConffilesFile(conffiles), outputStream);
+            }
         } else if ((conffiles != null) && (conffiles.size() == 0)) {
-        	console.info("Skipping 'conffiles' generation. No entries provided.");
+            console.info("Skipping 'conffiles' generation. No entries provided.");
         }
 
         if (packageControlFile == null) {
@@ -145,8 +145,8 @@ class ControlBuilder {
     
     private String createPackageConffilesFile(final List<String> conffiles) {
         StringBuilder content = new StringBuilder();
-    	
-    	if (conffiles != null && !conffiles.isEmpty()) {
+        
+        if (conffiles != null && !conffiles.isEmpty()) {
             for (String nextFileName : conffiles) {
                 content.append(nextFileName).append("\n");
             }
