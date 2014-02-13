@@ -54,7 +54,6 @@ public final class ChangesFile extends ControlFile {
 
     public ChangesFile() {
         set("Format", "1.8");
-        set("Distribution", "stable");
     }
 
     /**
@@ -70,6 +69,7 @@ public final class ChangesFile extends ControlFile {
         set("Version",      packageControlFile.get("Version"));
         set("Maintainer",   packageControlFile.get("Maintainer"));
         set("Changed-By",   packageControlFile.get("Maintainer"));
+        set("Distribution", packageControlFile.get("Distribution") == null ? "stable": packageControlFile.get("Distribution"));
 
         for (Entry<String, String> entry : packageControlFile.getUserDefinedFields().entrySet()) {
             set(entry.getKey(), entry.getValue());
@@ -100,12 +100,10 @@ public final class ChangesFile extends ControlFile {
         set("Changes", sb.toString());
     }
 
-    @Override
     protected ControlField[] getFields() {
         return FIELDS;
     }
 
-    @Override
     protected char getUserDefinedFieldLetter() {
         return 'C';
     }

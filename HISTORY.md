@@ -1,5 +1,6 @@
 ## Version 1.1, released ?
 
+* [ADD] Added support "Distribution" field
 * [ADD] Added support of maven-encrypted passphrases
 * [ADD] xz compression support
 * [ADD] Added link support to the Ant task
