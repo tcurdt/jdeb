@@ -48,12 +48,15 @@ public final class BinaryPackageControlFile extends ControlFile {
             new ControlField("Installed-Size"),
             new ControlField("Maintainer", true),
             new ControlField("Description", true, ControlField.Type.MULTILINE),
-            new ControlField("Homepage")
+            new ControlField("Homepage"),
+            new ControlField("Distribution", true),
     };
 
     public BinaryPackageControlFile() {
         set("Architecture", "all");
         set("Priority", "optional");
+        set("Urgency", "low");
+        set("Distribution", "stable");
     }
 
     public BinaryPackageControlFile(String input) throws IOException, ParseException {
@@ -87,7 +90,6 @@ public final class BinaryPackageControlFile extends ControlFile {
 
         return get("Description").split("\n")[0];
     }
-
 
     @Override
     protected char getUserDefinedFieldLetter() {
