@@ -48,15 +48,12 @@ public final class BinaryPackageControlFile extends ControlFile {
             new ControlField("Installed-Size"),
             new ControlField("Maintainer", true),
             new ControlField("Description", true, ControlField.Type.MULTILINE),
-            new ControlField("Homepage"),
-            new ControlField("Distribution", true),
+            new ControlField("Homepage")
     };
 
     public BinaryPackageControlFile() {
         set("Architecture", "all");
         set("Priority", "optional");
-        set("Urgency", "low");
-        set("Distribution", "stable");
     }
 
     public BinaryPackageControlFile(String input) throws IOException, ParseException {
