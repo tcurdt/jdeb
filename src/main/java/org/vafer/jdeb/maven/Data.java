@@ -29,6 +29,7 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
 import org.vafer.jdeb.producers.DataProducerFile;
+import org.vafer.jdeb.producers.DataProducerFiles;
 import org.vafer.jdeb.producers.DataProducerLink;
 import org.vafer.jdeb.producers.DataProducerPathTemplate;
 
@@ -155,7 +156,7 @@ public final class Data implements DataProducer {
 
         // link type
 
-        if ("link".equalsIgnoreCase(type)) {
+        if (typeIs("link")) {
             if (linkName == null) {
                 throw new RuntimeException("linkName is not set");
             }
@@ -169,12 +170,15 @@ public final class Data implements DataProducer {
 
         // template type
 
-        if ("template".equalsIgnoreCase(type)) {
-            if (paths == null || paths.length == 0) {
-                throw new RuntimeException("paths is not set");
-            }
-
+        if (typeIs("template")) {
+            checkPaths();
             new DataProducerPathTemplate(paths, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            return;
+        }
+
+        if (typeIs("files")) {
+            checkPaths();
+            new DataProducerFiles(paths, dst, mappers).produce(pReceiver);
             return;
         }
 
@@ -188,17 +192,17 @@ public final class Data implements DataProducer {
             }
         }
 
-        if ("file".equalsIgnoreCase(type)) {
+        if (typeIs("file")) {
             new DataProducerFile(src, dst, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 
-        if ("archive".equalsIgnoreCase(type)) {
+        if (typeIs("archive")) {
             new DataProducerArchive(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 
-        if ("directory".equalsIgnoreCase(type)) {
+        if (typeIs("directory")) {
             new DataProducerDirectory(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
@@ -206,4 +210,13 @@ public final class Data implements DataProducer {
         throw new IOException("Unknown type '" + type + "' (file|directory|archive|template|link) for " + src);
     }
 
+    private boolean typeIs( final String type ) {
+        return type.equalsIgnoreCase(this.type);
+    }
+
+    private void checkPaths() {
+        if (paths == null || paths.length == 0) {
+            throw new RuntimeException("paths parameter is not set");
+        }
+    }
 }

@@ -109,7 +109,7 @@ src              | The directory, tarball, file to include in the package       
 dst              | New filename at destination (type must be `file`)                            | No
 linkName         | The path of the link (type must be `link`)                                   | Yes for link
 linkTarget       | The target of the link (type must be `link`)                                 | Yes for link
-type             | Type of the data source. (archive, directory, file, link or template)        | No; but will be Yes in the future
+type             | Type of the data source. (archive, directory, file, files, link or template) | No; but will be Yes in the future
 missingSrc       | Fail if src file/folder is missing (ignore or fail)                          | No; defaults to `fail`
 includes         | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files
 excludes         | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions
@@ -127,7 +127,7 @@ uid           | Numerical uid                                         | No; defa
 gid           | Numerical gid                                         | No; defaults to 0
 user          | User name                                             | No; defaults to "root"
 group         | User group                                            | No; defaults to "root"
-filemode      | File permissions as octet                             | No; deftauls to 644
+filemode      | File permissions as octet                             | No; defaults to 644
 dirmode       | Dir permissions as octet                              | No; defaults to 755
 strip         | Strip n path components from the original file        | No; defaults to 0
 
@@ -191,6 +191,16 @@ include a directory, a tarball, and a file in your deb package and then sign it 
                   <missingSrc>ignore</missingSrc>
                 </data>
 
+                <!-- Multiple files example -->
+                <data>
+                  <type>files</type>
+                  <paths>
+                    <path>README.txt</path>
+                    <path>CHANGES.txt</path>
+                  </paths>
+                  <dst>/var/lib/${artifactId}</dst>
+                </data>
+
                 <!-- Template example -->
                 <data>
                   <type>template</type>
@@ -241,20 +251,21 @@ include a directory, a tarball, and a file in your deb package and then sign it 
 ```
 If you don't want to store your key information in the POM you can store this is your settings.xml, here's an example settings.xml:
 
-    <settings>
-        <profiles>
-            <profile>
-                <id>jdeb-signing</id>
-                <properties>
-                    <jdeb.keyring>/home/user/.gnupg/secring.gpg</jdeb.keyring>
-                    <jdeb.key>8306FE21</jdeb.key>
-                    <jdeb.passphrase>abcdef</jdeb.passphrase>
-                </properties>
-            </profile>
-        </profiles>
-        <activeProfiles>
-            <activeProfile>jdeb-signing</activeProfile>
-        </activeProfiles>
-    </settings>
-
+```xml
+  <settings>
+    <profiles>
+      <profile>
+        <id>jdeb-signing</id>
+        <properties>
+          <jdeb.keyring>/home/user/.gnupg/secring.gpg</jdeb.keyring>
+          <jdeb.key>8306FE21</jdeb.key>
+          <jdeb.passphrase>abcdef</jdeb.passphrase>
+        </properties>
+      </profile>
+    </profiles>
+    <activeProfiles>
+      <activeProfile>jdeb-signing</activeProfile>
+    </activeProfiles>
+  </settings>
+```
 keyring, key and passphrase can then be omitted from the POM entirely.

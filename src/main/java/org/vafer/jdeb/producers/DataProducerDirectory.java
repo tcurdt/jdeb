@@ -72,18 +72,7 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
                 dirname += "/";
             }
 
-            TarArchiveEntry entry = new TarArchiveEntry(dirname, true);
-            entry.setUserId(0);
-            entry.setUserName("root");
-            entry.setGroupId(0);
-            entry.setGroupName("root");
-            entry.setMode(TarArchiveEntry.DEFAULT_DIR_MODE);
-
-            entry = map(entry);
-
-            entry.setSize(0);
-
-            pReceiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+            produceDir(pReceiver, dirname);
         }
 
 
@@ -99,23 +88,7 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
                 continue;
             }
 
-            TarArchiveEntry entry = new TarArchiveEntry(filename, true);
-            entry.setUserId(0);
-            entry.setUserName("root");
-            entry.setGroupId(0);
-            entry.setGroupName("root");
-            entry.setMode(TarArchiveEntry.DEFAULT_FILE_MODE);
-
-            entry = map(entry);
-
-            entry.setSize(file.length());
-
-            final InputStream inputStream = new FileInputStream(file);
-            try {
-                pReceiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
-            } finally {
-                inputStream.close();
-            }
+            produceFile(pReceiver, file, filename);
         }
     }
 

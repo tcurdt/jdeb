@@ -51,23 +51,13 @@ public final class DataProducerFile extends AbstractDataProducer implements Data
             fileName = file.getName();
         }
 
-        TarArchiveEntry entry = new TarArchiveEntry(fileName, true);
-        entry.setUserId(0);
-        entry.setUserName("root");
-        entry.setGroupId(0);
-        entry.setGroupName("root");
-        entry.setMode(TarArchiveEntry.DEFAULT_FILE_MODE);
+        TarArchiveEntry entry = Producers.defaultFileEntryWithName(fileName);
 
         entry = map(entry);
 
         entry.setSize(file.length());
 
-        final InputStream inputStream = new FileInputStream(file);
-        try {
-            pReceiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
-        } finally {
-            inputStream.close();
-        }
+        Producers.produceInputStreamWithEntry(pReceiver, new FileInputStream(file), entry);
     }
 
 }

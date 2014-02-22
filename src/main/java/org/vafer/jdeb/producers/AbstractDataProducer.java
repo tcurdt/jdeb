@@ -17,8 +17,13 @@ package org.vafer.jdeb.producers;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.tools.ant.types.selectors.SelectorUtils;
+import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * Base Producer class providing including/excluding.
@@ -65,6 +70,23 @@ public abstract class AbstractDataProducer implements DataProducer {
             }
         }
         return false;
+    }
+
+    public void produceDir( final DataConsumer consumer,
+                            final String dirname ) throws IOException {
+        TarArchiveEntry entry = Producers.defaultDirEntryWithName(dirname);
+        entry = map(entry);
+        entry.setSize(0);
+        Producers.produceDirEntry(consumer, entry);
+    }
+
+    public void produceFile( final DataConsumer consumer,
+                             final File file,
+                             final String entryName ) throws IOException {
+        TarArchiveEntry entry = Producers.defaultFileEntryWithName(entryName);
+        entry.setSize(file.length());
+        entry = map(entry);
+        Producers.produceInputStreamWithEntry(consumer, new FileInputStream(file), entry);
     }
 
     public TarArchiveEntry map( final TarArchiveEntry pEntry ) {

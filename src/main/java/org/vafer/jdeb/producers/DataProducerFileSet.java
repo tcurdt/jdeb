@@ -42,10 +42,10 @@ public final class DataProducerFileSet implements DataProducer {
     }
 
     public void produce( final DataConsumer pReceiver ) throws IOException {
-        String user = "root";
-        int uid = 0;
-        String group = "root";
-        int gid = 0;
+        String user = Producers.ROOT_NAME;
+        int uid = Producers.ROOT_UID;
+        String group = Producers.ROOT_NAME;
+        int gid = Producers.ROOT_UID;
         int filemode = TarEntry.DEFAULT_FILE_MODE;
         int dirmode = TarEntry.DEFAULT_DIR_MODE;
         String prefix = "";
