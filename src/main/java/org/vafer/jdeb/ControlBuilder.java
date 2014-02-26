@@ -56,10 +56,14 @@ class ControlBuilder {
 
     private Console console;
     private VariableResolver resolver;
+    private final String openReplaceToken;
+    private final String closeReplaceToken;
 
-    ControlBuilder(Console console, VariableResolver resolver) {
+    ControlBuilder(Console console, VariableResolver resolver, String openReplaceToken, String closeReplaceToken) {
         this.console = console;
         this.resolver = resolver;
+        this.openReplaceToken = openReplaceToken;
+        this.closeReplaceToken = closeReplaceToken;
     }
 
     /**
@@ -102,6 +106,8 @@ class ControlBuilder {
             
             if (CONFIGURATION_FILENAMES.contains(file.getName()) || MAINTAINER_SCRIPTS.contains(file.getName())) {
                 FilteredFile configurationFile = new FilteredFile(new FileInputStream(file), resolver);
+                configurationFile.setOpenToken(openReplaceToken);
+                configurationFile.setCloseToken(closeReplaceToken);
                 addControlEntry(file.getName(), configurationFile.toString(), outputStream);
 
             } else if (!"control".equals(file.getName())) {

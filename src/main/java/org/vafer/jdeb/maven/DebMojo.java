@@ -289,14 +289,10 @@ public class DebMojo extends AbstractPluginMojo {
 
     public void setOpenReplaceToken( String openReplaceToken ) {
         this.openReplaceToken = openReplaceToken;
-        // FIXME yuck!
-        FilteredFile.setOpenToken(openReplaceToken);
     }
 
     public void setCloseReplaceToken( String closeReplaceToken ) {
         this.closeReplaceToken = closeReplaceToken;
-        // FIXME yuck!
-        FilteredFile.setCloseToken(closeReplaceToken);
     }
 
     protected void setData( Data[] dataSet ) {
@@ -478,6 +474,8 @@ public class DebMojo extends AbstractPluginMojo {
             debMaker.setPassphrase(passphrase);
             debMaker.setSignPackage(signPackage);
             debMaker.setResolver(resolver);
+            debMaker.setOpenReplaceToken(openReplaceToken);
+            debMaker.setCloseReplaceToken(closeReplaceToken);
             debMaker.validate();
             debMaker.makeDeb();
 

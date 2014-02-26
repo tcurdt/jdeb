@@ -25,19 +25,19 @@ import java.util.List;
 
 public class FilteredFile {
 
-    private static String openToken = "[[";
-    private static String closeToken = "]]";
+    private String openToken = "[[";
+    private String closeToken = "]]";
     private List<String> lines = new ArrayList<String>();
 
     public FilteredFile(InputStream in, VariableResolver resolver) throws IOException {
         parse(in, resolver);
     }
 
-    public static void setOpenToken(String token) {
+    public void setOpenToken(String token) {
         openToken = token;
     }
 
-    public static void setCloseToken(String token) {
+    public void setCloseToken(String token) {
         closeToken = token;
     }
 

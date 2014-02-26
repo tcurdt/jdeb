@@ -40,7 +40,7 @@ class ChangesFileBuilder {
         changesFile.setChanges(changesProvider.getChangesSets());
         changesFile.initialize(packageControlFile);
 
-        changesFile.set("Date", ChangesFile.DATE_FORMAT.format(new Date()));
+        changesFile.set("Date", ChangesFile.formatDate(new Date()));
         
         try {
             // compute the checksums of the binary package
