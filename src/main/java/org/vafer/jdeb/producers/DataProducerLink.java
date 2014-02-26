@@ -45,10 +45,10 @@ public final class DataProducerLink extends AbstractDataProducer implements Data
         TarArchiveEntry entry = new TarArchiveEntry(path, symlink ? TarArchiveEntry.LF_SYMLINK : TarArchiveEntry.LF_LINK);
         entry.setLinkName(linkName);
 
-        entry.setUserId(0);
-        entry.setUserName("root");
-        entry.setGroupId(0);
-        entry.setGroupName("root");
+        entry.setUserId(Producers.ROOT_UID);
+        entry.setUserName(Producers.ROOT_NAME);
+        entry.setGroupId(Producers.ROOT_UID);
+        entry.setGroupName(Producers.ROOT_NAME);
         entry.setMode(TarArchiveEntry.DEFAULT_FILE_MODE);
 
         entry = map(entry);

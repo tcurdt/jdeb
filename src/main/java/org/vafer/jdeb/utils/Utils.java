@@ -207,6 +207,18 @@ public final class Utils {
     }
 
     /**
+     * Construct new path by replacing file directory part. No
+     * files are actually modified.
+     * @param file path to move
+     * @param target new path directory
+     */
+    public static String movePath( final String file,
+                                   final String target ) {
+        final String name = new File(file).getName();
+        return target.endsWith("/") ? target + name : target + '/' + name;
+    }
+
+    /**
      * Extracts value from map if given value is null.
      * @param value current value
      * @param props properties to extract value from
@@ -327,5 +339,12 @@ public final class Utils {
             first = false;
         }
         return builder.toString();
+    }
+
+    /**
+     * Returns true if string is null or empty.
+     */
+    public static boolean isNullOrEmpty(final String str) {
+        return str == null || str.length() == 0;
     }
 }

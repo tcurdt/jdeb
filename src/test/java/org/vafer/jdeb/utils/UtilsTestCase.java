@@ -99,4 +99,12 @@ public class UtilsTestCase extends TestCase {
         assertEquals("should match", "1.0~Beta+4", Utils.convertToDebianVersion("1.0.Beta-4", cal.getTime()));
         assertEquals("should match", "1.0~rc7", Utils.convertToDebianVersion("1.0rc7", cal.getTime()));
     }
+
+    public void testMovePath() {
+        assertEquals("/usr/share/file.txt", Utils.movePath("file.txt", "/usr/share"));
+        assertEquals("/usr/share/file.txt", Utils.movePath("file.txt", "/usr/share/"));
+        assertEquals("/usr/share/noext", Utils.movePath("noext", "/usr/share/"));
+        assertEquals("/usr/share/file.txt", Utils.movePath("/home/user/file.txt", "/usr/share"));
+        assertEquals("/usr/share/file.txt", Utils.movePath("../relative/file.txt", "/usr/share/"));
+    }
 }
