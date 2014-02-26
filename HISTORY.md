@@ -1,4 +1,4 @@
-## Version 1.1, released ?
+## Version 1.1, released 27.02.2014
 
 * [ADD] Added support "Distribution" field
 * [ADD] Added support of maven-encrypted passphrases
