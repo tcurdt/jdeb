@@ -10,3 +10,4 @@ dependency-reduced-pom.xml
 *.ipr
 /.idea
 .release
+*~

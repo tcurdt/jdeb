@@ -302,8 +302,8 @@ public class DebMaker {
                                 new ChangeSet(packageControlFile.get("Package"),
                                         packageControlFile.get("Version"),
                                         new Date(),
-                                        packageControlFile.get("Distribution") == null ? "stable" : packageControlFile.get("Distribution"),
-                                        packageControlFile.get("Urgency") == null ? "low" : packageControlFile.get("Urgency"),
+                                        packageControlFile.get("Distribution"),
+                                        packageControlFile.get("Urgency"),
                                         packageControlFile.get("Maintainer"),
                                         new String[0])
                         };

@@ -88,7 +88,6 @@ public final class BinaryPackageControlFile extends ControlFile {
         return get("Description").split("\n")[0];
     }
 
-
     @Override
     protected char getUserDefinedFieldLetter() {
         return 'B';
