@@ -108,49 +108,63 @@ public final class Utils {
         
         final StringBuilder out = new StringBuilder();
         StringBuilder sb = new StringBuilder();
-        char[] watch = open;
-        int w = 0;
+        char[] last = null;
+        int wo = 0;
+        int wc = 0;
+        int level = 0;
         for (char c : pExpression.toCharArray()) {
-            if (c == watch[w]) {
-                w++;
-                if (watch.length == w) {
-                    // found the full token to watch for
-
-                    if (watch == open) {
-                        // found open
-                        out.append(sb);
-                        sb = new StringBuilder();
-                        // search for close
-                        watch = close;
-                    } else {
-                        // found close
+            if (c == open[wo]) {
+                wo++;
+                if (open.length == wo) {
+                    // found open
+                    if (last == open) {
+                        out.append(open);
+                    }
+                    level++;
+                    out.append(sb);
+                    sb = new StringBuilder();
+                    wo = 0;
+                    last = open;
+                }
+            } else if (c == close[wc]) {
+                wc++;
+                if (close.length == wc) {
+                    // found close
+                    if (last == open) {
                         final String variable = pResolver.get(sb.toString());
                         if (variable != null) {
                             out.append(variable);
                         } else {
-                            out.append(pOpen);
+                            out.append(open);
                             out.append(sb);
-                            out.append(pClose);
+                            out.append(close);
                         }
-                        sb = new StringBuilder();
-                        // search for open
-                        watch = open;
+                    } else {
+                        out.append(sb);
+                        out.append(close);
                     }
-                    w = 0;
+                    sb = new StringBuilder();
+                    level--;
+                    wc = 0;
+                    last = close;
                 }
             } else {
 
-                if (w > 0) {
-                    sb.append(watch, 0, w);
+                if (wo > 0) {
+                    sb.append(open, 0, wo);
+                }
+
+                if (wc > 0) {
+                    sb.append(close, 0, wc);
                 }
 
                 sb.append(c);
 
-                w = 0;
+                wo = wc = 0;
             }
         }
 
-        if (watch == close) {
+        if (level > 0) {
             out.append(open);
         }
         out.append(sb);

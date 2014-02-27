@@ -86,6 +86,15 @@ public class UtilsTestCase extends TestCase {
         // mixed valid and unknown variables
         result = Utils.replaceVariables(resolver, "[[name]] [[test]]", "[[", "]]");
         assertEquals("jdeb [[test]]", result);
+
+        // nested vars
+        result = Utils.replaceVariables(new VariableResolver() {
+            public String get(String pKey) {
+                return "VAR";
+            }
+        }, "[[var]] [[ [[var]] [[ [[var]] ]] [[var]] ]]", "[[", "]]");
+
+        assertEquals("VAR [[ VAR [[ VAR ]] VAR ]]", result);
     }
 
     public void testReplaceVariablesWithinOpenCloseTokens() throws Exception {
