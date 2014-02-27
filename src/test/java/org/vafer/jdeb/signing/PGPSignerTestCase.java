@@ -42,7 +42,7 @@ public final class PGPSignerTestCase extends TestCase {
                 "\n" +
                 "TEST3\n" +
                 "-----BEGIN PGP SIGNATURE-----\n" +
-                "Version: BCPG v1.49\n" +
+                "Version: BCPG v1.50\n" +
                 "\n" +
                 "iEYEARECABAFAkax1rgJEHM9pIAuB02PAABIJgCghFmoCJCZ0CGiqgVLGGPd/Yh5\n" +
                 "FQQAnRVqvI2ij45JQSHYJBblZ0Vv2meN\n" +
@@ -52,10 +52,10 @@ public final class PGPSignerTestCase extends TestCase {
         final byte[] expectedOutput = expectedOutputStr.getBytes("UTF-8");
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
-        
+
         PGPSigner signer = new PGPSigner(ring, "2E074D8F", "test");
         signer.clearSign(input, os);
-        
+
         final byte[] output = fixCRLF(os.toByteArray());
 
         final int from = expectedOutputStr.indexOf("iEYEAREC");
