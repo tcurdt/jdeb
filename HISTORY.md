@@ -1,5 +1,9 @@
 ## Version 1.1, released 28.02.2014
 
+* [CHG] Renamed configuration option 'disabled' to 'skip'
+* [ADD] Added support for conffiles (Thanks to Lukas Roedl)
+* [ADD] Added "files" data producer (Thanks to Roman Kashitsyn)
+* [FIX] Better token parsing
 * [ADD] Added support "Distribution" field
 * [ADD] Added support of maven-encrypted passphrases
 * [ADD] xz compression support
