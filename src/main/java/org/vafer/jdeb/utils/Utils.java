@@ -197,13 +197,18 @@ public final class Utils {
      * @param version the project version to convert to a Debian package version
      * @param timestamp the date used as the timestamp to replace the SNAPSHOT suffix
      */
-    public static String convertToDebianVersion( String version, Date timestamp ) {
+    public static String convertToDebianVersion( String version, boolean apply, String envName, Date timestamp ) {
         Pattern pattern1 = Pattern.compile("(.*)[\\-\\+]SNAPSHOT");
         Matcher matcher = pattern1.matcher(version);
         if (matcher.matches()) {
             version = matcher.group(1) + "~";
-            if (timestamp != null) {
-                version += new SimpleDateFormat("yyyyMMddHHmmss").format(timestamp);
+
+            if (apply) {
+                final String envValue = System.getenv(envName);
+                final String snapshot = (envValue != null && envValue.length() > 0)
+                        ? envValue
+                        : new SimpleDateFormat("yyyyMMddHHmmss").format(timestamp);
+                version += snapshot;
             } else {
                 version += "SNAPSHOT";
             }

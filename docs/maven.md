@@ -37,9 +37,7 @@ the plugin to your POM like this
 
 At least the one main control file is required to control the creation of the
 debian package. This required control file should be found in the control
-directory. By default the control file name is also `control` which gives a
-path of `src/deb/control/control` by default. This control file contains the
-metadata about the Debian package. Usually it will look something along the lines of
+directory (inside the data dir). By default the control file name is also `control` which gives a path of `src/deb/control/control` by default. This control file contains the metadata about the Debian package. Usually it will look something along the lines of
 
     Package: [[name]]
     Version: [[version]]
@@ -51,6 +49,7 @@ metadata about the Debian package. Usually it will look something along the line
     Description: jetty java servlet container
     Distribution: development
 
+but check out the [exmample](https://github.com/tcurdt/jdeb/tree/master/src/examples/maven) to get a better overview.
 
 If the environment variables `DEBEMAIL` and `DEBFULLNAME` are both set this
 will overrule the `Maintainer` field set in there. The `Installed-Size` will
@@ -93,7 +92,8 @@ key           | The name of the key to be used in the keyring                   
 passphrase    | The passphrase to use the key                                                | No
 attach        | Attach artifact to project                                                   | No; defaults to `true`
 submodules    | Execute the goal on all sub-modules                                          | No; defaults to `true`
-timestamped   | Turn SNAPSHOT into timestamps                                                | No; defaults to `false`
+SNAPSHOTexpand| Expand SNAPSHOT into the content of an environment variable or timestamp.    | No; defaults to `false`
+SNAPSHOTenv   | Name of the environment variable. If it's empty defaults to a timestamp.     | No; defaults to `SNAPSHOT`
 verbose       | Verbose logging                                                              | No; defaults to `true`, will be `false` in the future
 skip          | Indicates if an execution should be skipped                                  | No; defaults to `false`
 

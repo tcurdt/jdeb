@@ -1,4 +1,4 @@
-## Version 1.1, released 27.02.2014
+## Version 1.1, released 28.02.2014
 
 * [ADD] Added support "Distribution" field
 * [ADD] Added support of maven-encrypted passphrases
@@ -57,7 +57,7 @@ Some smaller fixes, Support for the 1.8 format, Changes support working.
 
 * [FIX] Default path for changes file with Maven
 * [FIX] Unresolved variables are now treated as null
-* [CHG] "Changes" support version 1.8 
+* [CHG] "Changes" support version 1.8
 * [CHG] Warn if control files have non-unix line endings
 * [CHG] Throw an exception for unknown mappers
 * [REM] InvalidDescriptorException, wasn't really used anyway
@@ -88,9 +88,9 @@ Many improvements on the Ant task.
 Quite a few fixes related to locale settings.
 Support for bzip2 and more descriptor keys.
 
-* [FIX] English locale for date format.	
-* [FIX] Proper installation size to be kbytes instead of bytes.	
-* [FIX] Close streams properly.	
+* [FIX] English locale for date format.
+* [FIX] Proper installation size to be kbytes instead of bytes.
+* [FIX] Close streams properly.
 * [CHG] The Ant task now breaks on errors.
 * [ADD] Support for bzip2 compression in data element of the Ant task.
 * [ADD] Compression attribute to specify data file compression (bzip2, gzip, none).

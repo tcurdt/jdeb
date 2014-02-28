@@ -19,6 +19,7 @@ package org.vafer.jdeb.maven;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -216,11 +217,24 @@ public class DebMojo extends AbstractPluginMojo {
     private Data[] dataSet;
 
     /**
-     * When SNAPSHOT version replace <code>SNAPSHOT</code> with current date
-     * and time to make sure each build is unique.
+     * @deprecated
      */
     @Parameter(defaultValue = "false")
     private boolean timestamped;
+
+    /**
+     * When enabled SNAPSHOT inside the version gets replaced with current timestamp or
+     * if set a value of a environment variable.
+     */
+    @Parameter(defaultValue = "false")
+    private boolean SNAPSHOTexpand;
+
+    /**
+     * Which environment variable to check for the SNAPSHOT value.
+     * If the variable is not set/empty it will default to use the timestamp.
+     */
+    @Parameter(defaultValue = "SNAPSHOT")
+    private String SNAPSHOTenv;
 
     /**
      * If verbose is true more build messages are logged.
@@ -342,7 +356,11 @@ public class DebMojo extends AbstractPluginMojo {
      * @return the Maven project version
      */
     private String getProjectVersion() {
-        return Utils.convertToDebianVersion(getProject().getVersion(), this.timestamped ? session.getStartTime() : null);
+        if (this.timestamped) {
+            getLog().error("Configuration 'timestamped' is deprecated. Please use SNAPSHOTexpand and SNAPSHOTenv instead.");
+        }
+
+        return Utils.convertToDebianVersion(getProject().getVersion(), this.SNAPSHOTexpand || this.timestamped, this.SNAPSHOTenv, session.getStartTime());
     }
 
     /**
@@ -375,7 +393,6 @@ public class DebMojo extends AbstractPluginMojo {
      *
      * @throws MojoExecutionException on error
      */
-    @Override
     public void execute() throws MojoExecutionException {
 
         final MavenProject project = getProject();

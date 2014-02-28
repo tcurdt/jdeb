@@ -111,14 +111,14 @@ public class UtilsTestCase extends TestCase {
 
     public void testVersionConversion() {
         Calendar cal = new GregorianCalendar(2013, Calendar.FEBRUARY, 17);
-        assertEquals("should match", "1.0", Utils.convertToDebianVersion("1.0", null));
-        assertEquals("should match", "1.0~SNAPSHOT", Utils.convertToDebianVersion("1.0+SNAPSHOT", null));
-        assertEquals("should match", "1.0~SNAPSHOT", Utils.convertToDebianVersion("1.0-SNAPSHOT", null));
-        assertEquals("should match", "1.0~20130217000000", Utils.convertToDebianVersion("1.0+SNAPSHOT", cal.getTime()));
-        assertEquals("should match", "1.0~RC2", Utils.convertToDebianVersion("1.0-RC2", cal.getTime()));
-        assertEquals("should match", "1.0~alpha3", Utils.convertToDebianVersion("1.0-alpha3", cal.getTime()));
-        assertEquals("should match", "1.0~Beta+4", Utils.convertToDebianVersion("1.0.Beta-4", cal.getTime()));
-        assertEquals("should match", "1.0~rc7", Utils.convertToDebianVersion("1.0rc7", cal.getTime()));
+        assertEquals("should match", "1.0", Utils.convertToDebianVersion("1.0", false, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0~SNAPSHOT", Utils.convertToDebianVersion("1.0+SNAPSHOT", false, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0~SNAPSHOT", Utils.convertToDebianVersion("1.0-SNAPSHOT", false, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0~20130217000000", Utils.convertToDebianVersion("1.0+SNAPSHOT", true, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0~RC2", Utils.convertToDebianVersion("1.0-RC2", true, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0~alpha3", Utils.convertToDebianVersion("1.0-alpha3", true, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0~Beta+4", Utils.convertToDebianVersion("1.0.Beta-4", true, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0~rc7", Utils.convertToDebianVersion("1.0rc7", true, "SNAPSHOT", cal.getTime()));
     }
 
     public void testMovePath() {
