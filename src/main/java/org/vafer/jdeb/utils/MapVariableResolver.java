@@ -26,6 +26,9 @@ import java.util.Map;
  */
 public final class MapVariableResolver implements VariableResolver {
 
+    private static final String MVN_VAR_PREFIX = "${";
+    private static final String MVN_VAR_SUFFIX = "}";
+    
     private final Map<String, String> map;
 
     public MapVariableResolver( Map<String, String> map ) {
@@ -33,7 +36,40 @@ public final class MapVariableResolver implements VariableResolver {
     }
 
     public String get( String key ) {
-        return map.get(key);
+        String value = map.get(key);
+        try {
+            return resolveVariables(value);
+        } catch (Exception e) {
+            return value;
+        }
+    }
+    
+    private String resolveVariables(String value ) {
+        String transformingValue = value;
+        int searchVariableFromIndex = 0;
+        while (!isEmptyOfVariable(transformingValue)) {
+            int indexOfPrefix = value.indexOf(MVN_VAR_PREFIX, searchVariableFromIndex);
+            int indexOfSuffix = value.indexOf(MVN_VAR_SUFFIX, searchVariableFromIndex) +1;
+            searchVariableFromIndex = indexOfSuffix;
+
+            String variable = value.substring(indexOfPrefix, indexOfSuffix);
+            transformingValue = substituteVariable(transformingValue, variable);
+        }
+        return transformingValue;
+    }
+
+    private String substituteVariable(String transformingValue, String variable) {
+        return transformingValue.replace(variable, get(stripVariable(variable)));
+    }
+
+    private String stripVariable(String variable) {
+        return variable.substring(MVN_VAR_PREFIX.length(), variable.length() -1);
+    }
+
+    private boolean isEmptyOfVariable(String value) {
+        int indexOfPrefix = value.indexOf(MVN_VAR_PREFIX);
+        int indexOfSuffix = value.indexOf(MVN_VAR_SUFFIX);
+        return value == null || indexOfSuffix <= indexOfPrefix;
     }
 
 }
