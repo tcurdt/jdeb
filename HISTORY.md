@@ -1,4 +1,4 @@
-## Version 1.1.1, released 14.03.2014
+## Version 1.1.1, released 10.03.2014
 
 * [FIX] renamed SNAPSHOT handling to snapshotExpand & snapshotEnv
 
