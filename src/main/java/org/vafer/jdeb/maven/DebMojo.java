@@ -19,7 +19,6 @@ package org.vafer.jdeb.maven;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,7 +47,6 @@ import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.DebMaker;
 import org.vafer.jdeb.PackagingException;
-import org.vafer.jdeb.utils.FilteredFile;
 import org.vafer.jdeb.utils.MapVariableResolver;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
@@ -227,14 +225,14 @@ public class DebMojo extends AbstractPluginMojo {
      * if set a value of a environment variable.
      */
     @Parameter(defaultValue = "false")
-    private boolean SNAPSHOTexpand;
+    private boolean snapshotExpand;
 
     /**
      * Which environment variable to check for the SNAPSHOT value.
      * If the variable is not set/empty it will default to use the timestamp.
      */
     @Parameter(defaultValue = "SNAPSHOT")
-    private String SNAPSHOTenv;
+    private String snapshotEnv;
 
     /**
      * If verbose is true more build messages are logged.
@@ -357,10 +355,10 @@ public class DebMojo extends AbstractPluginMojo {
      */
     private String getProjectVersion() {
         if (this.timestamped) {
-            getLog().error("Configuration 'timestamped' is deprecated. Please use SNAPSHOTexpand and SNAPSHOTenv instead.");
+            getLog().error("Configuration 'timestamped' is deprecated. Please use snapshotExpand and snapshotEnv instead.");
         }
 
-        return Utils.convertToDebianVersion(getProject().getVersion(), this.SNAPSHOTexpand || this.timestamped, this.SNAPSHOTenv, session.getStartTime());
+        return Utils.convertToDebianVersion(getProject().getVersion(), this.snapshotExpand || this.timestamped, this.snapshotEnv, session.getStartTime());
     }
 
     /**

@@ -1,3 +1,7 @@
+## Version 1.1.1, released 14.03.2014
+
+* [FIX] renamed SNAPSHOT handling to snapshotExpand & snapshotEnv
+
 ## Version 1.1, released 28.02.2014
 
 * [CHG] Renamed configuration option 'disabled' to 'skip'

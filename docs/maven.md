@@ -92,8 +92,8 @@ key           | The name of the key to be used in the keyring                   
 passphrase    | The passphrase to use the key                                                | No
 attach        | Attach artifact to project                                                   | No; defaults to `true`
 submodules    | Execute the goal on all sub-modules                                          | No; defaults to `true`
-SNAPSHOTexpand| Expand SNAPSHOT into the content of an environment variable or timestamp.    | No; defaults to `false`
-SNAPSHOTenv   | Name of the environment variable. If it's empty defaults to a timestamp.     | No; defaults to `SNAPSHOT`
+snapshotExpand| Expand SNAPSHOT into the content of an environment variable or timestamp.    | No; defaults to `false`
+snapshotEnv   | Name of the environment variable. If it's empty defaults to a timestamp.     | No; defaults to `SNAPSHOT`
 verbose       | Verbose logging                                                              | No; defaults to `true`, will be `false` in the future
 skip          | Indicates if an execution should be skipped                                  | No; defaults to `false`
 
