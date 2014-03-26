@@ -32,7 +32,7 @@ import java.util.Set;
 
 /**
  * A control file as specified by the <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html">Debian policy</a>.
- *
+ * 
  * @author Torsten Curdt
  */
 public abstract class ControlFile {
@@ -41,11 +41,11 @@ public abstract class ControlFile {
     protected final Map<String, String> userDefinedFields = new LinkedHashMap<String, String>();
     protected final Set<ControlField> userDefinedFieldNames = new HashSet<ControlField>();
 
-    public void parse(String input) throws IOException, ParseException {
+    public void parse( String input ) throws IOException, ParseException {
         parse(new ByteArrayInputStream(input.getBytes("UTF-8")));
     }
 
-    public void parse(InputStream input) throws IOException, ParseException {
+    public void parse( InputStream input ) throws IOException, ParseException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
         StringBuilder buffer = new StringBuilder();
         String field = null;
@@ -74,7 +74,6 @@ public abstract class ControlFile {
                 set(field, buffer.toString());
                 buffer = new StringBuilder();
 
-
                 final int i = line.indexOf(':');
 
                 if (i < 0) {
@@ -97,7 +96,7 @@ public abstract class ControlFile {
 
     }
 
-    public void set(String field, final String value) {
+    public void set( String field, final String value ) {
         if (field != null && isUserDefinedField(field)) {
             userDefinedFields.put(field, value);
             String fieldName = getUserDefinedFieldName(field);
@@ -114,7 +113,7 @@ public abstract class ControlFile {
         }
     }
 
-    public String get(String field) {
+    public String get( String field ) {
         return values.get(field);
     }
 
@@ -156,7 +155,7 @@ public abstract class ControlFile {
         return invalid;
     }
 
-    public String toString(ControlField... fields) {
+    public String toString( ControlField... fields ) {
         StringBuilder s = new StringBuilder();
         for (ControlField field : fields) {
             String value = values.get(field.getName());
@@ -175,13 +174,13 @@ public abstract class ControlFile {
     /**
      * Returns the letter expected in the prefix of a user defined field
      * in order to include the field in this control file.
-     *
+     * 
      * @return The letter returned is:
-     * <ul>
-     *   <li>B: for a binary package</li>
-     *   <li>S: for a source package</li>
-     *   <li>C: for a changes file</li>
-     * </ul>
+     *         <ul>
+     *         <li>B: for a binary package</li>
+     *         <li>S: for a source package</li>
+     *         <li>C: for a changes file</li>
+     *         </ul>
      * 
      * @since 1.1
      * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html#s5.7">Debian Policy - User-defined fields</a>
@@ -193,24 +192,26 @@ public abstract class ControlFile {
      * User-defined fields must begin with an 'X', followed by one or more
      * letters that specify the output file and a hyphen.
      * 
-     * @param field the name of the field
-     *
+     * @param field
+     *            the name of the field
+     * 
      * @since 1.1
      * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html#s5.7">Debian Policy - User-defined fields</a>
      */
-    protected boolean isUserDefinedField(String field) {
+    protected boolean isUserDefinedField( String field ) {
         return field.startsWith("X") && field.indexOf("-") > 0;
     }
 
     /**
      * Returns the user defined field without its prefix.
      * 
-     * @param field the name of the user defined field
+     * @param field
+     *            the name of the user defined field
      * @return the user defined field without the prefix, or null if the fields
      *         doesn't apply to this control file.
      * @since 1.1
      */
-    protected String getUserDefinedFieldName(String field) {
+    protected String getUserDefinedFieldName( String field ) {
         int index = field.indexOf('-');
         char letter = getUserDefinedFieldLetter();
 

@@ -1,0 +1,20 @@
+Format: 1.8
+Date: Wed, 26 Mar 2014 15:11:20 +0100
+Source: jdeb-it
+Binary: jdeb-it
+Architecture: all
+Version: 1.0
+Distribution: unknown
+Urgency: low
+Maintainer: tcurdt@vafer.org
+Changed-By: tcurdt@vafer.org
+Description:
+ jdeb-it - description from pom
+Changes:
+ jdeb-it (1.0) unknown; urgency=low
+Checksums-Sha1:
+ a96746f336c7cc7a68f271b8015efa34e7f9284a 2150 jdeb-it_1.0_all.deb
+Checksums-Sha256:
+ 86117f96a84a5b0c88a490389c36daa1fe4d34644d83ac8d2626c5dbe2ca7754 2150 jdeb-it_1.0_all.deb
+Files:
+ c403e265892ad8ad4731116193192bb2 2150 misc low jdeb-it_1.0_all.deb
