@@ -124,7 +124,8 @@ public class AptWriter {
 
     }
 
-    private List<Digester> digesters = new LinkedList<AptWriter.Digester>();
+    private List<Digester> digestersRelease = new LinkedList<AptWriter.Digester>();
+    private List<Digester> digestersPackage = new LinkedList<AptWriter.Digester>();
 
     private static final DateFormat DF;
 
@@ -139,9 +140,13 @@ public class AptWriter {
     public AptWriter( AptConfiguration configuration, Console console ) {
         this.console = console;
         this.configuration = configuration.clone();
-        this.digesters.add(new SimpleDigester("MD5Sum", MD5Digest.class));
-        this.digesters.add(new SimpleDigester("SHA1", SHA1Digest.class));
-        this.digesters.add(new SimpleDigester("SHA256", SHA256Digest.class));
+        this.digestersRelease.add(new SimpleDigester("MD5Sum", MD5Digest.class));
+        this.digestersRelease.add(new SimpleDigester("SHA1", SHA1Digest.class));
+        this.digestersRelease.add(new SimpleDigester("SHA256", SHA256Digest.class));
+
+        this.digestersPackage.add(new SimpleDigester("MD5sum", MD5Digest.class)); // yes, this is really the difference
+        this.digestersPackage.add(new SimpleDigester("SHA1", SHA1Digest.class));
+        this.digestersPackage.add(new SimpleDigester("SHA256", SHA256Digest.class));
     }
 
     public void build() throws Exception {
@@ -200,7 +205,7 @@ public class AptWriter {
         rf.set("Architectures", join(configuration.getArchitectures()));
         rf.set("Date", DF.format(new Date()));
 
-        for (Digester d : digesters) {
+        for (Digester d : digestersRelease) {
             rf.set(d.getName(), digestPackageLists(rf, d, dist));
         }
 
@@ -264,18 +269,6 @@ public class AptWriter {
         }
 
         return sb.toString();
-    }
-
-    private static void writeField( PrintStream ps, String fieldName, String data, boolean optional ) {
-        if (data == null || data.isEmpty()) {
-            if (optional)
-                return;
-            else
-                throw new IllegalArgumentException("'" + fieldName + "' must not be null or empty");
-        }
-        ps.print(fieldName);
-        ps.print(": ");
-        ps.println(data);
     }
 
     private void writePackageList( AptDistribution distribution, AptComponent component, String architecture, List<BinaryPackagePackagesFile> files ) throws IOException {
@@ -408,7 +401,7 @@ public class AptWriter {
     private BinaryPackagePackagesFile convert( BinaryPackageControlFile cf, File packageFile ) throws Exception {
         BinaryPackagePackagesFile pf = new BinaryPackagePackagesFile(cf.toString());
 
-        for (Digester d : digesters) {
+        for (Digester d : digestersPackage) {
             pf.set(d.getName(), digest(packageFile, d.create()));
         }
 
@@ -420,6 +413,7 @@ public class AptWriter {
         String filename = targetFile.toString().substring(configuration.getTargetFolder().toString().length() + 1);
 
         pf.set("Filename", filename);
+        pf.set("Size", "" + packageFile.length());
 
         return pf;
     }

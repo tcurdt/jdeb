@@ -52,6 +52,7 @@ public final class BinaryPackagePackagesFile extends ControlFile {
             new ControlField("SHA256"),
             new ControlField("SHA1"),
             new ControlField("MD5sum"),
+            new ControlField("Size", true),
             new ControlField("Filename")
     };
 
