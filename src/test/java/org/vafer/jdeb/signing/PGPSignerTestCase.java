@@ -17,11 +17,8 @@
 package org.vafer.jdeb.signing;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.util.Arrays;
-
-import org.apache.commons.io.FileUtils;
 
 import junit.framework.TestCase;
 
@@ -59,10 +56,6 @@ public final class PGPSignerTestCase extends TestCase {
         signer.clearSign(input, os);
 
         final byte[] output = fixCRLF(os.toByteArray());
-        
-//        FileUtils.writeByteArrayToFile(new File("./target/output_expected.txt"), expectedOutput);
-//        FileUtils.writeByteArrayToFile(new File("./target/output.txt"), output);
-
         final int from = expectedOutputStr.indexOf("iEYEAREC");
         final int until = expectedOutputStr.indexOf("=aAAT") + 5;
         Arrays.fill(output, from, until, (byte) '?');
