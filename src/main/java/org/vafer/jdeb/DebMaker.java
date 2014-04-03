@@ -111,6 +111,9 @@ public class DebMaker {
     /** Whether to sign the package that is created */
     private boolean signPackage;
 
+    /** Whether to sign the package that is created */
+    private String signMethod;
+    
     private VariableResolver variableResolver;
     private String openReplaceToken;
     private String closeReplaceToken;
@@ -128,6 +131,8 @@ public class DebMaker {
         if (conffileProducers != null) {
             this.conffilesProducers.addAll(conffileProducers);
         }
+        
+        Security.addProvider(new BouncyCastleProvider());
     }
 
     public void setDeb(File deb) {
@@ -172,6 +177,10 @@ public class DebMaker {
 
     public void setSignPackage(boolean signPackage) {
         this.signPackage = signPackage;
+    }
+    
+    public void setSignMethod(String signMethod) {
+        this.signMethod = signMethod;
     }
 
     public void setKeyring(File keyring) {
@@ -458,39 +467,46 @@ public class DebMaker {
 
             deb.getParentFile().mkdirs();
             
-            
             ArArchiveOutputStream ar = new ArArchiveOutputStream(new FileOutputStream(deb));
             
-            addTo(ar, "debian-binary", "2.0\n");
-            addTo(ar, "control.tar.gz", tempControl);
-            addTo(ar, "data.tar" + compression.getExtension(), tempData);
+            String binaryName = "debian-binary";
+            String binaryContent = "2.0\n";
+            String controlName = "control.tar.gz";
+            String dataName = "data.tar" + compression.getExtension();
+            
+            addTo(ar, binaryName, binaryContent);
+            addTo(ar, controlName, tempControl);
+            addTo(ar, dataName, tempData);
             
             if (signatureGenerator != null) {
                 console.info("Signing package with key " + key);
                 
-                // Sign file to verify with debsign-verify
-                PGPSignatureOutputStream sigStream = new PGPSignatureOutputStream(signatureGenerator);
-
-                addTo(sigStream, "2.0\n");
-                addTo(sigStream, tempControl);
-                addTo(sigStream, tempData);
-                addTo(ar, "_gpgorigin", sigStream.generateASCIISignature());
-                
-                // Sign file to verify with dpkg-sig --verify
-                final String outputStr =
-                            "Version: 4\n" +
-                            "Signer: \n" +
-                            "Date: " + new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy", Locale.ENGLISH).format(new Date()).replaceFirst("0", " ") + "\n" + 
-                            "Role: builder\n" + 
-                            "Files: \n" +
-                            addFile("2.0\n", "debian-binary") +
-                            addFile(tempControl, "control.tar.gz") +
-                            addFile(tempData, "data.tar" + compression.getExtension());
-                
-                ByteArrayOutputStream message = new ByteArrayOutputStream();
-                signer.clearSign(outputStr, message);
-                
-                addTo(ar, "_gpgbuilder", message.toString());
+                // Use debsig-verify as default
+                if(!signMethod.equals("dpkg-sig")) {
+                	// Sign file to verify with debsig-verify
+	                PGPSignatureOutputStream sigStream = new PGPSignatureOutputStream(signatureGenerator);
+	
+	                addTo(sigStream, binaryContent);
+	                addTo(sigStream, tempControl);
+	                addTo(sigStream, tempData);
+	                addTo(ar, "_gpgorigin", sigStream.generateASCIISignature());
+                } else {
+	                // Sign file to verify with dpkg-sig --verify
+	                final String outputStr =
+	                            "Version: 4\n" +
+	                            "Signer: \n" +
+	                            "Date: " + new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy", Locale.ENGLISH).format(new Date()) + "\n" + 
+	                            "Role: builder\n" + 
+	                            "Files: \n" +
+	                            addFile(binaryName, binaryContent) +
+	                            addFile(controlName, tempControl) +
+	                            addFile(dataName, tempData);
+	                
+	                ByteArrayOutputStream message = new ByteArrayOutputStream();
+	                signer.clearSign(outputStr, message);
+	                
+	                addTo(ar, "_gpgbuilder", message.toString());
+                }
             }
 
             ar.close();
@@ -513,11 +529,11 @@ public class DebMaker {
         }
     }
 
-    private String addFile(String input, String name){
+    private String addFile(String name, String input){
     	return addLine(md5Hash(input), sha1Hash(input), input.length(), name);
     }
     
-    private String addFile(File input, String name){
+    private String addFile(String name, File input){
     	return addLine(md5Hash(input), sha1Hash(input), input.length(), name);
     }
     
@@ -541,11 +557,6 @@ public class DebMaker {
     }
     
     private String md5Hash(byte input[]){
-    	//add the security provider
-        //not required if you have Install the library
-        //by Configuring the Java Runtime
-        Security.addProvider(new BouncyCastleProvider());
-
         //update the input of MD5
         MD5Digest md5 = new MD5Digest();
         md5.update(input, 0, input.length);
@@ -573,12 +584,9 @@ public class DebMaker {
     }
     
     private String sha1Hash(byte input[]){
-    	 Security.addProvider(new BouncyCastleProvider());
-    	 
          try
          {
                //prepare the input
-               //MessageDigest hash = MessageDigest.getInstance("SHA-1", "BC");
                MessageDigest hash = MessageDigest.getInstance("SHA1");
                hash.update(input);
 
@@ -592,11 +600,6 @@ public class DebMaker {
                System.err.println("No such algorithm");
                e.printStackTrace();
          }
-//         catch (NoSuchProviderException e)
-//         {
-//               System.err.println("No such provider");
-//               e.printStackTrace();
-//         }
          
          return null;
     }
