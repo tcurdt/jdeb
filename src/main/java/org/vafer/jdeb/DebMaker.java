@@ -111,8 +111,11 @@ public class DebMaker {
     /** Whether to sign the package that is created */
     private boolean signPackage;
 
-    /** Whether to sign the package that is created */
+    /** Defines which utility is used to verify the signed package */
     private String signMethod;
+    
+    /** Defines the role to sign with */
+    private String signRole;
     
     private VariableResolver variableResolver;
     private String openReplaceToken;
@@ -181,6 +184,10 @@ public class DebMaker {
     
     public void setSignMethod(String signMethod) {
         this.signMethod = signMethod;
+    }
+    
+    public void setSignRole(String signRole) {
+        this.signRole = signRole;
     }
 
     public void setKeyring(File keyring) {
@@ -481,22 +488,25 @@ public class DebMaker {
             if (signatureGenerator != null) {
                 console.info("Signing package with key " + key);
                 
+                if(signRole==null)
+                	signRole = "origin";
+                
                 // Use debsig-verify as default
-                if(!signMethod.equals("dpkg-sig")) {
+                if(signMethod==null || !signMethod.equals("dpkg-sig")) {
                 	// Sign file to verify with debsig-verify
 	                PGPSignatureOutputStream sigStream = new PGPSignatureOutputStream(signatureGenerator);
 	
 	                addTo(sigStream, binaryContent);
 	                addTo(sigStream, tempControl);
 	                addTo(sigStream, tempData);
-	                addTo(ar, "_gpgorigin", sigStream.generateASCIISignature());
+	                addTo(ar, "_gpg" + signRole, sigStream.generateASCIISignature());
                 } else {
 	                // Sign file to verify with dpkg-sig --verify
 	                final String outputStr =
 	                            "Version: 4\n" +
 	                            "Signer: \n" +
 	                            "Date: " + new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy", Locale.ENGLISH).format(new Date()) + "\n" + 
-	                            "Role: builder\n" + 
+	                            "Role: " + signRole +"\n" + 
 	                            "Files: \n" +
 	                            addFile(binaryName, binaryContent) +
 	                            addFile(controlName, tempControl) +
@@ -505,7 +515,7 @@ public class DebMaker {
 	                ByteArrayOutputStream message = new ByteArrayOutputStream();
 	                signer.clearSign(outputStr, message);
 	                
-	                addTo(ar, "_gpgbuilder", message.toString());
+	                addTo(ar, "_gpg" + signRole, message.toString());
                 }
             }
 

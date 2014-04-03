@@ -262,6 +262,12 @@ public class DebMojo extends AbstractPluginMojo {
     private String signMethod;
 
     /**
+     * Defines the role to sign with
+     */
+    @Parameter(defaultValue = "origin")
+    private String signRole;
+    
+    /**
      * The keyring to use for signing operations.
      */
     @Parameter
@@ -509,6 +515,7 @@ public class DebMojo extends AbstractPluginMojo {
             debMaker.setPassphrase(passphrase);
             debMaker.setSignPackage(signPackage);
             debMaker.setSignMethod(signMethod);
+            debMaker.setSignRole(signRole);
             debMaker.setResolver(resolver);
             debMaker.setOpenReplaceToken(openReplaceToken);
             debMaker.setCloseReplaceToken(closeReplaceToken);
