@@ -86,6 +86,8 @@ changesOut    | The changes file generated                                      
 changesSave   | (NYI) The merged changes file                                                | No
 compression   | (NYI) Compression method for the data file (`gzip`, `bzip2`, `xz` or `none`) | No; defaults to `gzip`
 signPackage   | If the debian package should be signed                                       | No
+signMethod    | Which utility is used for verification (`dpkg-sig`, `debsig-verify`)         | No; defaults to `debsig-verify`
+signRole      | Determines the filename of the signature, debsig only verifies `origin`      | No; defaults to `origin`
 signCfgPrefix | Prefix for when reading keyring, key and passphrase from settings.xml        | No; defaults to `jdeb.`
 keyring       | The file containing the PGP keys                                             | No
 key           | The name of the key to be used in the keyring                                | No
@@ -149,6 +151,8 @@ include a directory, a tarball, and a file in your deb package and then sign it 
             </goals>
             <configuration>
               <signPackage>true</signPackage>
+              <signMethod>dpkg-sig</signMethod>
+              <signRole>builder</signRole>
               <keyring>/home/user/.gnupg/secring.gpg</keyring>
               <key>8306FE21</key>
               <passphrase>abcdef</passphrase>

@@ -254,7 +254,19 @@ public class DebMojo extends AbstractPluginMojo {
      */
     @Parameter(defaultValue = "false")
     private boolean signPackage;
+    
+    /**
+     * Defines which utility is used to verify the signed package
+     */
+    @Parameter(defaultValue = "debsig-verify")
+    private String signMethod;
 
+    /**
+     * Defines the role to sign with
+     */
+    @Parameter(defaultValue = "origin")
+    private String signRole;
+    
     /**
      * The keyring to use for signing operations.
      */
@@ -502,6 +514,8 @@ public class DebMojo extends AbstractPluginMojo {
             debMaker.setKey(key);
             debMaker.setPassphrase(passphrase);
             debMaker.setSignPackage(signPackage);
+            debMaker.setSignMethod(signMethod);
+            debMaker.setSignRole(signRole);
             debMaker.setResolver(resolver);
             debMaker.setOpenReplaceToken(openReplaceToken);
             debMaker.setCloseReplaceToken(closeReplaceToken);
