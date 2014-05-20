@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.vafer.jdeb;
+package org.vafer.jdeb.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

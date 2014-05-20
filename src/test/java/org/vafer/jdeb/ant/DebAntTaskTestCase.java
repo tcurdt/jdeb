@@ -52,7 +52,7 @@ public final class DebAntTaskTestCase extends TestCase {
         project.setCoreLoader(getClass().getClassLoader());
         project.init();
 
-        File buildFile = new File("target/test-classes/testbuild.xml");
+        File buildFile = new File("target/test-classes/debtestbuild.xml");
         project.setBaseDir(buildFile.getParentFile());
 
         final ProjectHelper helper = ProjectHelper.getProjectHelper();

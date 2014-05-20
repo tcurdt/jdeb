@@ -34,7 +34,7 @@ public class DataBuilderTestCase extends TestCase {
      * (this test can only fail on Windows)
      */
     public void testBuildDataWithFileSet() throws Exception {
-        DataBuilder builder = new DataBuilder(new NullConsole());
+        DebDataBuilder builder = new DebDataBuilder(new NullConsole());
 
         Project project = new Project();
         project.setCoreLoader(getClass().getClassLoader());
@@ -58,7 +58,7 @@ public class DataBuilderTestCase extends TestCase {
             archive.delete();
         }
         
-        DataBuilder builder = new DataBuilder(new NullConsole());
+        DebDataBuilder builder = new DebDataBuilder(new NullConsole());
         
         DataProducer producer = new DataProducerFile(new File("pom.xml"), "/usr/share/myapp/pom.xml", null, null, null); 
         
