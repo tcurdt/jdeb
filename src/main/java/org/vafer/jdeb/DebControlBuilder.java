@@ -46,7 +46,7 @@ import org.vafer.jdeb.utils.VariableResolver;
 /**
  * Builds the control archive of the Debian package.
  */
-class ControlBuilder {
+class DebControlBuilder {
     
     /** The name of the package maintainer scripts */
     private static final Set<String> MAINTAINER_SCRIPTS = new HashSet<String>(Arrays.asList("preinst", "postinst", "prerm", "postrm", "config"));
@@ -59,7 +59,7 @@ class ControlBuilder {
     private final String openReplaceToken;
     private final String closeReplaceToken;
 
-    ControlBuilder(Console console, VariableResolver resolver, String openReplaceToken, String closeReplaceToken) {
+    DebControlBuilder(Console console, VariableResolver resolver, String openReplaceToken, String closeReplaceToken) {
         this.console = console;
         this.resolver = resolver;
         this.openReplaceToken = openReplaceToken;

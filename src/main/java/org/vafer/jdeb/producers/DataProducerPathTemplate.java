@@ -17,7 +17,6 @@ package org.vafer.jdeb.producers;
 
 import java.io.IOException;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;

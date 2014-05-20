@@ -1,0 +1,9 @@
+package="test"
+version="1.0.1"
+arch="i386"
+maintainer="John Doe <john@doe.org>"
+description="revision @REVISION@, test package
+ This is a sample package control file."
+ .
+ Use for testing purposes only.
+userdefinedfield="This is a user defined field."

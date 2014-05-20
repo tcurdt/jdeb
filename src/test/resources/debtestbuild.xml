@@ -7,7 +7,7 @@
   </target>
 
   <target name="invalid-control">
-    <deb destfile="test.deb" control="testbuild.xml"/>
+    <deb destfile="test.deb" control="debtestbuild.xml"/>
   </target>
 
   <target name="missing-destfile">

@@ -16,6 +16,7 @@
 
 package org.vafer.jdeb;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -27,10 +28,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
-import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSignature;
 import org.bouncycastle.openpgp.PGPSignatureGenerator;
 import org.bouncycastle.openpgp.PGPUtil;
@@ -43,7 +42,6 @@ import org.vafer.jdeb.debian.ChangesFile;
 import org.vafer.jdeb.signing.PGPSigner;
 import org.vafer.jdeb.utils.PGPSignatureOutputStream;
 import org.vafer.jdeb.utils.Utils;
-import org.vafer.jdeb.utils.VariableResolver;
 
 /**
  * A generic class for creating Debian archives. Even supports signed changes
@@ -52,10 +50,7 @@ import org.vafer.jdeb.utils.VariableResolver;
  * @author Torsten Curdt
  * @author Bryan Sant
  */
-public class DebMaker {
-
-    /** A console to output log message with */
-    private Console console;
+public class DebMaker extends PackageMaker {
 
     /** The Debian package produced */
     private File deb;
@@ -96,26 +91,14 @@ public class DebMaker {
     /** The file where to write the changes of the changes input to */
     private File changesSave;
 
-    /** The compression method used for the data file (none, gzip, bzip2 or xz) */
-    private String compression = "gzip";
-
     /** Whether to sign the package that is created */
     private boolean signPackage;
-
-    private VariableResolver variableResolver;
-    private String openReplaceToken;
-    private String closeReplaceToken;
-
-    private final Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
 
     private final Collection<DataProducer> conffilesProducers = new ArrayList<DataProducer>();
 
 
     public DebMaker(Console console, Collection<DataProducer> dataProducers, Collection<DataProducer> conffileProducers) {
-        this.console = console;
-        if (dataProducers != null) {
-            this.dataProducers.addAll(dataProducers);
-        }
+    	super(console, dataProducers);
         if (conffileProducers != null) {
             this.conffilesProducers.addAll(conffileProducers);
         }
@@ -175,18 +158,6 @@ public class DebMaker {
 
     public void setPassphrase(String passphrase) {
         this.passphrase = passphrase;
-    }
-
-    public void setCompression(String compression) {
-        this.compression = compression;
-    }
-
-    public void setResolver(VariableResolver variableResolver) {
-        this.variableResolver = variableResolver;
-    }
-
-    private boolean isWritableFile(File file) {
-        return !file.exists() || file.isFile() && file.canWrite();
     }
 
     /**
@@ -267,7 +238,7 @@ public class DebMaker {
                 PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(signer.getSecretKey().getPublicKey().getAlgorithm(), digest));
                 signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, signer.getPrivateKey());
 
-                packageControlFile = createSignedDeb(Compression.toEnum(compression), signatureGenerator);
+                packageControlFile = createSignedDeb(Compression.toEnum(compression), signatureGenerator, signer);
             } else {
                 packageControlFile = createDeb(Compression.toEnum(compression));
             }
@@ -362,6 +333,7 @@ public class DebMaker {
                 if (tempConffileItem.startsWith(".")) {
                     tempConffileItem = tempConffileItem.substring(1);
                 }
+                console.info("Adding conffile: " + tempConffileItem);
                 result.add(tempConffileItem);
             }
 
@@ -392,7 +364,7 @@ public class DebMaker {
      * @throws PackagingException
      */
     public BinaryPackageControlFile createDeb(Compression compression) throws PackagingException {
-        return createSignedDeb(compression, null);
+        return createSignedDeb(compression, null, null);
     }
     /**
      * Create the debian archive with from the provided control files and data producers.
@@ -403,7 +375,7 @@ public class DebMaker {
      * @return PackageDescriptor
      * @throws PackagingException
      */
-    public BinaryPackageControlFile createSignedDeb(Compression compression, final PGPSignatureGenerator signatureGenerator ) throws PackagingException {
+    public BinaryPackageControlFile createSignedDeb(Compression compression, final PGPSignatureGenerator signatureGenerator, final PGPSigner signer ) throws PackagingException {
         File tempData = null;
         File tempControl = null;
 
@@ -412,7 +384,7 @@ public class DebMaker {
             tempControl = File.createTempFile("deb", "control");
 
             console.debug("Building data");
-            DataBuilder dataBuilder = new DataBuilder(console);
+            DebDataBuilder dataBuilder = new DebDataBuilder(console);
             StringBuilder md5s = new StringBuilder();
             BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, compression);
 
@@ -420,7 +392,7 @@ public class DebMaker {
             List<String> tempConffiles = populateConffiles(conffilesProducers);
             
             console.debug("Building control");
-            ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver, openReplaceToken, closeReplaceToken);
+            DebControlBuilder controlBuilder = new DebControlBuilder(console, variableResolver, openReplaceToken, closeReplaceToken);
             BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size);
             if (packageControlFile.get("Package") == null) {
                 packageControlFile.set("Package", packageName);
@@ -462,6 +434,12 @@ public class DebMaker {
                 addTo(sigStream, tempControl);
                 addTo(sigStream, tempData);
                 addTo(ar, "_gpgorigin", sigStream.generateASCIISignature());
+                
+                final ByteArrayOutputStream os = new ByteArrayOutputStream();
+                signer.clearSign("HUHUHU", os);
+
+                addTo(ar, "_gpgbuilder", new String(os.toByteArray()));
+                os.close();
             }
 
             ar.close();
@@ -484,26 +462,6 @@ public class DebMaker {
         }
     }
 
-    private void addTo(ArArchiveOutputStream pOutput, String pName, String pContent) throws IOException {
-        final byte[] content = pContent.getBytes();
-        pOutput.putArchiveEntry(new ArArchiveEntry(pName, content.length));
-        pOutput.write(content);
-        pOutput.closeArchiveEntry();
-    }
-
-    private void addTo(ArArchiveOutputStream pOutput, String pName, File pContent) throws IOException {
-        pOutput.putArchiveEntry(new ArArchiveEntry(pName, pContent.length()));
-
-        final InputStream input = new FileInputStream(pContent);
-        try {
-            Utils.copy(input, pOutput);
-        } finally {
-            input.close();
-        }
-
-        pOutput.closeArchiveEntry();
-    }
-
     private void addTo(final PGPSignatureOutputStream pOutput, final String pContent) throws IOException {
         final byte[] content = pContent.getBytes();
         pOutput.write(content);
@@ -516,13 +474,5 @@ public class DebMaker {
         } finally {
             input.close();
         }
-    }
-
-    public void setOpenReplaceToken(String openReplaceToken) {
-        this.openReplaceToken = openReplaceToken;
-    }
-
-    public void setCloseReplaceToken(String closeReplaceToken) {
-        this.closeReplaceToken = closeReplaceToken;
     }
 }

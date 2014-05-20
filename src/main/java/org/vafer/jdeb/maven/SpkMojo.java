@@ -36,13 +36,18 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Settings;
 import org.apache.tools.tar.TarEntry;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.DebMaker;
 import org.vafer.jdeb.PackagingException;
+import org.vafer.jdeb.SpkMaker;
 import org.vafer.jdeb.utils.MapVariableResolver;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
@@ -50,13 +55,14 @@ import org.vafer.jdeb.utils.VariableResolver;
 import static org.vafer.jdeb.utils.Utils.lookupIfEmpty;
 
 /**
- * Creates Debian package
+ * Creates Synology package
  */
-@Mojo(name = "jdeb", defaultPhase = LifecyclePhase.PACKAGE)
-public class DebMojo extends AbstractPackageMojo {
+@SuppressWarnings("unused")
+@Mojo(name = "spk", defaultPhase = LifecyclePhase.PACKAGE)
+public class SpkMojo extends AbstractPackageMojo {
 
     /**
-     * Defines the name of deb package.
+     * Defines the name of spk package.
      */
     @Parameter
     private String name;
@@ -66,36 +72,23 @@ public class DebMojo extends AbstractPackageMojo {
      * substitutions are [[baseDir]] [[buildDir]] [[artifactId]] [[version]]
      * [[extension]] and [[groupId]].
      */
-    @Parameter(defaultValue = "[[buildDir]]/[[artifactId]]_[[version]]_all.[[extension]]")
-    private String deb;
+    @Parameter(defaultValue = "[[buildDir]]/[[artifactId]]_[[version]].[[extension]]")
+    private String spk;
 
     /**
-     * Explicitly defines the path to the control directory. At least the
-     * control file is mandatory.
+     * Explicitly defines the path to the info file.
      */
-    @Parameter(defaultValue = "[[baseDir]]/src/deb/control")
-    private String controlDir;
+    @Parameter(defaultValue = "[[baseDir]]/src/spk/info")
+    private String infoFile;
 
     /**
-     * Explicitly define the file to read the changes from.
+     * Explicitly defines the path to the scripts directory.
      */
-    @Parameter(defaultValue = "[[baseDir]]/CHANGES.txt")
-    private String changesIn;
+    @Parameter(defaultValue = "[[baseDir]]/src/spk/scripts")
+    private String scriptsDir;
 
     /**
-     * Explicitly define the file where to write the changes to.
-     */
-    @Parameter(defaultValue = "[[buildDir]]/[[artifactId]]_[[version]]_all.changes")
-    private String changesOut;
-
-    /**
-     * Explicitly define the file where to write the changes of the changes input to.
-     */
-    @Parameter(defaultValue = "[[baseDir]]/CHANGES.txt")
-    private String changesSave;
-
-    /**
-     * The compression method used for the data file (none, gzip, bzip2 or xz)
+     * The compression method used for the data file (gzip)
      */
     @Parameter(defaultValue = "gzip")
     private String compression;
@@ -112,34 +105,8 @@ public class DebMojo extends AbstractPackageMojo {
     /**
      * The type of attached artifact
      */
-    @Parameter(defaultValue = "deb")
-    private String type;
-
-    /**
-     * The project base directory
-     */
-    @Parameter(defaultValue = "${basedir}", required = true, readonly = true)
-    private File baseDir;
-
-    /**
-     * Run the plugin on all sub-modules.
-     * If set to false, the plugin will be run in the same folder where the
-     * mvn command was invoked
-     */
-    @Parameter(defaultValue = "true")
-    private boolean submodules;
-
-    /**
-     * The Maven Session Object
-     */
-    @Component
-    private MavenSession session;
-
-    /**
-     * The classifier of attached artifact
-     */
-    @Parameter
-    private String classifier;
+    @Parameter(defaultValue = "spk")
+    protected String type;
 
     /**
      * "data" entries used to determine which files should be added to this deb.
@@ -198,12 +165,6 @@ public class DebMojo extends AbstractPackageMojo {
     private Data[] dataSet;
 
     /**
-     * @deprecated
-     */
-    @Parameter(defaultValue = "false")
-    private boolean timestamped;
-
-    /**
      * When enabled SNAPSHOT inside the version gets replaced with current timestamp or
      * if set a value of a environment variable.
      */
@@ -217,91 +178,15 @@ public class DebMojo extends AbstractPackageMojo {
     @Parameter(defaultValue = "SNAPSHOT")
     private String snapshotEnv;
 
-    /**
-     * If verbose is true more build messages are logged.
-     */
-    @Parameter(defaultValue = "false")
-    private boolean verbose;
-
-    /**
-     * Indicates if the execution should be disabled. If <code>true</code>, nothing will occur during execution.
-     * 
-     * @since 1.1
-     */
-    @Parameter(defaultValue = "false")
-    private boolean skip;
-
-    /**
-     * If signPackage is true then a origin signature will be placed
-     * in the generated package.
-     */
-    @Parameter(defaultValue = "false")
-    private boolean signPackage;
-
-    /**
-     * The keyring to use for signing operations.
-     */
-    @Parameter
-    private String keyring;
-
-    /**
-     * The key to use for signing operations.
-     */
-    @Parameter
-    private String key;
-
-    /**
-     * The passphrase to use for signing operations.
-     */
-    @Parameter
-    private String passphrase; 
-
-    /**
-     * The prefix to use when reading signing variables
-     * from settings.
-     */
-    @Parameter(defaultValue = "jdeb.")
-    private String signCfgPrefix;
-
-    /**
-     * The settings.
-     */
-    @Parameter(defaultValue = "${settings}")
-    private Settings settings;
-
     /* end of parameters */
 
-
-    private static final String KEY = "key";
-    private static final String KEYRING = "keyring";
-    private static final String PASSPHRASE = "passphrase";
-
-    private String openReplaceToken = "[[";
-    private String closeReplaceToken = "]]";
-    private Console console;
     private Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
-    private Collection<DataProducer> conffileProducers = new ArrayList<DataProducer>();
-
-    public void setOpenReplaceToken( String openReplaceToken ) {
-        this.openReplaceToken = openReplaceToken;
-    }
-
-    public void setCloseReplaceToken( String closeReplaceToken ) {
-        this.closeReplaceToken = closeReplaceToken;
-    }
 
     protected void setData( Data[] dataSet ) {
         this.dataSet = dataSet;
         dataProducers.clear();
-        conffileProducers.clear();
         if (dataSet != null) {
             Collections.addAll(dataProducers, dataSet);
-            
-            for (Data item : dataSet) {
-                if (item.getConffile()) {
-                    conffileProducers.add(item);
-                }
-            }
         }
     }
 
@@ -318,7 +203,7 @@ public class DebMojo extends AbstractPackageMojo {
         variables.put("groupId", getProject().getGroupId());
         variables.put("version", getProjectVersion());
         variables.put("description", getProject().getDescription());
-        variables.put("extension", "deb");
+        variables.put("extension", "spk");
         variables.put("baseDir", getProject().getBasedir().getAbsolutePath());
         variables.put("buildDir", buildDirectory.getAbsolutePath());
         variables.put("project.version", getProject().getVersion());
@@ -337,11 +222,7 @@ public class DebMojo extends AbstractPackageMojo {
      * @return the Maven project version
      */
     private String getProjectVersion() {
-        if (this.timestamped) {
-            getLog().error("Configuration 'timestamped' is deprecated. Please use snapshotExpand and snapshotEnv instead.");
-        }
-
-        return Utils.convertToDebianVersion(getProject().getVersion(), this.snapshotExpand || this.timestamped, this.snapshotEnv, session.getStartTime());
+        return Utils.convertToDebianVersion(getProject().getVersion(), this.snapshotExpand, this.snapshotEnv, session.getStartTime());
     }
 
     /**
@@ -373,17 +254,12 @@ public class DebMojo extends AbstractPackageMojo {
 
         console = new MojoConsole(getLog(), verbose);
 
-        initializeSignProperties();
-
         final VariableResolver resolver = initializeVariableResolver(new HashMap<String, String>());
 
-        final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken));
-        final File controlDirFile = new File(Utils.replaceVariables(resolver, controlDir, openReplaceToken, closeReplaceToken));
+        final File spkFile = new File(Utils.replaceVariables(resolver, spk, openReplaceToken, closeReplaceToken));
+        final File spkInfoFile = new File(Utils.replaceVariables(resolver, infoFile, openReplaceToken, closeReplaceToken));
+        final File scriptsDirFile = new File(Utils.replaceVariables(resolver, scriptsDir, openReplaceToken, closeReplaceToken));
         final File installDirFile = new File(Utils.replaceVariables(resolver, installDir, openReplaceToken, closeReplaceToken));
-        final File changesInFile = new File(Utils.replaceVariables(resolver, changesIn, openReplaceToken, closeReplaceToken));
-        final File changesOutFile = new File(Utils.replaceVariables(resolver, changesOut, openReplaceToken, closeReplaceToken));
-        final File changesSaveFile = new File(Utils.replaceVariables(resolver, changesSave, openReplaceToken, closeReplaceToken));
-        final File keyringFile = keyring == null ? null : new File(Utils.replaceVariables(resolver, keyring, openReplaceToken, closeReplaceToken));
 
         // if there are no producers defined we try to use the artifacts
         if (dataProducers.isEmpty()) {
@@ -392,10 +268,10 @@ public class DebMojo extends AbstractPackageMojo {
 
                 final String packaging = project.getPackaging();
                 if ("pom".equalsIgnoreCase(packaging)) {
-                    getLog().warn("Creating empty debian package.");
+                    getLog().warn("Creating empty synology package.");
                 } else {
                     throw new MojoExecutionException(
-                        "Nothing to include into the debian package. " +
+                        "Nothing to include into the synology package. " +
                             "Did you maybe forget to add a <data> tag or call the plugin directly?");
                 }
 
@@ -446,65 +322,28 @@ public class DebMojo extends AbstractPackageMojo {
         }
 
         try {
-            DebMaker debMaker = new DebMaker(console, dataProducers, conffileProducers);
-            debMaker.setDeb(debFile);
-            debMaker.setControl(controlDirFile);
-            debMaker.setPackage(getProject().getArtifactId());
-            debMaker.setDescription(getProject().getDescription());
-            debMaker.setHomepage(getProject().getUrl());
-            debMaker.setChangesIn(changesInFile);
-            debMaker.setChangesOut(changesOutFile);
-            debMaker.setChangesSave(changesSaveFile);
-            debMaker.setCompression(compression);
-            debMaker.setKeyring(keyringFile);
-            debMaker.setKey(key);
-            debMaker.setPassphrase(passphrase);
-            debMaker.setSignPackage(signPackage);
-            debMaker.setResolver(resolver);
-            debMaker.setOpenReplaceToken(openReplaceToken);
-            debMaker.setCloseReplaceToken(closeReplaceToken);
-            debMaker.validate();
-            debMaker.makeDeb();
+            SpkMaker spkMaker = new SpkMaker(console, dataProducers);
+            spkMaker.setSpk(spkFile);
+            spkMaker.setInfo(spkInfoFile);
+            spkMaker.setScripts(scriptsDirFile);
+            spkMaker.setPackage(getProject().getArtifactId());
+            spkMaker.setDescription(getProject().getDescription());
+            spkMaker.setCompression(compression);
+            spkMaker.setResolver(resolver);
+            spkMaker.setOpenReplaceToken(openReplaceToken);
+            spkMaker.setCloseReplaceToken(closeReplaceToken);
+            spkMaker.validate();
+            spkMaker.makeSpk();
 
             // Always attach unless explicitly set to false
             if ("true".equalsIgnoreCase(attach)) {
-                console.info("Attaching created debian package " + debFile);
-                projectHelper.attachArtifact(project, type, classifier, debFile);
+                console.info("Attaching created synology package " + spkFile);
+                projectHelper.attachArtifact(project, type, classifier, spkFile);
             }
 
         } catch (PackagingException e) {
-            getLog().error("Failed to create debian package " + debFile, e);
-            throw new MojoExecutionException("Failed to create debian package " + debFile, e);
-        }
-    }
-
-    /**
-     * Initializes unspecified sign properties using available defaults
-     * and global settings.
-     */
-    private void initializeSignProperties() {
-        if (!signPackage) {
-            return;
-        }
-
-        if (key != null && keyring != null && passphrase != null) {
-            return;
-        }
-
-        Map<String, String> properties =
-                readPropertiesFromActiveProfiles(signCfgPrefix, KEY, KEYRING, PASSPHRASE);
-
-        key = lookupIfEmpty(key, properties, KEY);
-        keyring = lookupIfEmpty(keyring, properties, KEYRING);
-        passphrase = decrypt(lookupIfEmpty(passphrase, properties, PASSPHRASE));
-
-        if (keyring == null) {
-            try {
-                keyring = Utils.guessKeyRingFile().getAbsolutePath();
-                console.info("Located keyring at " + keyring);
-            } catch (FileNotFoundException e) {
-                console.warn(e.getMessage());
-            }
+            getLog().error("Failed to create synology package " + spkFile, e);
+            throw new MojoExecutionException("Failed to create synology package " + spkFile, e);
         }
     }
 

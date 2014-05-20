@@ -1,0 +1,104 @@
+<project name="JDeb Ant tests">
+
+  <taskdef name="spk" classname="org.vafer.jdeb.ant.SpkAntTask"/>
+
+  <target name="missing-info">
+    <spk destfile="test.spk"/>
+  </target>
+
+  <target name="invalid-info">
+    <spk destfile="test.spk" info="spktestbuild.xml"/>
+  </target>
+
+  <target name="missing-destfile">
+    <spk info="org/vafer/jdeb/spk/info" scripts="org/vafer/jdeb/spk/scripts">
+      <data src="org/vafer/jdeb/deb/invalid.tgz" type="archive"/>
+    </spk>
+  </target>
+
+  <target name="empty-package">
+    <spk destfile="test.spk" info="org/vafer/jdeb/spk/info" scripts="org/vafer/jdeb/spk/scripts"/>
+  </target>
+
+  <target name="with-archive">
+    <spk destfile="test.spk" info="org/vafer/jdeb/spk/info" scripts="org/vafer/jdeb/spk/scripts">
+      <data src="org/vafer/jdeb/deb/data.tgz" type="archive"/>
+    </spk>
+  </target>
+
+  <target name="with-missing-archive">
+    <spk destfile="test.spk" info="org/vafer/jdeb/spk/info" scripts="org/vafer/jdeb/spk/scripts">
+      <data src="org/vafer/jdeb/deb/invalid.tgz" type="archive"/>
+    </spk>
+  </target>
+
+  <target name="with-directory">
+    <spk destfile="test.spk" info="org/vafer/jdeb/spk/info" scripts="org/vafer/jdeb/spk/scripts">
+      <data src="org/vafer/jdeb/deb/data" type="directory"/>
+    </spk>
+  </target>
+
+  <target name="with-missing-directory">
+    <spk destfile="test.spk" info="org/vafer/jdeb/spk/info" scripts="org/vafer/jdeb/spk/scripts">
+      <data src="org/vafer/jdeb/deb/invalid" type="directory"/>
+    </spk>
+  </target>
+
+  <target name="verbose-enabled">
+    <spk destfile="test.spk" info="org/vafer/jdeb/spk/info" scripts="org/vafer/jdeb/spk/scripts" verbose="true">
+      <data src="org/vafer/jdeb/deb/data" type="directory"/>
+    </spk>
+  </target>
+
+  <target name="verbose-disabled">
+    <spk destfile="test.spk" info="org/vafer/jdeb/spk/info" scripts="org/vafer/jdeb/spk/scripts" verbose="false">
+      <data src="org/vafer/jdeb/deb/data" type="directory"/>
+    </spk>
+  </target>
+
+  <target name="missing-data-type">
+    <spk destfile="test.spk" info="org/vafer/jdeb/spk/info" scripts="org/vafer/jdeb/spk/scripts" verbose="false">
+      <data src="org/vafer/jdeb/deb/data"/>
+    </spk>
+  </target>
+
+  <target name="unknown-data-type">
+    <spk destfile="test.spk" info="org/vafer/jdeb/spk/info" scripts="org/vafer/jdeb/spk/scripts" verbose="false">
+      <data src="org/vafer/jdeb/deb/data" type="container"/>
+    </spk>
+  </target>
+
+  <target name="fileset">
+    <spk destfile="test.spk" info="org/vafer/jdeb/spk/info" scripts="org/vafer/jdeb/spk/scripts">
+      <fileset dir="org/vafer/jdeb/deb/data"/>
+    </spk>
+  </target>
+
+  <target name="tarfileset">
+    <spk destfile="test.spk" info="org/vafer/jdeb/spk/info" scripts="org/vafer/jdeb/spk/scripts">
+      <tarfileset dir="org/vafer/jdeb/deb/data" prefix="foo" dirmode="700" filemode="600" username="ebourg" group="ebourg"/>
+    </spk>
+  </target>
+
+  <target name="link">
+    <spk destfile="test.spk" info="org/vafer/jdeb/spk/info" scripts="org/vafer/jdeb/spk/scripts">
+      <tarfileset dir="org/vafer/jdeb/deb/data" prefix="foo" dirmode="700" filemode="600" username="ebourg" group="ebourg"/>
+      <link name="/usr/share/java/foo.jar" target="/usr/share/java/foo-1.0.jar" username="ebourg" group="ebourg" mode="755"/>
+    </spk>
+  </target>
+
+  <target name="perm-mapper">
+    <spk destfile="test.spk" info="org/vafer/jdeb/spk/info" scripts="org/vafer/jdeb/spk/scripts">
+      <data src="org/vafer/jdeb/deb/data" type="directory">
+        <mapper type="perm" filemode="700" prefix="/usr/share/foo"/>
+      </data>
+    </spk>
+  </target>
+
+  <target name="unknown-compression">
+    <spk destfile="test.spk" info="org/vafer/jdeb/spk/info" scripts="org/vafer/jdeb/spk/scripts" compression="rar">
+      <fileset dir="org/vafer/jdeb/deb/data"/>
+    </spk>
+  </target>
+
+</project>

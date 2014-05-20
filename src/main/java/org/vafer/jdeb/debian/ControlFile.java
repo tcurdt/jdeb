@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.vafer.jdeb.utils.ControlField;
+
 /**
  * A control file as specified by the <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html">Debian policy</a>.
  *

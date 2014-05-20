@@ -33,21 +33,20 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.archivers.tar.TarConstants;
 import org.apache.commons.compress.archivers.zip.ZipEncoding;
-import org.apache.commons.compress.archivers.zip.ZipEncodingHelper;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.vafer.jdeb.utils.Utils;
 
 /**
  * Builds the data archive of the Debian package.
  */
-class DataBuilder {
+abstract class DataBuilder {
 
-    private Console console;
+    protected Console console;
     
-    private ZipEncoding encoding;
+    protected ZipEncoding encoding;
     
-    private static final class Total {
-        private BigInteger count = BigInteger.valueOf(0);
+    protected static final class Total {
+    	protected BigInteger count = BigInteger.valueOf(0);
 
         public void add( long size ) {
             count = count.add(BigInteger.valueOf(size));
@@ -58,12 +57,7 @@ class DataBuilder {
         }
     }
 
-    DataBuilder(Console console) {
-        this.console = console;
-        this.encoding = ZipEncodingHelper.getZipEncoding(null);
-    }
-
-    private void checkField(String name, int length) throws IOException {
+    protected void checkField(String name, int length) throws IOException {
         if (name != null) {
             ByteBuffer b = encoding.encode(name);
             if (b.limit() > length) {
@@ -98,59 +92,61 @@ class DataBuilder {
 
         final Total dataSize = new Total();
 
-        final List<String> addedDirectories = new ArrayList<String>();
-        final DataConsumer receiver = new DataConsumer() {
-            public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
-                // Check link name
-                checkField(linkname, TarConstants.NAMELEN);
-                // Check user name
-                checkField(user, TarConstants.UNAMELEN);
-                // Check group name
-                checkField(group, TarConstants.GNAMELEN);
+		final List<String> addedDirectories = new ArrayList<String>();
+		final DataConsumer receiver = new DataConsumer() {
+			public void onEachDir(String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size) throws IOException {
+				// Check link name
+				checkField(linkname, TarConstants.NAMELEN);
+				// Check user name
+				checkField(user, TarConstants.UNAMELEN);
+				// Check group name
+				checkField(group, TarConstants.GNAMELEN);
 
-                dirname = fixPath(dirname);
+				dirname = fixPath(dirname);
 
-                createParentDirectories(dirname, user, uid, group, gid);
+				createParentDirectories(dirname, user, uid, group, gid);
 
-                // The directory passed in explicitly by the caller also gets the passed-in mode.  (Unlike
-                // the parent directories for now.  See related comments at "int mode =" in
-                // createParentDirectories, including about a possible bug.)
-                createDirectory(dirname, user, uid, group, gid, mode, 0);
+				// The directory passed in explicitly by the caller also gets
+				// the passed-in mode. (Unlike
+				// the parent directories for now. See related comments at
+				// "int mode =" in
+				// createParentDirectories, including about a possible bug.)
+				createDirectory(dirname, user, uid, group, gid, mode, 0);
 
-                console.debug("dir: " + dirname);
-            }
-            
-            public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
-                // Check link name
-                checkField(linkname, TarConstants.NAMELEN);
-                // Check user name
-                checkField(user, TarConstants.UNAMELEN);
-                // Check group name
-                checkField(group, TarConstants.GNAMELEN);
+				console.debug("dir: " + dirname);
+			}
 
-                filename = fixPath(filename);
+			public void onEachFile(InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size) throws IOException {
+				// Check link name
+				checkField(linkname, TarConstants.NAMELEN);
+				// Check user name
+				checkField(user, TarConstants.UNAMELEN);
+				// Check group name
+				checkField(group, TarConstants.GNAMELEN);
 
-                createParentDirectories(filename, user, uid, group, gid);
+				filename = fixPath(filename);
 
-                final TarArchiveEntry entry = new TarArchiveEntry(filename, true);
+				createParentDirectories(filename, user, uid, group, gid);
 
-                entry.setUserName(user);
-                entry.setUserId(uid);
-                entry.setGroupName(group);
-                entry.setGroupId(gid);
-                entry.setMode(mode);
-                entry.setSize(size);
+				final TarArchiveEntry entry = new TarArchiveEntry(filename, true);
 
-                tarOutputStream.putArchiveEntry(entry);
+				entry.setUserName(user);
+				entry.setUserId(uid);
+				entry.setGroupName(group);
+				entry.setGroupId(gid);
+				entry.setMode(mode);
+				entry.setSize(size);
 
-                dataSize.add(size);
-                digest.reset();
+				tarOutputStream.putArchiveEntry(entry);
 
-                Utils.copy(inputStream, new DigestOutputStream(tarOutputStream, digest));
+				dataSize.add(size);
+				digest.reset();
 
-                final String md5 = Utils.toHex(digest.digest());
+				Utils.copy(inputStream, new DigestOutputStream(tarOutputStream, digest));
 
-                tarOutputStream.closeArchiveEntry();
+				final String md5 = Utils.toHex(digest.digest());
+
+				tarOutputStream.closeArchiveEntry();
 
                 console.debug(
                     "file:" + entry.getName() +
@@ -165,33 +161,33 @@ class DataBuilder {
                         " md5: " + md5
                 );
 
-                // append to file md5 list
-                checksums.append(md5).append(" ").append(entry.getName()).append('\n');
-            }
+				// append to file md5 list
+				checksums.append(md5).append(" ").append(entry.getName()).append('\n');
+			}
 
-            public void onEachLink(String path, String linkname, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
-                // Check link name
-                checkField(linkname, TarConstants.NAMELEN);
-                // Check user name
-                checkField(user, TarConstants.UNAMELEN);
-                // Check group name
-                checkField(group, TarConstants.GNAMELEN);
+			public void onEachLink(String path, String linkname, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
+				// Check link name
+				checkField(linkname, TarConstants.NAMELEN);
+				// Check user name
+				checkField(user, TarConstants.UNAMELEN);
+				// Check group name
+				checkField(group, TarConstants.GNAMELEN);
 
-                path = fixPath(path);
+				path = fixPath(path);
 
-                createParentDirectories(path, user, uid, group, gid);
+				createParentDirectories(path, user, uid, group, gid);
 
-                final TarArchiveEntry entry = new TarArchiveEntry(path, symlink ? TarArchiveEntry.LF_SYMLINK : TarArchiveEntry.LF_LINK);
-                entry.setLinkName(linkname);
+				final TarArchiveEntry entry = new TarArchiveEntry(path, symlink ? TarArchiveEntry.LF_SYMLINK : TarArchiveEntry.LF_LINK, true);
+				entry.setLinkName(linkname);
 
-                entry.setUserName(user);
-                entry.setUserId(uid);
-                entry.setGroupName(group);
-                entry.setGroupId(gid);
-                entry.setMode(mode);
+				entry.setUserName(user);
+				entry.setUserId(uid);
+				entry.setGroupName(group);
+				entry.setGroupId(gid);
+				entry.setMode(mode);
 
-                tarOutputStream.putArchiveEntry(entry);
-                tarOutputStream.closeArchiveEntry();
+				tarOutputStream.putArchiveEntry(entry);
+				tarOutputStream.closeArchiveEntry();
 
                 console.debug(
                     "link:" + entry.getName() +
@@ -201,36 +197,41 @@ class DataBuilder {
                     " userid:" + entry.getUserId() +
                     " groupname:" + entry.getGroupName() +
                     " groupid:" + entry.getGroupId()
-                 );
-            }
-            
+                );
+			}
 
-            private void createDirectory( String directory, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
-                // All dirs should end with "/" when created, or the test DebAndTaskTestCase.testTarFileSet() thinks its a file
-                // and so thinks it has the wrong permission.
-                // This consistency also helps when checking if a directory already exists in addedDirectories.
-        
-                if (!directory.endsWith("/")) {
-                    directory += "/";
-                }
-        
-                if (!addedDirectories.contains(directory)) {
-                    TarArchiveEntry entry = new TarArchiveEntry(directory, true);
-                    entry.setUserName(user);
-                    entry.setUserId(uid);
-                    entry.setGroupName(group);
-                    entry.setGroupId(gid);
-                    entry.setMode(mode);
-                    entry.setSize(size);
-        
-                    tarOutputStream.putArchiveEntry(entry);
-                    tarOutputStream.closeArchiveEntry();
-                    addedDirectories.add(directory); // so addedDirectories consistently have "/" for finding duplicates.
-                }
-            }
+			private void createDirectory(String directory, String user, int uid, String group, int gid, int mode, long size) throws IOException {
+				// All dirs should end with "/" when created, or the test
+				// DebAndTaskTestCase.testTarFileSet() thinks its a file
+				// and so thinks it has the wrong permission.
+				// This consistency also helps when checking if a directory
+				// already exists in addedDirectories.
+
+				if (directory == null) {
+					return;
+				}
+				
+				if (!directory.endsWith("/")) {
+					directory += "/";
+				}
+
+				if (!addedDirectories.contains(directory)) {
+					TarArchiveEntry entry = new TarArchiveEntry(directory, true);
+					entry.setUserName(user);
+					entry.setUserId(uid);
+					entry.setGroupName(group);
+					entry.setGroupId(gid);
+					entry.setMode(mode);
+					entry.setSize(size);
+
+					tarOutputStream.putArchiveEntry(entry);
+					tarOutputStream.closeArchiveEntry();
+					addedDirectories.add(directory); // so addedDirectories consistently have "/" for finding duplicates.
+				}
+			}
         
             private void createParentDirectories( String filename, String user, int uid, String group, int gid ) throws IOException {
-                String dirname = fixPath(new File(filename).getParent());
+            	String dirname = fixPath(new File(filename).getParent());
                 
                 // Debian packages must have parent directories created
                 // before sub-directories or files can be installed.
@@ -238,7 +239,7 @@ class DataBuilder {
                 // in a .deb package, but the ./usr/lib/foo directory didn't
                 // exist, the package installation would fail.  The .deb must
                 // then have an entry for ./usr/lib/foo and then ./usr/lib/foo/bar
-        
+            	
                 if (dirname == null) {
                     return;
                 }
@@ -246,9 +247,11 @@ class DataBuilder {
                 // The loop below will create entries for all parent directories
                 // to ensure that .deb packages will install correctly.
                 String[] pathParts = dirname.split("/");
-                String parentDir = "./";
+                String parentDir = fixPath(pathParts[0] + "/");
+            	
                 for (int i = 1; i < pathParts.length; i++) {
                     parentDir += pathParts[i] + "/";
+                    
                     // Make it so the dirs can be traversed by users.
                     // We could instead try something more granular, like setting the directory
                     // permission to 'rx' for each of the 3 user/group/other read permissions
@@ -284,24 +287,8 @@ class DataBuilder {
         return dataSize.count;
     }
 
-    private String fixPath( String path ) {
-        if (path == null || path.equals(".")) {
-            return path;
-        }
-        
-        // If we're receiving directory names from Windows, then we'll convert to use slash
-        // This does eliminate the ability to use of a backslash in a directory name on *NIX,
-        // but in practice, this is a non-issue
-        if (path.contains("\\")) {
-            path = path.replace('\\', '/');
-        }
-        // ensure the path is like : ./foo/bar
-        if (path.startsWith("/")) {
-            path = "." + path;
-        } else if (!path.startsWith("./")) {
-            path = "./" + path;
-        }
-        return path;
-    }
+    protected abstract String fixPath( String path );
+
+    protected abstract String getPathPrefix();
 
 }

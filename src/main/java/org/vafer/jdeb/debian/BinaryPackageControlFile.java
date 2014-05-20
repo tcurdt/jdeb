@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 
+import org.vafer.jdeb.utils.ControlField;
+
 /**
  * Binary package control file.
  *

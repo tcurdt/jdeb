@@ -16,11 +16,8 @@
 package org.vafer.jdeb.producers;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.tools.ant.DirectoryScanner;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;

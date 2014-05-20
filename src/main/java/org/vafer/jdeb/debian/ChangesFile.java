@@ -17,6 +17,7 @@
 package org.vafer.jdeb.debian;
 
 import org.vafer.jdeb.changes.ChangeSet;
+import org.vafer.jdeb.utils.ControlField;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
