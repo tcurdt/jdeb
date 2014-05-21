@@ -93,12 +93,9 @@ public final class DebAntTaskTestCase extends TestCase {
     }
 
     public void testEmptyPackage() {
-        try {
-            project.executeTarget("empty-package");
-            fail("No exception thrown");
-        } catch (BuildException e) {
-            // expected
-        }
+        project.executeTarget("empty-package");
+
+        assertTrue("package not build", new File("target/test-classes/test.deb").exists());
     }
 
     public void testPackageWithArchive() {
