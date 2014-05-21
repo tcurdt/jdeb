@@ -1,3 +1,7 @@
+## Version 1.2, in progress
+
+* [ADD] Support <packaging>deb</packaging> in Maven
+
 ## Version 1.1.1, released 10.03.2014
 
 * [FIX] renamed SNAPSHOT handling to snapshotExpand & snapshotEnv
