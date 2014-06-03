@@ -9,7 +9,7 @@ the plugin to your POM like this
       <plugin>
         <artifactId>jdeb</artifactId>
         <groupId>org.vafer</groupId>
-        <version>1.0</version>
+        <version>1.2</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -32,6 +32,45 @@ the plugin to your POM like this
         </executions>
       </plugin>
     </plugins>
+  </build>
+```
+
+Or if you want to build a custom deb file
+
+```xml
+  <!-- Indicate it's a deb package which will automatically execute jdeb goal -->
+  <packaging>deb</packaging>
+
+  <build>
+    <extensions>
+      <!-- Add support for the "deb" packaging -->
+      <extension>
+        <groupId>org.vafer</groupId>
+        <artifactId>jdeb</artifactId>
+        <version>1.2</version>
+      </extension>
+    </extensions>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>jdeb</artifactId>
+          <groupId>org.vafer</groupId>
+          <!-- Customize deb package -->
+          <configuration>
+            <dataSet>
+              <data>
+                <src>${project.build.directory}/preparedfiles</src>
+                <type>directory</type>
+                <mapper>
+                  <type>perm</type>
+                  <prefix>/usr/lib/xwiki/myproject</prefix>
+                </mapper>
+              </data>
+            </dataSet>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 ```
 
@@ -86,6 +125,8 @@ changesOut    | The changes file generated                                      
 changesSave   | (NYI) The merged changes file                                                | No
 compression   | (NYI) Compression method for the data file (`gzip`, `bzip2`, `xz` or `none`) | No; defaults to `gzip`
 signPackage   | If the debian package should be signed                                       | No
+signMethod    | Which utility is used for verification (`dpkg-sig`, `debsig-verify`)         | No; defaults to `debsig-verify`
+signRole      | Determines the filename of the signature, debsig only verifies `origin`      | No; defaults to `origin`
 signCfgPrefix | Prefix for when reading keyring, key and passphrase from settings.xml        | No; defaults to `jdeb.`
 keyring       | The file containing the PGP keys                                             | No
 key           | The name of the key to be used in the keyring                                | No
@@ -140,7 +181,7 @@ include a directory, a tarball, and a file in your deb package and then sign it 
       <plugin>
         <artifactId>jdeb</artifactId>
         <groupId>org.vafer</groupId>
-        <version>1.0</version>
+        <version>1.2</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -149,6 +190,8 @@ include a directory, a tarball, and a file in your deb package and then sign it 
             </goals>
             <configuration>
               <signPackage>true</signPackage>
+              <signMethod>dpkg-sig</signMethod>
+              <signRole>builder</signRole>
               <keyring>/home/user/.gnupg/secring.gpg</keyring>
               <key>8306FE21</key>
               <passphrase>abcdef</passphrase>

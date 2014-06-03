@@ -93,4 +93,21 @@ public class ArchiveWalker {
         });
         return found.get();
     }
+    
+    public static boolean arArchiveContains(File archive, String filename) throws IOException {
+        ArchiveEntry entry;
+        ArArchiveInputStream tin;
+        
+        tin = new ArArchiveInputStream(new FileInputStream (archive));
+        
+        while ((entry = tin.getNextEntry()) != null) {
+            if(entry.getName().equals(filename)){
+            	tin.close();
+            	return true;
+            }
+        }
+        
+    	tin.close();
+        return false;
+    } 
 }

@@ -48,7 +48,7 @@ import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
  */
 public class PGPSigner {
 
-    private static final byte[] EOL = "\r\n".getBytes(Charset.forName("UTF-8"));
+    private static final byte[] EOL = "\n".getBytes(Charset.forName("UTF-8"));
 
     private PGPSecretKey secretKey;
     private PGPPrivateKey privateKey;

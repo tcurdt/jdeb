@@ -16,25 +16,34 @@
 
 package org.vafer.jdeb;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.Security;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.crypto.digests.MD5Digest;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPSignature;
 import org.bouncycastle.openpgp.PGPSignatureGenerator;
 import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
+import org.bouncycastle.util.encoders.Hex;
 import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.ChangesProvider;
 import org.vafer.jdeb.changes.TextfileChangesProvider;
@@ -102,6 +111,12 @@ public class DebMaker {
     /** Whether to sign the package that is created */
     private boolean signPackage;
 
+    /** Defines which utility is used to verify the signed package */
+    private String signMethod;
+    
+    /** Defines the role to sign with */
+    private String signRole;
+    
     private VariableResolver variableResolver;
     private String openReplaceToken;
     private String closeReplaceToken;
@@ -119,6 +134,8 @@ public class DebMaker {
         if (conffileProducers != null) {
             this.conffilesProducers.addAll(conffileProducers);
         }
+        
+        Security.addProvider(new BouncyCastleProvider());
     }
 
     public void setDeb(File deb) {
@@ -163,6 +180,14 @@ public class DebMaker {
 
     public void setSignPackage(boolean signPackage) {
         this.signPackage = signPackage;
+    }
+    
+    public void setSignMethod(String signMethod) {
+        this.signMethod = signMethod;
+    }
+    
+    public void setSignRole(String signRole) {
+        this.signRole = signRole;
     }
 
     public void setKeyring(File keyring) {
@@ -224,10 +249,6 @@ public class DebMaker {
         if (deb == null) {
             throw new PackagingException("You need to specify where the deb file is supposed to be created.");
         }
-        
-        if (dataProducers.size() == 0) {
-            throw new PackagingException("You need to provide at least one reference to a tgz or directory with data.");
-        }
     }
 
     public void makeDeb() throws PackagingException {
@@ -267,7 +288,7 @@ public class DebMaker {
                 PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(signer.getSecretKey().getPublicKey().getAlgorithm(), digest));
                 signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, signer.getPrivateKey());
 
-                packageControlFile = createSignedDeb(Compression.toEnum(compression), signatureGenerator);
+                packageControlFile = createSignedDeb(Compression.toEnum(compression), signatureGenerator, signer);
             } else {
                 packageControlFile = createDeb(Compression.toEnum(compression));
             }
@@ -362,6 +383,7 @@ public class DebMaker {
                 if (tempConffileItem.startsWith(".")) {
                     tempConffileItem = tempConffileItem.substring(1);
                 }
+                console.info("Adding conffile: " + tempConffileItem);
                 result.add(tempConffileItem);
             }
 
@@ -392,7 +414,7 @@ public class DebMaker {
      * @throws PackagingException
      */
     public BinaryPackageControlFile createDeb(Compression compression) throws PackagingException {
-        return createSignedDeb(compression, null);
+        return createSignedDeb(compression, null, null);
     }
     /**
      * Create the debian archive with from the provided control files and data producers.
@@ -403,7 +425,7 @@ public class DebMaker {
      * @return PackageDescriptor
      * @throws PackagingException
      */
-    public BinaryPackageControlFile createSignedDeb(Compression compression, final PGPSignatureGenerator signatureGenerator ) throws PackagingException {
+    public BinaryPackageControlFile createSignedDeb(Compression compression, final PGPSignatureGenerator signatureGenerator, PGPSigner signer ) throws PackagingException {
         File tempData = null;
         File tempControl = null;
 
@@ -448,20 +470,49 @@ public class DebMaker {
 
             deb.getParentFile().mkdirs();
             
-            
             ArArchiveOutputStream ar = new ArArchiveOutputStream(new FileOutputStream(deb));
             
-            addTo(ar, "debian-binary", "2.0\n");
-            addTo(ar, "control.tar.gz", tempControl);
-            addTo(ar, "data.tar" + compression.getExtension(), tempData);
-
+            String binaryName = "debian-binary";
+            String binaryContent = "2.0\n";
+            String controlName = "control.tar.gz";
+            String dataName = "data.tar" + compression.getExtension();
+            
+            addTo(ar, binaryName, binaryContent);
+            addTo(ar, controlName, tempControl);
+            addTo(ar, dataName, tempData);
+            
             if (signatureGenerator != null) {
                 console.info("Signing package with key " + key);
-                PGPSignatureOutputStream sigStream = new PGPSignatureOutputStream(signatureGenerator);
-                addTo(sigStream, "2.0\n");
-                addTo(sigStream, tempControl);
-                addTo(sigStream, tempData);
-                addTo(ar, "_gpgorigin", sigStream.generateASCIISignature());
+                
+                if(signRole==null)
+                	signRole = "origin";
+                
+                // Use debsig-verify as default
+                if(signMethod==null || !signMethod.equals("dpkg-sig")) {
+                	// Sign file to verify with debsig-verify
+	                PGPSignatureOutputStream sigStream = new PGPSignatureOutputStream(signatureGenerator);
+	
+	                addTo(sigStream, binaryContent);
+	                addTo(sigStream, tempControl);
+	                addTo(sigStream, tempData);
+	                addTo(ar, "_gpg" + signRole, sigStream.generateASCIISignature());
+                } else {
+	                // Sign file to verify with dpkg-sig --verify
+	                final String outputStr =
+	                            "Version: 4\n" +
+	                            "Signer: \n" +
+	                            "Date: " + new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy", Locale.ENGLISH).format(new Date()) + "\n" + 
+	                            "Role: " + signRole +"\n" + 
+	                            "Files: \n" +
+	                            addFile(binaryName, binaryContent) +
+	                            addFile(controlName, tempControl) +
+	                            addFile(dataName, tempData);
+	                
+	                ByteArrayOutputStream message = new ByteArrayOutputStream();
+	                signer.clearSign(outputStr, message);
+	                
+	                addTo(ar, "_gpg" + signRole, message.toString());
+                }
             }
 
             ar.close();
@@ -484,6 +535,81 @@ public class DebMaker {
         }
     }
 
+    private String addFile(String name, String input){
+    	return addLine(md5Hash(input), sha1Hash(input), input.length(), name);
+    }
+    
+    private String addFile(String name, File input){
+    	return addLine(md5Hash(input), sha1Hash(input), input.length(), name);
+    }
+    
+    private String addLine(String md5, String sha1, long size, String name){
+    	return "\t" + md5 + " " + sha1 + " " + size + " " + name + "\n";
+    }
+    
+    private String md5Hash(String input){
+    	return md5Hash(input.getBytes());
+    }
+    
+    private String md5Hash(File input){
+    	try {
+			return md5Hash(FileUtils.readFileToByteArray(input));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return null;
+    }
+    
+    private String md5Hash(byte input[]){
+        //update the input of MD5
+        MD5Digest md5 = new MD5Digest();
+        md5.update(input, 0, input.length);
+
+        //get the output/ digest size and hash it
+        byte[] digest = new byte[md5.getDigestSize()];
+        md5.doFinal(digest, 0);
+
+        return new String(Hex.encode(digest));
+    }
+    
+    private String sha1Hash(String input){
+    	return sha1Hash(input.getBytes());
+    }
+    
+    private String sha1Hash(File input){
+    	try {
+			return sha1Hash(FileUtils.readFileToByteArray(input));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return null;
+    }
+    
+    private String sha1Hash(byte input[]){
+         try
+         {
+               //prepare the input
+               MessageDigest hash = MessageDigest.getInstance("SHA1");
+               hash.update(input);
+
+               //proceed ....
+               byte[] digest = hash.digest();
+
+               return new String(Hex.encode(digest));
+         }
+         catch (NoSuchAlgorithmException e)
+         {
+               System.err.println("No such algorithm");
+               e.printStackTrace();
+         }
+         
+         return null;
+    }
+    
     private void addTo(ArArchiveOutputStream pOutput, String pName, String pContent) throws IOException {
         final byte[] content = pContent.getBytes();
         pOutput.putArchiveEntry(new ArArchiveEntry(pName, content.length));

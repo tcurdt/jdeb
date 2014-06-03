@@ -254,7 +254,19 @@ public class DebMojo extends AbstractPluginMojo {
      */
     @Parameter(defaultValue = "false")
     private boolean signPackage;
+    
+    /**
+     * Defines which utility is used to verify the signed package
+     */
+    @Parameter(defaultValue = "debsig-verify")
+    private String signMethod;
 
+    /**
+     * Defines the role to sign with
+     */
+    @Parameter(defaultValue = "origin")
+    private String signRole;
+    
     /**
      * The keyring to use for signing operations.
      */
@@ -370,6 +382,13 @@ public class DebMojo extends AbstractPluginMojo {
     }
 
     /**
+     * @return whether the artifact is of configured type (i.e. the package to generate is the main artifact)
+     */
+    private boolean isType() {
+        return type.equals(getProject().getArtifact().getType());
+    }
+
+    /**
      * @return whether or not Maven is currently operating in the execution root
      */
     private boolean isSubmodule() {
@@ -430,19 +449,7 @@ public class DebMojo extends AbstractPluginMojo {
         // if there are no producers defined we try to use the artifacts
         if (dataProducers.isEmpty()) {
 
-            if (!hasMainArtifact()) {
-
-                final String packaging = project.getPackaging();
-                if ("pom".equalsIgnoreCase(packaging)) {
-                    getLog().warn("Creating empty debian package.");
-                } else {
-                    throw new MojoExecutionException(
-                        "Nothing to include into the debian package. " +
-                            "Did you maybe forget to add a <data> tag or call the plugin directly?");
-                }
-
-            } else {
-
+            if (hasMainArtifact()) {
                 Set<Artifact> artifacts = new HashSet<Artifact>();
 
                 artifacts.add(project.getArtifact());
@@ -502,6 +509,8 @@ public class DebMojo extends AbstractPluginMojo {
             debMaker.setKey(key);
             debMaker.setPassphrase(passphrase);
             debMaker.setSignPackage(signPackage);
+            debMaker.setSignMethod(signMethod);
+            debMaker.setSignRole(signRole);
             debMaker.setResolver(resolver);
             debMaker.setOpenReplaceToken(openReplaceToken);
             debMaker.setCloseReplaceToken(closeReplaceToken);
@@ -511,7 +520,11 @@ public class DebMojo extends AbstractPluginMojo {
             // Always attach unless explicitly set to false
             if ("true".equalsIgnoreCase(attach)) {
                 console.info("Attaching created debian package " + debFile);
-                projectHelper.attachArtifact(project, type, classifier, debFile);
+                if (!isType()) {
+                    projectHelper.attachArtifact(project, type, classifier, debFile);
+                } else {
+                    project.getArtifact().setFile(debFile);
+                }
             }
 
         } catch (PackagingException e) {
