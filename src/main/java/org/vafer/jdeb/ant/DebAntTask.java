@@ -142,9 +142,9 @@ public class DebAntTask extends MatchingTask {
             if (dataProducer instanceof Data) {
                 Data data = (Data) dataProducer;
                 if (data.getType() == null) {
-                    throw new BuildException("The type of the data element wasn't specified (expected 'file', 'directory' or 'archive')");
-                } else if (!Arrays.asList("file", "directory", "archive").contains(data.getType().toLowerCase())) {
-                    throw new BuildException("The type '" + data.getType() + "' of the data element is unknown (expected 'file', 'directory' or 'archive')");
+                    throw new BuildException("The type of the data element wasn't specified (expected 'file', 'directory', 'archive' or 'template')");
+                } else if (!Arrays.asList("file", "directory", "archive", "template").contains(data.getType().toLowerCase())) {
+                    throw new BuildException("The type '" + data.getType() + "' of the data element is unknown (expected 'file', 'directory', 'archive' or 'template')");
                 }
                 if (data.getConffile() != null && data.getConffile()) {
                     conffilesProducers.add(dataProducer);

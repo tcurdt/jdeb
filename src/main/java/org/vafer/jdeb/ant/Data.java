@@ -28,6 +28,7 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
 import org.vafer.jdeb.producers.DataProducerFile;
+import org.vafer.jdeb.producers.DataProducerPathTemplate;
 
 /**
  * Ant "data" element acting as a factory for DataProducers.
@@ -47,6 +48,8 @@ public final class Data extends PatternSet implements DataProducer {
     private Boolean conffile;
 
     private String destinationName;
+
+    private String[] paths;
 
     public void setSrc(File src) {
         this.src = src;
@@ -76,11 +79,11 @@ public final class Data extends PatternSet implements DataProducer {
         mapperWrapper.add(mapper);
     }
 
-    public void produce( final DataConsumer pReceiver ) throws IOException {
+    public void setPaths(String paths) {
+        this.paths = paths.trim().split(",\\s*");
+    }
 
-        if (src == null || !src.exists()) {
-            throw new FileNotFoundException("Data source not found : " + src);
-        }
+    public void produce( final DataConsumer pReceiver ) throws IOException {
 
         org.vafer.jdeb.mapping.Mapper[] mappers = new org.vafer.jdeb.mapping.Mapper[mapperWrapper.size()];
         final Iterator<Mapper> it = mapperWrapper.iterator();
@@ -88,7 +91,24 @@ public final class Data extends PatternSet implements DataProducer {
             mappers[i] = it.next().createMapper();
         }
 
-        if ("file".equalsIgnoreCase(type)) {
+        if (typeIs("template")) {
+            checkPaths();
+            new DataProducerPathTemplate(
+                paths,
+                getIncludePatterns(getProject()),
+                getExcludePatterns(getProject()),
+                mappers
+            ).produce(pReceiver);
+            return;
+        }
+
+        // Types that require src to exist
+
+        if (src == null || !src.exists()) {
+            throw new FileNotFoundException("Data source not found : " + src);
+        }
+
+        if (typeIs("file")) {
             new DataProducerFile(
                 src,
                 destinationName,
@@ -96,22 +116,37 @@ public final class Data extends PatternSet implements DataProducer {
                 getExcludePatterns(getProject()),
                 mappers
             ).produce(pReceiver);
-
-        } else if ("archive".equalsIgnoreCase(type)) {
+            return;
+        }
+        if (typeIs("archive")) {
             new DataProducerArchive(
                 src,
                 getIncludePatterns(getProject()),
                 getExcludePatterns(getProject()),
                 mappers
             ).produce(pReceiver);
-
-        } else if ("directory".equalsIgnoreCase(type)) {
+            return;
+        }
+        if (typeIs("directory")) {
             new DataProducerDirectory(
                 src,
                 getIncludePatterns(getProject()),
                 getExcludePatterns(getProject()),
                 mappers
             ).produce(pReceiver);
+            return;
+        }
+
+       throw new RuntimeException("Unknown type '" + type + "' (file|directory|archive|template) for " + src);
+     }
+
+    private boolean typeIs( final String type ) {
+        return type.equalsIgnoreCase(this.type);
+    }
+
+    private void checkPaths() {
+        if (paths == null || paths.length == 0) {
+          throw new RuntimeException("paths parameter is not set");
         }
     }
 }
