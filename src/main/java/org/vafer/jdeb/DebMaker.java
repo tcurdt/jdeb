@@ -113,10 +113,10 @@ public class DebMaker {
 
     /** Defines which utility is used to verify the signed package */
     private String signMethod;
-    
+
     /** Defines the role to sign with */
     private String signRole;
-    
+
     private VariableResolver variableResolver;
     private String openReplaceToken;
     private String closeReplaceToken;
@@ -134,7 +134,7 @@ public class DebMaker {
         if (conffileProducers != null) {
             this.conffilesProducers.addAll(conffileProducers);
         }
-        
+
         Security.addProvider(new BouncyCastleProvider());
     }
 
@@ -181,11 +181,11 @@ public class DebMaker {
     public void setSignPackage(boolean signPackage) {
         this.signPackage = signPackage;
     }
-    
+
     public void setSignMethod(String signMethod) {
         this.signMethod = signMethod;
     }
-    
+
     public void setSignRole(String signRole) {
         this.signRole = signRole;
     }
@@ -227,7 +227,7 @@ public class DebMaker {
             if (changesIn.exists() && (!changesIn.isFile() || !changesIn.canRead())) {
                 throw new PackagingException("The 'changesIn' setting needs to point to a readable file. " + changesIn + " was not found/readable.");
             }
-            
+
             if (changesOut != null && !isWritableFile(changesOut)) {
                 throw new PackagingException("Cannot write the output for 'changesOut' to " + changesOut);
             }
@@ -296,7 +296,7 @@ public class DebMaker {
         } catch (Exception e) {
             throw new PackagingException("Failed to create debian package " + deb, e);
         }
-        
+
         makeChangesFiles(packageControlFile);
     }
 
@@ -304,15 +304,15 @@ public class DebMaker {
         if (changesOut == null) {
             changesOut = new File(deb.getParentFile(), deb.getName().replace(".deb", ".changes"));
         }
-        
+
         ChangesProvider changesProvider;
         FileOutputStream out = null;
-        
+
         try {
             console.info("Creating changes file: " + changesOut);
-            
+
             out = new FileOutputStream(changesOut);
-            
+
             if (changesIn != null && changesIn.exists()) {
                 // read the changes form a textfile provider
                 changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile);
@@ -333,10 +333,10 @@ public class DebMaker {
                     }
                 };
             }
-            
+
             ChangesFileBuilder builder = new ChangesFileBuilder();
             ChangesFile changesFile = builder.createChanges(packageControlFile, deb, changesProvider);
-            
+
             if (keyring != null && key != null && passphrase != null) {
                 console.info("Signing the changes file with the key " + key);
                 PGPSigner signer = new PGPSigner(new FileInputStream(keyring), key, passphrase);
@@ -351,11 +351,11 @@ public class DebMaker {
         } finally {
             IOUtils.closeQuietly(out);
         }
-        
+
         if (changesSave == null || !(changesProvider instanceof TextfileChangesProvider)) {
             return;
         }
-        
+
         try {
             console.info("Saving changes to file: " + changesSave);
 
@@ -365,19 +365,19 @@ public class DebMaker {
             throw new PackagingException("Failed to save debian changes file " + changesSave, e);
         }
     }
-    
+
     private List<String> populateConffiles(Collection<DataProducer> producers) {
         final List<String> result = new ArrayList<String>();
-        
+
         if (producers == null || producers.isEmpty()) {
             return result;
         }
-        
+
         final DataConsumer receiver = new DataConsumer() {
             public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 //
             }
-            
+
             public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 String tempConffileItem = filename;
                 if (tempConffileItem.startsWith(".")) {
@@ -399,10 +399,10 @@ public class DebMaker {
         } catch(Exception e) {
             //
         }
-        
+
         return result;
     }
-    
+
     /**
      * Create the debian archive with from the provided control files and data producers.
      *
@@ -421,7 +421,7 @@ public class DebMaker {
      *
      * @param compression   the compression method used for the data file (gzip, bzip2 or anything else for no compression)
      * @param signatureGenerator   the signature generator
-     * 
+     *
      * @return PackageDescriptor
      * @throws PackagingException
      */
@@ -440,7 +440,7 @@ public class DebMaker {
 
             console.info("Building conffiles");
             List<String> tempConffiles = populateConffiles(conffilesProducers);
-            
+
             console.debug("Building control");
             ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver, openReplaceToken, closeReplaceToken);
             BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size);
@@ -459,64 +459,67 @@ public class DebMaker {
             if (packageControlFile.get("Homepage") == null) {
                 packageControlFile.set("Homepage", homepage);
             }
-            
+
             controlBuilder.buildControl(packageControlFile, control.listFiles(), tempConffiles , md5s, tempControl);
-            
+
             if (!packageControlFile.isValid()) {
                 throw new PackagingException("Control file fields are invalid " + packageControlFile.invalidFields() +
-                    ". The following fields are mandatory: " + packageControlFile.getMandatoryFields() +
-                    ". Please check your pom.xml/build.xml and your control file.");
+                        ". The following fields are mandatory: " + packageControlFile.getMandatoryFields() +
+                        ". Please check your pom.xml/build.xml and your control file.");
             }
 
             deb.getParentFile().mkdirs();
-            
+
             ArArchiveOutputStream ar = new ArArchiveOutputStream(new FileOutputStream(deb));
-            
+
             String binaryName = "debian-binary";
             String binaryContent = "2.0\n";
             String controlName = "control.tar.gz";
             String dataName = "data.tar" + compression.getExtension();
-            
+
             addTo(ar, binaryName, binaryContent);
             addTo(ar, controlName, tempControl);
             addTo(ar, dataName, tempData);
-            
+
             if (signatureGenerator != null) {
                 console.info("Signing package with key " + key);
-                
-                if(signRole==null)
-                	signRole = "origin";
-                
+
+                if(signRole == null) {
+                    signRole = "origin";
+                }
+
                 // Use debsig-verify as default
-                if(signMethod==null || !signMethod.equals("dpkg-sig")) {
-                	// Sign file to verify with debsig-verify
-	                PGPSignatureOutputStream sigStream = new PGPSignatureOutputStream(signatureGenerator);
-	
-	                addTo(sigStream, binaryContent);
-	                addTo(sigStream, tempControl);
-	                addTo(sigStream, tempData);
-	                addTo(ar, "_gpg" + signRole, sigStream.generateASCIISignature());
+                if(signMethod == null || !"dpkg-sig".equals(signMethod)) {
+                    // Sign file to verify with debsig-verify
+                    PGPSignatureOutputStream sigStream = new PGPSignatureOutputStream(signatureGenerator);
+
+                    addTo(sigStream, binaryContent);
+                    addTo(sigStream, tempControl);
+                    addTo(sigStream, tempData);
+                    addTo(ar, "_gpg" + signRole, sigStream.generateASCIISignature());
+
                 } else {
-	                // Sign file to verify with dpkg-sig --verify
-	                final String outputStr =
-	                            "Version: 4\n" +
-	                            "Signer: \n" +
-	                            "Date: " + new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy", Locale.ENGLISH).format(new Date()) + "\n" + 
-	                            "Role: " + signRole +"\n" + 
-	                            "Files: \n" +
-	                            addFile(binaryName, binaryContent) +
-	                            addFile(controlName, tempControl) +
-	                            addFile(dataName, tempData);
-	                
-	                ByteArrayOutputStream message = new ByteArrayOutputStream();
-	                signer.clearSign(outputStr, message);
-	                
-	                addTo(ar, "_gpg" + signRole, message.toString());
+
+                    // Sign file to verify with dpkg-sig --verify
+                    final String outputStr =
+                            "Version: 4\n" +
+                                    "Signer: \n" +
+                                    "Date: " + new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy", Locale.ENGLISH).format(new Date()) + "\n" +
+                                    "Role: " + signRole +"\n" +
+                                    "Files: \n" +
+                                    addFile(binaryName, binaryContent) +
+                                    addFile(controlName, tempControl) +
+                                    addFile(dataName, tempData);
+
+                    ByteArrayOutputStream message = new ByteArrayOutputStream();
+                    signer.clearSign(outputStr, message);
+
+                    addTo(ar, "_gpg" + signRole, message.toString());
                 }
             }
 
             ar.close();
-            
+
             return packageControlFile;
 
         } catch (Exception e) {
@@ -536,32 +539,32 @@ public class DebMaker {
     }
 
     private String addFile(String name, String input){
-    	return addLine(md5Hash(input), sha1Hash(input), input.length(), name);
+        return addLine(md5Hash(input), sha1Hash(input), input.length(), name);
     }
-    
+
     private String addFile(String name, File input){
-    	return addLine(md5Hash(input), sha1Hash(input), input.length(), name);
+        return addLine(md5Hash(input), sha1Hash(input), input.length(), name);
     }
-    
+
     private String addLine(String md5, String sha1, long size, String name){
-    	return "\t" + md5 + " " + sha1 + " " + size + " " + name + "\n";
+        return "\t" + md5 + " " + sha1 + " " + size + " " + name + "\n";
     }
-    
+
     private String md5Hash(String input){
-    	return md5Hash(input.getBytes());
+        return md5Hash(input.getBytes());
     }
-    
+
     private String md5Hash(File input){
-    	try {
-			return md5Hash(FileUtils.readFileToByteArray(input));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	
-    	return null;
+        try {
+            return md5Hash(FileUtils.readFileToByteArray(input));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return null;
     }
-    
+
     private String md5Hash(byte input[]){
         //update the input of MD5
         MD5Digest md5 = new MD5Digest();
@@ -573,43 +576,43 @@ public class DebMaker {
 
         return new String(Hex.encode(digest));
     }
-    
+
     private String sha1Hash(String input){
-    	return sha1Hash(input.getBytes());
+        return sha1Hash(input.getBytes());
     }
-    
+
     private String sha1Hash(File input){
-    	try {
-			return sha1Hash(FileUtils.readFileToByteArray(input));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	
-    	return null;
+        try {
+            return sha1Hash(FileUtils.readFileToByteArray(input));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return null;
     }
-    
+
     private String sha1Hash(byte input[]){
-         try
-         {
-               //prepare the input
-               MessageDigest hash = MessageDigest.getInstance("SHA1");
-               hash.update(input);
+        try
+        {
+            //prepare the input
+            MessageDigest hash = MessageDigest.getInstance("SHA1");
+            hash.update(input);
 
-               //proceed ....
-               byte[] digest = hash.digest();
+            //proceed ....
+            byte[] digest = hash.digest();
 
-               return new String(Hex.encode(digest));
-         }
-         catch (NoSuchAlgorithmException e)
-         {
-               System.err.println("No such algorithm");
-               e.printStackTrace();
-         }
-         
-         return null;
+            return new String(Hex.encode(digest));
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            System.err.println("No such algorithm");
+            e.printStackTrace();
+        }
+
+        return null;
     }
-    
+
     private void addTo(ArArchiveOutputStream pOutput, String pName, String pContent) throws IOException {
         final byte[] content = pContent.getBytes();
         pOutput.putArchiveEntry(new ArArchiveEntry(pName, content.length));

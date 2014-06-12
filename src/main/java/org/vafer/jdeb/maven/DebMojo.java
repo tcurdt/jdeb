@@ -139,14 +139,6 @@ public class DebMojo extends AbstractPluginMojo {
     private File baseDir;
 
     /**
-     * Run the plugin on all sub-modules.
-     * If set to false, the plugin will be run in the same folder where the
-     * mvn command was invoked
-     */
-    @Parameter(defaultValue = "true")
-    private boolean submodules;
-
-    /**
      * The Maven Session Object
      */
     @Component
@@ -216,9 +208,9 @@ public class DebMojo extends AbstractPluginMojo {
 
     /**
      * @deprecated
-     */
     @Parameter(defaultValue = "false")
     private boolean timestamped;
+     */
 
     /**
      * When enabled SNAPSHOT inside the version gets replaced with current timestamp or
@@ -247,6 +239,19 @@ public class DebMojo extends AbstractPluginMojo {
      */
     @Parameter(defaultValue = "false")
     private boolean skip;
+
+    @Parameter(defaultValue = "true")
+    private boolean skipPOMs;
+
+    @Parameter(defaultValue = "false")
+    private boolean skipSubmodules;
+
+    /**
+     * @deprecated
+     */
+    @Parameter(defaultValue = "true")
+    private boolean submodules;
+
 
     /**
      * If signPackage is true then a origin signature will be placed
@@ -366,11 +371,7 @@ public class DebMojo extends AbstractPluginMojo {
      * @return the Maven project version
      */
     private String getProjectVersion() {
-        if (this.timestamped) {
-            getLog().error("Configuration 'timestamped' is deprecated. Please use snapshotExpand and snapshotEnv instead.");
-        }
-
-        return Utils.convertToDebianVersion(getProject().getVersion(), this.snapshotExpand || this.timestamped, this.snapshotEnv, session.getStartTime());
+        return Utils.convertToDebianVersion(getProject().getVersion(), this.snapshotExpand, this.snapshotEnv, session.getStartTime());
     }
 
     /**
@@ -415,17 +416,17 @@ public class DebMojo extends AbstractPluginMojo {
         final MavenProject project = getProject();
 
         if (skip) {
-            getLog().info("skipping execution as configured");
+            getLog().info("skipping as configured (skip)");
             return;
         }
 
-        if (isPOM()) {
-            getLog().info("skipping execution because artifact is a pom");
+        if (skipPOMs && isPOM()) {
+            getLog().info("skipping because artifact is a pom (skipPOMs)");
             return;
         }
 
-        if (isSubmodule() && !submodules) {
-            getLog().info("skipping sub module: jdeb executing at top-level only");
+        if (skipSubmodules && isSubmodule()) {
+            getLog().info("skipping submodule (skipSubmodules)");
             return;
         }
 
