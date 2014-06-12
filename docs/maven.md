@@ -132,11 +132,13 @@ keyring       | The file containing the PGP keys                                
 key           | The name of the key to be used in the keyring                                | No
 passphrase    | The passphrase to use the key                                                | No
 attach        | Attach artifact to project                                                   | No; defaults to `true`
-submodules    | Execute the goal on all sub-modules                                          | No; defaults to `true`
 snapshotExpand| Expand SNAPSHOT into the content of an environment variable or timestamp.    | No; defaults to `false`
 snapshotEnv   | Name of the environment variable. If it's empty defaults to a timestamp.     | No; defaults to `SNAPSHOT`
 verbose       | Verbose logging                                                              | No; defaults to `true`, will be `false` in the future
 skip          | Indicates if an execution should be skipped                                  | No; defaults to `false`
+skipSubmodules| Skip goal on all submodules                                                  | No; defaults to `false`
+skipPOMs      | Skip goal on POM artifacts                                                   | No; defaults to `true`
+
 
 If you use the `dataSet` element, you'll need to populate it with a one or
 more `data` elements. A `data` element is used to specify a directory, a
