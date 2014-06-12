@@ -83,6 +83,11 @@ public class UtilsTestCase extends TestCase {
         result = Utils.replaceVariables(resolver, "if [[ \"${HOST_TYPE}\" -eq \"admin\" ]] ; then", "[[", "]]");
         assertEquals("if [[ \"${HOST_TYPE}\" -eq \"admin\" ]] ; then", result);
 
+        // end of line https://github.com/tcurdt/jdeb/issues/154
+        String input = "if [ -e some_file ]";
+        result = Utils.replaceVariables(resolver, input, "[[", "]]");
+        assertEquals(input, result);
+
         // mixed valid and unknown variables
         result = Utils.replaceVariables(resolver, "[[name]] [[test]]", "[[", "]]");
         assertEquals("jdeb [[test]]", result);

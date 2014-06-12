@@ -164,6 +164,14 @@ public final class Utils {
             }
         }
 
+        if (wo > 0) {
+            sb.append(open, 0, wo);
+        }
+
+        if (wc > 0) {
+            sb.append(close, 0, wc);
+        }
+
         if (level > 0) {
             out.append(open);
         }
