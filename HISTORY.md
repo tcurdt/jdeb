@@ -1,6 +1,6 @@
 ## Version 1.2.1, in progress
 
-## Version 1.2, released 15.06.2014
+## Version 1.2, released 22.06.2014
 
 * [CHG] Deprecated "submodules" in favour of "skipSubmodules"
 * [FIX] Fixed variable replacement issue on line endings
