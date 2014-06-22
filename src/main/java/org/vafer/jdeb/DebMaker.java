@@ -259,22 +259,23 @@ public class DebMaker {
             // If we should sign the package
             boolean doSign = signPackage;
 
-            if (keyring == null || !keyring.exists()) {
-                doSign = false;
-                console.warn("Signing requested, but no keyring supplied");
-            }
-
-            if (key == null) {
-                doSign = false;
-                console.warn("Signing requested, but no key supplied");
-            }
-
-            if (passphrase == null) {
-                doSign = false;
-                console.warn("Signing requested, but no passphrase supplied");
-            }
-
             if (doSign) {
+
+                if (keyring == null || !keyring.exists()) {
+                    doSign = false;
+                    console.warn("Signing requested, but no keyring supplied");
+                }
+
+                if (key == null) {
+                    doSign = false;
+                    console.warn("Signing requested, but no key supplied");
+                }
+
+                if (passphrase == null) {
+                    doSign = false;
+                    console.warn("Signing requested, but no passphrase supplied");
+                }
+
                 FileInputStream keyRingInput = new FileInputStream(keyring);
                 PGPSigner signer = null;
                 try {
