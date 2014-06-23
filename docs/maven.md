@@ -152,6 +152,7 @@ src              | The directory, tarball, file to include in the package       
 dst              | New filename at destination (type must be `file`)                            | No
 linkName         | The path of the link (type must be `link`)                                   | Yes for link
 linkTarget       | The target of the link (type must be `link`)                                 | Yes for link
+symlink          | Indicate if the link is a symblolic link (type must be `link`)               | No; defaults to `true`
 type             | Type of the data source. (archive, directory, file, files, link or template) | No; but will be Yes in the future
 missingSrc       | Fail if src file/folder is missing (ignore or fail)                          | No; defaults to `fail`
 includes         | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files
