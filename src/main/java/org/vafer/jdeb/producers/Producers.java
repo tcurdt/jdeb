@@ -98,16 +98,7 @@ class Producers {
                                              final InputStream inputStream,
                                              final TarArchiveEntry entry ) throws IOException {
         try {
-            consumer.onEachFile(inputStream,
-                    entry.getName(),
-                    entry.getLinkName(),
-                    entry.getUserName(),
-                    entry.getUserId(),
-                    entry.getGroupName(),
-                    entry.getGroupId(),
-                    entry.getMode(),
-                    entry.getSize()
-            );
+            consumer.onEachFile(inputStream, entry);
         } finally {
             IOUtils.closeQuietly(inputStream);
         }

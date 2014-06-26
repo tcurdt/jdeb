@@ -15,17 +15,16 @@
  */
 package org.vafer.jdeb.producers;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
 import junit.framework.TestCase;
-
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataProducerPathTemplateTestCase extends TestCase {
 
@@ -80,11 +79,12 @@ public class DataProducerPathTemplateTestCase extends TestCase {
         }
 
         @Override
-        public void onEachFile( InputStream input, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+        public void onEachFile(InputStream input, TarArchiveEntry entry) throws IOException {
         }
 
         @Override
-        public void onEachLink(String path, String linkName, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
+        public void onEachLink(TarArchiveEntry entry) throws IOException {
+
         }
 
         private class Invocation {

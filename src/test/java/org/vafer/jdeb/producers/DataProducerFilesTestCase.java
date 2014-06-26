@@ -1,20 +1,19 @@
 package org.vafer.jdeb.producers;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import junit.framework.TestCase;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.vafer.jdeb.DataConsumer;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-import junit.framework.TestCase;
-
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.vafer.jdeb.DataConsumer;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link org.vafer.jdeb.producers.DataProducerFiles}.
@@ -46,17 +45,29 @@ public class DataProducerFilesTestCase extends TestCase {
                 null
         ).produce(consumer);
 
-        for (File f : Arrays.asList(file1, file2)) {
+        for (final File f : Arrays.asList(file1, file2)) {
             verify(consumer).onEachFile(
                     any(FileInputStream.class),
-                    eq("/usr/include/" + f.getName()),
-                    any(String.class),
-                    eq("root"),
-                    eq(0),
-                    eq("root"),
-                    eq(0),
-                    anyInt(),
-                    eq(f.length())
+                    argThat(new BaseMatcher<TarArchiveEntry>() {
+                        @Override
+                        public boolean matches(final Object o) {
+                            if (!(o instanceof TarArchiveEntry)) {
+                                return false;
+                            }
+                            final TarArchiveEntry e = (TarArchiveEntry) o;
+                            return e.getSize() == f.length()
+                                && e.getGroupId() == 0
+                                && e.getUserId() == 0
+                                && "root".equals(e.getUserName())
+                                && "root".equals(e.getGroupName())
+                                && ("/usr/include/" + f.getName()).equals(e.getName())
+                                   ;
+                        }
+
+                        @Override
+                        public void describeTo(final Description description) {
+                        }
+                    })
             );
         }
     }
@@ -72,17 +83,29 @@ public class DataProducerFilesTestCase extends TestCase {
                 null
         ).produce(consumer);
 
-        for (File f : Arrays.asList(file1, file2)) {
+        for (final File f : Arrays.asList(file1, file2)) {
             verify(consumer).onEachFile(
                     any(FileInputStream.class),
-                    eq(new TarArchiveEntry(f.getAbsolutePath(), true).getName()),
-                    any(String.class),
-                    eq("root"),
-                    eq(0),
-                    eq("root"),
-                    eq(0),
-                    anyInt(),
-                    eq(f.length())
+                    argThat(new BaseMatcher<TarArchiveEntry>() {
+                        @Override
+                        public boolean matches(final Object o) {
+                            if (!(o instanceof TarArchiveEntry)) {
+                                return false;
+                            }
+                            final TarArchiveEntry e = (TarArchiveEntry) o;
+                            return e.getSize() == f.length()
+                                    && e.getGroupId() == 0
+                                    && e.getUserId() == 0
+                                    && "root".equals(e.getUserName())
+                                    && "root".equals(e.getGroupName())
+                                    && (f.getAbsolutePath()).equals(e.getName())
+                                    ;
+                        }
+
+                        @Override
+                        public void describeTo(final Description description) {
+                        }
+                    })
             );
         }
     }

@@ -15,12 +15,12 @@
  */
 package org.vafer.jdeb.producers;
 
-import java.io.IOException;
-
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
+
+import java.io.IOException;
 
 /**
  * DataProducer representing a single file
@@ -53,7 +53,10 @@ public final class DataProducerLink extends AbstractDataProducer implements Data
 
         entry = map(entry);
 
-        pReceiver.onEachLink(path, linkName, symlink, entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode());
+        entry.setName(path);
+        entry.setLinkName(linkName);
+
+        pReceiver.onEachLink(entry);
     }
 
 }

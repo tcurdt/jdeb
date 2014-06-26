@@ -15,6 +15,8 @@
  */
 package org.vafer.jdeb.mapping;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,8 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
  * Reads permissions and ownerships from a "ls -laR > mapping.txt" dump and
@@ -215,22 +215,10 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
     }
 
     public TarArchiveEntry map( final TarArchiveEntry pEntry ) {
-
         final TarArchiveEntry entry = mapping.get(pEntry.getName());
-
         if (entry != null) {
-
-            final TarArchiveEntry newEntry = new TarArchiveEntry(entry.getName(), true);
-            newEntry.setUserId(entry.getUserId());
-            newEntry.setGroupId(entry.getGroupId());
-            newEntry.setUserName(entry.getUserName());
-            newEntry.setGroupName(entry.getGroupName());
-            newEntry.setMode(entry.getMode());
-            newEntry.setSize(entry.getSize());
-
-            return newEntry;
+            return entry;
         }
-
         return pEntry;
     }
 

@@ -15,17 +15,22 @@
  */
 package org.vafer.jdeb.producers;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarConstants;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.taskdefs.Tar;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * DataProducer providing data from an Ant fileset. TarFileSets are also
@@ -65,20 +70,39 @@ public final class DataProducerFileSet implements DataProducer {
         scanner.scan();
 
         final File basedir = scanner.getBasedir();
-        
+
         for (String directory : scanner.getIncludedDirectories()) {
             String name = directory.replace('\\', '/');
 
             pReceiver.onEachDir(prefix + "/" + name, null, user, uid, group, gid, dirmode, 0);
         }
-        
-        for (String filename : scanner.getIncludedFiles()) {
+
+        for (final String filename : scanner.getIncludedFiles()) {
             final String name = filename.replace('\\', '/');
             final File file = new File(basedir, name);
 
             final InputStream inputStream = new FileInputStream(file);
             try {
-                pReceiver.onEachFile(inputStream, prefix + "/" + name, null, user, uid, group, gid, filemode, file.length());
+                final String entryName = prefix + "/" + name;
+
+                final Path entryPath = Paths.get(entryName);
+                final boolean symbolicLink = Files.isSymbolicLink(entryPath);
+                final TarArchiveEntry e;
+                if (symbolicLink) {
+                    e = new TarArchiveEntry(entryName, TarConstants.LF_SYMLINK);
+                    e.setLinkName(Files.readSymbolicLink(entryPath).toFile().getPath());
+                } else {
+                    e = new TarArchiveEntry(entryName, true);
+                }
+
+                e.setUserId(uid);
+                e.setGroupId(gid);
+                e.setUserName(user);
+                e.setGroupName(group);
+                e.setMode(filemode);
+                e.setSize(file.length());
+
+                pReceiver.onEachFile(inputStream, e);
             } finally {
                 inputStream.close();
             }
