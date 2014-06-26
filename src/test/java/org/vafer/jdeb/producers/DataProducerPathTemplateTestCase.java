@@ -15,16 +15,17 @@
  */
 package org.vafer.jdeb.producers;
 
-import junit.framework.TestCase;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.vafer.jdeb.DataConsumer;
-import org.vafer.jdeb.DataProducer;
-import org.vafer.jdeb.mapping.Mapper;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import junit.framework.TestCase;
+
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.vafer.jdeb.DataConsumer;
+import org.vafer.jdeb.DataProducer;
+import org.vafer.jdeb.mapping.Mapper;
 
 public class DataProducerPathTemplateTestCase extends TestCase {
 

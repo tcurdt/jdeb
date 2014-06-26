@@ -15,6 +15,12 @@
  */
 package org.vafer.jdeb.producers;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -29,8 +35,6 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
-
-import java.io.*;
 
 /**
  * Providing data from an archive keeping permissions and ownerships.
@@ -86,7 +90,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
                 public TarArchiveEntry convert( ArchiveEntry entry ) {
                     ZipArchiveEntry src = (ZipArchiveEntry) entry;
                     final TarArchiveEntry dst = new TarArchiveEntry(src.getName(), true);
-                    //if (src.isUnixSymlink()) {
+                    //TODO: if (src.isUnixSymlink()) {
                     //}
 
                     dst.setSize(src.getSize());

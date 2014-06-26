@@ -16,6 +16,18 @@
 
 package org.vafer.jdeb.maven;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarConstants;
 import org.apache.maven.artifact.Artifact;
@@ -32,18 +44,15 @@ import org.apache.maven.settings.Settings;
 import org.apache.tools.tar.TarEntry;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
-import org.vafer.jdeb.*;
+import org.vafer.jdeb.Console;
+import org.vafer.jdeb.DataConsumer;
+import org.vafer.jdeb.DataProducer;
+import org.vafer.jdeb.DebMaker;
+import org.vafer.jdeb.PackagingException;
 import org.vafer.jdeb.utils.MapVariableResolver;
+import org.vafer.jdeb.utils.SymlinkUtils;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
 
 import static org.vafer.jdeb.utils.Utils.lookupIfEmpty;
 
@@ -228,7 +237,7 @@ public class DebMojo extends AbstractPluginMojo {
 
     /**
      * Indicates if the execution should be disabled. If <code>true</code>, nothing will occur during execution.
-     *
+     * 
      * @since 1.1
      */
     @Parameter(defaultValue = "false")
@@ -253,7 +262,7 @@ public class DebMojo extends AbstractPluginMojo {
      */
     @Parameter(defaultValue = "false")
     private boolean signPackage;
-
+    
     /**
      * Defines which utility is used to verify the signed package
      */
@@ -265,7 +274,7 @@ public class DebMojo extends AbstractPluginMojo {
      */
     @Parameter(defaultValue = "origin")
     private String signRole;
-
+    
     /**
      * The keyring to use for signing operations.
      */
@@ -282,7 +291,7 @@ public class DebMojo extends AbstractPluginMojo {
      * The passphrase to use for signing operations.
      */
     @Parameter
-    private String passphrase;
+    private String passphrase; 
 
     /**
      * The prefix to use when reading signing variables
@@ -324,7 +333,7 @@ public class DebMojo extends AbstractPluginMojo {
         conffileProducers.clear();
         if (dataSet != null) {
             Collections.addAll(dataProducers, dataSet);
-
+            
             for (Data item : dataSet) {
                 if (item.getConffile()) {
                     conffileProducers.add(item);
@@ -470,14 +479,14 @@ public class DebMojo extends AbstractPluginMojo {
                             @Override
                             public void produce( final DataConsumer receiver ) {
                                 try {
-                                    final Path path = Paths.get(installDirFile.getPath(), file.getName());
-                                    final String entryName = path.toFile().getPath();
+                                    final File path = new File(installDirFile.getPath(), file.getName());
+                                    final String entryName = path.getPath();
 
-                                    final boolean symbolicLink = Files.isSymbolicLink(path);
+                                    final boolean symbolicLink = SymlinkUtils.isSymbolicLink(path);
                                     final TarArchiveEntry e;
                                     if (symbolicLink) {
                                         e = new TarArchiveEntry(entryName, TarConstants.LF_SYMLINK);
-                                        e.setLinkName(Files.readSymbolicLink(path).toFile().getPath());
+                                        e.setLinkName(SymlinkUtils.readSymbolicLink(path));
                                     } else {
                                         e = new TarArchiveEntry(entryName, true);
                                     }

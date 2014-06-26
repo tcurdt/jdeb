@@ -16,6 +16,23 @@
 
 package org.vafer.jdeb;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.Security;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -37,14 +54,6 @@ import org.vafer.jdeb.signing.PGPSigner;
 import org.vafer.jdeb.utils.PGPSignatureOutputStream;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
-
-import java.io.*;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.Security;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * A generic class for creating Debian archives. Even supports signed changes
@@ -367,7 +376,6 @@ public class DebMaker {
         }
 
         final DataConsumer receiver = new DataConsumer() {
-            @Override
             public void onEachFile(InputStream input, TarArchiveEntry entry)  {
                 String tempConffileItem = entry.getName();
                 if (tempConffileItem.startsWith(".")) {
@@ -377,14 +385,10 @@ public class DebMaker {
                 result.add(tempConffileItem);
             }
 
-            @Override
             public void onEachLink(TarArchiveEntry entry)  {
-
             }
 
-            @Override
             public void onEachDir(String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size)  {
-
             }
         };
 

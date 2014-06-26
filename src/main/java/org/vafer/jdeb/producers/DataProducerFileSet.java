@@ -15,6 +15,11 @@
  */
 package org.vafer.jdeb.producers;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarConstants;
 import org.apache.tools.ant.DirectoryScanner;
@@ -23,14 +28,7 @@ import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import org.vafer.jdeb.utils.SymlinkUtils;
 
 /**
  * DataProducer providing data from an Ant fileset. TarFileSets are also
@@ -70,14 +68,14 @@ public final class DataProducerFileSet implements DataProducer {
         scanner.scan();
 
         final File basedir = scanner.getBasedir();
-
+        
         for (String directory : scanner.getIncludedDirectories()) {
             String name = directory.replace('\\', '/');
 
             pReceiver.onEachDir(prefix + "/" + name, null, user, uid, group, gid, dirmode, 0);
         }
-
-        for (final String filename : scanner.getIncludedFiles()) {
+        
+        for (String filename : scanner.getIncludedFiles()) {
             final String name = filename.replace('\\', '/');
             final File file = new File(basedir, name);
 
@@ -85,12 +83,13 @@ public final class DataProducerFileSet implements DataProducer {
             try {
                 final String entryName = prefix + "/" + name;
 
-                final Path entryPath = Paths.get(entryName);
-                final boolean symbolicLink = Files.isSymbolicLink(entryPath);
+                final File entryPath = new File(entryName);
+
+                final boolean symbolicLink = SymlinkUtils.isSymbolicLink(entryPath);
                 final TarArchiveEntry e;
                 if (symbolicLink) {
                     e = new TarArchiveEntry(entryName, TarConstants.LF_SYMLINK);
-                    e.setLinkName(Files.readSymbolicLink(entryPath).toFile().getPath());
+                    e.setLinkName(SymlinkUtils.readSymbolicLink(entryPath));
                 } else {
                     e = new TarArchiveEntry(entryName, true);
                 }
