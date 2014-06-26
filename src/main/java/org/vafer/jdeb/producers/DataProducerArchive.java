@@ -89,6 +89,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
                     dst.setUserId(src.getUserId());
                     dst.setMode(src.getMode());
                     dst.setModTime(src.getModTime());
+                    dst.setLinkName(src.getLinkName());
 
                     return dst;
                 }
