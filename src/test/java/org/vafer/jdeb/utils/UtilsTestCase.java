@@ -123,6 +123,9 @@ public class UtilsTestCase extends TestCase {
         assertEquals("should match", "1.0~RC2", Utils.convertToDebianVersion("1.0-RC2", true, "SNAPSHOT", cal.getTime()));
         assertEquals("should match", "1.0~alpha3", Utils.convertToDebianVersion("1.0-alpha3", true, "SNAPSHOT", cal.getTime()));
         assertEquals("should match", "1.0~Beta+4", Utils.convertToDebianVersion("1.0.Beta-4", true, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0~milestone+4", Utils.convertToDebianVersion("1.0-milestone-4", true, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0~a+4", Utils.convertToDebianVersion("1.0-a-4", true, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0~b+4", Utils.convertToDebianVersion("1.0-b-4", true, "SNAPSHOT", cal.getTime()));
         assertEquals("should match", "1.0~rc7", Utils.convertToDebianVersion("1.0rc7", true, "SNAPSHOT", cal.getTime()));
     }
 

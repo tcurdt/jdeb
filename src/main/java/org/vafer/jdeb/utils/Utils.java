@@ -222,11 +222,11 @@ public final class Utils {
             } else {
                 version += "SNAPSHOT";
             }
-        }
-        
-        matcher = BETA_PATTERN.matcher(version);
-        if (matcher.matches()) {
-            version = matcher.group(1) + "~" + matcher.group(3) + matcher.group(4);
+        } else {
+            matcher = BETA_PATTERN.matcher(version);
+            if (matcher.matches()) {
+                version = matcher.group(1) + "~" + matcher.group(3) + matcher.group(4);
+            }
         }
         
         version = version.replace('-', '+');
