@@ -1,6 +1,7 @@
 ## Version 1.2.1, in progress
 
 * [FIX] Fixed badly formatted version for "milestone", "a", "b" and "cr" (they where not matched as beta versions)
+* [FIX] Add two spaces in the md5sums file between the checksum and the filename to be compatible with GNU coreutils md5sum
 
 ## Version 1.2, released 22.06.2014
 

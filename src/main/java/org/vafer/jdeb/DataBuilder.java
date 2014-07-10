@@ -165,8 +165,8 @@ class DataBuilder {
                         " md5: " + md5
                 );
 
-                // append to file md5 list
-                checksums.append(md5).append(" ").append(entry.getName()).append('\n');
+                // append to file md5 list, two spaces to be compatible with GNU coreutils md5sum
+                checksums.append(md5).append("  ").append(entry.getName()).append('\n');
             }
 
             public void onEachLink(String path, String linkname, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
