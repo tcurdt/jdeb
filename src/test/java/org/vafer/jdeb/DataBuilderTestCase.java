@@ -50,7 +50,7 @@ public class DataBuilderTestCase extends TestCase {
 
         assertTrue("empty md5 file", md5s.length() > 0);
         assertFalse("windows path separator found", md5s.indexOf("\\") != -1);
-        assertTrue("two spaces between md5 and file", md5s.equals("8bc944dbd052ef51652e70a5104492e3  ./test/testfile"));
+        assertTrue("two spaces between md5 and file", md5s.equals("8bc944dbd052ef51652e70a5104492e3  ./test/testfile\n"));
     }
     
     public void testCreateParentDirectories() throws Exception {
