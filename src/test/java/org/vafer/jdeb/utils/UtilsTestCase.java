@@ -127,6 +127,9 @@ public class UtilsTestCase extends TestCase {
         assertEquals("should match", "1.0~a+4", Utils.convertToDebianVersion("1.0-a-4", true, "SNAPSHOT", cal.getTime()));
         assertEquals("should match", "1.0~b+4", Utils.convertToDebianVersion("1.0-b-4", true, "SNAPSHOT", cal.getTime()));
         assertEquals("should match", "1.0~rc7", Utils.convertToDebianVersion("1.0rc7", true, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0~M1", Utils.convertToDebianVersion("1.0.M1", true, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0~M2", Utils.convertToDebianVersion("1.0-M2", true, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0~M3", Utils.convertToDebianVersion("1.0M3", true, "SNAPSHOT", cal.getTime()));
     }
 
     public void testMovePath() {

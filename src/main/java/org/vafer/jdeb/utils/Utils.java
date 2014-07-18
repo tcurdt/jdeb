@@ -42,7 +42,7 @@ import org.apache.tools.ant.util.ReaderInputStream;
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class Utils {
-    private static final Pattern BETA_PATTERN = Pattern.compile("(.*?)([\\.\\-_]?)(alpha|a|beta|b|milestone|cr|rc)(.*)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern BETA_PATTERN = Pattern.compile("(.*?)([\\.\\-_]?)(alpha|a|beta|b|milestone|m|cr|rc)(.*)", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern SNAPSHOT_PATTERN = Pattern.compile("(.*)[\\-\\+]SNAPSHOT");
 
