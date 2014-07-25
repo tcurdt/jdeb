@@ -1,4 +1,6 @@
-## Version 1.3, in progress
+## Version 1.3.1, in progress
+
+## Version 1.3, released 25.07.2014
 
 * [CHG] Switched from maven2 to maven3
 * [FIX] Fixed badly formatted version for "milestone", "m", "a", "b" and "cr" (they where not matched as beta versions)
