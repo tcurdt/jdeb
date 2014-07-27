@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -56,9 +57,8 @@ import static org.vafer.jdeb.utils.Utils.lookupIfEmpty;
 /**
  * Creates Debian package
  */
-@SuppressWarnings("unused")
 @Mojo(name = "jdeb", defaultPhase = LifecyclePhase.PACKAGE)
-public class DebMojo extends AbstractPluginMojo {
+public class DebMojo extends AbstractMojo {
 
     @Component
     private MavenProjectHelper projectHelper;
@@ -141,8 +141,20 @@ public class DebMojo extends AbstractPluginMojo {
     /**
      * The Maven Session Object
      */
-    @Component
+    @Parameter( defaultValue = "${session}", readonly = true )
     private MavenSession session;
+    
+    /**
+     * The Maven Project Object
+     */
+    @Parameter( defaultValue = "${project}", readonly = true )
+    private MavenProject project;
+
+    /**
+     * The build directory
+     */
+    @Parameter(property = "project.build.directory", required = true, readonly = true)
+    private File buildDirectory;
 
     /**
      * The classifier of attached artifact
@@ -155,7 +167,8 @@ public class DebMojo extends AbstractPluginMojo {
      * The "data" entries may specify a tarball (tar.gz, tar.bz2, tgz), a
      * directory, or a normal file. An entry would look something like this in
      * your pom.xml:
-     *
+     * 
+     * 
      * <pre>
      *   <build>
      *     <plugins>
@@ -202,6 +215,7 @@ public class DebMojo extends AbstractPluginMojo {
      *     </plugins>
      *   </build>
      * </pre>
+     * 
      */
     @Parameter
     private Data[] dataSet;
@@ -304,8 +318,7 @@ public class DebMojo extends AbstractPluginMojo {
     private Settings settings;
 
     /* end of parameters */
-
-
+    
     private static final String KEY = "key";
     private static final String KEYRING = "keyring";
     private static final String PASSPHRASE = "passphrase";
@@ -590,6 +603,19 @@ public class DebMojo extends AbstractPluginMojo {
 
         return maybeEncryptedPassphrase;
     }
+    
+    /**
+     * 
+     * @return the maven project used by this mojo
+     */
+    private MavenProject getProject() {
+        if (project.getExecutionProject() != null) {
+            return project.getExecutionProject();
+        }
+
+        return project;
+    }
+
 
 
     /**
