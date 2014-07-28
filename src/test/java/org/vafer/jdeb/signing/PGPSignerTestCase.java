@@ -41,7 +41,7 @@ public final class PGPSignerTestCase extends TestCase {
                 "\n" +
                 "TEST3\n" +
                 "-----BEGIN PGP SIGNATURE-----\n" +
-                "Version: BCPG v1.50\n" +
+                "Version: BCPG v1.51\n" +
                 "\n" +
                 "iEYEARECABAFAkax1rgJEHM9pIAuB02PAABIJgCghFmoCJCZ0CGiqgVLGGPd/Yh5\n" +
                 "FQQAnRVqvI2ij45JQSHYJBblZ0Vv2meN\n" +
