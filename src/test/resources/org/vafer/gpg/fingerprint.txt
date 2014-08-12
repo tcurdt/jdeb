@@ -2,3 +2,8 @@ pub   1024D/2E074D8F 2007-08-02
       Key fingerprint = 5A17 CB12 37F0 85BC 8264  E649 733D A480 2E07 4D8F
 uid                  Unit test user (only for testing) <test@vafer.org>
 sub   2048g/5E8CA506 2007-08-02
+
+pub   1024R/0C1FF47A 2014-08-12
+      Key fingerprint = C44C 6374 7D2E B28F AB23  1DA6 2197 0BB8 0C1F F47A
+uid                  Unit test user (only for testing) <test@vafer.org>
+
