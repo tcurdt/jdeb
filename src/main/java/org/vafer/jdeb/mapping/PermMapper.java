@@ -83,7 +83,7 @@ public final class PermMapper implements Mapper {
         } else {
             newEntry.setGroupName(entry.getGroupName());
         }
-      System.out.println(entry.getName() + " ---> " + entry.getMode());
+ 
         // Set permissions
         if (newEntry.isDirectory()) {
             if (dirMode > -1) {
