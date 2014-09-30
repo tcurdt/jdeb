@@ -551,6 +551,7 @@ public class DebMojo extends AbstractMojo {
         }
         
         if (!StringUtils.isBlank(propertyPrefix)) {
+          project.getProperties().put(propertyPrefix+"version", getProjectVersion() );
           project.getProperties().put(propertyPrefix+"deb", debFile.getAbsolutePath());
           project.getProperties().put(propertyPrefix+"deb.name", debFile.getName());
           project.getProperties().put(propertyPrefix+"changes", changesOutFile.getAbsolutePath());
