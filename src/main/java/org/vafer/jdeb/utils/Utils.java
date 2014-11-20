@@ -42,6 +42,9 @@ import org.apache.tools.ant.util.ReaderInputStream;
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class Utils {
+    private static final Pattern BETA_PATTERN = Pattern.compile("(.*?)([\\.\\-_]?)(alpha|a|beta|b|milestone|m|cr|rc)(.*)", Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern SNAPSHOT_PATTERN = Pattern.compile("(.*)[\\-\\+]SNAPSHOT");
 
     public static int copy( final InputStream pInput, final OutputStream pOutput ) throws IOException {
         final byte[] buffer = new byte[2048];
@@ -164,6 +167,14 @@ public final class Utils {
             }
         }
 
+        if (wo > 0) {
+            sb.append(open, 0, wo);
+        }
+
+        if (wc > 0) {
+            sb.append(close, 0, wc);
+        }
+
         if (level > 0) {
             out.append(open);
         }
@@ -198,8 +209,7 @@ public final class Utils {
      * @param timestamp the date used as the timestamp to replace the SNAPSHOT suffix
      */
     public static String convertToDebianVersion( String version, boolean apply, String envName, Date timestamp ) {
-        Pattern pattern1 = Pattern.compile("(.*)[\\-\\+]SNAPSHOT");
-        Matcher matcher = pattern1.matcher(version);
+        Matcher matcher = SNAPSHOT_PATTERN.matcher(version);
         if (matcher.matches()) {
             version = matcher.group(1) + "~";
 
@@ -212,12 +222,11 @@ public final class Utils {
             } else {
                 version += "SNAPSHOT";
             }
-        }
-        
-        Pattern pattern2 = Pattern.compile("(.*?)([\\.\\-_]?)(alpha|beta|rc)(.*)", Pattern.CASE_INSENSITIVE);
-        matcher = pattern2.matcher(version);
-        if (matcher.matches()) {
-            version = matcher.group(1) + "~" + matcher.group(3) + matcher.group(4);
+        } else {
+            matcher = BETA_PATTERN.matcher(version);
+            if (matcher.matches()) {
+                version = matcher.group(1) + "~" + matcher.group(3) + matcher.group(4);
+            }
         }
         
         version = version.replace('-', '+');

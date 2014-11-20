@@ -24,6 +24,7 @@
                         </goals>
                         <configuration>
                             <verbose>true</verbose>
+                            <skipPOMs>false</skipPOMs>
                             <controlDir>${basedir}/src/deb/control</controlDir>
                         </configuration>
                     </execution>

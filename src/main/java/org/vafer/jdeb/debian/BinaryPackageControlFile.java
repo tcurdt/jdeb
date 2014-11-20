@@ -48,7 +48,8 @@ public final class BinaryPackageControlFile extends ControlFile {
             new ControlField("Installed-Size"),
             new ControlField("Maintainer", true),
             new ControlField("Description", true, ControlField.Type.MULTILINE),
-            new ControlField("Homepage")
+            new ControlField("Homepage"),
+            new ControlField("Multi-Arch")
     };
 
     public BinaryPackageControlFile() {

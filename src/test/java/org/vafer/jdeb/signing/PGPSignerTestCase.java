@@ -41,7 +41,7 @@ public final class PGPSignerTestCase extends TestCase {
                 "\n" +
                 "TEST3\n" +
                 "-----BEGIN PGP SIGNATURE-----\n" +
-                "Version: BCPG v1.50\n" +
+                "Version: BCPG v1.51\n" +
                 "\n" +
                 "iEYEARECABAFAkax1rgJEHM9pIAuB02PAABIJgCghFmoCJCZ0CGiqgVLGGPd/Yh5\n" +
                 "FQQAnRVqvI2ij45JQSHYJBblZ0Vv2meN\n" +
@@ -62,6 +62,16 @@ public final class PGPSignerTestCase extends TestCase {
         Arrays.fill(expectedOutput, from, until, (byte) '?');
         
         assertEquals(new String(expectedOutput), new String(output));
+    }
+
+    public void testKeyLoading() throws Exception {
+        InputStream ring = getClass().getClassLoader().getResourceAsStream("org/vafer/gpg/secring.gpg");
+        PGPSigner signer = new PGPSigner(ring, "2E074D8F", "test");
+        assertEquals("correct key found", "733da4802e074d8f", String.format("%016x", signer.getSecretKey().getKeyID()));
+
+        ring.reset();
+        signer = new PGPSigner(ring, "0C1FF47A", "test");
+        assertEquals("key with leading 0 found", "21970bb80c1ff47a", String.format("%016x", signer.getSecretKey().getKeyID()));
     }
 
     private byte[] fixCRLF(byte[] b) {

@@ -146,7 +146,7 @@ public class PGPSigner {
             while (kIt.hasNext()) {
                 PGPSecretKey key = (PGPSecretKey) kIt.next();
                 
-                if (key.isSigningKey() && Long.toHexString(key.getKeyID() & 0xFFFFFFFFL).equals(keyId.toLowerCase())) {
+                if (key.isSigningKey() && String.format("%08x", key.getKeyID() & 0xFFFFFFFFL).equals(keyId.toLowerCase())) {
                     return key;
                 }
             }
