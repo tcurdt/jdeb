@@ -80,17 +80,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 
             converter = new EntryConverter() {
                 public TarArchiveEntry convert( ArchiveEntry entry ) {
-                    TarArchiveEntry src = (TarArchiveEntry) entry;
-                    TarArchiveEntry dst = new TarArchiveEntry(src.getName(), true);
-
-                    dst.setSize(src.getSize());
-                    dst.setGroupName(src.getGroupName());
-                    dst.setGroupId(src.getGroupId());
-                    dst.setUserId(src.getUserId());
-                    dst.setMode(src.getMode());
-                    dst.setModTime(src.getModTime());
-
-                    return dst;
+                    return (TarArchiveEntry) entry;
                 }
             };
 
@@ -99,7 +89,9 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
             converter = new EntryConverter() {
                 public TarArchiveEntry convert( ArchiveEntry entry ) {
                     ZipArchiveEntry src = (ZipArchiveEntry) entry;
-                    TarArchiveEntry dst = new TarArchiveEntry(src.getName(), true);
+                    final TarArchiveEntry dst = new TarArchiveEntry(src.getName(), true);
+                    //TODO: if (src.isUnixSymlink()) {
+                    //}
 
                     dst.setSize(src.getSize());
                     dst.setMode(src.getUnixMode());
@@ -131,11 +123,17 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 
                 entry = map(entry);
 
+                if (entry.isSymbolicLink()) {
+                    pReceiver.onEachLink(entry);
+                    continue;
+                }
+
                 if (entry.isDirectory()) {
                     pReceiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
                     continue;
                 }
-                pReceiver.onEachFile(archiveInputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+
+                pReceiver.onEachFile(archiveInputStream, entry);
             }
 
         } finally {

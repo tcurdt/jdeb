@@ -35,6 +35,7 @@ import java.util.Locale;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.crypto.digests.MD5Digest;
@@ -375,12 +376,8 @@ public class DebMaker {
         }
 
         final DataConsumer receiver = new DataConsumer() {
-            public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
-                //
-            }
-
-            public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
-                String tempConffileItem = filename;
+            public void onEachFile(InputStream input, TarArchiveEntry entry)  {
+                String tempConffileItem = entry.getName();
                 if (tempConffileItem.startsWith(".")) {
                     tempConffileItem = tempConffileItem.substring(1);
                 }
@@ -388,8 +385,10 @@ public class DebMaker {
                 result.add(tempConffileItem);
             }
 
-            public void onEachLink(String path, String linkname, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
-                //
+            public void onEachLink(TarArchiveEntry entry)  {
+            }
+
+            public void onEachDir(String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size)  {
             }
         };
 
@@ -407,9 +406,6 @@ public class DebMaker {
     /**
      * Create the debian archive with from the provided control files and data producers.
      *
-     * @param pControlFiles
-     * @param pData
-     * @param deb
      * @param compression   the compression method used for the data file
      * @return BinaryPackageControlFile
      * @throws PackagingException

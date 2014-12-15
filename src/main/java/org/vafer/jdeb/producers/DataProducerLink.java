@@ -53,7 +53,10 @@ public final class DataProducerLink extends AbstractDataProducer implements Data
 
         entry = map(entry);
 
-        pReceiver.onEachLink(path, linkName, symlink, entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode());
+        entry.setName(path);
+        entry.setLinkName(linkName);
+
+        pReceiver.onEachLink(entry);
     }
 
 }

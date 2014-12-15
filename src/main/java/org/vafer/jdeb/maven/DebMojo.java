@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarConstants;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -49,6 +51,7 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.DebMaker;
 import org.vafer.jdeb.PackagingException;
 import org.vafer.jdeb.utils.MapVariableResolver;
+import org.vafer.jdeb.utils.SymlinkUtils;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
@@ -489,13 +492,26 @@ public class DebMojo extends AbstractMojo {
                             @Override
                             public void produce( final DataConsumer receiver ) {
                                 try {
-                                    receiver.onEachFile(
-                                        new FileInputStream(file),
-                                        new File(installDirFile, file.getName()).getAbsolutePath(),
-                                        "",
-                                        "root", 0, "root", 0,
-                                        TarEntry.DEFAULT_FILE_MODE,
-                                        file.length());
+                                    final File path = new File(installDirFile.getPath(), file.getName());
+                                    final String entryName = path.getPath();
+
+                                    final boolean symbolicLink = SymlinkUtils.isSymbolicLink(path);
+                                    final TarArchiveEntry e;
+                                    if (symbolicLink) {
+                                        e = new TarArchiveEntry(entryName, TarConstants.LF_SYMLINK);
+                                        e.setLinkName(SymlinkUtils.readSymbolicLink(path));
+                                    } else {
+                                        e = new TarArchiveEntry(entryName, true);
+                                    }
+
+                                    e.setUserId(0);
+                                    e.setGroupId(0);
+                                    e.setUserName("root");
+                                    e.setGroupName("root");
+                                    e.setMode(TarEntry.DEFAULT_FILE_MODE);
+                                    e.setSize(file.length());
+
+                                    receiver.onEachFile(new FileInputStream(file), e);
                                 } catch (Exception e) {
                                     getLog().error(e);
                                 }

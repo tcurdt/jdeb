@@ -120,33 +120,24 @@ class DataBuilder {
                 console.debug("dir: " + dirname);
             }
             
-            public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+            public void onEachFile(InputStream input, TarArchiveEntry entry) throws IOException {
                 // Check link name
-                checkField(linkname, TarConstants.NAMELEN);
+                checkField(entry.getLinkName(), TarConstants.NAMELEN);
                 // Check user name
-                checkField(user, TarConstants.UNAMELEN);
+                checkField(entry.getUserName(), TarConstants.UNAMELEN);
                 // Check group name
-                checkField(group, TarConstants.GNAMELEN);
+                checkField(entry.getGroupName(), TarConstants.GNAMELEN);
 
-                filename = fixPath(filename);
+                entry.setName(fixPath(entry.getName()));
 
-                createParentDirectories(filename, user, uid, group, gid);
-
-                final TarArchiveEntry entry = new TarArchiveEntry(filename, true);
-
-                entry.setUserName(user);
-                entry.setUserId(uid);
-                entry.setGroupName(group);
-                entry.setGroupId(gid);
-                entry.setMode(mode);
-                entry.setSize(size);
+                createParentDirectories(entry.getName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId());
 
                 tarOutputStream.putArchiveEntry(entry);
 
-                dataSize.add(size);
+                dataSize.add(entry.getSize());
                 digest.reset();
 
-                Utils.copy(inputStream, new DigestOutputStream(tarOutputStream, digest));
+                Utils.copy(input, new DigestOutputStream(tarOutputStream, digest));
 
                 final String md5 = Utils.toHex(digest.digest());
 
@@ -169,26 +160,17 @@ class DataBuilder {
                 checksums.append(md5).append("  ").append(entry.getName()).append('\n');
             }
 
-            public void onEachLink(String path, String linkname, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
+            public void onEachLink(TarArchiveEntry entry) throws IOException {
                 // Check link name
-                checkField(linkname, TarConstants.NAMELEN);
+                checkField(entry.getLinkName(), TarConstants.NAMELEN);
                 // Check user name
-                checkField(user, TarConstants.UNAMELEN);
+                checkField(entry.getUserName(), TarConstants.UNAMELEN);
                 // Check group name
-                checkField(group, TarConstants.GNAMELEN);
+                checkField(entry.getGroupName(), TarConstants.GNAMELEN);
 
-                path = fixPath(path);
+                entry.setName(fixPath(entry.getName()));
 
-                createParentDirectories(path, user, uid, group, gid);
-
-                final TarArchiveEntry entry = new TarArchiveEntry(path, symlink ? TarArchiveEntry.LF_SYMLINK : TarArchiveEntry.LF_LINK);
-                entry.setLinkName(linkname);
-
-                entry.setUserName(user);
-                entry.setUserId(uid);
-                entry.setGroupName(group);
-                entry.setGroupId(gid);
-                entry.setMode(mode);
+                createParentDirectories(entry.getName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId());
 
                 tarOutputStream.putArchiveEntry(entry);
                 tarOutputStream.closeArchiveEntry();
