@@ -125,4 +125,22 @@
     </deb>
   </target>
 
+  <target name="with-template">
+    <deb destfile="test.deb" control="org/vafer/jdeb/deb/control">
+      <data type="template" paths="
+          /var/log/foo,
+          /var/cache/foo
+        ">
+        <mapper type="perm" filemode="755"/>
+      </data>
+    </deb>
+  </target>
+
+  <target name="with-missing-template">
+    <deb destfile="test.deb" control="org/vafer/jdeb/deb/control">
+      <data type="template">
+        <mapper type="perm" filemode="755"/>
+      </data>
+    </deb>
+  </target>
 </project>

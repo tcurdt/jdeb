@@ -323,4 +323,19 @@ public final class DebAntTaskTestCase extends TestCase {
 
         assertTrue("package not build", new File("target/test-classes/test.deb").exists());
     }
+
+    public void testPackageWithTemplate() {
+        project.executeTarget("with-template");
+
+        assertTrue("package not build", new File("target/test-classes/test.deb").exists());
+    }
+
+    public void testPackageWithTemplateMissingPaths() {
+        try {
+            project.executeTarget("with-missing-template");
+            fail("No exception thrown");
+        } catch (BuildException e) {
+            // expected
+        }
+    }
 }
