@@ -76,12 +76,6 @@ public class DebMaker {
     /** The name of the package. Default value if not specified in the control file */
     private String packageName;
 
-    /** The section of the package. Default value if not specified in the control file */
-    private String section = "java";
-
-    /** The dependencies of the package. Default value if not specified in the control file */
-    private String depends = "default-jre | java6-runtime";
-
     /** The description of the package. Default value if not specified in the control file */
     private String description;
 
@@ -149,14 +143,6 @@ public class DebMaker {
 
     public void setPackage(String packageName) {
         this.packageName = packageName;
-    }
-
-    public void setSection(String section) {
-        this.section = section;
-    }
-
-    public void setDepends(String depends) {
-        this.depends = depends;
     }
 
     public void setDescription(String description) {
@@ -376,6 +362,7 @@ public class DebMaker {
         }
 
         final DataConsumer receiver = new DataConsumer() {
+            @Override
             public void onEachFile(InputStream input, TarArchiveEntry entry)  {
                 String tempConffileItem = entry.getName();
                 if (tempConffileItem.startsWith(".")) {
@@ -385,9 +372,11 @@ public class DebMaker {
                 result.add(tempConffileItem);
             }
 
+            @Override
             public void onEachLink(TarArchiveEntry entry)  {
             }
 
+            @Override
             public void onEachDir(String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size)  {
             }
         };
@@ -443,12 +432,6 @@ public class DebMaker {
             BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size);
             if (packageControlFile.get("Package") == null) {
                 packageControlFile.set("Package", packageName);
-            }
-            if (packageControlFile.get("Depends") == null) {
-                packageControlFile.set("Depends", depends);
-            }
-            if (packageControlFile.get("Section") == null) {
-                packageControlFile.set("Section", section);
             }
             if (packageControlFile.get("Description") == null) {
                 packageControlFile.set("Description", description);

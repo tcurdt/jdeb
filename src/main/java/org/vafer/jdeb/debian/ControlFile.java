@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.plexus.util.StringUtils;
+
 /**
  * A control file as specified by the <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html">Debian policy</a>.
  *
@@ -160,11 +162,15 @@ public abstract class ControlFile {
         StringBuilder s = new StringBuilder();
         for (ControlField field : fields) {
             String value = values.get(field.getName());
-            s.append(field.format(value));
+            if(!StringUtils.isEmpty(value)) {
+              s.append(field.format(value));
+            }
+            
         }
         return s.toString();
     }
 
+    @Override
     public String toString() {
         List<ControlField> fields = new ArrayList<ControlField>();
         fields.addAll(Arrays.asList(getFields()));
