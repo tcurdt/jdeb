@@ -32,6 +32,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
@@ -80,7 +82,7 @@ public class DebMaker {
     private String section = "java";
 
     /** The dependencies of the package. Default value if not specified in the control file */
-    private String depends = "default-jre | java6-runtime";
+    private String depends;
 
     /** The description of the package. Default value if not specified in the control file */
     private String description;
@@ -137,6 +139,14 @@ public class DebMaker {
         }
 
         Security.addProvider(new BouncyCastleProvider());
+        
+        // Determine jre version
+        String version = System.getProperty("java.runtime.version");
+        Pattern versionPattern = Pattern.compile("1\\.(\\d).*");
+        Matcher matcher = versionPattern.matcher(version);
+        matcher.matches();
+        
+        this.depends = "default-jre | java"+matcher.group(1)+"-runtime";
     }
 
     public void setDeb(File deb) {
@@ -376,6 +386,7 @@ public class DebMaker {
         }
 
         final DataConsumer receiver = new DataConsumer() {
+            @Override
             public void onEachFile(InputStream input, TarArchiveEntry entry)  {
                 String tempConffileItem = entry.getName();
                 if (tempConffileItem.startsWith(".")) {
@@ -385,9 +396,11 @@ public class DebMaker {
                 result.add(tempConffileItem);
             }
 
+            @Override
             public void onEachLink(TarArchiveEntry entry)  {
             }
 
+            @Override
             public void onEachDir(String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size)  {
             }
         };
