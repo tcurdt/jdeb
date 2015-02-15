@@ -66,6 +66,11 @@ public abstract class ControlFile {
             }
 
             final char first = line.charAt(0);
+            if (first == '#') {
+                // ignore commented out lines
+                continue;
+            }
+
             if (Character.isLetter(first)) {
 
                 // new field
