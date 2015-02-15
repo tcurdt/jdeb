@@ -16,6 +16,8 @@
 
 package org.vafer.jdeb.maven;
 
+import static org.vafer.jdeb.utils.Utils.lookupIfEmpty;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -43,6 +45,7 @@ import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Settings;
 import org.apache.tools.tar.TarEntry;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 import org.vafer.jdeb.Console;
@@ -54,8 +57,6 @@ import org.vafer.jdeb.utils.MapVariableResolver;
 import org.vafer.jdeb.utils.SymlinkUtils;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
-
-import static org.vafer.jdeb.utils.Utils.lookupIfEmpty;
 
 /**
  * Creates Debian package
@@ -262,7 +263,7 @@ public class DebMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "false")
     private boolean skipSubmodules;
-
+    
     /**
      * @deprecated
      */
@@ -319,6 +320,9 @@ public class DebMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "${settings}")
     private Settings settings;
+    
+    @Parameter(defaultValue = "")
+    private String propertyPrefix;
 
     /* end of parameters */
     
@@ -561,6 +565,17 @@ public class DebMojo extends AbstractMojo {
             getLog().error("Failed to create debian package " + debFile, e);
             throw new MojoExecutionException("Failed to create debian package " + debFile, e);
         }
+        
+        if (!StringUtils.isBlank(propertyPrefix)) {
+          project.getProperties().put(propertyPrefix+"version", getProjectVersion() );
+          project.getProperties().put(propertyPrefix+"deb", debFile.getAbsolutePath());
+          project.getProperties().put(propertyPrefix+"deb.name", debFile.getName());
+          project.getProperties().put(propertyPrefix+"changes", changesOutFile.getAbsolutePath());
+          project.getProperties().put(propertyPrefix+"changes.name", changesOutFile.getName());
+          project.getProperties().put(propertyPrefix+"changes.txt", changesSaveFile.getAbsolutePath());
+          project.getProperties().put(propertyPrefix+"changes.txt.name", changesSaveFile.getName());
+        }
+        
     }
 
     /**
