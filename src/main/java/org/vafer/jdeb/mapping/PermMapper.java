@@ -74,7 +74,7 @@ public final class PermMapper implements Mapper {
         if (group != null) {
             entry.setGroupName(group);
         }
-
+ 
         // Set permissions
         if (entry.isDirectory()) {
             if (dirMode > -1) {
