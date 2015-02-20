@@ -10,8 +10,8 @@ additional native tools installed.
 Check the documentation on how to use it with [Maven](http://github.com/tcurdt/jdeb/blob/master/docs/maven.md)
 or [Ant](http://github.com/tcurdt/jdeb/blob/master/docs/ant.md). Especially don't forget to check out the
 [examples](http://github.com/tcurdt/jdeb/blob/master/src/examples/). Current
-[javadocs](http://tcurdt.github.com/jdeb/release/1.3.1/apidocs/) and a source
-[xref](http://tcurdt.github.com/jdeb/release/1.3.1/xref/) is also available.
+[javadocs](http://tcurdt.github.com/jdeb/release/1.4/apidocs/) and a source
+[xref](http://tcurdt.github.com/jdeb/release/1.4/xref/) is also available.
 
 
 ## Where to get it
