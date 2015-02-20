@@ -40,9 +40,6 @@ import org.vafer.jdeb.ArchiveVisitor;
 import org.vafer.jdeb.ArchiveWalker;
 import org.vafer.jdeb.Compression;
 
-/**
- * @author Emmanuel Bourg
- */
 public final class DebAntTaskTestCase extends TestCase {
 
     private Project project;

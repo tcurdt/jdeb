@@ -36,12 +36,11 @@ import org.vafer.jdeb.debian.BinaryPackageControlFile;
  * Gets the changes from a changes file. The first entry are the current changes.
  * The release line will be added. Example:
  *
- * release date=22:13 19.08.2007,version=1.5+r90114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
+ * release date=22:13 19.08.2007,version=1.5+r90114,urgency=low,by=Torsten Curdt &lt;torsten@vafer.org&gt;
  *   * debian changes support
- * release date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
+ * release date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt &lt;torsten@vafer.org&gt;
  *   * debian changes support
  *
- * @author Torsten Curdt
  */
 public final class TextfileChangesProvider implements ChangesProvider {
 

@@ -21,8 +21,6 @@ import java.util.Map;
  * Resolve variables based on a Map.
  *
  * ATTENTION: don't use outside of jdeb
- *
- * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class MapVariableResolver implements VariableResolver {
 

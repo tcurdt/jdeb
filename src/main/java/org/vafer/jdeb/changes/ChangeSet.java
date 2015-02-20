@@ -29,10 +29,9 @@ import java.util.Date;
  *        [blank line(s), included in output of dpkg-parsechangelog]
  *   * even more change details
  *        [optional blank line(s), stripped]
- *  -- maintainer name <email address>[two spaces]  date
+ *  -- maintainer name &lt;email address&gt;[two spaces]  date
  * </pre>
  * 
- * @author Torsten Curdt
  * @see <a href="http://www.debian.org/doc/debian-policy/ch-source.html#s-dpkgchangelog">Debian Policy Manual - Debian changelog</a>
  */
 public final class ChangeSet {

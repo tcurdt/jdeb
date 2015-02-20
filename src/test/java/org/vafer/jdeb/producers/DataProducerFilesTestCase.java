@@ -21,8 +21,6 @@ import org.vafer.jdeb.DataConsumer;
 
 /**
  * Tests for {@link org.vafer.jdeb.producers.DataProducerFiles}.
- *
- * @author Roman Kashitsyn
  */
 public class DataProducerFilesTestCase extends TestCase {
     File file1;

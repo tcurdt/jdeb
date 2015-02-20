@@ -28,7 +28,6 @@ import java.util.Map.Entry;
  * Reflecting a changes file
  *
  * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-debianchangesfiles">Debian Policy Manual - Debian changes files</a>
- * @author Torsten Curdt
  */
 public final class ChangesFile extends ControlFile {
 

@@ -24,8 +24,6 @@ import java.security.MessageDigest;
  * Convenience class to provide digest info and length of a stream.
  *
  * ATTENTION: don't use outside of jdeb
- *
- * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public class InformationOutputStream extends DigestOutputStream {
 

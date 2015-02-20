@@ -20,8 +20,6 @@ package org.vafer.jdeb.utils;
  * See Utils.replaceVariables()
  *
  * ATTENTION: don't use outside of jdeb
- *
- * @author Torsten Curdt <tcurdt@vafer.org>
  */
 
 public interface VariableResolver {

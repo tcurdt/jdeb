@@ -32,8 +32,6 @@ import java.util.Set;
 
 /**
  * A control file as specified by the <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html">Debian policy</a>.
- *
- * @author Torsten Curdt
  */
 public abstract class ControlFile {
 

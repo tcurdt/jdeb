@@ -20,8 +20,6 @@ import org.vafer.jdeb.utils.Utils;
 
 /**
  * Applies a uniform set of permissions and ownership to all entries.
- *
- * @author Bryan Sant
  */
 public final class PermMapper implements Mapper {
 

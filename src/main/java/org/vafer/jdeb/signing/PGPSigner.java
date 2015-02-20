@@ -42,9 +42,6 @@ import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
 
 /**
  * Signing with OpenPGP.
- * 
- * @author Torsten Curdt
- * @author Emmanuel Bourg
  */
 public class PGPSigner {
 

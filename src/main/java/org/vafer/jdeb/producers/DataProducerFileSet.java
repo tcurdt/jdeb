@@ -33,8 +33,6 @@ import org.vafer.jdeb.utils.SymlinkUtils;
 /**
  * DataProducer providing data from an Ant fileset. TarFileSets are also
  * supported with their permissions.
- *
- * @author Emmanuel Bourg
  */
 public final class DataProducerFileSet implements DataProducer {
 

@@ -22,8 +22,6 @@ import java.io.InputStream;
 
 /**
  * A DataConsumer consumes Data produced from a producer.
- *
- * @author Torsten Curdt
  */
 public interface DataConsumer {
 

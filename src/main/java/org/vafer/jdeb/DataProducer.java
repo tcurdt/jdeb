@@ -19,8 +19,6 @@ import java.io.IOException;
 
 /**
  * Provides Data to a DataConsumer.
- *
- * @author Torsten Curdt
  */
 public interface DataProducer {
 

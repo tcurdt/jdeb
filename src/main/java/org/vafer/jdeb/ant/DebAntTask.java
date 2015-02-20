@@ -34,8 +34,6 @@ import org.vafer.jdeb.producers.DataProducerFileSet;
 
 /**
  * AntTask for creating debian archives.
- *
- * @author Torsten Curdt
  */
 public class DebAntTask extends MatchingTask {
 

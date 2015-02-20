@@ -28,8 +28,6 @@ import org.vafer.jdeb.mapping.PermMapper;
 /**
  * Maven "mapper" element acting as factory for the entry mapper.
  * Supported types: ls, perm
- *
- * @author Bryan Sant
  */
 public final class Mapper {
 

@@ -58,9 +58,6 @@ import org.vafer.jdeb.utils.VariableResolver;
 /**
  * A generic class for creating Debian archives. Even supports signed changes
  * files.
- *
- * @author Torsten Curdt
- * @author Bryan Sant
  */
 public class DebMaker {
 

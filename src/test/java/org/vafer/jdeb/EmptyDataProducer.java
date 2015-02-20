@@ -19,7 +19,7 @@ package org.vafer.jdeb;
 import java.io.IOException;
 
 /**
- * @author Emmanuel Bourg
+ * Producer that does nothing
  */
 public class EmptyDataProducer implements DataProducer {
 

@@ -24,7 +24,6 @@ import java.text.ParseException;
  * Binary package control file.
  *
  * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-binarycontrolfiles">Debian Policy Manual - Binary package control files</a>
- * @author Torsten Curdt
  */
 public final class BinaryPackageControlFile extends ControlFile {
 

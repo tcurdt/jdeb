@@ -27,8 +27,6 @@ import java.io.IOException;
 
 /**
  * Base Producer class providing including/excluding.
- *
- * @author Torsten Curdt
  */
 public abstract class AbstractDataProducer implements DataProducer {
 

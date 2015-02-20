@@ -23,9 +23,6 @@ import org.vafer.jdeb.producers.DataProducerLink;
 
 /**
  * Defines a symbolic or hard link.
- * 
- * @author Emmanuel Bourg
- * @version $Revision$, $Date$
  */
 public final class Link {
 

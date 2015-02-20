@@ -25,8 +25,6 @@ import java.io.IOException;
 /**
  * Data producer that places multiple files into a single
  * destination directory.
- *
- * @author Roman Kashitsyn
  */
 public class DataProducerFiles extends AbstractDataProducer {
 

@@ -23,8 +23,6 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
 /**
  * Compression method used for the data file.
- * 
- * @author Emmanuel Bourg
  */
 public enum Compression {
 

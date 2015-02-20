@@ -25,8 +25,6 @@ import java.io.InputStream;
 
 /**
  * Package-private utility class with common producers functionality.
- *
- * @author Roman Kashitsyn <roman.kashitsyn@gmail.com>
  */
 class Producers {
 

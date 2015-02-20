@@ -35,8 +35,6 @@ import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 
 /**
  * Support class for inspecting the content of an archive.
- * 
- * @author Emmanuel Bourg
  */
 public class ArchiveWalker {
     

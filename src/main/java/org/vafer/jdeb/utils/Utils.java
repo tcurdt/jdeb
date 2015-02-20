@@ -38,8 +38,6 @@ import org.apache.tools.ant.util.ReaderInputStream;
  * Simple utils functions.
  *
  * ATTENTION: don't use outside of jdeb
- *
- * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class Utils {
     private static final Pattern BETA_PATTERN = Pattern.compile("(.*?)([\\.\\-_]?)(alpha|a|beta|b|milestone|m|cr|rc)(.*)", Pattern.CASE_INSENSITIVE);

@@ -20,8 +20,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
  * Maps one entry to another. So you modify ownerships permissions etc in a Mapper.
- *
- * @author Torsten Curdt
  */
 public interface Mapper {
 

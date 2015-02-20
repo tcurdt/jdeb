@@ -22,8 +22,6 @@ import java.io.StringReader;
 
 /**
  * A field of a control file. This class is immutable.
- *
- * @author Emmanuel Bourg
  */
 public class ControlField {
 

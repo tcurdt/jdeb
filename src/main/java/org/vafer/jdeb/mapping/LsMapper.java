@@ -27,10 +27,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
- * Reads permissions and ownerships from a "ls -laR > mapping.txt" dump and
+ * Reads permissions and ownerships from a "ls -laR &gt; mapping.txt" dump and
  * maps entries accordingly.
- *
- * @author Torsten Curdt
  */
 public final class LsMapper implements Mapper {
 

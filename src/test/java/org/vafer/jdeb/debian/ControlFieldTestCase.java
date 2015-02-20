@@ -18,10 +18,6 @@ package org.vafer.jdeb.debian;
 
 import junit.framework.TestCase;
 
-/**
- * @author Emmanuel Bourg
- * @version $Revision$, $Date$
- */
 public class ControlFieldTestCase extends TestCase {
 
     public void testFormatSimpleValue() {

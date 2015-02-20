@@ -22,8 +22,6 @@ import org.apache.commons.compress.archivers.ArchiveEntry;
 
 /**
  * Callback used for inspecting an archive.
- * 
- * @author Emmanuel Bourg
  */
 public interface ArchiveVisitor<E extends ArchiveEntry> {
     

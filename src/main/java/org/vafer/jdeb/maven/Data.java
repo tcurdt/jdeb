@@ -39,8 +39,6 @@ import static org.vafer.jdeb.maven.MissingSourceBehavior.*;
  * Maven "data" element acting as a factory for DataProducers. So far Archive and
  * Directory producers are supported. Both support the usual ant pattern set
  * matching.
- *
- * @author Bryan Sant
  */
 public final class Data implements DataProducer {
 

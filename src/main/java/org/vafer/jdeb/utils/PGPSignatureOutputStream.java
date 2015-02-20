@@ -12,9 +12,6 @@ import org.bouncycastle.openpgp.PGPSignatureGenerator;
 /**
  * An output stream that calculates the signature of the input data as it
  * is written
- * 
- * @author mpoindexter
- *
  */
 public class PGPSignatureOutputStream extends OutputStream {
     private final PGPSignatureGenerator signatureGenerator;

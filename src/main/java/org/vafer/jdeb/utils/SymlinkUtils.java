@@ -20,8 +20,6 @@ import java.io.IOException;
 
 /**
  * Simple utilities to deal with symbolic links
- *
- * @author <a href="mailto:ketoth.xupack@gmail.com">Ketoth Xupack</a>
  */
 public final class SymlinkUtils {
     private SymlinkUtils() {

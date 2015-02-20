@@ -38,8 +38,6 @@ import org.vafer.jdeb.mapping.Mapper;
 
 /**
  * Providing data from an archive keeping permissions and ownerships.
- *
- * @author Torsten Curdt
  */
 public final class DataProducerArchive extends AbstractDataProducer implements DataProducer {
 
