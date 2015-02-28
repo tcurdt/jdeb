@@ -217,7 +217,7 @@ public class DebMaker {
      */
     public void validate() throws PackagingException {
         if (control == null || !control.isDirectory()) {
-            throw new PackagingException("The 'control' attribute doesn't point to a directory.");
+            throw new PackagingException("The 'control' attribute doesn't point to a directory. " + control);
         }
 
         if (changesIn != null) {
