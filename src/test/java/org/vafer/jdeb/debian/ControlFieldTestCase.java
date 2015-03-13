@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2015 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,6 @@ package org.vafer.jdeb.debian;
 
 import junit.framework.TestCase;
 
-/**
- * @author Emmanuel Bourg
- * @version $Revision$, $Date$
- */
 public class ControlFieldTestCase extends TestCase {
 
     public void testFormatSimpleValue() {

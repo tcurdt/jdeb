@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2015 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
  * Maps one entry to another. So you modify ownerships permissions etc in a Mapper.
- *
- * @author Torsten Curdt
  */
 public interface Mapper {
 

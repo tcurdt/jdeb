@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2015 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,31 @@ public final class PackageControlFileTestCase extends TestCase {
         assertEquals("key 1", "Value1", d.get("Key1"));
         assertEquals("key 2", "Value2\nValue2.1\nValue2.2", d.get("Key2"));
         assertEquals("key 3", "Value3", d.get("Key3"));
+    }
+
+    public void testComments() throws Exception {
+        String input =
+                "Key1: Value1\n" +
+                "Key2: Value2\n" +
+                " Value2.1\n" +
+                "# Value2.2\n" +
+                "#Key3: Value3comment\n" +
+                "Key3: Value3\n" +
+                "# Value3.1\n" +
+                " Value3.2\n" +
+                "Key4: Value4\n" +
+                "# Value4.1\n" +
+                "# Value4.2\n" +
+                "#Key5: Value5\n";
+
+        BinaryPackageControlFile d = new BinaryPackageControlFile(input);
+        assertFalse(d.isValid());
+
+        assertEquals("key 1", "Value1", d.get("Key1"));
+        assertEquals("key 2", "Value2\nValue2.1", d.get("Key2"));
+        assertEquals("key 3", "Value3\nValue3.2", d.get("Key3"));
+        assertEquals("key 4", "Value4", d.get("Key4"));
+        assertEquals("key 5", null, d.get("Key5"));
     }
 
     public void testToString() throws Exception {

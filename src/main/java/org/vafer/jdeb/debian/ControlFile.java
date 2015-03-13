@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2015 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,6 @@ import java.util.Set;
 
 /**
  * A control file as specified by the <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html">Debian policy</a>.
- *
- * @author Torsten Curdt
  */
 public abstract class ControlFile {
 
@@ -66,6 +64,11 @@ public abstract class ControlFile {
             }
 
             final char first = line.charAt(0);
+            if (first == '#') {
+                // ignore commented out lines
+                continue;
+            }
+
             if (Character.isLetter(first)) {
 
                 // new field

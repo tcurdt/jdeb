@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2015 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,6 @@ import org.vafer.jdeb.producers.DataProducerLink;
 
 /**
  * Defines a symbolic or hard link.
- * 
- * @author Emmanuel Bourg
- * @version $Revision$, $Date$
  */
 public final class Link {
 

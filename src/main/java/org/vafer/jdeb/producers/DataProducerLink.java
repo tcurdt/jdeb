@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2015 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import org.vafer.jdeb.mapping.Mapper;
 /**
  * DataProducer representing a single file
  * For cross-platform permissions and ownerships you probably want to use a Mapper, too.
- *
- * @author Thomas Mortagne
  */
 public final class DataProducerLink extends AbstractDataProducer implements DataProducer {
 
@@ -53,7 +51,10 @@ public final class DataProducerLink extends AbstractDataProducer implements Data
 
         entry = map(entry);
 
-        pReceiver.onEachLink(path, linkName, symlink, entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode());
+        entry.setName(path);
+        entry.setLinkName(linkName);
+
+        pReceiver.onEachLink(entry);
     }
 
 }

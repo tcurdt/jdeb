@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2015 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarConstants;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.taskdefs.Tar;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.tar.TarEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
+import org.vafer.jdeb.utils.SymlinkUtils;
 
 /**
  * DataProducer providing data from an Ant fileset. TarFileSets are also
  * supported with their permissions.
- *
- * @author Emmanuel Bourg
  */
 public final class DataProducerFileSet implements DataProducer {
 
@@ -78,7 +79,27 @@ public final class DataProducerFileSet implements DataProducer {
 
             final InputStream inputStream = new FileInputStream(file);
             try {
-                pReceiver.onEachFile(inputStream, prefix + "/" + name, null, user, uid, group, gid, filemode, file.length());
+                final String entryName = prefix + "/" + name;
+
+                final File entryPath = new File(entryName);
+
+                final boolean symbolicLink = SymlinkUtils.isSymbolicLink(entryPath);
+                final TarArchiveEntry e;
+                if (symbolicLink) {
+                    e = new TarArchiveEntry(entryName, TarConstants.LF_SYMLINK);
+                    e.setLinkName(SymlinkUtils.readSymbolicLink(entryPath));
+                } else {
+                    e = new TarArchiveEntry(entryName, true);
+                }
+
+                e.setUserId(uid);
+                e.setGroupId(gid);
+                e.setUserName(user);
+                e.setGroupName(group);
+                e.setMode(filemode);
+                e.setSize(file.length());
+
+                pReceiver.onEachFile(inputStream, e);
             } finally {
                 inputStream.close();
             }

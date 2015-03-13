@@ -1,4 +1,11 @@
-## Version 1.3.1, in progress
+## Version 1.4.1, in progress
+
+## Version 1.4, released 20.02.2014
+* [FIX] Support comments in control files
+* [FIX] Fixed handling of links
+* [FIX] Fixed hex format to use leading 0 when signing
+* [ADD] Provide jdeb build information back to maven (if propertyPrefix is set)
+* [ADD] Allow for Multi-Arch declaration in control files
 
 ## Version 1.3, released 25.07.2014
 

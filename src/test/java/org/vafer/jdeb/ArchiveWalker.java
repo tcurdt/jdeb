@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2015 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,6 @@ import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 
 /**
  * Support class for inspecting the content of an archive.
- * 
- * @author Emmanuel Bourg
  */
 public class ArchiveWalker {
     

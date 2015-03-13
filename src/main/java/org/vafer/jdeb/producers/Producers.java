@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2015 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import java.io.InputStream;
 
 /**
  * Package-private utility class with common producers functionality.
- *
- * @author Roman Kashitsyn <roman.kashitsyn@gmail.com>
  */
 class Producers {
 
@@ -98,16 +96,7 @@ class Producers {
                                              final InputStream inputStream,
                                              final TarArchiveEntry entry ) throws IOException {
         try {
-            consumer.onEachFile(inputStream,
-                    entry.getName(),
-                    entry.getLinkName(),
-                    entry.getUserName(),
-                    entry.getUserId(),
-                    entry.getGroupName(),
-                    entry.getGroupId(),
-                    entry.getMode(),
-                    entry.getSize()
-            );
+            consumer.onEachFile(inputStream, entry);
         } finally {
             IOUtils.closeQuietly(inputStream);
         }

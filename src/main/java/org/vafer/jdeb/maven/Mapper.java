@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2015 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,6 @@ import org.vafer.jdeb.mapping.PermMapper;
 /**
  * Maven "mapper" element acting as factory for the entry mapper.
  * Supported types: ls, perm
- *
- * @author Bryan Sant
  */
 public final class Mapper {
 
