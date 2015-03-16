@@ -30,6 +30,7 @@ public final class MapVariableResolver implements VariableResolver {
         this.map = map;
     }
 
+    @Override
     public String get( String key ) {
         return map.get(key);
     }

@@ -21,14 +21,17 @@ public class PGPSignatureOutputStream extends OutputStream {
         this.signatureGenerator = signatureGenerator;
     }
 
+    @Override
     public void write( int b ) throws IOException {
         signatureGenerator.update(new byte[] { (byte)b });
     }
 
+    @Override
     public void write( byte[] b ) throws IOException {
         signatureGenerator.update(b);
     }
 
+    @Override
     public void write( byte[] b, int off, int len ) throws IOException {
         signatureGenerator.update(b, off, len);
     }

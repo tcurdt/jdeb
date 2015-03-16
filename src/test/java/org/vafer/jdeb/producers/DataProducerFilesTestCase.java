@@ -1,9 +1,7 @@
 package org.vafer.jdeb.producers;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -26,11 +24,13 @@ public class DataProducerFilesTestCase extends TestCase {
     File file1;
     File file2;
 
+    @Override
     public void setUp() throws Exception {
         file1 = File.createTempFile(getClass().getSimpleName() + ".1", "txt");
         file2 = File.createTempFile(getClass().getSimpleName() + ".2", "txt");
     }
 
+    @Override
     public void tearDown() throws Exception {
         file1.delete();
         file2.delete();

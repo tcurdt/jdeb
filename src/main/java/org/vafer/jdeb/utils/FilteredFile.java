@@ -60,6 +60,7 @@ public class FilteredFile {
         }
     }
 
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for (String line : lines) {

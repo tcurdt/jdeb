@@ -74,6 +74,7 @@ public final class Data extends PatternSet implements DataProducer {
         mapperWrapper.add(mapper);
     }
 
+    @Override
     public void produce( final DataConsumer pReceiver ) throws IOException {
 
         if (src == null || !src.exists()) {

@@ -33,16 +33,19 @@ class MojoConsole implements Console {
         this.verbose = verbose;
     }
 
+    @Override
     public void debug(String message) {
         if (verbose) {
             log.info(message);
         }
     }
 
+    @Override
     public void info(String message) {
         log.info(message);
     }
 
+    @Override
     public void warn(String message) {
         log.warn(message);
     }

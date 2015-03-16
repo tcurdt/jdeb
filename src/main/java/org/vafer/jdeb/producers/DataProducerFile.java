@@ -18,7 +18,6 @@ package org.vafer.jdeb.producers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.DataConsumer;
@@ -41,6 +40,7 @@ public final class DataProducerFile extends AbstractDataProducer implements Data
         destinationName = pDestinationName;
     }
 
+    @Override
     public void produce( final DataConsumer pReceiver ) throws IOException {
         String fileName;
         if (destinationName != null && destinationName.trim().length() > 0) {

@@ -212,6 +212,7 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
         return mapping;
     }
 
+    @Override
     public TarArchiveEntry map( final TarArchiveEntry pEntry ) {
         final TarArchiveEntry entry = mapping.get(pEntry.getName());
         if (entry != null) {

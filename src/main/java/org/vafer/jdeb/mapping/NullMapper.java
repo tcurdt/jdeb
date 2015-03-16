@@ -24,6 +24,7 @@ public final class NullMapper implements Mapper {
     private NullMapper() {
     }
 
+    @Override
     public TarArchiveEntry map( final TarArchiveEntry pEntry ) {
         return pEntry;
     }

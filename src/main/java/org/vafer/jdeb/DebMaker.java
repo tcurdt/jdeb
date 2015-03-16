@@ -373,6 +373,7 @@ public class DebMaker {
         }
 
         final DataConsumer receiver = new DataConsumer() {
+            @Override
             public void onEachFile(InputStream input, TarArchiveEntry entry)  {
                 String tempConffileItem = entry.getName();
                 if (tempConffileItem.startsWith(".")) {
@@ -382,9 +383,11 @@ public class DebMaker {
                 result.add(tempConffileItem);
             }
 
+            @Override
             public void onEachLink(TarArchiveEntry entry)  {
             }
 
+            @Override
             public void onEachDir(String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size)  {
             }
         };

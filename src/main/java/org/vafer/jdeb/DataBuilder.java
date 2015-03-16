@@ -53,6 +53,7 @@ class DataBuilder {
             count = count.add(BigInteger.valueOf(size));
         }
 
+        @Override
         public String toString() {
             return "" + count;
         }
@@ -100,6 +101,7 @@ class DataBuilder {
 
         final List<String> addedDirectories = new ArrayList<String>();
         final DataConsumer receiver = new DataConsumer() {
+            @Override
             public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 // Check link name
                 checkField(linkname, TarConstants.NAMELEN);
@@ -119,7 +121,8 @@ class DataBuilder {
 
                 console.debug("dir: " + dirname);
             }
-            
+
+            @Override
             public void onEachFile(InputStream input, TarArchiveEntry entry) throws IOException {
                 // Check link name
                 checkField(entry.getLinkName(), TarConstants.NAMELEN);
@@ -160,6 +163,7 @@ class DataBuilder {
                 checksums.append(md5).append("  ").append(entry.getName()).append('\n');
             }
 
+            @Override
             public void onEachLink(TarArchiveEntry entry) throws IOException {
                 // Check link name
                 checkField(entry.getLinkName(), TarConstants.NAMELEN);

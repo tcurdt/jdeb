@@ -431,6 +431,7 @@ public class DebMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException on error
      */
+    @Override
     public void execute() throws MojoExecutionException {
 
         final MavenProject project = getProject();
