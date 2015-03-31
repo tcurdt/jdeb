@@ -2,6 +2,8 @@
 
 # Debian packages in Java
 
+[![Join the chat at https://gitter.im/tcurdt/jdeb](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/tcurdt/jdeb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This library provides an Ant task and a Maven plugin to create Debian packages
 from Java builds in a truly cross platform manner. Build your Debian packages
 on any platform that has Java support. Windows, Linux, OS X - it doesn't require
