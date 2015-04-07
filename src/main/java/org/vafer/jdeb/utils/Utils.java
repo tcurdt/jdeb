@@ -227,7 +227,9 @@ public final class Utils {
             }
         }
         
-        version = version.replace('-', '+');
+        // safest upstream_version should only contain full stop, plus, tilde, and alphanumerics
+        // https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
+        version = version.replaceAll("[^\\.+~A-Za-z0-9]", "+").replaceAll("\\++", "+");
         
         return version;
     }
