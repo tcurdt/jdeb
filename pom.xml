@@ -257,6 +257,11 @@
             <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+        	<groupId>org.codehaus.plexus</groupId>
+        	<artifactId>plexus-utils</artifactId>
+        	<version>[1.5.2,)</version>
+        </dependency>
     </dependencies>
     <reporting>
         <excludeDefaults>true</excludeDefaults>
