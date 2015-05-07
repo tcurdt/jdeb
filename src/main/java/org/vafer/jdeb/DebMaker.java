@@ -76,8 +76,8 @@ public class DebMaker {
     /** The section of the package. Default value if not specified in the control file */
     private String section = "java";
 
-    /** The dependencies of the package. Default value if not specified in the control file */
-    private String depends = "default-jre | java6-runtime";
+    /** The dependencies of the package. */
+    private String depends;
 
     /** The description of the package. Default value if not specified in the control file */
     private String description;
@@ -443,9 +443,6 @@ public class DebMaker {
             BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size);
             if (packageControlFile.get("Package") == null) {
                 packageControlFile.set("Package", packageName);
-            }
-            if (packageControlFile.get("Depends") == null) {
-                packageControlFile.set("Depends", depends);
             }
             if (packageControlFile.get("Section") == null) {
                 packageControlFile.set("Section", section);
