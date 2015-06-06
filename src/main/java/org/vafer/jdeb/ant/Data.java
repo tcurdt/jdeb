@@ -29,6 +29,8 @@ import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
 import org.vafer.jdeb.producers.DataProducerFile;
 
+import static org.vafer.jdeb.ant.MissingSourceBehavior.*;
+
 /**
  * Ant "data" element acting as a factory for DataProducers.
  * So far Archive and Directory producers are supported.
@@ -45,6 +47,8 @@ public final class Data extends PatternSet implements DataProducer {
     private Boolean conffile;
 
     private String destinationName;
+
+    private MissingSourceBehavior missingSrc = FAIL;
 
     public void setSrc(File src) {
         this.src = src;
@@ -74,11 +78,24 @@ public final class Data extends PatternSet implements DataProducer {
         mapperWrapper.add(mapper);
     }
 
+
+    public void setMissingSrc( String missingSrc ) {
+        MissingSourceBehavior value = MissingSourceBehavior.valueOf(missingSrc.trim().toUpperCase());
+        if (value == null) {
+            throw new IllegalArgumentException("Unknown " + MissingSourceBehavior.class.getSimpleName() + ": " + missingSrc);
+        }
+        this.missingSrc = value;
+    }
+
     @Override
     public void produce( final DataConsumer pReceiver ) throws IOException {
 
         if (src == null || !src.exists()) {
-            throw new FileNotFoundException("Data source not found : " + src);
+            if (missingSrc == IGNORE) {
+                return;
+            } else {
+                throw new FileNotFoundException("Data source not found : " + src);
+            }
         }
 
         org.vafer.jdeb.mapping.Mapper[] mappers = new org.vafer.jdeb.mapping.Mapper[mapperWrapper.size()];
