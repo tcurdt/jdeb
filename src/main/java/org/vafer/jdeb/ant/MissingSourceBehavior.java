@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.vafer.jdeb.maven;
+package org.vafer.jdeb.ant;
 
 public enum MissingSourceBehavior {
     IGNORE, FAIL
