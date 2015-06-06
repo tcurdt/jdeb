@@ -146,7 +146,6 @@
                                 <includes>
                                     <include>org.apache.commons:commons-compress</include>
                                     <include>commons-io:commons-io</include>
-                                    <include>commons-lang:commons-lang</include>
                                     <include>org.bouncycastle:bcpg-jdk15on</include>
                                     <include>org.bouncycastle:bcprov-jdk15on</include>
                                 </includes>
@@ -219,11 +218,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
             <version>1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
