@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarConstants;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -45,7 +46,6 @@ import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Settings;
 import org.apache.tools.tar.TarEntry;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 import org.vafer.jdeb.Console;
