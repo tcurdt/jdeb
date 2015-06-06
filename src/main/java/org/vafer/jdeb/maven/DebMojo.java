@@ -17,6 +17,7 @@
 package org.vafer.jdeb.maven;
 
 import static org.vafer.jdeb.utils.Utils.lookupIfEmpty;
+import static org.vafer.jdeb.utils.Utils.isBlank;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,7 +46,6 @@ import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Settings;
 import org.apache.tools.tar.TarEntry;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 import org.vafer.jdeb.Console;
@@ -567,7 +567,7 @@ public class DebMojo extends AbstractMojo {
             throw new MojoExecutionException("Failed to create debian package " + debFile, e);
         }
         
-        if (!StringUtils.isBlank(propertyPrefix)) {
+        if (!isBlank(propertyPrefix)) {
           project.getProperties().put(propertyPrefix+"version", getProjectVersion() );
           project.getProperties().put(propertyPrefix+"deb", debFile.getAbsolutePath());
           project.getProperties().put(propertyPrefix+"deb.name", debFile.getName());
