@@ -64,6 +64,13 @@ public class DebAntTask extends MatchingTask {
     /** The compression method used for the data file (none, gzip, bzip2 or xz) */
     private String compression = "gzip";
 
+    /**
+     * The digest algorithm to use.
+     *
+     * @see org.bouncycastle.bcpg.HashAlgorithmTags
+     */
+    private String digest = "SHA1";
+
     /** Trigger the verbose mode detailing all operations */
     private boolean verbose;
 
@@ -129,6 +136,10 @@ public class DebAntTask extends MatchingTask {
         links.add(link);
     }
 
+    public void setDigest(String digest) {
+        this.digest = digest;
+    }
+
     @Override
     public void execute() {
         // add the data producers for the links
@@ -163,6 +174,7 @@ public class DebAntTask extends MatchingTask {
         debMaker.setKey(key);
         debMaker.setPassphrase(passphrase);
         debMaker.setCompression(compression);
+        debMaker.setDigest(digest);
         
         try {
             debMaker.validate();

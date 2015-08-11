@@ -63,7 +63,7 @@ public class DebMakerTestCase extends TestCase {
         };
 
         int digest = PGPUtil.SHA1;
-        PGPSigner signer = new PGPSigner(ring, "2E074D8F", "test");
+        PGPSigner signer = new PGPSigner(ring, "2E074D8F", "test", PGPUtil.SHA1);
         PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(signer.getSecretKey().getPublicKey().getAlgorithm(), digest));
         signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, signer.getPrivateKey());
         

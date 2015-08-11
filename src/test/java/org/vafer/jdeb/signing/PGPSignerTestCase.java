@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import junit.framework.TestCase;
+import org.bouncycastle.openpgp.PGPUtil;
 
 public final class PGPSignerTestCase extends TestCase {
 
@@ -52,7 +53,7 @@ public final class PGPSignerTestCase extends TestCase {
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-        PGPSigner signer = new PGPSigner(ring, "2E074D8F", "test");
+        PGPSigner signer = new PGPSigner(ring, "2E074D8F", "test", PGPUtil.SHA1);
         signer.clearSign(input, os);
 
         final byte[] output = fixCRLF(os.toByteArray());
@@ -66,11 +67,11 @@ public final class PGPSignerTestCase extends TestCase {
 
     public void testKeyLoading() throws Exception {
         InputStream ring = getClass().getClassLoader().getResourceAsStream("org/vafer/gpg/secring.gpg");
-        PGPSigner signer = new PGPSigner(ring, "2E074D8F", "test");
+        PGPSigner signer = new PGPSigner(ring, "2E074D8F", "test", PGPUtil.SHA1);
         assertEquals("correct key found", "733da4802e074d8f", String.format("%016x", signer.getSecretKey().getKeyID()));
 
         ring.reset();
-        signer = new PGPSigner(ring, "0C1FF47A", "test");
+        signer = new PGPSigner(ring, "0C1FF47A", "test", PGPUtil.SHA1);
         assertEquals("key with leading 0 found", "21970bb80c1ff47a", String.format("%016x", signer.getSecretKey().getKeyID()));
     }
 
