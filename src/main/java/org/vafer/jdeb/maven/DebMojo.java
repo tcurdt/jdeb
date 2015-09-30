@@ -167,6 +167,14 @@ public class DebMojo extends AbstractMojo {
     private String classifier;
 
     /**
+     * The digest algorithm to use.
+     *
+     * @see org.bouncycastle.bcpg.HashAlgorithmTags
+     */
+    @Parameter(defaultValue = "SHA1")
+    private String digest;
+
+    /**
      * "data" entries used to determine which files should be added to this deb.
      * The "data" entries may specify a tarball (tar.gz, tar.bz2, tgz), a
      * directory, or a normal file. An entry would look something like this in
@@ -277,7 +285,13 @@ public class DebMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "false")
     private boolean signPackage;
-    
+
+    /**
+     * If signChanges is true then changes file will be signed.
+     */
+    @Parameter(defaultValue = "false")
+    private boolean signChanges;
+
     /**
      * Defines which utility is used to verify the signed package
      */
@@ -544,11 +558,13 @@ public class DebMojo extends AbstractMojo {
             debMaker.setKey(key);
             debMaker.setPassphrase(passphrase);
             debMaker.setSignPackage(signPackage);
+            debMaker.setSignChanges(signChanges);
             debMaker.setSignMethod(signMethod);
             debMaker.setSignRole(signRole);
             debMaker.setResolver(resolver);
             debMaker.setOpenReplaceToken(openReplaceToken);
             debMaker.setCloseReplaceToken(closeReplaceToken);
+            debMaker.setDigest(digest);
             debMaker.validate();
             debMaker.makeDeb();
 
@@ -584,7 +600,7 @@ public class DebMojo extends AbstractMojo {
      * and global settings.
      */
     private void initializeSignProperties() {
-        if (!signPackage) {
+        if (!signPackage && !signChanges) {
             return;
         }
 

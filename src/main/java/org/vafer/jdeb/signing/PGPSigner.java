@@ -49,14 +49,16 @@ public class PGPSigner {
 
     private PGPSecretKey secretKey;
     private PGPPrivateKey privateKey;
+    private int digest;
 
-    public PGPSigner(InputStream keyring, String keyId, String passphrase) throws IOException, PGPException {
+    public PGPSigner(InputStream keyring, String keyId, String passphrase, int digest) throws IOException, PGPException {
         secretKey = getSecretKey(keyring, keyId);
         if(secretKey == null)
         {
             throw new PGPException(String.format("Specified key %s does not exist in key ring %s", keyId, keyring));
         }
         privateKey = secretKey.extractPrivateKey(new BcPBESecretKeyDecryptorBuilder(new BcPGPDigestCalculatorProvider()).build(passphrase.toCharArray()));
+        this.digest = digest;
     }
 
     /**
@@ -76,8 +78,7 @@ public class PGPSigner {
      * @param output     the output destination of the signature
      */
     public void clearSign(InputStream input, OutputStream output) throws IOException, PGPException, GeneralSecurityException {
-        int digest = PGPUtil.SHA1;
-        
+
         PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(privateKey.getPublicKeyPacket().getAlgorithm(), digest));
         signatureGenerator.init(PGPSignature.CANONICAL_TEXT_DOCUMENT, privateKey);
         
