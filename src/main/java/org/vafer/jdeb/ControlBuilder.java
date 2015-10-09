@@ -17,6 +17,7 @@
 package org.vafer.jdeb;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -103,13 +104,19 @@ class ControlBuilder {
             if ("conffiles".equals(file.getName())) {
                 foundConffiles = true;
             }
-            
             if (CONFIGURATION_FILENAMES.contains(file.getName()) || MAINTAINER_SCRIPTS.contains(file.getName())) {
                 FilteredFile configurationFile = new FilteredFile(new FileInputStream(file), resolver);
                 configurationFile.setOpenToken(openReplaceToken);
                 configurationFile.setCloseToken(closeReplaceToken);
                 addControlEntry(file.getName(), configurationFile.toString(), outputStream);
 
+            } else if (file.getName().endsWith(".bin")) {
+                InputStream in = new FileInputStream(file);
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                Utils.copy(in, out);
+                in.close();
+                out.close();
+                addControlEntry(file.getName().substring(0, file.getName().length() - 4), out.toByteArray(), outputStream);
             } else if (!"control".equals(file.getName())) {
                 // initialize the information stream to guess the type of the file
                 InformationInputStream infoStream = new InformationInputStream(new FileInputStream(file));
@@ -209,23 +216,25 @@ class ControlBuilder {
 
 
     private static void addControlEntry(final String pName, final String pContent, final TarArchiveOutputStream pOutput) throws IOException {
-        final byte[] data = pContent.getBytes("UTF-8");
+        addControlEntry(pName, pContent.getBytes("UTF-8"), pOutput);
+    }
 
+    private static void addControlEntry(final String pName, final byte[] pData, final TarArchiveOutputStream pOutput) throws IOException {
         final TarArchiveEntry entry = new TarArchiveEntry("./" + pName, true);
-        entry.setSize(data.length);
+        entry.setSize(pData.length);
         entry.setNames("root", "root");
-        
+
         if (MAINTAINER_SCRIPTS.contains(pName)) {
             entry.setMode(PermMapper.toMode("755"));
         } else {
             entry.setMode(PermMapper.toMode("644"));
         }
-        
+
         pOutput.putArchiveEntry(entry);
-        pOutput.write(data);
+        pOutput.write(pData);
         pOutput.closeArchiveEntry();
     }
-    
+
     /**
      * Tells if the specified directory is ignored by default (.svn, cvs, etc)
      * 
