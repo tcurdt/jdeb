@@ -556,15 +556,16 @@ public class DebMaker {
         } catch (Exception e) {
             throw new PackagingException("Could not create deb package", e);
         } finally {
-            if (tempData != null) {
-                if (!tempData.delete()) {
-                    console.warn("Could not delete the temporary file " + tempData);
-                }
-            }
-            if (tempControl != null) {
-                if (!tempControl.delete()) {
-                    console.warn("Could not delete the temporary file " + tempControl);
-                }
+            deleteTempFile(tempData);
+            deleteTempFile(tempControl);
+            deleteTempFile(tempMd5);
+        }
+    }
+
+    private void deleteTempFile(File tempFile) {
+        if (tempFile != null) {
+            if (!tempFile.delete()) {
+                console.warn("Could not delete the temporary file " + tempFile);
             }
         }
     }
