@@ -38,12 +38,7 @@ import org.vafer.jdeb.utils.PGPSignatureOutputStream;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -463,15 +458,16 @@ public class DebMaker {
     public BinaryPackageControlFile createSignedDeb(Compression compression, final PGPSignatureGenerator signatureGenerator, PGPSigner signer ) throws PackagingException {
         File tempData = null;
         File tempControl = null;
+        File tempMd5 = null;
 
         try {
             tempData = File.createTempFile("deb", "data");
             tempControl = File.createTempFile("deb", "control");
+            tempMd5 = File.createTempFile("deb", "md5");
 
             console.debug("Building data");
             DataBuilder dataBuilder = new DataBuilder(console);
-            StringBuilder md5s = new StringBuilder();
-            BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, compression);
+            BigInteger size = dataBuilder.buildData(dataProducers, tempData, tempMd5, compression);
 
             console.info("Building conffiles");
             List<String> tempConffiles = populateConffiles(conffilesProducers);
@@ -495,7 +491,7 @@ public class DebMaker {
                 packageControlFile.set("Homepage", homepage);
             }
 
-            controlBuilder.buildControl(packageControlFile, control.listFiles(), tempConffiles , md5s, tempControl);
+            controlBuilder.buildControl(packageControlFile, control.listFiles(), tempConffiles , tempMd5, tempControl);
 
             if (!packageControlFile.isValid()) {
                 throw new PackagingException("Control file fields are invalid " + packageControlFile.invalidFields() +
@@ -560,15 +556,16 @@ public class DebMaker {
         } catch (Exception e) {
             throw new PackagingException("Could not create deb package", e);
         } finally {
-            if (tempData != null) {
-                if (!tempData.delete()) {
-                    console.warn("Could not delete the temporary file " + tempData);
-                }
-            }
-            if (tempControl != null) {
-                if (!tempControl.delete()) {
-                    console.warn("Could not delete the temporary file " + tempControl);
-                }
+            deleteTempFile(tempData);
+            deleteTempFile(tempControl);
+            deleteTempFile(tempMd5);
+        }
+    }
+
+    private void deleteTempFile(File tempFile) {
+        if (tempFile != null) {
+            if (!tempFile.delete()) {
+                console.warn("Could not delete the temporary file " + tempFile);
             }
         }
     }
