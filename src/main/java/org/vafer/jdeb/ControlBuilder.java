@@ -16,21 +16,6 @@
 
 package org.vafer.jdeb;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.zip.GZIPOutputStream;
-
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
@@ -42,6 +27,15 @@ import org.vafer.jdeb.utils.FilteredFile;
 import org.vafer.jdeb.utils.InformationInputStream;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
+
+import java.io.*;
+import java.math.BigInteger;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * Builds the control archive of the Debian package.
@@ -71,7 +65,6 @@ class ControlBuilder {
      *
      * @param packageControlFile the package control file
      * @param controlFiles the other control information files (maintainer scripts, etc)
-     * @param dataSize  the size of the installed package
      * @param checksums the md5 checksums of the files in the data archive
      * @param output
      * @return
@@ -79,7 +72,7 @@ class ControlBuilder {
      * @throws java.io.IOException
      * @throws java.text.ParseException
      */
-    void buildControl(BinaryPackageControlFile packageControlFile, File[] controlFiles, List<String> conffiles, StringBuilder checksums, File output) throws IOException, ParseException {
+    void buildControl(BinaryPackageControlFile packageControlFile, File[] controlFiles, List<String> conffiles, File checksums, File output) throws IOException, ParseException {
         final File dir = output.getParentFile();
         if (dir != null && (!dir.exists() || !dir.isDirectory())) {
             throw new IOException("Cannot write control file at '" + output.getAbsolutePath() + "'");
@@ -142,7 +135,7 @@ class ControlBuilder {
         }
         
         addControlEntry("control", packageControlFile.toString(), outputStream);
-        addControlEntry("md5sums", checksums.toString(), outputStream);
+        addControlEntry("md5sums", checksums, outputStream);
 
         outputStream.close();
     }
@@ -223,7 +216,28 @@ class ControlBuilder {
         pOutput.write(data);
         pOutput.closeArchiveEntry();
     }
-    
+
+    private static void addControlEntry(final String pName, final File data, final TarArchiveOutputStream pOutput) throws IOException {
+        final TarArchiveEntry entry = new TarArchiveEntry("./" + pName, true);
+        entry.setSize(data.length());
+        entry.setNames("root", "root");
+
+        if (MAINTAINER_SCRIPTS.contains(pName)) {
+            entry.setMode(PermMapper.toMode("755"));
+        } else {
+            entry.setMode(PermMapper.toMode("644"));
+        }
+
+        pOutput.putArchiveEntry(entry);
+        InputStream input = new FileInputStream(data);
+        try {
+            IOUtils.copy(input, pOutput);
+        } finally {
+            input.close();
+        }
+        pOutput.closeArchiveEntry();
+    }
+
     /**
      * Tells if the specified directory is ignored by default (.svn, cvs, etc)
      * 

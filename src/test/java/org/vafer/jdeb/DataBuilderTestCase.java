@@ -16,16 +16,17 @@
 
 package org.vafer.jdeb;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Arrays;
-
 import junit.framework.TestCase;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.io.IOUtils;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileSet;
 import org.vafer.jdeb.producers.DataProducerFile;
 import org.vafer.jdeb.producers.DataProducerFileSet;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Arrays;
 
 public class DataBuilderTestCase extends TestCase {
     
@@ -45,12 +46,13 @@ public class DataBuilderTestCase extends TestCase {
         fileset.setIncludes("**/*");
         fileset.setProject(project);
 
-        StringBuilder md5s = new StringBuilder();
-        builder.buildData(Arrays.asList((DataProducer) new DataProducerFileSet(fileset)), new File("target/data.tar"), md5s, Compression.GZIP);
+        File md5File = File.createTempFile("deb", "md5");
+        builder.buildData(Arrays.asList((DataProducer) new DataProducerFileSet(fileset)), new File("target/data.tar"), md5File, Compression.GZIP);
 
+        String md5s = IOUtils.toString(md5File.toURI());
         assertTrue("empty md5 file", md5s.length() > 0);
-        assertFalse("windows path separator found", md5s.indexOf("\\") != -1);
-        assertTrue("two spaces between md5 and file", md5s.toString().equals("8bc944dbd052ef51652e70a5104492e3  ./test/testfile\n"));
+        assertFalse("windows path separator found", md5s.contains("\\"));
+        assertTrue("two spaces between md5 and file", md5s.equals("8bc944dbd052ef51652e70a5104492e3  ./test/testfile\n"));
     }
     
     public void testCreateParentDirectories() throws Exception {
@@ -63,7 +65,7 @@ public class DataBuilderTestCase extends TestCase {
         
         DataProducer producer = new DataProducerFile(new File("pom.xml"), "/usr/share/myapp/pom.xml", null, null, null); 
         
-        builder.buildData(Arrays.asList(producer), archive, new StringBuilder(), Compression.NONE);
+        builder.buildData(Arrays.asList(producer), archive, File.createTempFile("deb", "md5"), Compression.NONE);
         
         int count = 0;
         TarArchiveInputStream in = null;
