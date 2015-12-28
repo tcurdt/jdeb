@@ -8,6 +8,7 @@ dependency-reduced-pom.xml
 *.iml
 *.iws
 *.ipr
+*.psd
 /.idea
 .release
 *~
