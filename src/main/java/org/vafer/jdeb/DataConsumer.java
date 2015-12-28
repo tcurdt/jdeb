@@ -25,7 +25,7 @@ import java.io.InputStream;
  */
 public interface DataConsumer {
 
-    void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException;
+    void onEachDir( String dirname, String linkname, String user, long uid, String group, long gid, int mode, long size ) throws IOException;
 
     void onEachFile( InputStream input, TarArchiveEntry entry ) throws IOException;
 

@@ -55,7 +55,6 @@ public final class PermMapper implements Mapper {
         this(uid, gid, user, group, toMode(fileMode), toMode(dirMode), strip, prefix);
     }
 
-    @Override
     public TarArchiveEntry map( final TarArchiveEntry entry ) {
         final String name = entry.getName();
         entry.setName(prefix + '/' + Utils.stripPath(strip, name));

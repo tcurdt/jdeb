@@ -39,6 +39,7 @@ import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.operator.bc.BcPBESecretKeyDecryptorBuilder;
 import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
 import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
+import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 
 /**
  * Signing with OpenPGP.
@@ -133,7 +134,7 @@ public class PGPSigner {
      * @param keyId the 4 bytes identifier of the key
      */
     private PGPSecretKey getSecretKey(InputStream input, String keyId) throws IOException, PGPException {
-        PGPSecretKeyRingCollection keyrings = new PGPSecretKeyRingCollection(PGPUtil.getDecoderStream(input));
+        PGPSecretKeyRingCollection keyrings = new PGPSecretKeyRingCollection(PGPUtil.getDecoderStream(input), new JcaKeyFingerprintCalculator());
         
         Iterator rIt = keyrings.getKeyRings();
 

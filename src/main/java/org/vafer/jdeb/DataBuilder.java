@@ -101,8 +101,8 @@ class DataBuilder {
 
         final List<String> addedDirectories = new ArrayList<String>();
         final DataConsumer receiver = new DataConsumer() {
-            @Override
-            public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+
+            public void onEachDir( String dirname, String linkname, String user, long uid, String group, long gid, int mode, long size ) throws IOException {
                 // Check link name
                 checkField(linkname, TarConstants.NAMELEN);
                 // Check user name
@@ -122,7 +122,6 @@ class DataBuilder {
                 console.debug("dir: " + dirname);
             }
 
-            @Override
             public void onEachFile(InputStream input, TarArchiveEntry entry) throws IOException {
                 // Check link name
                 checkField(entry.getLinkName(), TarConstants.NAMELEN);
@@ -133,7 +132,7 @@ class DataBuilder {
 
                 entry.setName(fixPath(entry.getName()));
 
-                createParentDirectories(entry.getName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId());
+                createParentDirectories(entry.getName(), entry.getUserName(), entry.getLongUserId(), entry.getGroupName(), entry.getLongGroupId());
 
                 tarOutputStream.putArchiveEntry(entry);
 
@@ -152,9 +151,9 @@ class DataBuilder {
                         " mode:" + entry.getMode() +
                         " linkname:" + entry.getLinkName() +
                         " username:" + entry.getUserName() +
-                        " userid:" + entry.getUserId() +
+                        " userid:" + entry.getLongUserId() +
                         " groupname:" + entry.getGroupName() +
-                        " groupid:" + entry.getGroupId() +
+                        " groupid:" + entry.getLongGroupId() +
                         " modtime:" + entry.getModTime() +
                         " md5: " + md5
                 );
@@ -163,7 +162,6 @@ class DataBuilder {
                 checksums.append(md5).append("  ").append(entry.getName()).append('\n');
             }
 
-            @Override
             public void onEachLink(TarArchiveEntry entry) throws IOException {
                 // Check link name
                 checkField(entry.getLinkName(), TarConstants.NAMELEN);
@@ -174,7 +172,7 @@ class DataBuilder {
 
                 entry.setName(fixPath(entry.getName()));
 
-                createParentDirectories(entry.getName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId());
+                createParentDirectories(entry.getName(), entry.getUserName(), entry.getLongUserId(), entry.getGroupName(), entry.getLongGroupId());
 
                 tarOutputStream.putArchiveEntry(entry);
                 tarOutputStream.closeArchiveEntry();
@@ -184,14 +182,14 @@ class DataBuilder {
                     " mode:" + entry.getMode() +
                     " linkname:" + entry.getLinkName() +
                     " username:" + entry.getUserName() +
-                    " userid:" + entry.getUserId() +
+                    " userid:" + entry.getLongUserId() +
                     " groupname:" + entry.getGroupName() +
-                    " groupid:" + entry.getGroupId()
+                    " groupid:" + entry.getLongGroupId()
                  );
             }
             
 
-            private void createDirectory( String directory, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+            private void createDirectory( String directory, String user, long uid, String group, long gid, int mode, long size ) throws IOException {
                 // All dirs should end with "/" when created, or the test DebAndTaskTestCase.testTarFileSet() thinks its a file
                 // and so thinks it has the wrong permission.
                 // This consistency also helps when checking if a directory already exists in addedDirectories.
@@ -215,7 +213,7 @@ class DataBuilder {
                 }
             }
         
-            private void createParentDirectories( String filename, String user, int uid, String group, int gid ) throws IOException {
+            private void createParentDirectories( String filename, String user, long uid, String group, long gid ) throws IOException {
                 String dirname = fixPath(new File(filename).getParent());
                 
                 // Debian packages must have parent directories created

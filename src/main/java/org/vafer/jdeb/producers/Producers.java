@@ -76,9 +76,9 @@ class Producers {
                 entry.getName(),
                 entry.getLinkName(),
                 entry.getUserName(),
-                entry.getUserId(),
+                entry.getLongUserId(),
                 entry.getGroupName(),
-                entry.getGroupId(),
+                entry.getLongGroupId(),
                 entry.getMode(),
                 entry.getSize()
         );

@@ -58,8 +58,8 @@ public class DataProducerFilesTestCase extends TestCase {
                             }
                             final TarArchiveEntry e = (TarArchiveEntry) o;
                             return e.getSize() == f.length()
-                                && e.getGroupId() == 0
-                                && e.getUserId() == 0
+                                && e.getLongGroupId() == 0
+                                && e.getLongUserId() == 0
                                 && "root".equals(e.getUserName())
                                 && "root".equals(e.getGroupName())
                                 && ("/usr/include/" + f.getName()).equals(e.getName())
@@ -96,8 +96,8 @@ public class DataProducerFilesTestCase extends TestCase {
                             }
                             final TarArchiveEntry e = (TarArchiveEntry) o;
                             return e.getSize() == f.length()
-                                    && e.getGroupId() == 0
-                                    && e.getUserId() == 0
+                                    && e.getLongGroupId() == 0
+                                    && e.getLongUserId() == 0
                                     && "root".equals(e.getUserName())
                                     && "root".equals(e.getGroupName())
                                     && (f.getAbsolutePath()).equals(e.getName())
