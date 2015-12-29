@@ -40,7 +40,7 @@ import org.apache.tools.ant.util.ReaderInputStream;
  * ATTENTION: don't use outside of jdeb
  */
 public final class Utils {
-    private static final Pattern BETA_PATTERN = Pattern.compile("(.*?)([\\.\\-_]?)(alpha|a|beta|b|milestone|m|cr|rc)(.*)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern BETA_PATTERN = Pattern.compile("^(?:(?:(.*?)([\\.\\-_]))|(.*[^a-z]))(alpha|a|beta|b|milestone|m|cr|rc)([^a-z].*)?$", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern SNAPSHOT_PATTERN = Pattern.compile("(.*)[\\-\\+]SNAPSHOT");
 
@@ -223,7 +223,11 @@ public final class Utils {
         } else {
             matcher = BETA_PATTERN.matcher(version);
             if (matcher.matches()) {
-                version = matcher.group(1) + "~" + matcher.group(3) + matcher.group(4);
+                if (matcher.group(1) != null) {
+                    version = matcher.group(1) + "~" + matcher.group(4) + matcher.group(5);
+                } else {
+                    version = matcher.group(3) + "~" + matcher.group(4) + matcher.group(5);
+                }
             }
         }
         
