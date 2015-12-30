@@ -422,7 +422,7 @@ public class DebMaker {
             public void onEachLink(TarArchiveEntry entry)  {
             }
 
-            public void onEachDir(String dirname, String linkname, String user, long uid, String group, long gid, int mode, long size)  {
+            public void onEachDir(TarArchiveEntry tarArchiveEntry)  {
             }
         };
 

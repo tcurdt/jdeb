@@ -74,8 +74,17 @@ public class DataProducerPathTemplateTestCase extends TestCase {
             invocations = new ArrayList<Invocation>();
         }
 
-        public void onEachDir( String dirname, String linkname, String user, long uid, String group, long gid, int mode, long size ) throws IOException {
-            invocations.add(new Invocation(dirname, linkname, user, uid, group, gid, mode, size));
+        public void onEachDir(TarArchiveEntry dirEntry) throws IOException {
+            invocations.add(new Invocation(
+                dirEntry.getName(),
+                dirEntry.getLinkName(),
+                dirEntry.getUserName(),
+                dirEntry.getLongUserId(),
+                dirEntry.getGroupName(),
+                dirEntry.getLongGroupId(),
+                dirEntry.getMode(),
+                dirEntry.getSize()
+            ));
         }
 
         public void onEachFile(InputStream input, TarArchiveEntry entry) throws IOException {

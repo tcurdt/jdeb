@@ -73,15 +73,7 @@ class Producers {
     static void produceDirEntry( final DataConsumer consumer,
                                  final TarArchiveEntry entry ) throws IOException {
         consumer.onEachDir(
-                entry.getName(),
-                entry.getLinkName(),
-                entry.getUserName(),
-                entry.getLongUserId(),
-                entry.getGroupName(),
-                entry.getLongGroupId(),
-                entry.getMode(),
-                entry.getSize()
-        );
+                entry);
     }
 
 

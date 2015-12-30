@@ -101,41 +101,41 @@ class DataBuilder {
         final List<String> addedDirectories = new ArrayList<String>();
         final DataConsumer receiver = new DataConsumer() {
 
-            public void onEachDir( String dirname, String linkname, String user, long uid, String group, long gid, int mode, long size ) throws IOException {
+            public void onEachDir(TarArchiveEntry dirEntry) throws IOException {
                 // Check link name
-                checkField(linkname, TarConstants.NAMELEN);
+                checkField(dirEntry.getLinkName(), TarConstants.NAMELEN);
                 // Check user name
-                checkField(user, TarConstants.UNAMELEN);
+                checkField(dirEntry.getUserName(), TarConstants.UNAMELEN);
                 // Check group name
-                checkField(group, TarConstants.GNAMELEN);
+                checkField(dirEntry.getUserName(), TarConstants.GNAMELEN);
 
-                dirname = fixPath(dirname);
+                dirEntry.setName(fixPath(dirEntry.getName()));
 
-                createParentDirectories(dirname, user, uid, group, gid);
+                createParentDirectories(dirEntry.getName(), dirEntry.getUserName(), dirEntry.getLongUserId(), dirEntry.getGroupName(), dirEntry.getLongGroupId());
 
                 // The directory passed in explicitly by the caller also gets the passed-in mode.  (Unlike
                 // the parent directories for now.  See related comments at "int mode =" in
                 // createParentDirectories, including about a possible bug.)
-                createDirectory(dirname, user, uid, group, gid, mode, 0);
+                createDirectory(dirEntry.getName(), dirEntry.getUserName(), dirEntry.getLongUserId(), dirEntry.getGroupName(), dirEntry.getLongGroupId(), dirEntry.getMode(), 0);
 
-                console.debug("dir: " + dirname);
+                console.debug("dir: " + dirEntry.getName());
             }
 
-            public void onEachFile(InputStream input, TarArchiveEntry entry) throws IOException {
+            public void onEachFile(InputStream input, TarArchiveEntry fileEntry) throws IOException {
                 // Check link name
-                checkField(entry.getLinkName(), TarConstants.NAMELEN);
+                checkField(fileEntry.getLinkName(), TarConstants.NAMELEN);
                 // Check user name
-                checkField(entry.getUserName(), TarConstants.UNAMELEN);
+                checkField(fileEntry.getUserName(), TarConstants.UNAMELEN);
                 // Check group name
-                checkField(entry.getGroupName(), TarConstants.GNAMELEN);
+                checkField(fileEntry.getGroupName(), TarConstants.GNAMELEN);
 
-                entry.setName(fixPath(entry.getName()));
+                fileEntry.setName(fixPath(fileEntry.getName()));
 
-                createParentDirectories(entry.getName(), entry.getUserName(), entry.getLongUserId(), entry.getGroupName(), entry.getLongGroupId());
+                createParentDirectories(fileEntry.getName(), fileEntry.getUserName(), fileEntry.getLongUserId(), fileEntry.getGroupName(), fileEntry.getLongGroupId());
 
-                tarOutputStream.putArchiveEntry(entry);
+                tarOutputStream.putArchiveEntry(fileEntry);
 
-                dataSize.add(entry.getSize());
+                dataSize.add(fileEntry.getSize());
                 digest.reset();
 
                 Utils.copy(input, new DigestOutputStream(tarOutputStream, digest));
@@ -145,20 +145,20 @@ class DataBuilder {
                 tarOutputStream.closeArchiveEntry();
 
                 console.debug(
-                    "file:" + entry.getName() +
-                        " size:" + entry.getSize() +
-                        " mode:" + entry.getMode() +
-                        " linkname:" + entry.getLinkName() +
-                        " username:" + entry.getUserName() +
-                        " userid:" + entry.getLongUserId() +
-                        " groupname:" + entry.getGroupName() +
-                        " groupid:" + entry.getLongGroupId() +
-                        " modtime:" + entry.getModTime() +
+                    "file:" + fileEntry.getName() +
+                        " size:" + fileEntry.getSize() +
+                        " mode:" + fileEntry.getMode() +
+                        " linkname:" + fileEntry.getLinkName() +
+                        " username:" + fileEntry.getUserName() +
+                        " userid:" + fileEntry.getLongUserId() +
+                        " groupname:" + fileEntry.getGroupName() +
+                        " groupid:" + fileEntry.getLongGroupId() +
+                        " modtime:" + fileEntry.getModTime() +
                         " md5: " + md5
                 );
 
                 // append to file md5 list, two spaces to be compatible with GNU coreutils md5sum
-                checksums.append(md5).append("  ").append(entry.getName()).append('\n');
+                checksums.append(md5).append("  ").append(fileEntry.getName()).append('\n');
             }
 
             public void onEachLink(TarArchiveEntry entry) throws IOException {

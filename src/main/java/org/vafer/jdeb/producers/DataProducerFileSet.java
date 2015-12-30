@@ -70,7 +70,14 @@ public final class DataProducerFileSet implements DataProducer {
         for (String directory : scanner.getIncludedDirectories()) {
             String name = directory.replace('\\', '/');
 
-            pReceiver.onEachDir(prefix + "/" + name, null, user, uid, group, gid, dirmode, 0);
+            final TarArchiveEntry entry = new TarArchiveEntry(prefix + "/" + name);
+            entry.setUserName(user);
+            entry.setUserId(uid);
+            entry.setGroupName(group);
+            entry.setGroupId(gid);
+            entry.setMode(dirmode);
+
+            pReceiver.onEachDir(entry);
         }
 
         for (String filename : scanner.getIncludedFiles()) {
