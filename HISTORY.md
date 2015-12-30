@@ -1,6 +1,17 @@
-## Version 1.4.1, in progress
+## Version 1.5.1, in progress
+
+## Version 1.5, released 15.01.2016
+
+* [FIX] Fixed maven to debian version conversion
+* [FIX] Allow comments in control files
+* [FIX] Fixed incorrectly handled links for tar archives
+* [FIX] Fixed leading zeros on PGP hex strings
+* [ADD] Provide more attributes maven properties (version, deb.name, changes.name, changes.txt.name)
+* [ADD] Added option to provide a propertyPrefix
+* [ADD] Allow Multi-Arch declarations
 
 ## Version 1.4, released 20.02.2014
+
 * [FIX] Support comments in control files
 * [FIX] Fixed handling of links
 * [FIX] Fixed hex format to use leading 0 when signing
