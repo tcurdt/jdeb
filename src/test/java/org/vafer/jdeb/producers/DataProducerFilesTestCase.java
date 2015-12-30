@@ -24,13 +24,11 @@ public class DataProducerFilesTestCase extends TestCase {
     File file1;
     File file2;
 
-    @Override
     public void setUp() throws Exception {
         file1 = File.createTempFile(getClass().getSimpleName() + ".1", "txt");
         file2 = File.createTempFile(getClass().getSimpleName() + ".2", "txt");
     }
 
-    @Override
     public void tearDown() throws Exception {
         file1.delete();
         file2.delete();
@@ -51,7 +49,6 @@ public class DataProducerFilesTestCase extends TestCase {
             verify(consumer).onEachFile(
                     any(FileInputStream.class),
                     argThat(new BaseMatcher<TarArchiveEntry>() {
-                        @Override
                         public boolean matches(final Object o) {
                             if (!(o instanceof TarArchiveEntry)) {
                                 return false;
@@ -66,7 +63,6 @@ public class DataProducerFilesTestCase extends TestCase {
                                    ;
                         }
 
-                        @Override
                         public void describeTo(final Description description) {
                         }
                     })
@@ -89,7 +85,6 @@ public class DataProducerFilesTestCase extends TestCase {
             verify(consumer).onEachFile(
                     any(FileInputStream.class),
                     argThat(new BaseMatcher<TarArchiveEntry>() {
-                        @Override
                         public boolean matches(final Object o) {
                             if (!(o instanceof TarArchiveEntry)) {
                                 return false;
@@ -104,7 +99,6 @@ public class DataProducerFilesTestCase extends TestCase {
                                     ;
                         }
 
-                        @Override
                         public void describeTo(final Description description) {
                         }
                     })

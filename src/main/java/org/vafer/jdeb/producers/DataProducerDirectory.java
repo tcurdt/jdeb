@@ -41,13 +41,12 @@ public final class DataProducerDirectory extends AbstractDataProducer implements
         scanner.setFollowSymlinks(true);
     }
 
-    @Override
     public void produce( final DataConsumer pReceiver ) throws IOException {
 
         scanner.scan();
 
         final File baseDir = scanner.getBasedir();
-        
+
         for (String dir : scanner.getIncludedDirectories()) {
             final File file = new File(baseDir, dir);
             String dirname = getFilename(baseDir, file);

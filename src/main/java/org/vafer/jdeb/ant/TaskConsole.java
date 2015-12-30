@@ -34,19 +34,16 @@ class TaskConsole implements Console {
         this.verbose = verbose;
     }
 
-    @Override
     public void debug(String message) {
         if (verbose) {
             task.log(message);
         }
     }
 
-    @Override
     public void info(String message) {
         task.log(message);
     }
 
-    @Override
     public void warn(String message) {
         task.log(message, Project.MSG_WARN);
     }

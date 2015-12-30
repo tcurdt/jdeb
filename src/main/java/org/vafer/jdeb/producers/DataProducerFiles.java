@@ -39,7 +39,6 @@ public class DataProducerFiles extends AbstractDataProducer {
         this.destDir = destDir;
     }
 
-    @Override
     public void produce( DataConsumer receiver ) throws IOException {
         boolean hasDestDir = !Utils.isNullOrEmpty(destDir);
 

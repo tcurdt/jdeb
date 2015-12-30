@@ -40,13 +40,11 @@ public class InformationOutputStream extends DigestOutputStream {
         return Utils.toHex(digest.digest());
     }
 
-    @Override
     public void write( byte[] b, int off, int len ) throws IOException {
         super.write(b, off, len);
         size += len;
     }
 
-    @Override
     public void write( int b ) throws IOException {
         super.write(b);
         size++;

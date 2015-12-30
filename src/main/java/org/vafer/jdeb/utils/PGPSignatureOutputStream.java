@@ -21,25 +21,22 @@ public class PGPSignatureOutputStream extends OutputStream {
         this.signatureGenerator = signatureGenerator;
     }
 
-    @Override
     public void write( int b ) throws IOException {
         signatureGenerator.update(new byte[] { (byte)b });
     }
 
-    @Override
     public void write( byte[] b ) throws IOException {
         signatureGenerator.update(b);
     }
 
-    @Override
     public void write( byte[] b, int off, int len ) throws IOException {
         signatureGenerator.update(b, off, len);
     }
-    
+
     public PGPSignature generateSignature() throws PGPException {
         return signatureGenerator.generate();
     }
-    
+
     public String generateASCIISignature() throws PGPException {
         try {
             PGPSignature signature = generateSignature();
@@ -54,4 +51,4 @@ public class PGPSignatureOutputStream extends OutputStream {
         }
     }
 
-} 
+}

@@ -100,12 +100,10 @@ public final class ChangesFile extends ControlFile {
         set("Changes", sb.toString());
     }
 
-    @Override
     protected ControlField[] getFields() {
         return FIELDS;
     }
 
-    @Override
     protected char getUserDefinedFieldLetter() {
         return 'C';
     }

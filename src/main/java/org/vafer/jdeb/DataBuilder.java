@@ -43,9 +43,9 @@ import org.vafer.jdeb.utils.Utils;
 class DataBuilder {
 
     private Console console;
-    
+
     private ZipEncoding encoding;
-    
+
     private static final class Total {
         private BigInteger count = BigInteger.valueOf(0);
 
@@ -53,7 +53,6 @@ class DataBuilder {
             count = count.add(BigInteger.valueOf(size));
         }
 
-        @Override
         public String toString() {
             return "" + count;
         }
@@ -187,17 +186,17 @@ class DataBuilder {
                     " groupid:" + entry.getLongGroupId()
                  );
             }
-            
+
 
             private void createDirectory( String directory, String user, long uid, String group, long gid, int mode, long size ) throws IOException {
                 // All dirs should end with "/" when created, or the test DebAndTaskTestCase.testTarFileSet() thinks its a file
                 // and so thinks it has the wrong permission.
                 // This consistency also helps when checking if a directory already exists in addedDirectories.
-        
+
                 if (!directory.endsWith("/")) {
                     directory += "/";
                 }
-        
+
                 if (!addedDirectories.contains(directory)) {
                     TarArchiveEntry entry = new TarArchiveEntry(directory, true);
                     entry.setUserName(user);
@@ -206,27 +205,27 @@ class DataBuilder {
                     entry.setGroupId(gid);
                     entry.setMode(mode);
                     entry.setSize(size);
-        
+
                     tarOutputStream.putArchiveEntry(entry);
                     tarOutputStream.closeArchiveEntry();
                     addedDirectories.add(directory); // so addedDirectories consistently have "/" for finding duplicates.
                 }
             }
-        
+
             private void createParentDirectories( String filename, String user, long uid, String group, long gid ) throws IOException {
                 String dirname = fixPath(new File(filename).getParent());
-                
+
                 // Debian packages must have parent directories created
                 // before sub-directories or files can be installed.
                 // For example, if an entry of ./usr/lib/foo/bar existed
                 // in a .deb package, but the ./usr/lib/foo directory didn't
                 // exist, the package installation would fail.  The .deb must
                 // then have an entry for ./usr/lib/foo and then ./usr/lib/foo/bar
-        
+
                 if (dirname == null) {
                     return;
                 }
-        
+
                 // The loop below will create entries for all parent directories
                 // to ensure that .deb packages will install correctly.
                 String[] pathParts = dirname.split("/");
@@ -249,7 +248,7 @@ class DataBuilder {
                     // drw-r----- fs/fs   # what you get with setMode(mode)
                     // drwxr-xr-x fs/fs   # Usable. Too loose?
                     int mode = TarArchiveEntry.DEFAULT_DIR_MODE;
-        
+
                     createDirectory(parentDir, user, uid, group, gid, mode, 0);
                 }
             }
@@ -272,7 +271,7 @@ class DataBuilder {
         if (path == null || path.equals(".")) {
             return path;
         }
-        
+
         // If we're receiving directory names from Windows, then we'll convert to use slash
         // This does eliminate the ability to use of a backslash in a directory name on *NIX,
         // but in practice, this is a non-issue

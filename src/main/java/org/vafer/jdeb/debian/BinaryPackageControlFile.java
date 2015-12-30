@@ -64,12 +64,10 @@ public final class BinaryPackageControlFile extends ControlFile {
         parse(input);
     }
 
-    @Override
     public void set(final String field, final String value) {
         super.set(field, value);
     }
 
-    @Override
     protected ControlField[] getFields() {
         return FIELDS;
     }
@@ -88,7 +86,6 @@ public final class BinaryPackageControlFile extends ControlFile {
         return get("Description").split("\n")[0];
     }
 
-    @Override
     protected char getUserDefinedFieldLetter() {
         return 'B';
     }

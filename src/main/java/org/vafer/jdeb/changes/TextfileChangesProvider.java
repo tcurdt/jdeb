@@ -45,13 +45,13 @@ import org.vafer.jdeb.debian.BinaryPackageControlFile;
 public final class TextfileChangesProvider implements ChangesProvider {
 
     private final ChangeSet[] changeSets;
-    
+
     private DateFormat fmt = new SimpleDateFormat("HH:mm dd.MM.yyyy");
 
     public TextfileChangesProvider( final InputStream pInput, final BinaryPackageControlFile packageControlFile ) throws IOException, ParseException {
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
-        
+
         String packageName = packageControlFile.get("Package");
         String version = packageControlFile.get("Version");
         Date date = new Date();
@@ -136,7 +136,6 @@ public final class TextfileChangesProvider implements ChangesProvider {
         writer.close();
     }
 
-    @Override
     public ChangeSet[] getChangesSets() {
         return changeSets;
     }

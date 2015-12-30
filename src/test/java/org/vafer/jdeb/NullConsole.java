@@ -18,15 +18,12 @@ package org.vafer.jdeb;
 
 public class NullConsole implements Console {
 
-    @Override
     public void debug(String message) {
     }
 
-    @Override
     public void info(String message) {
     }
 
-    @Override
     public void warn(String message) {
     }
 }

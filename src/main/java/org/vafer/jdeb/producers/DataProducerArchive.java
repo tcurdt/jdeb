@@ -48,7 +48,6 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
         archive = pArchive;
     }
 
-    @Override
     public void produce( final DataConsumer pReceiver ) throws IOException {
 
         InputStream is = new BufferedInputStream(new FileInputStream(archive));

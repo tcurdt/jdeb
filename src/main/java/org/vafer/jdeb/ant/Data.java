@@ -65,7 +65,7 @@ public final class Data extends PatternSet implements DataProducer {
     public void setConffile(Boolean conffile) {
         this.conffile = conffile;
     }
-    
+
     public Boolean getConffile() {
         return this.conffile;
     }
@@ -87,7 +87,6 @@ public final class Data extends PatternSet implements DataProducer {
         this.missingSrc = value;
     }
 
-    @Override
     public void produce( final DataConsumer pReceiver ) throws IOException {
 
         if (src == null || !src.exists()) {

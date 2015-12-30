@@ -355,7 +355,6 @@ public class DebMaker {
             } else {
                 // create an empty changelog
                 changesProvider = new ChangesProvider() {
-                    @Override
                     public ChangeSet[] getChangesSets() {
                         return new ChangeSet[] {
                                 new ChangeSet(packageControlFile.get("Package"),

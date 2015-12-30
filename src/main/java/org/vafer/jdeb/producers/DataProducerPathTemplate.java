@@ -30,7 +30,6 @@ public class DataProducerPathTemplate extends AbstractDataProducer implements Da
         literalPaths = pLiteralPaths;
     }
 
-    @Override
     public void produce( DataConsumer pReceiver ) throws IOException {
         for (String literalPath : literalPaths) {
             produceDir(pReceiver, literalPath);

@@ -168,7 +168,6 @@ public abstract class ControlFile {
         return s.toString();
     }
 
-    @Override
     public String toString() {
         List<ControlField> fields = new ArrayList<ControlField>();
         fields.addAll(Arrays.asList(getFields()));
@@ -186,7 +185,7 @@ public abstract class ControlFile {
      *   <li>S: for a source package</li>
      *   <li>C: for a changes file</li>
      * </ul>
-     * 
+     *
      * @since 1.1
      * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html#s5.7">Debian Policy - User-defined fields</a>
      */
@@ -196,7 +195,7 @@ public abstract class ControlFile {
      * Tells if the specified field name is a user defined field.
      * User-defined fields must begin with an 'X', followed by one or more
      * letters that specify the output file and a hyphen.
-     * 
+     *
      * @param field the name of the field
      *
      * @since 1.1
@@ -208,7 +207,7 @@ public abstract class ControlFile {
 
     /**
      * Returns the user defined field without its prefix.
-     * 
+     *
      * @param field the name of the user defined field
      * @return the user defined field without the prefix, or null if the fields
      *         doesn't apply to this control file.

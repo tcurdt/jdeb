@@ -40,7 +40,6 @@ public final class DataProducerFile extends AbstractDataProducer implements Data
         destinationName = pDestinationName;
     }
 
-    @Override
     public void produce( final DataConsumer pReceiver ) throws IOException {
         String fileName;
         if (destinationName != null && destinationName.trim().length() > 0) {

@@ -31,7 +31,7 @@ import java.util.Date;
  *        [optional blank line(s), stripped]
  *  -- maintainer name &lt;email address&gt;[two spaces]  date
  * </pre>
- * 
+ *
  * @see <a href="http://www.debian.org/doc/debian-policy/ch-source.html#s-dpkgchangelog">Debian Policy Manual - Debian changelog</a>
  */
 public final class ChangeSet {
@@ -82,16 +82,15 @@ public final class ChangeSet {
         return changes;
     }
 
-    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append(getTitle()).append('\n');
-        
+
         if (changes.length > 0) {
             sb.append("\n");
         }
-        
+
         for (String change : changes) {
             sb.append("  * ").append(change).append('\n');
         }

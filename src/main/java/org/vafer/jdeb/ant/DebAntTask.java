@@ -140,13 +140,12 @@ public class DebAntTask extends MatchingTask {
         this.digest = digest;
     }
 
-    @Override
     public void execute() {
         // add the data producers for the links
         for (Link link : links) {
             dataProducers.add(link.toDataProducer());
         }
-        
+
         // validate the type of the <data> elements
         for (DataProducer dataProducer : dataProducers) {
             if (dataProducer instanceof Data) {
@@ -161,9 +160,9 @@ public class DebAntTask extends MatchingTask {
                 }
             }
         }
-        
+
         Console console = new TaskConsole(this, verbose);
-        
+
         DebMaker debMaker = new DebMaker(console, dataProducers, conffilesProducers);
         debMaker.setDeb(deb);
         debMaker.setControl(control);
@@ -175,11 +174,11 @@ public class DebAntTask extends MatchingTask {
         debMaker.setPassphrase(passphrase);
         debMaker.setCompression(compression);
         debMaker.setDigest(digest);
-        
+
         try {
             debMaker.validate();
             debMaker.makeDeb();
-            
+
         } catch (PackagingException e) {
             log("Failed to create the Debian package " + deb, e, Project.MSG_ERR);
             throw new BuildException("Failed to create the Debian package " + deb, e);

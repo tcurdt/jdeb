@@ -42,7 +42,6 @@ public final class DataProducerFileSet implements DataProducer {
         this.fileset = fileset;
     }
 
-    @Override
     public void produce( final DataConsumer pReceiver ) throws IOException {
         String user = Producers.ROOT_NAME;
         int uid = Producers.ROOT_UID;
@@ -67,13 +66,13 @@ public final class DataProducerFileSet implements DataProducer {
         scanner.scan();
 
         final File basedir = scanner.getBasedir();
-        
+
         for (String directory : scanner.getIncludedDirectories()) {
             String name = directory.replace('\\', '/');
 
             pReceiver.onEachDir(prefix + "/" + name, null, user, uid, group, gid, dirmode, 0);
         }
-        
+
         for (String filename : scanner.getIncludedFiles()) {
             final String name = filename.replace('\\', '/');
             final File file = new File(basedir, name);

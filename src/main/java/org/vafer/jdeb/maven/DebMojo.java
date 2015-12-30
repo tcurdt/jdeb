@@ -147,7 +147,7 @@ public class DebMojo extends AbstractMojo {
      */
     @Parameter( defaultValue = "${session}", readonly = true )
     private MavenSession session;
-    
+
     /**
      * The Maven Project Object
      */
@@ -179,8 +179,8 @@ public class DebMojo extends AbstractMojo {
      * The "data" entries may specify a tarball (tar.gz, tar.bz2, tgz), a
      * directory, or a normal file. An entry would look something like this in
      * your pom.xml:
-     * 
-     * 
+     *
+     *
      * <pre>
      *   <build>
      *     <plugins>
@@ -227,7 +227,7 @@ public class DebMojo extends AbstractMojo {
      *     </plugins>
      *   </build>
      * </pre>
-     * 
+     *
      */
     @Parameter
     private Data[] dataSet;
@@ -260,7 +260,7 @@ public class DebMojo extends AbstractMojo {
 
     /**
      * Indicates if the execution should be disabled. If <code>true</code>, nothing will occur during execution.
-     * 
+     *
      * @since 1.1
      */
     @Parameter(defaultValue = "false")
@@ -271,7 +271,7 @@ public class DebMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "false")
     private boolean skipSubmodules;
-    
+
     /**
      * @deprecated
      */
@@ -303,7 +303,7 @@ public class DebMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "origin")
     private String signRole;
-    
+
     /**
      * The keyring to use for signing operations.
      */
@@ -320,7 +320,7 @@ public class DebMojo extends AbstractMojo {
      * The passphrase to use for signing operations.
      */
     @Parameter
-    private String passphrase; 
+    private String passphrase;
 
     /**
      * The prefix to use when reading signing variables
@@ -334,12 +334,12 @@ public class DebMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "${settings}")
     private Settings settings;
-    
+
     @Parameter(defaultValue = "")
     private String propertyPrefix;
 
     /* end of parameters */
-    
+
     private static final String KEY = "key";
     private static final String KEYRING = "keyring";
     private static final String PASSPHRASE = "passphrase";
@@ -364,7 +364,7 @@ public class DebMojo extends AbstractMojo {
         conffileProducers.clear();
         if (dataSet != null) {
             Collections.addAll(dataProducers, dataSet);
-            
+
             for (Data item : dataSet) {
                 if (item.getConffile()) {
                     conffileProducers.add(item);
@@ -445,7 +445,6 @@ public class DebMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException on error
      */
-    @Override
     public void execute() throws MojoExecutionException {
 
         final MavenProject project = getProject();
@@ -508,7 +507,6 @@ public class DebMojo extends AbstractMojo {
                     final File file = artifact.getFile();
                     if (file != null) {
                         dataProducers.add(new DataProducer() {
-                            @Override
                             public void produce( final DataConsumer receiver ) {
                                 try {
                                     final File path = new File(installDirFile.getPath(), file.getName());
@@ -582,7 +580,7 @@ public class DebMojo extends AbstractMojo {
             getLog().error("Failed to create debian package " + debFile, e);
             throw new MojoExecutionException("Failed to create debian package " + debFile, e);
         }
-        
+
         if (!isBlank(propertyPrefix)) {
           project.getProperties().put(propertyPrefix+"version", getProjectVersion() );
           project.getProperties().put(propertyPrefix+"deb", debFile.getAbsolutePath());
@@ -592,7 +590,7 @@ public class DebMojo extends AbstractMojo {
           project.getProperties().put(propertyPrefix+"changes.txt", changesSaveFile.getAbsolutePath());
           project.getProperties().put(propertyPrefix+"changes.txt.name", changesSaveFile.getName());
         }
-        
+
     }
 
     /**
@@ -651,9 +649,9 @@ public class DebMojo extends AbstractMojo {
 
         return maybeEncryptedPassphrase;
     }
-    
+
     /**
-     * 
+     *
      * @return the maven project used by this mojo
      */
     private MavenProject getProject() {

@@ -94,7 +94,7 @@ public final class Data implements DataProducer {
     public void setSymlink(boolean symlink) {
         this.symlink = symlink;
     }
-    
+
     private boolean conffile = false;
 
     /**
@@ -103,7 +103,7 @@ public final class Data implements DataProducer {
     public void setConffile(boolean conffile) {
         this.conffile = conffile;
     }
-    
+
     public boolean getConffile() {
         return this.conffile;
     }
@@ -146,7 +146,6 @@ public final class Data implements DataProducer {
         return result;
     }
 
-    @Override
     public void produce( final DataConsumer pReceiver ) throws IOException {
         org.vafer.jdeb.mapping.Mapper[] mappers = null;
         if (mapper != null) {

@@ -39,7 +39,6 @@ public final class DataProducerLink extends AbstractDataProducer implements Data
         this.linkName = linkName;
     }
 
-    @Override
     public void produce( final DataConsumer pReceiver ) throws IOException {
         TarArchiveEntry entry = new TarArchiveEntry(path, symlink ? TarArchiveEntry.LF_SYMLINK : TarArchiveEntry.LF_LINK);
         entry.setLinkName(linkName);
