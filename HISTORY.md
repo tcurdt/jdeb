@@ -2,6 +2,7 @@
 
 ## Version 1.5, released 15.01.2016
 
+* [CHG] Use TarArchiveEntry in DataConsumer interface
 * [FIX] Fixed maven to debian version conversion
 * [FIX] Allow comments in control files
 * [FIX] Fixed incorrectly handled links for tar archives
