@@ -125,6 +125,7 @@ public class UtilsTestCase extends TestCase {
         assertEquals("should match", "1.0~Beta+4", Utils.convertToDebianVersion("1.0.Beta-4", true, "SNAPSHOT", cal.getTime()));
         assertEquals("should match", "1.0~milestone+4", Utils.convertToDebianVersion("1.0-milestone-4", true, "SNAPSHOT", cal.getTime()));
         assertEquals("should match", "1.0~a+4", Utils.convertToDebianVersion("1.0-a-4", true, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0~a+4", Utils.convertToDebianVersion("1.0a-4", true, "SNAPSHOT", cal.getTime()));
         assertEquals("should match", "1.0~b+4", Utils.convertToDebianVersion("1.0-b-4", true, "SNAPSHOT", cal.getTime()));
         assertEquals("should match", "1.0~rc7", Utils.convertToDebianVersion("1.0rc7", true, "SNAPSHOT", cal.getTime()));
         assertEquals("should match", "1.0~M1", Utils.convertToDebianVersion("1.0.M1", true, "SNAPSHOT", cal.getTime()));
@@ -151,6 +152,11 @@ public class UtilsTestCase extends TestCase {
         assertEquals("should match", "1.0+prj+3+~M3", Utils.convertToDebianVersion("1.0-prj_3:M3", true, "SNAPSHOT", cal.getTime()));
         assertEquals("should match", "1.0+prj+3+c+~20130217000000", Utils.convertToDebianVersion("1.0-prj_3-c++-SNAPSHOT", true, "SNAPSHOT", cal.getTime()));
         assertEquals("should match", "1.0+prj+3+c+~20130217000000", Utils.convertToDebianVersion("1.0-prj_3-c+++++++-SNAPSHOT", true, "SNAPSHOT", cal.getTime()));
+
+        assertEquals("should match", "1.0+MMM+3", Utils.convertToDebianVersion("1.0-MMM-3", true, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0+aaa+3", Utils.convertToDebianVersion("1.0-aaa-3", true, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0+bbb+3", Utils.convertToDebianVersion("1.0-bbb-3", true, "SNAPSHOT", cal.getTime()));
+        assertEquals("should match", "1.0aaa+3", Utils.convertToDebianVersion("1.0aaa-3", true, "SNAPSHOT", cal.getTime()));
     }
 
     public void testMovePath() {
