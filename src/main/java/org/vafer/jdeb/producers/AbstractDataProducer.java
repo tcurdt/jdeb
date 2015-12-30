@@ -71,8 +71,8 @@ public abstract class AbstractDataProducer implements DataProducer {
     }
 
     public void produceDir( final DataConsumer consumer,
-                            final String dirname ) throws IOException {
-        TarArchiveEntry entry = Producers.defaultDirEntryWithName(dirname);
+                            final String dirName ) throws IOException {
+        TarArchiveEntry entry = Producers.defaultDirEntryWithName(dirName);
         entry = map(entry);
         entry.setSize(0);
         Producers.produceDirEntry(consumer, entry);
@@ -80,11 +80,11 @@ public abstract class AbstractDataProducer implements DataProducer {
 
     public void produceFile( final DataConsumer consumer,
                              final File file,
-                             final String entryName ) throws IOException {
-        TarArchiveEntry entry = Producers.defaultFileEntryWithName(entryName);
-        entry.setSize(file.length());
-        entry = map(entry);
-        Producers.produceInputStreamWithEntry(consumer, new FileInputStream(file), entry);
+                             final String fileName ) throws IOException {
+        TarArchiveEntry fileEntry = Producers.defaultFileEntryWithName(fileName);
+        fileEntry.setSize(file.length());
+        fileEntry = map(fileEntry);
+        Producers.produceInputStreamWithEntry(consumer, new FileInputStream(file), fileEntry);
     }
 
     public TarArchiveEntry map( final TarArchiveEntry pEntry ) {

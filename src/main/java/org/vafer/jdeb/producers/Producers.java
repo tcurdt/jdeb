@@ -36,11 +36,11 @@ class Producers {
 
     /**
      * Creates a tar file entry with defaults parameters.
-     * @param entryName the entry name
+     * @param fileName the entry name
      * @return file entry with reasonable defaults
      */
-    static TarArchiveEntry defaultFileEntryWithName( final String entryName ) {
-        TarArchiveEntry entry = new TarArchiveEntry(entryName, true);
+    static TarArchiveEntry defaultFileEntryWithName( final String fileName ) {
+        TarArchiveEntry entry = new TarArchiveEntry(fileName, true);
         entry.setUserId(ROOT_UID);
         entry.setUserName(ROOT_NAME);
         entry.setGroupId(ROOT_UID);
@@ -67,13 +67,12 @@ class Producers {
     /**
      * Forwards tar archive entry entry to a consumer.
      * @param consumer the consumer
-     * @param entry the entry to pass
+     * @param dirEntry the entry to pass
      * @throws IOException
      */
     static void produceDirEntry( final DataConsumer consumer,
-                                 final TarArchiveEntry entry ) throws IOException {
-        consumer.onEachDir(
-                entry);
+                                 final TarArchiveEntry dirEntry ) throws IOException {
+        consumer.onEachDir(dirEntry);
     }
 
 
