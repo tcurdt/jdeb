@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,17 +59,17 @@ public class FilteredFileTestCase extends TestCase {
         Map<String, String> map = new HashMap<String, String>();
         map.put("VERSION", "1.2");
         map.put("MAINTAINER", "Torsten Curdt <tcurdt@vafer.org>");
-        
-        String controlFile = 
+
+        String controlFile =
                 "Version: [[VERSION]]\n"
                 + "Maintainer: [[MAINTAINER]]\n"
                 + "NoResolve1: test[[test\n"
                 + "NoResolve2: [[test]]\n";
 
         FilteredFile filteredFile = new FilteredFile(new ByteArrayInputStream(controlFile.getBytes()), new MapVariableResolver(map));
-        
+
         BinaryPackageControlFile d = new BinaryPackageControlFile(filteredFile.toString());
-        
+
         assertEquals("1.2", d.get("Version"));
         assertEquals("Torsten Curdt <tcurdt@vafer.org>", d.get("Maintainer"));
         assertEquals("test[[test", d.get("NoResolve1"));

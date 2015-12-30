@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public final class PGPSignerTestCase extends TestCase {
         final int until = expectedOutputStr.indexOf("=aAAT") + 5;
         Arrays.fill(output, from, until, (byte) '?');
         Arrays.fill(expectedOutput, from, until, (byte) '?');
-        
+
         assertEquals(new String(expectedOutput), new String(output));
     }
 

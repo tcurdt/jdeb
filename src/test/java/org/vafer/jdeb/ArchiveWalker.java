@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
  * Support class for inspecting the content of an archive.
  */
 public class ArchiveWalker {
-    
+
     public static void walk(ArchiveInputStream in, ArchiveVisitor visitor) throws IOException {
         try {
             ArchiveEntry entry;
@@ -49,7 +49,7 @@ public class ArchiveWalker {
                         throw new IOException("Couldn't read entry " + entry.getName() + " : read " + length + ", expected " + entry.getSize());
                     }
                 }
-                
+
                 visitor.visit(entry, content);
             }
         } finally {
@@ -79,7 +79,7 @@ public class ArchiveWalker {
                     } else if (compression == Compression.BZIP2) {
                         in = new BZip2CompressorInputStream(in);
                     }
-                    
+
                     ArchiveWalker.walk(new TarArchiveInputStream(in), new ArchiveVisitor<TarArchiveEntry>() {
                         public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
                             found.set(true);
@@ -91,21 +91,21 @@ public class ArchiveWalker {
         });
         return found.get();
     }
-    
+
     public static boolean arArchiveContains(File archive, String filename) throws IOException {
         ArchiveEntry entry;
         ArArchiveInputStream tin;
-        
+
         tin = new ArArchiveInputStream(new FileInputStream (archive));
-        
+
         while ((entry = tin.getNextEntry()) != null) {
             if(entry.getName().equals(filename)){
             	tin.close();
             	return true;
             }
         }
-        
+
     	tin.close();
         return false;
-    } 
+    }
 }

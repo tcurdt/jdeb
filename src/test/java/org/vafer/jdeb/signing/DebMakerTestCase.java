@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ public class DebMakerTestCase extends TestCase {
         File archive2 = new File(getClass().getResource("../deb/data.tar.bz2").toURI());
         File archive3 = new File(getClass().getResource("../deb/data.zip").toURI());
         File directory = new File(getClass().getResource("../deb/data").toURI());
-        
+
         final InputStream ring = getClass().getClassLoader().getResourceAsStream("org/vafer/gpg/secring.gpg");
 
         DataProducer[] data = new DataProducer[] {
@@ -66,31 +66,31 @@ public class DebMakerTestCase extends TestCase {
         PGPSigner signer = new PGPSigner(ring, "2E074D8F", "test", PGPUtil.SHA1);
         PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(signer.getSecretKey().getPublicKey().getAlgorithm(), digest));
         signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, signer.getPrivateKey());
-        
+
         for(int i = 0; i <=1; i++){
 	        File deb = File.createTempFile("jdeb", ".deb");
-	
+
 	        DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data), null);
 	        maker.setControl(new File(getClass().getResource("../deb/control").toURI()));
 	        maker.setDeb(deb);
-	        
+
 	        if(i==0)
 	        	maker.setSignMethod("debsig-verify");
 	        else
 	        	maker.setSignMethod("dpkg-sig");
-	        
+
 	        BinaryPackageControlFile packageControlFile = maker.createSignedDeb(Compression.GZIP, signatureGenerator, signer);
-	        
+
 	        assertTrue(packageControlFile.isValid());
-	
+
 	        final Map<String, TarArchiveEntry> filesInDeb = new HashMap<String, TarArchiveEntry>();
-	        
+
 	        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
 	            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
 	                filesInDeb.put(entry.getName(), entry);
 	            }
 	        }, Compression.GZIP);
-	        
+
 	        assertTrue("_gpgorigin wasn't found in the package", ArchiveWalker.arArchiveContains(deb, "_gpgorigin"));
 	        assertTrue("debian-binary wasn't found in the package", ArchiveWalker.arArchiveContains(deb, "debian-binary"));
 	        assertTrue("control.tar.gz wasn't found in the package", ArchiveWalker.arArchiveContains(deb, "control.tar.gz"));
@@ -100,13 +100,13 @@ public class DebMakerTestCase extends TestCase {
 	        assertTrue("testfile4 wasn't found in the package", filesInDeb.containsKey("./test/testfile4"));
 	        assertTrue("/link/path-element.ext wasn't found in the package", filesInDeb.containsKey("./link/path-element.ext"));
 	        assertEquals("/link/path-element.ext has wrong link target", "/link/target-element.ext", filesInDeb.get("./link/path-element.ext").getLinkName());
-	        
+
 	        if(i==0){
 	        	FileUtils.copyFile(deb, new File("./target/test_debsig-verify.deb"));
 	        }else{
 	        	FileUtils.copyFile(deb, new File("./target/test_dpkg-sig.deb"));
 	        }
-	        
+
 	        assertTrue("Cannot delete the file " + deb, deb.delete());
         }
     }

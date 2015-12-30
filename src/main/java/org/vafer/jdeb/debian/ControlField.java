@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,23 +88,23 @@ public class ControlField {
     /**
      * Returns the field with the specified value properly formatted. Multiline
      * values are automatically indented, and dots are added on the empty lines.
-     * 
+     *
      * <pre>
      * Field-Name: value
      * </pre>
      */
     public String format(String value) {
         StringBuilder s = new StringBuilder();
-        
+
         if (value != null && value.trim().length() > 0) {
             boolean continuationLine = false;
-            
+
             s.append(getName()).append(":");
             if (isFirstLineEmpty()) {
                 s.append("\n");
                 continuationLine = true;
             }
-            
+
             try {
                 BufferedReader reader = new BufferedReader(new StringReader(value));
                 String line;
@@ -122,7 +122,7 @@ public class ControlField {
                 e.printStackTrace();
             }
         }
-        
+
         return s.toString();
     }
 }

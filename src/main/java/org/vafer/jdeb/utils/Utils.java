@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,7 +106,7 @@ public final class Utils {
     public static String replaceVariables( final VariableResolver pResolver, final String pExpression, final String pOpen, final String pClose ) {
         final char[] open = pOpen.toCharArray();
         final char[] close = pClose.toCharArray();
-        
+
         final StringBuilder out = new StringBuilder();
         StringBuilder sb = new StringBuilder();
         char[] last = null;
@@ -202,7 +202,7 @@ public final class Utils {
      * -SNAPSHOT suffixes are replaced with a timestamp (~yyyyMMddHHmmss).
      * The separator before a rc, alpha or beta version is replaced with '~'
      * such that the version is always ordered before the final or GA release.
-     * 
+     *
      * @param version the project version to convert to a Debian package version
      * @param timestamp the date used as the timestamp to replace the SNAPSHOT suffix
      */
@@ -230,11 +230,11 @@ public final class Utils {
                 }
             }
         }
-        
+
         // safest upstream_version should only contain full stop, plus, tilde, and alphanumerics
         // https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
         version = version.replaceAll("[^\\.+~A-Za-z0-9]", "+").replaceAll("\\++", "+");
-        
+
         return version;
     }
 
@@ -262,11 +262,11 @@ public final class Utils {
                                         final String key ) {
         return value != null ? value : props.get(key);
     }
-    
+
     /**
      * Get the known locations where the secure keyring can be located.
      * Looks through known locations of the GNU PG secure keyring.
-     * 
+     *
      * @return The location of the PGP secure keyring if it was found,
      *         null otherwise
      */
@@ -350,7 +350,7 @@ public final class Utils {
     /**
      * Join together path elements with File.separator. Filters out null
      * elements.
-     * 
+     *
      * @param elements The path elements to join
      * @return elements concatenated together with File.separator
      */

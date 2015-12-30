@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,40 +41,40 @@ class ChangesFileBuilder {
         changesFile.initialize(packageControlFile);
 
         changesFile.set("Date", ChangesFile.formatDate(new Date()));
-        
+
         try {
             // compute the checksums of the binary package
             InformationOutputStream md5output = new InformationOutputStream(new NullOutputStream(), MessageDigest.getInstance("MD5"));
             InformationOutputStream sha1output = new InformationOutputStream(md5output, MessageDigest.getInstance("SHA1"));
             InformationOutputStream sha256output = new InformationOutputStream(sha1output, MessageDigest.getInstance("SHA-256"));
-            
+
             FileUtils.copyFile(binaryPackage, sha256output);
-            
+
             // Checksums-Sha1:
             //  56ef4c6249dc3567fd2967f809c42d1f9b61adf7 45964 jdeb.deb
             changesFile.set("Checksums-Sha1", sha1output.getHexDigest() + " " + binaryPackage.length() + " " + binaryPackage.getName());
-            
+
             // Checksums-Sha256:
             //  38c6fa274eb9299a69b739bcbdbd05c7ffd1d8d6472f4245ed732a25c0e5d616 45964 jdeb.deb
             changesFile.set("Checksums-Sha256", sha256output.getHexDigest() + " " + binaryPackage.length() + " " + binaryPackage.getName());
-            
+
             StringBuilder files = new StringBuilder(md5output.getHexDigest());
             files.append(' ').append(binaryPackage.length());
             files.append(' ').append(packageControlFile.get("Section"));
             files.append(' ').append(packageControlFile.get("Priority"));
             files.append(' ').append(binaryPackage.getName());
             changesFile.set("Files", files.toString());
-            
+
         } catch (NoSuchAlgorithmException e) {
             throw new PackagingException("Unable to compute the checksums for " + binaryPackage, e);
         }
-        
+
         if (!changesFile.isValid()) {
             throw new PackagingException("Changes file fields are invalid " + changesFile.invalidFields() +
                 ". The following fields are mandatory: " + changesFile.getMandatoryFields() +
                 ". Please check your pom.xml/build.xml and your control file.");
         }
-        
+
         return changesFile;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,11 @@ public final class ChangesFileTestCase extends TestCase {
         packageControlFile.set("Description", "This is\na description\non several lines");
         packageControlFile.set("Version", "1.0");
         packageControlFile.set("XC-UserDefinedField", "This is a user defined field.");
-        
+
         ChangesFile changes = new ChangesFile();
         changes.setChanges(new ChangeSet[0]);
         changes.initialize(packageControlFile);
-        
+
         assertEquals("1.0", changes.get("Version"));
         assertEquals("This is a user defined field.", changes.get("UserDefinedField"));
     }

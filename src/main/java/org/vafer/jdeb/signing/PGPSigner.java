@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,21 +82,21 @@ public class PGPSigner {
 
         PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(privateKey.getPublicKeyPacket().getAlgorithm(), digest));
         signatureGenerator.init(PGPSignature.CANONICAL_TEXT_DOCUMENT, privateKey);
-        
+
         ArmoredOutputStream armoredOutput = new ArmoredOutputStream(output);
         armoredOutput.beginClearText(digest);
-        
+
         LineIterator iterator = new LineIterator(new InputStreamReader(input));
-        
+
         while (iterator.hasNext()) {
             String line = iterator.nextLine();
-            
+
             // trailing spaces must be removed for signature calculation (see http://tools.ietf.org/html/rfc4880#section-7.1)
             byte[] data = trim(line).getBytes("UTF-8");
-            
+
             armoredOutput.write(data);
             armoredOutput.write(EOL);
-            
+
             signatureGenerator.update(data);
             if (iterator.hasNext()) {
                 signatureGenerator.update(EOL);
@@ -104,13 +104,13 @@ public class PGPSigner {
         }
 
         armoredOutput.endClearText();
-        
+
         PGPSignature signature = signatureGenerator.generate();
         signature.encode(new BCPGOutputStream(armoredOutput));
-        
+
         armoredOutput.close();
     }
-    
+
     /**
      * Returns the secret key.
      */
@@ -129,13 +129,13 @@ public class PGPSigner {
 
     /**
      * Returns the secret key matching the specified identifier.
-     * 
+     *
      * @param input the input stream containing the keyring collection
      * @param keyId the 4 bytes identifier of the key
      */
     private PGPSecretKey getSecretKey(InputStream input, String keyId) throws IOException, PGPException {
         PGPSecretKeyRingCollection keyrings = new PGPSecretKeyRingCollection(PGPUtil.getDecoderStream(input), new JcaKeyFingerprintCalculator());
-        
+
         Iterator rIt = keyrings.getKeyRings();
 
         while (rIt.hasNext()) {
@@ -144,7 +144,7 @@ public class PGPSigner {
 
             while (kIt.hasNext()) {
                 PGPSecretKey key = (PGPSecretKey) kIt.next();
-                
+
                 if (key.isSigningKey() && String.format("%08x", key.getKeyID() & 0xFFFFFFFFL).equals(keyId.toLowerCase())) {
                     return key;
                 }
@@ -156,7 +156,7 @@ public class PGPSigner {
 
     /**
      * Trim the trailing spaces.
-     * 
+     *
      * @param line
      */
     private String trim(String line) {
@@ -169,7 +169,7 @@ public class PGPSigner {
             }
             len--;
         }
-        
+
         return line.substring(0, len);
     }
 }

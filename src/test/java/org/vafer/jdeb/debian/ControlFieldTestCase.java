@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,19 @@ public class ControlFieldTestCase extends TestCase {
 
     public void testFormatSimpleValue() {
         ControlField field = new ControlField("Field-Name");
-        
+
         assertEquals("Field-Name: value\n", field.format("value"));
     }
-    
+
     public void testFormatMultilineValue1() {
         ControlField field = new ControlField("Field-Name", false, ControlField.Type.MULTILINE);
-        
+
         assertEquals("Field-Name: value1\n value2\n .\n value3\n", field.format("value1\nvalue2\n\nvalue3"));
     }
-    
+
     public void testFormatMultilineValue2() {
         ControlField field = new ControlField("Field-Name", false, ControlField.Type.MULTILINE, true);
-        
+
         assertEquals("Field-Name:\n value1\n value2\n .\n value3\n", field.format("value1\nvalue2\n\nvalue3"));
     }
 }

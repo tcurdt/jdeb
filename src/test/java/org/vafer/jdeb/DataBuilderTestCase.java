@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.vafer.jdeb.producers.DataProducerFile;
 import org.vafer.jdeb.producers.DataProducerFileSet;
 
 public class DataBuilderTestCase extends TestCase {
-    
+
     /**
      * Checks if the file paths in the md5sums file use only unix file separators
      * (this test can only fail on Windows)
@@ -52,19 +52,19 @@ public class DataBuilderTestCase extends TestCase {
         assertFalse("windows path separator found", md5s.indexOf("\\") != -1);
         assertTrue("two spaces between md5 and file", md5s.toString().equals("8bc944dbd052ef51652e70a5104492e3  ./test/testfile\n"));
     }
-    
+
     public void testCreateParentDirectories() throws Exception {
         File archive = new File("target/data.tar");
         if (archive.exists()) {
             archive.delete();
         }
-        
+
         DataBuilder builder = new DataBuilder(new NullConsole());
-        
-        DataProducer producer = new DataProducerFile(new File("pom.xml"), "/usr/share/myapp/pom.xml", null, null, null); 
-        
+
+        DataProducer producer = new DataProducerFile(new File("pom.xml"), "/usr/share/myapp/pom.xml", null, null, null);
+
         builder.buildData(Arrays.asList(producer), archive, new StringBuilder(), Compression.NONE);
-        
+
         int count = 0;
         TarArchiveInputStream in = null;
         try {
@@ -77,7 +77,7 @@ public class DataBuilderTestCase extends TestCase {
                 in.close();
             }
         }
-        
+
         assertEquals("entries", 4, count);
     }
 }
