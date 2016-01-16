@@ -179,7 +179,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.18.1</version>
                 <configuration>
-                    <forkMode>never</forkMode>
+                    <!-- <forkCount>0</forkCount> -->
                     <includes>
                         <include>**/*TestCase.java</include>
                     </includes>
@@ -214,6 +214,56 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.5.201505241946</version>
+                <configuration>
+                  <includes>
+                     <include>org/vafer/jdeb/*</include>
+                  </includes>
+                  <excludes>
+                     <exclude>org/vafer/jdeb/shaded/*</exclude>
+                  </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>pre-unit-test</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <!-- <configuration>
+                            <destFile>${basedir}/coverage-reports/jacoco.exec</destFile>
+                            <propertyName>surefireArgLine</propertyName>
+                        </configuration> -->
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <!-- <configuration>
+                            <dataFile>${basedir}/coverage-reports/jacoco.exec</dataFile>
+                            <outputDirectory>${basedir}/jacoco</outputDirectory>
+                        </configuration> -->
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>4.1.0</version>
+            </plugin>
+
         </plugins>
     </build>
     <dependencies>
@@ -315,6 +365,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
                 <version>2.18.1</version>
+                <configuration>
+                  <argLine>${surefireArgLine}</argLine>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
