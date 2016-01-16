@@ -5,5 +5,11 @@ jdk:
   - openjdk7
   - openjdk6
 
+before_install:
+  - cat /etc/hosts # work around openjdk bugs
+  - sudo hostname "$(hostname | cut -c1-63)"
+  - sed -e "s/^\\(127\\.0\\.0\\.1.*\\)/\\1 $(hostname | cut -c1-63)/" /etc/hosts | sudo tee /etc/hosts
+  - cat /etc/hosts
+
 after_success:
   - mvn clean test jacoco:report coveralls:report
