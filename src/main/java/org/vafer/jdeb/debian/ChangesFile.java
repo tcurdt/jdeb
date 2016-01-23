@@ -16,6 +16,7 @@
 
 package org.vafer.jdeb.debian;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.vafer.jdeb.changes.ChangeSet;
 
 import java.text.DateFormat;
@@ -64,7 +65,7 @@ public final class ChangesFile extends ControlFile {
      */
     public void initialize(BinaryPackageControlFile packageControlFile) {
         set("Binary",       packageControlFile.get("Package"));
-        set("Source",       packageControlFile.get("Package"));
+        set("Source",       StringUtils.defaultString(packageControlFile.get("Source"), packageControlFile.get("Package")));
         set("Architecture", packageControlFile.get("Architecture"));
         set("Version",      packageControlFile.get("Version"));
         set("Maintainer",   packageControlFile.get("Maintainer"));
