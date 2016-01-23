@@ -9,7 +9,7 @@ the plugin to your POM like this
       <plugin>
         <artifactId>jdeb</artifactId>
         <groupId>org.vafer</groupId>
-        <version>1.4</version>
+        <version>1.5</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -47,7 +47,7 @@ Or if you want to build a custom deb file
       <extension>
         <groupId>org.vafer</groupId>
         <artifactId>jdeb</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
       </extension>
     </extensions>
     <pluginManagement>
@@ -87,6 +87,7 @@ directory (inside the data dir). By default the control file name is also `contr
     Maintainer: Torsten Curdt <torsten@something.com>
     Description: jetty java servlet container
     Distribution: development
+    Depends: default-jre | java6-runtime
 
 but check out the [example](https://github.com/tcurdt/jdeb/tree/master/src/examples/maven) to get a better overview.
 
@@ -184,7 +185,7 @@ include a directory, a tarball, and a file in your deb package and then sign it 
       <plugin>
         <artifactId>jdeb</artifactId>
         <groupId>org.vafer</groupId>
-        <version>1.4</version>
+        <version>1.5</version>
         <executions>
           <execution>
             <phase>package</phase>
