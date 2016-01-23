@@ -5,3 +5,4 @@ Priority: low
 Architecture: all
 Description: [[description]]
 Maintainer: tcurdt@vafer.org
+Depends: default-jre | java6-runtime

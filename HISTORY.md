@@ -1,6 +1,6 @@
-## Version 1.5.1, in progress
+## Version 1.6, in progress
 
-## Version 1.5, released 15.01.2016
+## Version 1.5, released 30.01.2016
 
 * [CHG] Use TarArchiveEntry in DataConsumer interface
 * [FIX] Fixed maven to debian version conversion
