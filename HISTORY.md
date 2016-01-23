@@ -2,7 +2,8 @@
 
 ## Version 1.5, released 30.01.2016
 
-* [CHG] Use TarArchiveEntry in DataConsumer interface
+* [CHG] Breaking: No longer provides a default "Depends" add to your control as needed
+* [CHG] Breaking: Use TarArchiveEntry in DataConsumer interface
 * [FIX] Fixed maven to debian version conversion
 * [FIX] Allow comments in control files
 * [FIX] Fixed incorrectly handled links for tar archives

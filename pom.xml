@@ -47,6 +47,7 @@
     </developer>
   </developers>
   <contributors>
+    <contributor><name>Aleksandr Kormushin</name></contributor>
     <contributor><name>Alexander Horz</name></contributor>
     <contributor><name>Ben McCann</name></contributor>
     <contributor><name>Brian Moyles</name></contributor>
@@ -56,7 +57,9 @@
     <contributor><name>David Sauer</name></contributor>
     <contributor><name>Elliot West</name></contributor>
     <contributor><name>Jeroen Rosenberg</name></contributor>
+    <contributor><name>John Shields</name></contributor>
     <contributor><name>Ketoth Xupack</name></contributor>
+    <contributor><name>Lee Thompso</name></contributor>
     <contributor><name>Lukas Roedl</name></contributor>
     <contributor><name>Manfred Stock</name></contributor>
     <contributor><name>Manuel Woelker</name></contributor>
@@ -64,8 +67,10 @@
     <contributor><name>Max Garmash</name></contributor>
     <contributor><name>Nepomuk Seiler</name></contributor>
     <contributor><name>Patrick Schultz</name></contributor>
+    <contributor><name>Paul Kremer</name></contributor>
     <contributor><name>Petr Kozelka</name></contributor>
     <contributor><name>Ralph van Etten</name></contributor>
+    <contributor><name>Rob Spieldenner</name></contributor>
     <contributor><name>Roman Kashitsyn</name></contributor>
     <contributor><name>Scott Kuehn</name></contributor>
     <contributor><name>Sergio Fernández</name></contributor>
