@@ -11,6 +11,7 @@
 * [ADD] Provide more attributes maven properties (version, deb.name, changes.name, changes.txt.name)
 * [ADD] Added option to provide a propertyPrefix
 * [ADD] Allow Multi-Arch declarations
+* [ADD] Allow overriding of Source
 
 ## Version 1.4, released 20.02.2014
 

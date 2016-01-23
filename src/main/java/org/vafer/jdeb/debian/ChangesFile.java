@@ -16,7 +16,7 @@
 
 package org.vafer.jdeb.debian;
 
-import org.codehaus.plexus.util.StringUtils;
+import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.changes.ChangeSet;
 
 import java.text.DateFormat;
@@ -33,22 +33,22 @@ import java.util.Map.Entry;
 public final class ChangesFile extends ControlFile {
 
     private static final ControlField[] FIELDS = {
-            new ControlField("Format", true),
-            new ControlField("Date", true),
-            new ControlField("Source", true),
-            new ControlField("Binary", true),
-            new ControlField("Architecture", true),
-            new ControlField("Version", true),
-            new ControlField("Distribution", true),
-            new ControlField("Urgency", true),
-            new ControlField("Maintainer", true),
-            new ControlField("Changed-By"),
-            new ControlField("Description", true, ControlField.Type.MULTILINE, true),
-            new ControlField("Changes", true, ControlField.Type.MULTILINE, true),
-            new ControlField("Closes"),
-            new ControlField("Checksums-Sha1", true, ControlField.Type.MULTILINE, true),
-            new ControlField("Checksums-Sha256", true, ControlField.Type.MULTILINE, true),
-            new ControlField("Files", true, ControlField.Type.MULTILINE, true)
+        new ControlField("Format", true),
+        new ControlField("Date", true),
+        new ControlField("Source", true),
+        new ControlField("Binary", true),
+        new ControlField("Architecture", true),
+        new ControlField("Version", true),
+        new ControlField("Distribution", true),
+        new ControlField("Urgency", true),
+        new ControlField("Maintainer", true),
+        new ControlField("Changed-By"),
+        new ControlField("Description", true, ControlField.Type.MULTILINE, true),
+        new ControlField("Changes", true, ControlField.Type.MULTILINE, true),
+        new ControlField("Closes"),
+        new ControlField("Checksums-Sha1", true, ControlField.Type.MULTILINE, true),
+        new ControlField("Checksums-Sha256", true, ControlField.Type.MULTILINE, true),
+        new ControlField("Files", true, ControlField.Type.MULTILINE, true)
     };
 
     public ChangesFile() {
@@ -65,7 +65,7 @@ public final class ChangesFile extends ControlFile {
      */
     public void initialize(BinaryPackageControlFile packageControlFile) {
         set("Binary",       packageControlFile.get("Package"));
-        set("Source",       StringUtils.defaultString(packageControlFile.get("Source"), packageControlFile.get("Package")));
+        set("Source",       Utils.defaultString(packageControlFile.get("Source"), packageControlFile.get("Package")));
         set("Architecture", packageControlFile.get("Architecture"));
         set("Version",      packageControlFile.get("Version"));
         set("Maintainer",   packageControlFile.get("Maintainer"));

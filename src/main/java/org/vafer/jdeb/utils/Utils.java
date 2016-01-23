@@ -264,12 +264,12 @@ public final class Utils {
     }
 
     /**
-     * Get the known locations where the secure keyring can be located.
-     * Looks through known locations of the GNU PG secure keyring.
-     *
-     * @return The location of the PGP secure keyring if it was found,
-     *         null otherwise
-     */
+    * Get the known locations where the secure keyring can be located.
+    * Looks through known locations of the GNU PG secure keyring.
+    *
+    * @return The location of the PGP secure keyring if it was found,
+    *         null otherwise
+    */
     public static Collection<String> getKnownPGPSecureRingLocations() {
         final LinkedHashSet<String> locations = new LinkedHashSet<String>();
 
@@ -380,31 +380,39 @@ public final class Utils {
         return str == null || str.length() == 0;
     }
 
-	/**
-	 * Check if a CharSequence is whitespace, empty ("") or null.
-	 *
-	 * <pre>
-	 * StringUtils.isBlank(null)      = true
-	 * StringUtils.isBlank("")        = true
-	 * StringUtils.isBlank(" ")       = true
-	 * StringUtils.isBlank("bob")     = false
-	 * StringUtils.isBlank("  bob  ") = false
-	 * </pre>
-	 *
-	 * @param cs
-	 *            the CharSequence to check, may be null
-	 * @return {@code true} if the CharSequence is null, empty or whitespace
-	 */
-	public static boolean isBlank(final CharSequence cs) {
-		int strLen;
-		if (cs == null || (strLen = cs.length()) == 0) {
-			return true;
-		}
-		for (int i = 0; i < strLen; i++) {
-			if (Character.isWhitespace(cs.charAt(i)) == false) {
-				return false;
-			}
-		}
-		return true;
-	}
+    /**
+    * Return fallback if first string is null or empty
+    */
+    public static String defaultString(final String str, final String fallback) {
+        return isNullOrEmpty(str) ? fallback : str;
+    }
+
+
+    /**
+     * Check if a CharSequence is whitespace, empty ("") or null.
+     *
+     * <pre>
+     * StringUtils.isBlank(null)      = true
+     * StringUtils.isBlank("")        = true
+     * StringUtils.isBlank(" ")       = true
+     * StringUtils.isBlank("bob")     = false
+     * StringUtils.isBlank("  bob  ") = false
+     * </pre>
+     *
+     * @param cs
+     *            the CharSequence to check, may be null
+     * @return {@code true} if the CharSequence is null, empty or whitespace
+     */
+    public static boolean isBlank(final CharSequence cs) {
+        int strLen;
+        if (cs == null || (strLen = cs.length()) == 0) {
+            return true;
+        }
+        for (int i = 0; i < strLen; i++) {
+            if (Character.isWhitespace(cs.charAt(i)) == false) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
