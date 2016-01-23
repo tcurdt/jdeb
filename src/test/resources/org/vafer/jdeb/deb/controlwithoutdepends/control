@@ -1,0 +1,12 @@
+Package: controlwithoutdepends
+Version: 1.0.1
+Section: misc
+Priority: optional
+Architecture: i386
+Maintainer: John Doe <john@doe.org>
+Distribution: development
+Description: revision @REVISION@, test package
+ This is a sample package control file.
+ .
+ Use for testing purposes only.
+XB-UserDefinedField: This is a user defined field.

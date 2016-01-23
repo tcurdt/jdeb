@@ -151,9 +151,40 @@ public class DebMakerTestCase extends TestCase {
                     assertFalse("Variables not replaced in the control file " + entry.getName(), body.contains("[[name]] [[version]]"));
                     assertTrue("Expected variables not found in the control file " + entry.getName(), body.contains("jdeb 1.0"));
                 }
+                if (entry.getName().contains("control")) {
+                    String control = new String(content, "ISO-8859-1");
+                    assertTrue("Depends missing" + entry.getName(), control.contains("Depends: some-package"));
+                }
             }
         });
 
         assertTrue("Control files not found in the package", found);
+    }
+
+    public void testDependsIsOmittedWhenEmpty() throws Exception {
+        File deb = new File("target/test-classes/test-control.deb");
+        if (deb.exists() && !deb.delete()) {
+            fail("Couldn't delete " + deb);
+        }
+        
+        Collection<DataProducer> producers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
+        Collection<DataProducer> conffileProducers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
+        DebMaker maker = new DebMaker(new NullConsole(), producers, conffileProducers);
+        maker.setDeb(deb);
+        maker.setControl(new File("target/test-classes/org/vafer/jdeb/deb/controlwithoutdepends"));
+        
+        maker.createDeb(Compression.NONE);
+
+        // now reopen the package and check the control files
+        assertTrue("package not build", deb.exists());
+                
+        boolean found = ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
+            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
+                if (entry.getName().contains("control")) {
+                    String control = new String(content, "ISO-8859-1");
+                    assertFalse("Depends should be omitted" + entry.getName(), control.contains("Depends:"));
+                }
+            }
+        });    
     }
 }
