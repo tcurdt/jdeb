@@ -1,6 +1,6 @@
 ## Version 1.6, in progress
 
-## Version 1.5, released 30.01.2016
+## Version 1.5, released 01.02.2016
 
 * [CHG] Breaking: No longer provides a default "Depends" add to your control as needed
 * [CHG] Breaking: Use TarArchiveEntry in DataConsumer interface
