@@ -1,0 +1,9 @@
+org.vafer.jdeb
+org.vafer.jdeb.ant
+org.vafer.jdeb.changes
+org.vafer.jdeb.debian
+org.vafer.jdeb.mapping
+org.vafer.jdeb.maven
+org.vafer.jdeb.producers
+org.vafer.jdeb.signing
+org.vafer.jdeb.utils
