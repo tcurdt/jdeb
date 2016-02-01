@@ -18,7 +18,7 @@
     <maven>3.0</maven>
   </prerequisites>
   <name>jdeb</name>
-  <version>1.5</version>
+  <version>1.6-SNAPSHOT</version>
   <description>
     This library provides an Ant task and a Maven plugin to create Debian packages from Java builds in a truly cross
     platform manner. Build your Debian packages on any platform that has Java support. Windows, Linux, OS X - it doesn't
