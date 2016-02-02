@@ -16,6 +16,14 @@
 
 package org.vafer.jdeb;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+import org.apache.commons.compress.archivers.tar.TarConstants;
+import org.apache.commons.compress.archivers.zip.ZipEncoding;
+import org.apache.commons.compress.archivers.zip.ZipEncodingHelper;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.vafer.jdeb.utils.Utils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,14 +36,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.commons.compress.archivers.tar.TarConstants;
-import org.apache.commons.compress.archivers.zip.ZipEncoding;
-import org.apache.commons.compress.archivers.zip.ZipEncodingHelper;
-import org.apache.commons.compress.compressors.CompressorException;
-import org.vafer.jdeb.utils.Utils;
 
 /**
  * Builds the data archive of the Debian package.
@@ -96,9 +96,6 @@ class DataBuilder {
         );
         tarOutputStream.setLongFileMode(options.longFileMode());
         tarOutputStream.setBigNumberMode(options.bigNumberMode());
-
-        System.out.println("##### longFileMode: " + options.longFileMode());
-        System.out.println("##### bigNumberMode: " + options.bigNumberMode());
 
         final MessageDigest digest = MessageDigest.getInstance("MD5");
 
