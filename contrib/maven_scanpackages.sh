@@ -11,12 +11,12 @@
 # configured lts branch releases.
 #
 # Requirements:
-# * This script is based on scna_packages. It is provided by dpkg-dev.
+# * This script is based on scan_packages. It is provided by dpkg-dev package on Debian.
 # * The script expect to find
 # ** a "releases" folder containing a maven repository with the deployed
-#    releases
+#    releases (but it's easy to modify it at the beginning of the script)
 # ** a "snapshots" dolder containing a maven repository with the deployed
-#    snaphots
+#    snaphots (but it's easy to modify it at the beginning of the script)
 # ** make sure the "stable" folder exists if you want a filtered stable debian
 #    repository
 # ** make sure the "lts" folder exists if you want a filtered lts debian
