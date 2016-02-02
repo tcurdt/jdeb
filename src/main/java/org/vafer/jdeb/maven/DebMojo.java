@@ -338,6 +338,20 @@ public class DebMojo extends AbstractMojo {
     @Parameter(defaultValue = "")
     private String propertyPrefix;
 
+    /**
+     * Sets the long file mode for the resulting tar file.  Valid values are "gnu", "posix", "error" or "truncate"
+     * @see org.apache.commons.compress.archivers.tar.TarArchiveOutputStream#setLongFileMode(int)
+     */
+    @Parameter(defaultValue = "gnu")
+    private String tarLongFileMode;
+
+    /**
+     * Sets the big number mode for the resulting tar file.  Valid values are "gnu", "posix" or "error"
+     * @see org.apache.commons.compress.archivers.tar.TarArchiveOutputStream#setBigNumberMode(int)
+     */
+    @Parameter(defaultValue = "error")
+    private String tarBigNumberMode;
+
     /* end of parameters */
 
     private static final String KEY = "key";
@@ -563,6 +577,8 @@ public class DebMojo extends AbstractMojo {
             debMaker.setOpenReplaceToken(openReplaceToken);
             debMaker.setCloseReplaceToken(closeReplaceToken);
             debMaker.setDigest(digest);
+            debMaker.setTarBigNumberMode(tarBigNumberMode);
+            debMaker.setTarLongFileMode(tarLongFileMode);
             debMaker.validate();
             debMaker.makeDeb();
 

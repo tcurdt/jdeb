@@ -78,21 +78,27 @@ class DataBuilder {
      * @param producers
      * @param output
      * @param checksums
-     * @param compression the compression method used for the data file
+     * @param options Options used to build the data file
      * @return
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws org.apache.commons.compress.compressors.CompressorException
      */
-    BigInteger buildData(Collection<DataProducer> producers, File output, final StringBuilder checksums, Compression compression) throws NoSuchAlgorithmException, IOException, CompressorException {
+    BigInteger buildData(Collection<DataProducer> producers, File output, final StringBuilder checksums, TarOptions options) throws NoSuchAlgorithmException, IOException, CompressorException {
 
         final File dir = output.getParentFile();
         if (dir != null && (!dir.exists() || !dir.isDirectory())) {
             throw new IOException("Cannot write data file at '" + output.getAbsolutePath() + "'");
         }
 
-        final TarArchiveOutputStream tarOutputStream = new TarArchiveOutputStream(compression.toCompressedOutputStream(new FileOutputStream(output)));
-        tarOutputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
+        final TarArchiveOutputStream tarOutputStream = new TarArchiveOutputStream(
+            options.compression().toCompressedOutputStream(new FileOutputStream(output))
+        );
+        tarOutputStream.setLongFileMode(options.longFileMode());
+        tarOutputStream.setBigNumberMode(options.bigNumberMode());
+
+        System.out.println("##### longFileMode: " + options.longFileMode());
+        System.out.println("##### bigNumberMode: " + options.bigNumberMode());
 
         final MessageDigest digest = MessageDigest.getInstance("MD5");
 
