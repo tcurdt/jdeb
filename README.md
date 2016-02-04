@@ -1,4 +1,5 @@
-[![Build Status](https://secure.travis-ci.org/tcurdt/jdeb.png)](http://travis-ci.org/tcurdt/jdeb)
+[![Linux/Mac Build Status](https://secure.travis-ci.org/tcurdt/jdeb.png)](http://travis-ci.org/tcurdt/jdeb)
+[![Windows Build Status](https://img.shields.io/appveyor/ci/tcurdt/jdeb/master.svg?label=Windows)](https://ci.appveyor.com/project/tcurdt/jdeb/branch/master)
 [![Coverage Status](https://coveralls.io/repos/tcurdt/jdeb/badge.svg?branch=master&service=github)](https://coveralls.io/github/tcurdt/jdeb?branch=master)
 [![Join the chat at https://gitter.im/tcurdt/jdeb](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/tcurdt/jdeb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
