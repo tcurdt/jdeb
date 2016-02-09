@@ -5,8 +5,8 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 public class TarOptions {
 
     private Compression compression = Compression.GZIP;
-    private int longFileMode = TarArchiveOutputStream.LONGFILE_GNU;
-    private int bigNumberMode = TarArchiveOutputStream.BIGNUMBER_ERROR;
+    private int longFileMode = TarArchiveOutputStream.LONGFILE_POSIX;
+    private int bigNumberMode = TarArchiveOutputStream.BIGNUMBER_POSIX;
 
     public TarOptions compression(Compression compression) {
         this.compression = compression;

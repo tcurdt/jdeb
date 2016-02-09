@@ -342,14 +342,14 @@ public class DebMojo extends AbstractMojo {
      * Sets the long file mode for the resulting tar file.  Valid values are "gnu", "posix", "error" or "truncate"
      * @see org.apache.commons.compress.archivers.tar.TarArchiveOutputStream#setLongFileMode(int)
      */
-    @Parameter(defaultValue = "gnu")
+    @Parameter(defaultValue = "posix")
     private String tarLongFileMode;
 
     /**
      * Sets the big number mode for the resulting tar file.  Valid values are "gnu", "posix" or "error"
      * @see org.apache.commons.compress.archivers.tar.TarArchiveOutputStream#setBigNumberMode(int)
      */
-    @Parameter(defaultValue = "error")
+    @Parameter(defaultValue = "posix")
     private String tarBigNumberMode;
 
     /* end of parameters */
