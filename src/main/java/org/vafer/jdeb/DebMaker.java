@@ -118,6 +118,12 @@ public class DebMaker {
     /** Defines the role to sign with */
     private String signRole;
 
+    /** Defines the longFileMode of the tar file that is built */
+    private String tarLongFileMode;
+
+    /** Defines the bigNumberMode of the tar file that is built */
+    private String tarBigNumberMode;
+
     private VariableResolver variableResolver;
     private String openReplaceToken;
     private String closeReplaceToken;
@@ -225,6 +231,14 @@ public class DebMaker {
 
     public void setDigest(String digest) {
         this.digest = digest;
+    }
+
+    public void setTarLongFileMode(String tarLongFileMode) {
+        this.tarLongFileMode = tarLongFileMode;
+    }
+
+    public void setTarBigNumberMode(String tarBigNumberMode) {
+        this.tarBigNumberMode = tarBigNumberMode;
     }
 
     /**
@@ -467,7 +481,11 @@ public class DebMaker {
             console.debug("Building data");
             DataBuilder dataBuilder = new DataBuilder(console);
             StringBuilder md5s = new StringBuilder();
-            BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, compression);
+            TarOptions options = new TarOptions()
+                .compression(compression)
+                .longFileMode(tarLongFileMode)
+                .bigNumberMode(tarBigNumberMode);
+            BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, options);
 
             console.info("Building conffiles");
             List<String> tempConffiles = populateConffiles(conffilesProducers);
