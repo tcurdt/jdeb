@@ -15,26 +15,26 @@ public class TarOptions {
     }
 
     public TarOptions longFileMode(String input) {
-        if ("posix".equals(input)) {
-            longFileMode = TarArchiveOutputStream.LONGFILE_POSIX;
+        if ("gnu".equals(input)) {
+            longFileMode = TarArchiveOutputStream.LONGFILE_GNU;
         } else if ("error".equals(input)) {
             longFileMode = TarArchiveOutputStream.LONGFILE_ERROR;
         } else if ("truncate".equals(input)) {
             longFileMode = TarArchiveOutputStream.LONGFILE_TRUNCATE;
         } else {
-            longFileMode = TarArchiveOutputStream.LONGFILE_GNU;
+            longFileMode = TarArchiveOutputStream.LONGFILE_POSIX;
         }
 
         return this;
     }
 
     public TarOptions bigNumberMode(String input) {
-        if ("posix".equals(input)) {
-            bigNumberMode = TarArchiveOutputStream.BIGNUMBER_POSIX;
+        if ("error".equals(input)) {
+            bigNumberMode = TarArchiveOutputStream.BIGNUMBER_ERROR;
         } else if ("star".equals(input) || "gnu".equals(input)) {
             bigNumberMode = TarArchiveOutputStream.BIGNUMBER_STAR;
         } else {
-            bigNumberMode = TarArchiveOutputStream.LONGFILE_ERROR;
+            bigNumberMode = TarArchiveOutputStream.BIGNUMBER_POSIX;
         }
 
         return this;
