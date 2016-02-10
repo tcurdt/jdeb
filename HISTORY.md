@@ -1,5 +1,7 @@
 ## Version 1.6, in progress
 
+* [CHG] Default to posix style tar archives (Thanks to Kevin Conaway)
+
 ## Version 1.5, released 01.02.2016
 
 * [CHG] Breaking: No longer provides a default "Depends" add to your control as needed
