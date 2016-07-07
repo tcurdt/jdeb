@@ -83,15 +83,15 @@ function update_repository ()
 
     rm -rf $repositoryName/Release $repositoryName/Release.gpg
     apt-ftparchive -c=$repositoryName/Release.conf release $repositoryName > $repositoryName/Release
-    gpg -abs --default-key $GPG_KEY -o $repositoryName/Release.gpg $repositoryName/Release
+    gpg --digest-algo SHA512 -abs --default-key $GPG_KEY -o $repositoryName/Release.gpg $repositoryName/Release
   fi
 }
 
 ## LTS
-update_repository $LTS_REP ".*-${LTS_BRANCH}\(\.[0-9]+\)*.deb"
+update_repository $LTS_REP ".*-${LTS_BRANCH}\(\.[0-9]+\)*\(-[0-9]+\)*.deb"
 
 ## stable
-update_repository $STABLE_REP ".*[\.-][0-9]+.deb"
+update_repository $STABLE_REP ".*\.[0-9]+\(-[0-9]+\)*.deb"
 
 ## releases
 if [ -d $RELEASES_REP ]; then
@@ -102,7 +102,7 @@ if [ -d $RELEASES_REP ]; then
 
   rm -rf $RELEASES_REP/Release $RELEASES_REP/Release.gpg
   apt-ftparchive -c=$RELEASES_REP/Release.conf release $RELEASES_REP > $RELEASES_REP/Release
-  gpg -abs --default-key $GPG_KEY -o $RELEASES_REP/Release.gpg $RELEASES_REP/Release
+  gpg --digest-algo SHA512 -abs --default-key $GPG_KEY -o $RELEASES_REP/Release.gpg $RELEASES_REP/Release
 fi
 
 ## snapshots
@@ -114,5 +114,5 @@ if [ -d $SNAPSHOTS_REP ]; then
 
   rm -rf $SNAPSHOTS_REP/Release $SNAPSHOTS_REP/Release.gpg
   apt-ftparchive -c=$SNAPSHOTS_REP/Release.conf release $SNAPSHOTS_REP > $SNAPSHOTS_REP/Release
-  gpg -abs --default-key $GPG_KEY -o $SNAPSHOTS_REP/Release.gpg $SNAPSHOTS_REP/Release
+  gpg --digest-algo SHA512 -abs --default-key $GPG_KEY -o $SNAPSHOTS_REP/Release.gpg $SNAPSHOTS_REP/Release
 fi
