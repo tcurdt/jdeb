@@ -20,6 +20,7 @@ import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.bcpg.HashAlgorithmTags;
 import org.bouncycastle.crypto.digests.MD5Digest;
@@ -352,7 +353,7 @@ public class DebMaker {
 
     private void makeChangesFiles(final BinaryPackageControlFile packageControlFile) throws PackagingException {
         if (changesOut == null) {
-            changesOut = new File(deb.getParentFile(), deb.getName().replace(".deb", ".changes"));
+            changesOut = new File(deb.getParentFile(), FilenameUtils.getBaseName(deb.getName()) + ".changes");
         }
 
         ChangesProvider changesProvider;
