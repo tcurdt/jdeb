@@ -1,5 +1,9 @@
 ## Version 1.6, in progress
 
+* [CHG] Upgraded Commons Compress
+* [ADD] Added support for the fullpath attribute in Ant (Thanks to (Daniel Ivan Ruiz Barranco)
+* [FIX] Fixed the maintainer name according to Debian standards (Thanks to Bogdan Artyushenko)
+* [FIX] Fixed deriving the changes file (Thanks to Reinhard Pointner)
 * [CHG] Default to posix style tar archives (Thanks to Kevin Conaway)
 
 ## Version 1.5, released 01.02.2016
