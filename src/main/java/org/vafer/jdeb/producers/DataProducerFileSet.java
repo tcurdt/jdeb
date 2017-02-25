@@ -93,7 +93,7 @@ public final class DataProducerFileSet implements DataProducer {
 
             final InputStream inputStream = new FileInputStream(file);
             try {
-                final String entryName = (fullpath.equals("") ? prefix + "/" + name : fullpath);
+                final String entryName = "".equals(fullpath) ? prefix + "/" + name : fullpath;
 
                 final File entryPath = new File(entryName);
 
