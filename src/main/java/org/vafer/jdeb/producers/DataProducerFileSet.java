@@ -50,6 +50,7 @@ public final class DataProducerFileSet implements DataProducer {
         int filemode = TarEntry.DEFAULT_FILE_MODE;
         int dirmode = TarEntry.DEFAULT_DIR_MODE;
         String prefix = "";
+        String fullpath = "";
 
         if (fileset instanceof Tar.TarFileSet) {
             Tar.TarFileSet tarfileset = (Tar.TarFileSet) fileset;
@@ -60,12 +61,19 @@ public final class DataProducerFileSet implements DataProducer {
             filemode = tarfileset.getMode();
             dirmode = tarfileset.getDirMode(tarfileset.getProject());
             prefix = tarfileset.getPrefix(tarfileset.getProject());
+            fullpath = tarfileset.getFullpath();
         }
 
         final DirectoryScanner scanner = fileset.getDirectoryScanner(fileset.getProject());
         scanner.scan();
 
         final File basedir = scanner.getBasedir();
+
+        if (scanner.getIncludedFilesCount() != 1 || scanner.getIncludedDirsCount() != 0) {
+            // the full path attribute only have sense in this context
+            // if it's a single-file fileset, we ignore it otherwise
+            fullpath = "";
+        }
 
         for (String directory : scanner.getIncludedDirectories()) {
             String name = directory.replace('\\', '/');
@@ -86,7 +94,7 @@ public final class DataProducerFileSet implements DataProducer {
 
             final InputStream inputStream = new FileInputStream(file);
             try {
-                final String entryName = prefix + "/" + name;
+                final String entryName = "".equals(fullpath) ? prefix + "/" + name : fullpath;
 
                 final File entryPath = new File(entryName);
 
