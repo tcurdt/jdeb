@@ -4,5 +4,5 @@ Section: misc
 Priority: low
 Architecture: all
 Description: [[description]]
-Maintainer: tcurdt@vafer.org
+Maintainer: Tcurdt At GitHub <tcurdt@vafer.org>
 Depends: default-jre | java6-runtime
