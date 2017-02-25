@@ -70,7 +70,8 @@ public final class DataProducerFileSet implements DataProducer {
         final File basedir = scanner.getBasedir();
 
         if (scanner.getIncludedFilesCount() != 1 || scanner.getIncludedDirsCount() != 0) {
-            //this isn't a single-file tarfileset, ignoring the fullpath
+            // the full path attribute only have sense in this context
+            // if it's a single-file fileset, we ignore it otherwise
             fullpath = "";
         }
 
