@@ -16,9 +16,6 @@
 
 package org.vafer.jdeb.maven;
 
-import static org.vafer.jdeb.utils.Utils.lookupIfEmpty;
-import static org.vafer.jdeb.utils.Utils.isBlank;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -58,10 +55,13 @@ import org.vafer.jdeb.utils.SymlinkUtils;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
+import static org.vafer.jdeb.utils.Utils.isBlank;
+import static org.vafer.jdeb.utils.Utils.lookupIfEmpty;
+
 /**
  * Creates Debian package
  */
-@Mojo(name = "jdeb", defaultPhase = LifecyclePhase.PACKAGE)
+@Mojo(name = "jdeb", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true)
 public class DebMojo extends AbstractMojo {
 
     @Component
@@ -388,9 +388,7 @@ public class DebMojo extends AbstractMojo {
     }
 
     protected VariableResolver initializeVariableResolver( Map<String, String> variables ) {
-        @SuppressWarnings("unchecked")
         final Map<String, String> projectProperties = Map.class.cast(getProject().getProperties());
-        @SuppressWarnings("unchecked")
         final Map<String, String> systemProperties = Map.class.cast(System.getProperties());
 
         variables.putAll(projectProperties);
@@ -459,7 +457,8 @@ public class DebMojo extends AbstractMojo {
      *
      * @throws MojoExecutionException on error
      */
-    public void execute() throws MojoExecutionException {
+    @Override
+	public void execute() throws MojoExecutionException {
 
         final MavenProject project = getProject();
 
@@ -503,14 +502,12 @@ public class DebMojo extends AbstractMojo {
 
                 artifacts.add(project.getArtifact());
 
-                @SuppressWarnings("unchecked")
                 final Set<Artifact> projectArtifacts = project.getArtifacts();
 
                 for (Artifact artifact : projectArtifacts) {
                     artifacts.add(artifact);
                 }
 
-                @SuppressWarnings("unchecked")
                 final List<Artifact> attachedArtifacts = project.getAttachedArtifacts();
 
                 for (Artifact artifact : attachedArtifacts) {
@@ -521,7 +518,8 @@ public class DebMojo extends AbstractMojo {
                     final File file = artifact.getFile();
                     if (file != null) {
                         dataProducers.add(new DataProducer() {
-                            public void produce( final DataConsumer receiver ) {
+                            @Override
+							public void produce( final DataConsumer receiver ) {
                                 try {
                                     final File path = new File(installDirFile.getPath(), file.getName());
                                     final String entryName = path.getPath();
