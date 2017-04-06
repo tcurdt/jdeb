@@ -16,9 +16,6 @@
 
 package org.vafer.jdeb.maven;
 
-import static org.vafer.jdeb.utils.Utils.lookupIfEmpty;
-import static org.vafer.jdeb.utils.Utils.isBlank;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -58,10 +55,13 @@ import org.vafer.jdeb.utils.SymlinkUtils;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
+import static org.vafer.jdeb.utils.Utils.isBlank;
+import static org.vafer.jdeb.utils.Utils.lookupIfEmpty;
+
 /**
  * Creates Debian package
  */
-@Mojo(name = "jdeb", defaultPhase = LifecyclePhase.PACKAGE)
+@Mojo(name = "jdeb", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true)
 public class DebMojo extends AbstractMojo {
 
     @Component
