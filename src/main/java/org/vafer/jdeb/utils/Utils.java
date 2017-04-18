@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -204,7 +205,7 @@ public final class Utils {
      * such that the version is always ordered before the final or GA release.
      *
      * @param version the project version to convert to a Debian package version
-     * @param timestamp the date used as the timestamp to replace the SNAPSHOT suffix
+     * @param timestamp the UTC date used as the timestamp to replace the SNAPSHOT suffix.
      */
     public static String convertToDebianVersion( String version, boolean apply, String envName, Date timestamp ) {
         Matcher matcher = SNAPSHOT_PATTERN.matcher(version);
@@ -213,9 +214,11 @@ public final class Utils {
 
             if (apply) {
                 final String envValue = System.getenv(envName);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                 final String snapshot = (envValue != null && envValue.length() > 0)
                         ? envValue
-                        : new SimpleDateFormat("yyyyMMddHHmmss").format(timestamp);
+                        : dateFormat.format(timestamp);
                 version += snapshot;
             } else {
                 version += "SNAPSHOT";

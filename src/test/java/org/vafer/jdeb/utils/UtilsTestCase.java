@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
@@ -116,6 +117,7 @@ public class UtilsTestCase extends TestCase {
 
     public void testVersionConversion() {
         Calendar cal = new GregorianCalendar(2013, Calendar.FEBRUARY, 17);
+        cal.setTimeZone(TimeZone.getTimeZone("UTC"));
         assertEquals("should match", "1.0", Utils.convertToDebianVersion("1.0", false, "SNAPSHOT", cal.getTime()));
         assertEquals("should match", "1.0~SNAPSHOT", Utils.convertToDebianVersion("1.0+SNAPSHOT", false, "SNAPSHOT", cal.getTime()));
         assertEquals("should match", "1.0~SNAPSHOT", Utils.convertToDebianVersion("1.0-SNAPSHOT", false, "SNAPSHOT", cal.getTime()));
