@@ -3,7 +3,6 @@ package org.vafer.jdeb.utils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.SignatureException;
 
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.openpgp.PGPException;
@@ -13,9 +12,6 @@ import org.bouncycastle.openpgp.PGPSignatureGenerator;
 /**
  * An output stream that calculates the signature of the input data as it
  * is written
- * 
- * @author mpoindexter
- *
  */
 public class PGPSignatureOutputStream extends OutputStream {
     private final PGPSignatureGenerator signatureGenerator;
@@ -26,34 +22,22 @@ public class PGPSignatureOutputStream extends OutputStream {
     }
 
     public void write( int b ) throws IOException {
-        try {
-            signatureGenerator.update(new byte[] { (byte)b });
-        } catch(SignatureException e) {
-            throw new IOException(e);
-        }
+        signatureGenerator.update(new byte[] { (byte)b });
     }
 
     public void write( byte[] b ) throws IOException {
-        try {
-            signatureGenerator.update(b);
-        } catch(SignatureException e) {
-            throw new IOException(e);
-        }
+        signatureGenerator.update(b);
     }
 
     public void write( byte[] b, int off, int len ) throws IOException {
-        try {
-            signatureGenerator.update(b, off, len);
-        } catch(SignatureException e) {
-            throw new IOException(e);
-        }
+        signatureGenerator.update(b, off, len);
     }
-    
-    public PGPSignature generateSignature() throws SignatureException, PGPException {
+
+    public PGPSignature generateSignature() throws PGPException {
         return signatureGenerator.generate();
     }
-    
-    public String generateASCIISignature() throws SignatureException, PGPException {
+
+    public String generateASCIISignature() throws PGPException {
         try {
             PGPSignature signature = generateSignature();
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -67,4 +51,4 @@ public class PGPSignatureOutputStream extends OutputStream {
         }
     }
 
-} 
+}

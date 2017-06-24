@@ -1,6 +1,37 @@
-## Version 1.2.1, in progress
+## Version 1.6, in progress
 
-* [FIX] Fixed badly formatted version for "milestone", "a", "b" and "cr" (they where not matched as beta versions)
+* [CHG] Upgraded Commons Compress
+* [ADD] Added support for the fullpath attribute in Ant (Thanks to (Daniel Ivan Ruiz Barranco)
+* [FIX] Fixed the maintainer name according to Debian standards (Thanks to Bogdan Artyushenko)
+* [FIX] Fixed deriving the changes file (Thanks to Reinhard Pointner)
+* [CHG] Default to posix style tar archives (Thanks to Kevin Conaway)
+
+## Version 1.5, released 01.02.2016
+
+* [CHG] Breaking: No longer provides a default "Depends" add to your control as needed
+* [CHG] Breaking: Use TarArchiveEntry in DataConsumer interface
+* [FIX] Fixed maven to debian version conversion
+* [FIX] Allow comments in control files
+* [FIX] Fixed incorrectly handled links for tar archives
+* [FIX] Fixed leading zeros on PGP hex strings
+* [ADD] Provide more attributes maven properties (version, deb.name, changes.name, changes.txt.name)
+* [ADD] Added option to provide a propertyPrefix
+* [ADD] Allow Multi-Arch declarations
+* [ADD] Allow overriding of Source
+
+## Version 1.4, released 20.02.2014
+
+* [FIX] Support comments in control files
+* [FIX] Fixed handling of links
+* [FIX] Fixed hex format to use leading 0 when signing
+* [ADD] Provide jdeb build information back to maven (if propertyPrefix is set)
+* [ADD] Allow for Multi-Arch declaration in control files
+
+## Version 1.3, released 25.07.2014
+
+* [CHG] Switched from maven2 to maven3
+* [FIX] Fixed badly formatted version for "milestone", "m", "a", "b" and "cr" (they where not matched as beta versions)
+* [FIX] Add two spaces in the md5sums file between the checksum and the filename to be compatible with GNU coreutils md5sum
 
 ## Version 1.2, released 22.06.2014
 

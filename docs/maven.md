@@ -9,7 +9,7 @@ the plugin to your POM like this
       <plugin>
         <artifactId>jdeb</artifactId>
         <groupId>org.vafer</groupId>
-        <version>1.2</version>
+        <version>1.5</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -47,7 +47,7 @@ Or if you want to build a custom deb file
       <extension>
         <groupId>org.vafer</groupId>
         <artifactId>jdeb</artifactId>
-        <version>1.2</version>
+        <version>1.5</version>
       </extension>
     </extensions>
     <pluginManagement>
@@ -87,8 +87,9 @@ directory (inside the data dir). By default the control file name is also `contr
     Maintainer: Torsten Curdt <torsten@something.com>
     Description: jetty java servlet container
     Distribution: development
+    Depends: default-jre | java6-runtime
 
-but check out the [exmample](https://github.com/tcurdt/jdeb/tree/master/src/examples/maven) to get a better overview.
+but check out the [example](https://github.com/tcurdt/jdeb/tree/master/src/examples/maven) to get a better overview.
 
 If the environment variables `DEBEMAIL` and `DEBFULLNAME` are both set this
 will overrule the `Maintainer` field set in there. The `Installed-Size` will
@@ -156,7 +157,7 @@ symlink          | Indicate if the link is a symblolic link (type must be `link`
 type             | Type of the data source. (archive, directory, file, files, link or template) | No; but will be Yes in the future
 missingSrc       | Fail if src file/folder is missing (ignore or fail)                          | No; defaults to `fail`
 includes         | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files
-excludes         | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions
+excludes         | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclusions
 conffile         | A boolean value to define if the files should be included in the conffiles   | No; defaults to `false`
 mapper           | The files to exclude from the directory or tarball                           | No
 paths/(path..)   | One or more string literal paths that will created in the package            | No; Yes for type `template`
@@ -184,7 +185,7 @@ include a directory, a tarball, and a file in your deb package and then sign it 
       <plugin>
         <artifactId>jdeb</artifactId>
         <groupId>org.vafer</groupId>
-        <version>1.2</version>
+        <version>1.5</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -295,7 +296,7 @@ include a directory, a tarball, and a file in your deb package and then sign it 
     </plugins>
   </build>
 ```
-If you don't want to store your key information in the POM you can store this is your settings.xml, here's an example settings.xml:
+If you don't want to store your key information in the POM you can store this in your settings.xml, here's an example settings.xml:
 
 ```xml
   <settings>

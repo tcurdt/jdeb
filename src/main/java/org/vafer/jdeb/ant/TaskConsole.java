@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,19 +34,16 @@ class TaskConsole implements Console {
         this.verbose = verbose;
     }
 
-    @Override
     public void debug(String message) {
         if (verbose) {
             task.log(message);
         }
     }
 
-    @Override
     public void info(String message) {
         task.log(message);
     }
 
-    @Override
     public void warn(String message) {
         task.log(message, Project.MSG_WARN);
     }

@@ -1,334 +1,445 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.vafer</groupId>
-    <artifactId>jdeb</artifactId>
-    <packaging>maven-plugin</packaging>
-    <name>jdeb</name>
-    <version>1.2</version>
-    <description>
-        This library provides an Ant task and a Maven plugin to create Debian packages from Java builds in a truly cross
-        platform manner. Build your Debian packages on any platform that has Java support. Windows, Linux, OS X - it doesn't
-        require additional native tools installed.
-    </description>
-    <url>http://github.com/tcurdt/jdeb</url>
-    <developers>
-        <developer>
-            <id>tcurdt</id>
-            <name>Torsten Curdt</name>
-            <email>tcurdt at apache.org</email>
-            <roles><role>Lead Developer</role></roles>
-            <timezone>+1</timezone>
-        </developer>
-        <developer>
-            <id>ebourg</id>
-            <name>Emmanuel Bourg</name>
-            <email>ebourg at apache.org</email>
-            <timezone>+1</timezone>
-        </developer>
-        <developer>
-            <id>tmortagne</id>
-            <name>Thomas Mortagne</name>
-            <email>thomas.mortagne at gmail.com</email>
-            <timezone>+1</timezone>
-        </developer>
-    </developers>
-    <contributors>
-        <contributor><name>Bryan Sant</name></contributor>
-        <contributor><name>Christian Rigdon</name></contributor>
-        <contributor><name>Elliot West</name></contributor>
-        <contributor><name>Jeroen Rosenberg</name></contributor>
-        <contributor><name>Manuel Woelker</name></contributor>
-        <contributor><name>Patrick Schultz</name></contributor>
-        <contributor><name>Petr Kozelka</name></contributor>
-        <contributor><name>Scott Kuehn</name></contributor>
-        <contributor><name>Ralph van Etten</name></contributor>
-        <contributor><name>Alexander Horz</name></contributor>
-        <contributor><name>Roman Kashitsyn</name></contributor>
-        <contributor><name>Lukas Roedl</name></contributor>
-        <contributor><name>David Sauer</name></contributor>
-        <contributor><name>Max Garmash</name></contributor>
-        <contributor><name>Marco Soeima</name></contributor>
-        <contributor><name>Christian Egli</name></contributor>
-        <contributor><name>Sergio Fernández</name></contributor>
-    </contributors>
-    <licenses>
-        <license>
-            <name>Apache License 2</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    <scm>
-        <connection>scm:git:git://github.com:tcurdt/jdeb.git</connection>
-        <developerConnection>scm:git:git://github.com:tcurdt/jdeb.git</developerConnection>
-        <url>http://github.com/tcurdt/jdeb/tree/master</url>
-    </scm>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>1.6</maven.compiler.source>
-        <maven.compiler.target>1.6</maven.compiler.target>
-        <mavenVersion>2.2.1</mavenVersion>
-        <mavenPluginPluginVersion>3.2</mavenPluginPluginVersion>
-    </properties>
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <artifactId>maven-site-plugin</artifactId>
-                    <version>3.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-plugin-plugin</artifactId>
-                    <version>${mavenPluginPluginVersion}</version>
-                    <configuration>
-                        <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-                        <extractors>
-                            <extractor>java-annotations</extractor>
-                        </extractors>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>mojo-descriptor</id>
-                            <phase>process-classes</phase>
-                            <goals>
-                                <goal>descriptor</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>1.7.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <!-- <dependencyReducedPomLocation>${basedir}/target/dependency-reduced-pom.xml</dependencyReducedPomLocation> -->
-                            <minimizeJar>true</minimizeJar>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/*.SF</exclude>
-                                        <exclude>META-INF/*.DSA</exclude>
-                                        <exclude>META-INF/*.RSA</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
-                            <artifactSet>
-                                <includes>
-                                    <include>org.apache.commons:commons-compress</include>
-                                    <include>commons-io:commons-io</include>
-                                    <include>org.bouncycastle:bcpg-jdk15on</include>
-                                    <include>org.bouncycastle:bcprov-jdk15on</include>
-                                </includes>
-                            </artifactSet>
-                            <relocations>
-                                <relocation>
-                                    <pattern>org.apache.commons</pattern>
-                                    <shadedPattern>org.vafer.jdeb.shaded.compress</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.bouncycastle</pattern>
-                                    <shadedPattern>org.vafer.jdeb.shaded.bc</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.11</version>
-                <configuration>
-                    <forkMode>never</forkMode>
-                    <includes>
-                        <include>**/*TestCase.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>**/Abstract*</exclude>
-                    </excludes>
-                    <testFailureIgnore>false</testFailureIgnore>
-                    <skip>false</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-invoker-plugin</artifactId>
-                <version>1.6</version>
-                <configuration>
-                    <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-                    <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-                    <settingsFile>src/it/settings.xml</settingsFile>
-                    <goals>
-                        <goal>clean</goal>
-                        <goal>package</goal>
-                    </goals>
-                    <debug>true</debug>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>integration-test</id>
-                        <goals>
-                          <goal>install</goal>
-                          <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-    <dependencies>
-        <!-- mvn versions:display-dependency-updates -->
-        <!-- mvn versions:display-plugin-updates -->
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
-            <version>1.7</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-core</artifactId>
-            <version>${mavenVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-plugin-api</artifactId>
-            <version>${mavenVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-project</artifactId>
-            <version>${mavenVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-artifact</artifactId>
-            <version>${mavenVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.plugin-tools</groupId>
-            <artifactId>maven-plugin-annotations</artifactId>
-            <version>${mavenPluginPluginVersion}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-            <version>1.5.15</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>1.9.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpg-jdk15on</artifactId>
-            <version>1.50</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>1.9.5</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <reporting>
-        <excludeDefaults>true</excludeDefaults>
-        <outputDirectory>${project.build.directory}/site</outputDirectory>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
-                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-                </configuration>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>project-team</report>
-                            <report>dependencies</report>
-                            <report>license</report>
-                            <report>scm</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.8.1</version>
-                <configuration>
-                    <linksource>true</linksource>
-                    <links>
-                        <link>http://java.sun.com/javase/6/docs/api</link>
-                    </links>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.12</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>2.7.1</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.3</version>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>taglist-maven-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <tags>
-                        <tag>FIXME</tag>
-                        <tag>TODO</tag>
-                        <tag>@todo</tag>
-                        <tag>@deprecated</tag>
-                    </tags>
-                    <aggregate>true</aggregate>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <maven.compiler.target>1.6</maven.compiler.target>
+    <additionalparam>-Xdoclint:none</additionalparam>
+    <mavenVersion>3.2.5</mavenVersion>
+    <!-- <mavenVersion>3.3.9</mavenVersion> -->
+    <mavenPluginPluginVersion>3.4</mavenPluginPluginVersion>
+  </properties>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.vafer</groupId>
+  <artifactId>jdeb</artifactId>
+  <packaging>maven-plugin</packaging>
+  <prerequisites>
+    <maven>3.0</maven>
+  </prerequisites>
+  <name>jdeb</name>
+  <version>1.6-SNAPSHOT</version>
+  <description>
+    This library provides an Ant task and a Maven plugin to create Debian packages from Java builds in a truly cross
+    platform manner. Build your Debian packages on any platform that has Java support. Windows, Linux, OS X - it doesn't
+    require additional native tools installed.
+  </description>
+  <url>http://github.com/tcurdt/jdeb</url>
+  <developers>
+    <developer>
+      <id>tcurdt</id>
+      <name>Torsten Curdt</name>
+      <email>tcurdt at apache.org</email>
+      <roles><role>Lead Developer</role></roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>ebourg</id>
+      <name>Emmanuel Bourg</name>
+      <email>ebourg at apache.org</email>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>tmortagne</id>
+      <name>Thomas Mortagne</name>
+      <email>thomas.mortagne at gmail.com</email>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+  <contributors>
+    <contributor><name>Aleksandr Kormushin</name></contributor>
+    <contributor><name>Alexander Horz</name></contributor>
+    <contributor><name>Ben McCann</name></contributor>
+    <contributor><name>Brian Moyles</name></contributor>
+    <contributor><name>Bryan Sant</name></contributor>
+    <contributor><name>Christian Egli</name></contributor>
+    <contributor><name>Christian Rigdon</name></contributor>
+    <contributor><name>David Sauer</name></contributor>
+    <contributor><name>Elliot West</name></contributor>
+    <contributor><name>Jakob Frank</name></contributor>
+    <contributor><name>Jeroen Rosenberg</name></contributor>
+    <contributor><name>John Shields</name></contributor>
+    <contributor><name>Kevin Conaway</name></contributor>
+    <contributor><name>Lee Thompso</name></contributor>
+    <contributor><name>Lukas Roedl</name></contributor>
+    <contributor><name>Manfred Stock</name></contributor>
+    <contributor><name>Manuel Woelker</name></contributor>
+    <contributor><name>Marco Soeima</name></contributor>
+    <contributor><name>Max Garmash</name></contributor>
+    <contributor><name>Nepomuk Seiler</name></contributor>
+    <contributor><name>Patrick Schultz</name></contributor>
+    <contributor><name>Paul Kremer</name></contributor>
+    <contributor><name>Petr Kozelka</name></contributor>
+    <contributor><name>Ralph van Etten</name></contributor>
+    <contributor><name>Rob Spieldenner</name></contributor>
+    <contributor><name>Roman Kashitsyn</name></contributor>
+    <contributor><name>Scott Kuehn</name></contributor>
+    <contributor><name>Sergio Fernández</name></contributor>
+    <contributor><name>Steven Bower</name></contributor>
+  </contributors>
+  <licenses>
+    <license>
+      <name>Apache License 2</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:git:git://github.com:tcurdt/jdeb.git</connection>
+    <developerConnection>scm:git:git://github.com:tcurdt/jdeb.git</developerConnection>
+    <url>http://github.com/tcurdt/jdeb/tree/master</url>
+  </scm>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <version>${mavenPluginPluginVersion}</version>
+          <configuration>
+            <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+            <extractors>
+              <extractor>java-annotations</extractor>
+            </extractors>
+          </configuration>
+          <executions>
+            <execution>
+              <id>mojo-descriptor</id>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>descriptor</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.2</version>
+        <configuration>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
+          <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.3</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <!-- <dependencyReducedPomLocation>${basedir}/target/dependency-reduced-pom.xml</dependencyReducedPomLocation> -->
+              <!-- <createDependencyReducedPom>true</createDependencyReducedPom> -->
+              <minimizeJar>true</minimizeJar>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <artifactSet>
+                <includes>
+                  <include>org.apache.commons:commons-compress</include>
+                  <include>commons-io:commons-io</include>
+                  <include>org.bouncycastle:bcpg-jdk15on</include>
+                  <include>org.bouncycastle:bcprov-jdk15on</include>
+                  <include>org.tukaani:xz</include>
+                </includes>
+              </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>org.apache.commons</pattern>
+                  <shadedPattern>org.vafer.jdeb.shaded.commons</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.bouncycastle</pattern>
+                  <shadedPattern>org.vafer.jdeb.shaded.bc</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.tukaani</pattern>
+                  <shadedPattern>org.vafer.jdeb.shaded.xz</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.18.1</version>
+        <configuration>
+          <includes>
+            <include>**/*TestCase.java</include>
+          </includes>
+          <excludes>
+            <exclude>**/Abstract*</exclude>
+          </excludes>
+          <testFailureIgnore>false</testFailureIgnore>
+          <skip>false</skip>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <version>1.9</version>
+        <configuration>
+          <!-- <cloneClean>true</cloneClean> -->
+          <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
+          <debug>false</debug>
+          <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
+          <!-- <postBuildHookScript>verify</postBuildHookScript> -->
+          <streamLogs>true</streamLogs>
+          <settingsFile>src/it/settings.xml</settingsFile>
+          <goals>
+              <goal>clean</goal>
+              <goal>package</goal>
+            </goals>
+          <!--
+          <extraArtifacts>
+              <extraArtifact>org.jacoco:org.jacoco.agent:${project.version}:jar:runtime</extraArtifact>
+            </extraArtifacts>
+          -->
+        </configuration>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <goals>
+              <goal>install</goal>
+              <goal>run</goal>
+                <!--
+                <goal>integration-test</goal>
+                <goal>verify</goal
+                -->
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.7.5.201505241946</version>
+          <configuration>
+            <append>true</append>
+            <includes>
+             <include>org/vafer/jdeb/*</include>
+           </includes>
+           <excludes>
+             <exclude>org/vafer/jdeb/shaded/*</exclude>
+           </excludes>
+         </configuration>
+         <executions>
+
+          <execution>
+            <id>default-report</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+
+          <execution>
+            <id>pre-unit-test</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <!-- <destFile>${project.build.directory}/jacoco-unit.exec</destFile> -->
+              <!-- <propertyName>surefireArgLine</propertyName> -->
+            </configuration>
+          </execution>
+          <execution>
+            <id>post-unit-test</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <!-- <dataFile>${project.build.directory}/jacoco-unit.exec</dataFile> -->
+              <!-- <outputDirectory>${project.reporting.outputDirectory}/jacoco-unit</outputDirectory> -->
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>pre-integration-test</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <!-- <destFile>${project.build.directory}/jacoco-it.exec</destFile> -->
+              <propertyName>invoker.mavenOpts</propertyName>
+            </configuration>
+          </execution>
+          <execution>
+            <id>post-integration-test</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <!-- <dataFile>${project.build.directory}/jacoco-it.exec</dataFile> -->
+              <!-- <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory> -->
+            </configuration>
+          </execution>
+
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.eluder.coveralls</groupId>
+        <artifactId>coveralls-maven-plugin</artifactId>
+        <version>4.1.0</version>
+      </plugin>
+
+    </plugins>
+  </build>
+  <dependencies>
+    <!-- mvn versions:display-dependency-updates -->
+    <!-- mvn versions:display-plugin-updates -->
+    <dependency>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>1.9.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <version>${mavenPluginPluginVersion}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.4</version>
+      <!-- <scope>provided</scope> -->
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+      <version>1.13</version>
+      <!-- <scope>provided</scope> -->
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpg-jdk15on</artifactId>
+      <version>1.53</version>
+      <!-- <scope>provided</scope> -->
+    </dependency>
+    <dependency>
+      <groupId>org.tukaani</groupId>
+      <artifactId>xz</artifactId>
+      <version>1.5</version>
+      <!-- <scope>provided</scope> -->
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>1.9.5</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <reporting>
+    <excludeDefaults>true</excludeDefaults>
+    <outputDirectory>${project.build.directory}/site</outputDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.8</version>
+        <configuration>
+          <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+          <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>project-team</report>
+              <report>dependencies</report>
+              <report>license</report>
+              <report>scm</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.1</version>
+        <configuration>
+          <linksource>true</linksource>
+          <links>
+            <link>http://java.sun.com/javase/6/docs/api</link>
+          </links>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.18.1</version>
+        <configuration>
+          <argLine>${surefireArgLine}</argLine>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.4</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.5</version>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>taglist-maven-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <tags>
+            <tag>FIXME</tag>
+            <tag>TODO</tag>
+            <tag>@todo</tag>
+            <tag>@deprecated</tag>
+          </tags>
+          <aggregate>true</aggregate>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>

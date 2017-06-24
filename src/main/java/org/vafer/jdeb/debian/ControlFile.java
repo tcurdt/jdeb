@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,6 @@ import java.util.Set;
 
 /**
  * A control file as specified by the <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html">Debian policy</a>.
- *
- * @author Torsten Curdt
  */
 public abstract class ControlFile {
 
@@ -66,6 +64,11 @@ public abstract class ControlFile {
             }
 
             final char first = line.charAt(0);
+            if (first == '#') {
+                // ignore commented out lines
+                continue;
+            }
+
             if (Character.isLetter(first)) {
 
                 // new field
@@ -182,7 +185,7 @@ public abstract class ControlFile {
      *   <li>S: for a source package</li>
      *   <li>C: for a changes file</li>
      * </ul>
-     * 
+     *
      * @since 1.1
      * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html#s5.7">Debian Policy - User-defined fields</a>
      */
@@ -192,7 +195,7 @@ public abstract class ControlFile {
      * Tells if the specified field name is a user defined field.
      * User-defined fields must begin with an 'X', followed by one or more
      * letters that specify the output file and a hyphen.
-     * 
+     *
      * @param field the name of the field
      *
      * @since 1.1
@@ -204,7 +207,7 @@ public abstract class ControlFile {
 
     /**
      * Returns the user defined field without its prefix.
-     * 
+     *
      * @param field the name of the user defined field
      * @return the user defined field without the prefix, or null if the fields
      *         doesn't apply to this control file.

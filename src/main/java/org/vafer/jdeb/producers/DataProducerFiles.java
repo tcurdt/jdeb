@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import java.io.IOException;
 /**
  * Data producer that places multiple files into a single
  * destination directory.
- *
- * @author Roman Kashitsyn
  */
 public class DataProducerFiles extends AbstractDataProducer {
 
@@ -41,7 +39,6 @@ public class DataProducerFiles extends AbstractDataProducer {
         this.destDir = destDir;
     }
 
-    @Override
     public void produce( DataConsumer receiver ) throws IOException {
         boolean hasDestDir = !Utils.isNullOrEmpty(destDir);
 

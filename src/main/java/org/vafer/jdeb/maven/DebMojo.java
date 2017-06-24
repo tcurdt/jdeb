@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarConstants;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -48,17 +51,18 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.DebMaker;
 import org.vafer.jdeb.PackagingException;
 import org.vafer.jdeb.utils.MapVariableResolver;
+import org.vafer.jdeb.utils.SymlinkUtils;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
+import static org.vafer.jdeb.utils.Utils.isBlank;
 import static org.vafer.jdeb.utils.Utils.lookupIfEmpty;
 
 /**
  * Creates Debian package
  */
-@SuppressWarnings("unused")
-@Mojo(name = "jdeb", defaultPhase = LifecyclePhase.PACKAGE)
-public class DebMojo extends AbstractPluginMojo {
+@Mojo(name = "jdeb", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true)
+public class DebMojo extends AbstractMojo {
 
     @Component
     private MavenProjectHelper projectHelper;
@@ -141,8 +145,20 @@ public class DebMojo extends AbstractPluginMojo {
     /**
      * The Maven Session Object
      */
-    @Component
+    @Parameter( defaultValue = "${session}", readonly = true )
     private MavenSession session;
+
+    /**
+     * The Maven Project Object
+     */
+    @Parameter( defaultValue = "${project}", readonly = true )
+    private MavenProject project;
+
+    /**
+     * The build directory
+     */
+    @Parameter(property = "project.build.directory", required = true, readonly = true)
+    private File buildDirectory;
 
     /**
      * The classifier of attached artifact
@@ -151,10 +167,19 @@ public class DebMojo extends AbstractPluginMojo {
     private String classifier;
 
     /**
+     * The digest algorithm to use.
+     *
+     * @see org.bouncycastle.bcpg.HashAlgorithmTags
+     */
+    @Parameter(defaultValue = "SHA1")
+    private String digest;
+
+    /**
      * "data" entries used to determine which files should be added to this deb.
      * The "data" entries may specify a tarball (tar.gz, tar.bz2, tgz), a
      * directory, or a normal file. An entry would look something like this in
      * your pom.xml:
+     *
      *
      * <pre>
      *   <build>
@@ -202,6 +227,7 @@ public class DebMojo extends AbstractPluginMojo {
      *     </plugins>
      *   </build>
      * </pre>
+     *
      */
     @Parameter
     private Data[] dataSet;
@@ -234,7 +260,7 @@ public class DebMojo extends AbstractPluginMojo {
 
     /**
      * Indicates if the execution should be disabled. If <code>true</code>, nothing will occur during execution.
-     * 
+     *
      * @since 1.1
      */
     @Parameter(defaultValue = "false")
@@ -259,7 +285,13 @@ public class DebMojo extends AbstractPluginMojo {
      */
     @Parameter(defaultValue = "false")
     private boolean signPackage;
-    
+
+    /**
+     * If signChanges is true then changes file will be signed.
+     */
+    @Parameter(defaultValue = "false")
+    private boolean signChanges;
+
     /**
      * Defines which utility is used to verify the signed package
      */
@@ -271,7 +303,7 @@ public class DebMojo extends AbstractPluginMojo {
      */
     @Parameter(defaultValue = "origin")
     private String signRole;
-    
+
     /**
      * The keyring to use for signing operations.
      */
@@ -288,7 +320,7 @@ public class DebMojo extends AbstractPluginMojo {
      * The passphrase to use for signing operations.
      */
     @Parameter
-    private String passphrase; 
+    private String passphrase;
 
     /**
      * The prefix to use when reading signing variables
@@ -303,8 +335,24 @@ public class DebMojo extends AbstractPluginMojo {
     @Parameter(defaultValue = "${settings}")
     private Settings settings;
 
-    /* end of parameters */
+    @Parameter(defaultValue = "")
+    private String propertyPrefix;
 
+    /**
+     * Sets the long file mode for the resulting tar file.  Valid values are "gnu", "posix", "error" or "truncate"
+     * @see org.apache.commons.compress.archivers.tar.TarArchiveOutputStream#setLongFileMode(int)
+     */
+    @Parameter(defaultValue = "gnu")
+    private String tarLongFileMode;
+
+    /**
+     * Sets the big number mode for the resulting tar file.  Valid values are "gnu", "posix" or "error"
+     * @see org.apache.commons.compress.archivers.tar.TarArchiveOutputStream#setBigNumberMode(int)
+     */
+    @Parameter(defaultValue = "gnu")
+    private String tarBigNumberMode;
+
+    /* end of parameters */
 
     private static final String KEY = "key";
     private static final String KEYRING = "keyring";
@@ -330,7 +378,7 @@ public class DebMojo extends AbstractPluginMojo {
         conffileProducers.clear();
         if (dataSet != null) {
             Collections.addAll(dataProducers, dataSet);
-            
+
             for (Data item : dataSet) {
                 if (item.getConffile()) {
                     conffileProducers.add(item);
@@ -473,16 +521,28 @@ public class DebMojo extends AbstractPluginMojo {
                     final File file = artifact.getFile();
                     if (file != null) {
                         dataProducers.add(new DataProducer() {
-                            @Override
                             public void produce( final DataConsumer receiver ) {
                                 try {
-                                    receiver.onEachFile(
-                                        new FileInputStream(file),
-                                        new File(installDirFile, file.getName()).getAbsolutePath(),
-                                        "",
-                                        "root", 0, "root", 0,
-                                        TarEntry.DEFAULT_FILE_MODE,
-                                        file.length());
+                                    final File path = new File(installDirFile.getPath(), file.getName());
+                                    final String entryName = path.getPath();
+
+                                    final boolean symbolicLink = SymlinkUtils.isSymbolicLink(path);
+                                    final TarArchiveEntry e;
+                                    if (symbolicLink) {
+                                        e = new TarArchiveEntry(entryName, TarConstants.LF_SYMLINK);
+                                        e.setLinkName(SymlinkUtils.readSymbolicLink(path));
+                                    } else {
+                                        e = new TarArchiveEntry(entryName, true);
+                                    }
+
+                                    e.setUserId(0);
+                                    e.setGroupId(0);
+                                    e.setUserName("root");
+                                    e.setGroupName("root");
+                                    e.setMode(TarEntry.DEFAULT_FILE_MODE);
+                                    e.setSize(file.length());
+
+                                    receiver.onEachFile(new FileInputStream(file), e);
                                 } catch (Exception e) {
                                     getLog().error(e);
                                 }
@@ -510,11 +570,15 @@ public class DebMojo extends AbstractPluginMojo {
             debMaker.setKey(key);
             debMaker.setPassphrase(passphrase);
             debMaker.setSignPackage(signPackage);
+            debMaker.setSignChanges(signChanges);
             debMaker.setSignMethod(signMethod);
             debMaker.setSignRole(signRole);
             debMaker.setResolver(resolver);
             debMaker.setOpenReplaceToken(openReplaceToken);
             debMaker.setCloseReplaceToken(closeReplaceToken);
+            debMaker.setDigest(digest);
+            debMaker.setTarBigNumberMode(tarBigNumberMode);
+            debMaker.setTarLongFileMode(tarLongFileMode);
             debMaker.validate();
             debMaker.makeDeb();
 
@@ -532,6 +596,17 @@ public class DebMojo extends AbstractPluginMojo {
             getLog().error("Failed to create debian package " + debFile, e);
             throw new MojoExecutionException("Failed to create debian package " + debFile, e);
         }
+
+        if (!isBlank(propertyPrefix)) {
+          project.getProperties().put(propertyPrefix+"version", getProjectVersion() );
+          project.getProperties().put(propertyPrefix+"deb", debFile.getAbsolutePath());
+          project.getProperties().put(propertyPrefix+"deb.name", debFile.getName());
+          project.getProperties().put(propertyPrefix+"changes", changesOutFile.getAbsolutePath());
+          project.getProperties().put(propertyPrefix+"changes.name", changesOutFile.getName());
+          project.getProperties().put(propertyPrefix+"changes.txt", changesSaveFile.getAbsolutePath());
+          project.getProperties().put(propertyPrefix+"changes.txt.name", changesSaveFile.getName());
+        }
+
     }
 
     /**
@@ -539,7 +614,7 @@ public class DebMojo extends AbstractPluginMojo {
      * and global settings.
      */
     private void initializeSignProperties() {
-        if (!signPackage) {
+        if (!signPackage && !signChanges) {
             return;
         }
 
@@ -590,6 +665,19 @@ public class DebMojo extends AbstractPluginMojo {
 
         return maybeEncryptedPassphrase;
     }
+
+    /**
+     *
+     * @return the maven project used by this mojo
+     */
+    private MavenProject getProject() {
+        if (project.getExecutionProject() != null) {
+            return project.getExecutionProject();
+        }
+
+        return project;
+    }
+
 
 
     /**

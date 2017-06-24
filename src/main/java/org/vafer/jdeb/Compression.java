@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,6 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
 /**
  * Compression method used for the data file.
- * 
- * @author Emmanuel Bourg
  */
 public enum Compression {
 
@@ -62,7 +60,7 @@ public enum Compression {
     /**
      * Returns the compression method corresponding to the specified name.
      * The matching is case insensitive.
-     * 
+     *
      * @param name the name of the compression method
      * @return the compression method, or null if not recognized
      */

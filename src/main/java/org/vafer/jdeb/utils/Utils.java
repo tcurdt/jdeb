@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,11 +39,9 @@ import org.apache.tools.ant.util.ReaderInputStream;
  * Simple utils functions.
  *
  * ATTENTION: don't use outside of jdeb
- *
- * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class Utils {
-    private static final Pattern BETA_PATTERN = Pattern.compile("(.*?)([\\.\\-_]?)(alpha|a|beta|b|milestone|cr|rc)(.*)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern BETA_PATTERN = Pattern.compile("^(?:(?:(.*?)([\\.\\-_]))|(.*[^a-z]))(alpha|a|beta|b|milestone|m|cr|rc)([^a-z].*)?$", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern SNAPSHOT_PATTERN = Pattern.compile("(.*)[\\-\\+]SNAPSHOT");
 
@@ -108,7 +107,7 @@ public final class Utils {
     public static String replaceVariables( final VariableResolver pResolver, final String pExpression, final String pOpen, final String pClose ) {
         final char[] open = pOpen.toCharArray();
         final char[] close = pClose.toCharArray();
-        
+
         final StringBuilder out = new StringBuilder();
         StringBuilder sb = new StringBuilder();
         char[] last = null;
@@ -204,9 +203,9 @@ public final class Utils {
      * -SNAPSHOT suffixes are replaced with a timestamp (~yyyyMMddHHmmss).
      * The separator before a rc, alpha or beta version is replaced with '~'
      * such that the version is always ordered before the final or GA release.
-     * 
+     *
      * @param version the project version to convert to a Debian package version
-     * @param timestamp the date used as the timestamp to replace the SNAPSHOT suffix
+     * @param timestamp the UTC date used as the timestamp to replace the SNAPSHOT suffix.
      */
     public static String convertToDebianVersion( String version, boolean apply, String envName, Date timestamp ) {
         Matcher matcher = SNAPSHOT_PATTERN.matcher(version);
@@ -215,9 +214,11 @@ public final class Utils {
 
             if (apply) {
                 final String envValue = System.getenv(envName);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                 final String snapshot = (envValue != null && envValue.length() > 0)
                         ? envValue
-                        : new SimpleDateFormat("yyyyMMddHHmmss").format(timestamp);
+                        : dateFormat.format(timestamp);
                 version += snapshot;
             } else {
                 version += "SNAPSHOT";
@@ -225,12 +226,18 @@ public final class Utils {
         } else {
             matcher = BETA_PATTERN.matcher(version);
             if (matcher.matches()) {
-                version = matcher.group(1) + "~" + matcher.group(3) + matcher.group(4);
+                if (matcher.group(1) != null) {
+                    version = matcher.group(1) + "~" + matcher.group(4) + matcher.group(5);
+                } else {
+                    version = matcher.group(3) + "~" + matcher.group(4) + matcher.group(5);
+                }
             }
         }
-        
-        version = version.replace('-', '+');
-        
+
+        // safest upstream_version should only contain full stop, plus, tilde, and alphanumerics
+        // https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
+        version = version.replaceAll("[^\\.+~A-Za-z0-9]", "+").replaceAll("\\++", "+");
+
         return version;
     }
 
@@ -258,14 +265,14 @@ public final class Utils {
                                         final String key ) {
         return value != null ? value : props.get(key);
     }
-    
+
     /**
-     * Get the known locations where the secure keyring can be located.
-     * Looks through known locations of the GNU PG secure keyring.
-     * 
-     * @return The location of the PGP secure keyring if it was found,
-     *         null otherwise
-     */
+    * Get the known locations where the secure keyring can be located.
+    * Looks through known locations of the GNU PG secure keyring.
+    *
+    * @return The location of the PGP secure keyring if it was found,
+    *         null otherwise
+    */
     public static Collection<String> getKnownPGPSecureRingLocations() {
         final LinkedHashSet<String> locations = new LinkedHashSet<String>();
 
@@ -346,7 +353,7 @@ public final class Utils {
     /**
      * Join together path elements with File.separator. Filters out null
      * elements.
-     * 
+     *
      * @param elements The path elements to join
      * @return elements concatenated together with File.separator
      */
@@ -374,5 +381,41 @@ public final class Utils {
      */
     public static boolean isNullOrEmpty(final String str) {
         return str == null || str.length() == 0;
+    }
+
+    /**
+    * Return fallback if first string is null or empty
+    */
+    public static String defaultString(final String str, final String fallback) {
+        return isNullOrEmpty(str) ? fallback : str;
+    }
+
+
+    /**
+     * Check if a CharSequence is whitespace, empty ("") or null.
+     *
+     * <pre>
+     * StringUtils.isBlank(null)      = true
+     * StringUtils.isBlank("")        = true
+     * StringUtils.isBlank(" ")       = true
+     * StringUtils.isBlank("bob")     = false
+     * StringUtils.isBlank("  bob  ") = false
+     * </pre>
+     *
+     * @param cs
+     *            the CharSequence to check, may be null
+     * @return {@code true} if the CharSequence is null, empty or whitespace
+     */
+    public static boolean isBlank(final CharSequence cs) {
+        int strLen;
+        if (cs == null || (strLen = cs.length()) == 0) {
+            return true;
+        }
+        for (int i = 0; i < strLen; i++) {
+            if (Character.isWhitespace(cs.charAt(i)) == false) {
+                return false;
+            }
+        }
+        return true;
     }
 }

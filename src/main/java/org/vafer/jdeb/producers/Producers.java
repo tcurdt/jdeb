@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import java.io.InputStream;
 
 /**
  * Package-private utility class with common producers functionality.
- *
- * @author Roman Kashitsyn <roman.kashitsyn@gmail.com>
  */
 class Producers {
 
@@ -38,11 +36,11 @@ class Producers {
 
     /**
      * Creates a tar file entry with defaults parameters.
-     * @param entryName the entry name
+     * @param fileName the entry name
      * @return file entry with reasonable defaults
      */
-    static TarArchiveEntry defaultFileEntryWithName( final String entryName ) {
-        TarArchiveEntry entry = new TarArchiveEntry(entryName, true);
+    static TarArchiveEntry defaultFileEntryWithName( final String fileName ) {
+        TarArchiveEntry entry = new TarArchiveEntry(fileName, true);
         entry.setUserId(ROOT_UID);
         entry.setUserName(ROOT_NAME);
         entry.setGroupId(ROOT_UID);
@@ -69,21 +67,12 @@ class Producers {
     /**
      * Forwards tar archive entry entry to a consumer.
      * @param consumer the consumer
-     * @param entry the entry to pass
+     * @param dirEntry the entry to pass
      * @throws IOException
      */
     static void produceDirEntry( final DataConsumer consumer,
-                                 final TarArchiveEntry entry ) throws IOException {
-        consumer.onEachDir(
-                entry.getName(),
-                entry.getLinkName(),
-                entry.getUserName(),
-                entry.getUserId(),
-                entry.getGroupName(),
-                entry.getGroupId(),
-                entry.getMode(),
-                entry.getSize()
-        );
+                                 final TarArchiveEntry dirEntry ) throws IOException {
+        consumer.onEachDir(dirEntry);
     }
 
 
@@ -98,16 +87,7 @@ class Producers {
                                              final InputStream inputStream,
                                              final TarArchiveEntry entry ) throws IOException {
         try {
-            consumer.onEachFile(inputStream,
-                    entry.getName(),
-                    entry.getLinkName(),
-                    entry.getUserName(),
-                    entry.getUserId(),
-                    entry.getGroupName(),
-                    entry.getGroupId(),
-                    entry.getMode(),
-                    entry.getSize()
-            );
+            consumer.onEachFile(inputStream, entry);
         } finally {
             IOUtils.closeQuietly(inputStream);
         }

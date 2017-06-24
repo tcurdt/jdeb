@@ -2,5 +2,15 @@ language: java
 jdk:
   - oraclejdk8
   - oraclejdk7
-  - openjdk7
-  - openjdk6
+
+before_install:
+  - sudo rm /etc/mavenrc # work around https://github.com/travis-ci/travis-ci/issues/1689
+  - cat /etc/hosts # work around openjdk bugs
+  - sudo hostname "$(hostname | cut -c1-63)"
+  - sed -e "s/^\\(127\\.0\\.0\\.1.*\\)/\\1 $(hostname | cut -c1-63)/" /etc/hosts | sudo tee /etc/hosts
+  - cat /etc/hosts
+  - pip install --user codecov
+
+after_success:
+  - mvn clean test jacoco:report coveralls:report
+  - codecov

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,19 +58,19 @@ public class DebMakerTestCase extends TestCase {
         DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data), null);
         maker.setControl(new File(getClass().getResource("deb/control").toURI()));
         maker.setDeb(deb);
-        
+
         BinaryPackageControlFile packageControlFile = maker.createDeb(Compression.GZIP);
-        
+
         assertTrue(packageControlFile.isValid());
 
         final Map<String, TarArchiveEntry> filesInDeb = new HashMap<String, TarArchiveEntry>();
-        
+
         ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
             public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
                 filesInDeb.put(entry.getName(), entry);
             }
         }, Compression.GZIP);
-        
+
         assertTrue("testfile wasn't found in the package", filesInDeb.containsKey("./test/testfile"));
         assertTrue("testfile2 wasn't found in the package", filesInDeb.containsKey("./test/testfile2"));
         assertTrue("testfile3 wasn't found in the package", filesInDeb.containsKey("./test/testfile3"));
@@ -86,39 +86,39 @@ public class DebMakerTestCase extends TestCase {
         if (deb.exists() && !deb.delete()) {
             fail("Couldn't delete " + deb);
         }
-        
+
         Collection<DataProducer> producers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
         Collection<DataProducer> conffileProducers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
         DebMaker maker = new DebMaker(new NullConsole(), producers, conffileProducers);
         maker.setDeb(deb);
         maker.setControl(new File("target/test-classes/org/vafer/jdeb/deb/control"));
-        
+
         maker.createDeb(Compression.NONE);
-        
+
         // now reopen the package and check the control files
         assertTrue("package not build", deb.exists());
-        
+
         boolean found = ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
             public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
                 assertFalse("directory found in the control archive", entry.isDirectory());
                 assertTrue("prefix", entry.getName().startsWith("./"));
-                
+
                 InformationInputStream infoStream = new InformationInputStream(new ByteArrayInputStream(content));
                 IOUtils.copy(infoStream, NullOutputStream.NULL_OUTPUT_STREAM);
-                
+
                 if (infoStream.isShell()) {
                     assertTrue("Permissions on " + entry.getName() + " should be 755", entry.getMode() == 0755);
                 } else {
                     assertTrue("Permissions on " + entry.getName() + " should be 644", entry.getMode() == 0644);
                 }
-                
+
                 assertTrue(entry.getName() + " doesn't have Unix line endings", infoStream.hasUnixLineEndings());
-                
+
                 assertEquals("user", "root", entry.getUserName());
                 assertEquals("group", "root", entry.getGroupName());
             }
         });
-        
+
         assertTrue("Control files not found in the package", found);
     }
 
@@ -127,33 +127,64 @@ public class DebMakerTestCase extends TestCase {
         if (deb.exists() && !deb.delete()) {
             fail("Couldn't delete " + deb);
         }
-        
+
         Map<String, String> variables = new HashMap<String, String>();
         variables.put("name", "jdeb");
         variables.put("version", "1.0");
-        
+
         Collection<DataProducer> producers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
         Collection<DataProducer> conffileProducers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
         DebMaker maker = new DebMaker(new NullConsole(), producers, conffileProducers);
         maker.setDeb(deb);
         maker.setControl(new File("target/test-classes/org/vafer/jdeb/deb/control"));
         maker.setResolver(new MapVariableResolver(variables));
-        
+
         maker.createDeb(Compression.NONE);
-        
+
         // now reopen the package and check the control files
         assertTrue("package not build", deb.exists());
-                
+
         boolean found = ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
             public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
                 if (entry.getName().contains("postinst") || entry.getName().contains("prerm")) {
-                    String body = new String(content, "ISO-8859-1");
+                    String body = new String(content, "UTF-8");
                     assertFalse("Variables not replaced in the control file " + entry.getName(), body.contains("[[name]] [[version]]"));
                     assertTrue("Expected variables not found in the control file " + entry.getName(), body.contains("jdeb 1.0"));
                 }
+                if (entry.getName().contains("control")) {
+                    String control = new String(content, "UTF-8");
+                    assertTrue("Depends missing" + entry.getName(), control.contains("Depends: some-package"));
+                }
             }
         });
-        
+
         assertTrue("Control files not found in the package", found);
+    }
+
+    public void testDependsIsOmittedWhenEmpty() throws Exception {
+        File deb = new File("target/test-classes/test-control.deb");
+        if (deb.exists() && !deb.delete()) {
+            fail("Couldn't delete " + deb);
+        }
+
+        Collection<DataProducer> producers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
+        Collection<DataProducer> conffileProducers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
+        DebMaker maker = new DebMaker(new NullConsole(), producers, conffileProducers);
+        maker.setDeb(deb);
+        maker.setControl(new File("target/test-classes/org/vafer/jdeb/deb/controlwithoutdepends"));
+
+        maker.createDeb(Compression.NONE);
+
+        // now reopen the package and check the control files
+        assertTrue("package not build", deb.exists());
+
+        boolean found = ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
+            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
+                if (entry.getName().contains("control")) {
+                    String control = new String(content, "ISO-8859-1");
+                    assertFalse("Depends should be omitted" + entry.getName(), control.contains("Depends:"));
+                }
+            }
+        });
     }
 }

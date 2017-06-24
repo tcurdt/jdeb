@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
- * Reads permissions and ownerships from a "ls -laR > mapping.txt" dump and
+ * Reads permissions and ownerships from a "ls -laR &gt; mapping.txt" dump and
  * maps entries accordingly.
- *
- * @author Torsten Curdt
  */
 public final class LsMapper implements Mapper {
 
@@ -215,22 +213,10 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
     }
 
     public TarArchiveEntry map( final TarArchiveEntry pEntry ) {
-
         final TarArchiveEntry entry = mapping.get(pEntry.getName());
-
         if (entry != null) {
-
-            final TarArchiveEntry newEntry = new TarArchiveEntry(entry.getName(), true);
-            newEntry.setUserId(entry.getUserId());
-            newEntry.setGroupId(entry.getGroupId());
-            newEntry.setUserName(entry.getUserName());
-            newEntry.setGroupName(entry.getGroupName());
-            newEntry.setMode(entry.getMode());
-            newEntry.setSize(entry.getSize());
-
-            return newEntry;
+            return entry;
         }
-
         return pEntry;
     }
 

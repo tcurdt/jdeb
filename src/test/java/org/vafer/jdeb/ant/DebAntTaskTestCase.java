@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,9 +40,6 @@ import org.vafer.jdeb.ArchiveVisitor;
 import org.vafer.jdeb.ArchiveWalker;
 import org.vafer.jdeb.Compression;
 
-/**
- * @author Emmanuel Bourg
- */
 public final class DebAntTaskTestCase extends TestCase {
 
     private Project project;
@@ -202,12 +199,12 @@ public final class DebAntTaskTestCase extends TestCase {
 
     public void testLink() throws Exception {
         project.executeTarget("link");
-        
+
         File deb = new File("target/test-classes/test.deb");
         assertTrue("package not build", deb.exists());
-        
+
         final AtomicBoolean linkFound = new AtomicBoolean(false);
-        
+
         ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
             public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
                 if (entry.isSymbolicLink()) {
@@ -218,7 +215,7 @@ public final class DebAntTaskTestCase extends TestCase {
                 assertEquals("group", "ebourg", entry.getGroupName());
             }
         }, Compression.GZIP);
-        
+
         assertTrue("Link not found", linkFound.get());
     }
 
@@ -252,8 +249,8 @@ public final class DebAntTaskTestCase extends TestCase {
         File deb = new File("target/test-classes/test.deb");
         assertTrue("package not build", deb.exists());
 
-        final AtomicBoolean found = new AtomicBoolean(false); 
-        
+        final AtomicBoolean found = new AtomicBoolean(false);
+
         ArArchiveInputStream in = new ArArchiveInputStream(new FileInputStream(deb));
         ArchiveWalker.walk(in, new ArchiveVisitor<ArArchiveEntry>() {
             public void visit(ArArchiveEntry entry, byte[] content) throws IOException {
@@ -269,7 +266,7 @@ public final class DebAntTaskTestCase extends TestCase {
                 }
             }
         });
-        
+
         assertTrue("bz2 file not found", found.get());
     }
 
@@ -279,28 +276,28 @@ public final class DebAntTaskTestCase extends TestCase {
         File deb = new File("target/test-classes/test.deb");
         assertTrue("package not build", deb.exists());
 
-        final AtomicBoolean found = new AtomicBoolean(false); 
-        
+        final AtomicBoolean found = new AtomicBoolean(false);
+
         ArArchiveInputStream in = new ArArchiveInputStream(new FileInputStream(deb));
         ArchiveWalker.walk(in, new ArchiveVisitor<ArArchiveEntry>() {
             public void visit(ArArchiveEntry entry, byte[] content) throws IOException {
                 if (entry.getName().equals("data.tar.xz")) {
                     found.set(true);
-                    
+
                     assertEquals("header 0", (byte) 0xFD, content[0]);
                     assertEquals("header 1", (byte) '7', content[1]);
                     assertEquals("header 2", (byte) 'z', content[2]);
                     assertEquals("header 3", (byte) 'X', content[3]);
                     assertEquals("header 4", (byte) 'Z', content[4]);
                     assertEquals("header 5", (byte) '\0', content[5]);
-                    
+
                     TarInputStream tar = new TarInputStream(new XZCompressorInputStream(new ByteArrayInputStream(content)));
                     while ((tar.getNextEntry()) != null) ;
                     tar.close();
                 }
             }
         });
-        
+
         assertTrue("xz file not found", found.get());
     }
 

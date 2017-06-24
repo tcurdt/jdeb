@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import junit.framework.TestCase;
+import org.bouncycastle.openpgp.PGPUtil;
 
 public final class PGPSignerTestCase extends TestCase {
 
@@ -41,7 +42,7 @@ public final class PGPSignerTestCase extends TestCase {
                 "\n" +
                 "TEST3\n" +
                 "-----BEGIN PGP SIGNATURE-----\n" +
-                "Version: BCPG v1.50\n" +
+                "Version: BCPG v1.53\n" +
                 "\n" +
                 "iEYEARECABAFAkax1rgJEHM9pIAuB02PAABIJgCghFmoCJCZ0CGiqgVLGGPd/Yh5\n" +
                 "FQQAnRVqvI2ij45JQSHYJBblZ0Vv2meN\n" +
@@ -52,7 +53,7 @@ public final class PGPSignerTestCase extends TestCase {
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-        PGPSigner signer = new PGPSigner(ring, "2E074D8F", "test");
+        PGPSigner signer = new PGPSigner(ring, "2E074D8F", "test", PGPUtil.SHA1);
         signer.clearSign(input, os);
 
         final byte[] output = fixCRLF(os.toByteArray());
@@ -60,8 +61,18 @@ public final class PGPSignerTestCase extends TestCase {
         final int until = expectedOutputStr.indexOf("=aAAT") + 5;
         Arrays.fill(output, from, until, (byte) '?');
         Arrays.fill(expectedOutput, from, until, (byte) '?');
-        
+
         assertEquals(new String(expectedOutput), new String(output));
+    }
+
+    public void testKeyLoading() throws Exception {
+        InputStream ring = getClass().getClassLoader().getResourceAsStream("org/vafer/gpg/secring.gpg");
+        PGPSigner signer = new PGPSigner(ring, "2E074D8F", "test", PGPUtil.SHA1);
+        assertEquals("correct key found", "733da4802e074d8f", String.format("%016x", signer.getSecretKey().getKeyID()));
+
+        ring.reset();
+        signer = new PGPSigner(ring, "0C1FF47A", "test", PGPUtil.SHA1);
+        assertEquals("key with leading 0 found", "21970bb80c1ff47a", String.format("%016x", signer.getSecretKey().getKeyID()));
     }
 
     private byte[] fixCRLF(byte[] b) {

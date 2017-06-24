@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,6 @@ import java.util.Map;
  * Resolve variables based on a Map.
  *
  * ATTENTION: don't use outside of jdeb
- *
- * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class MapVariableResolver implements VariableResolver {
 

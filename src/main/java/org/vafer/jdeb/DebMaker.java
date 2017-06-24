@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,29 @@
  */
 
 package org.vafer.jdeb;
+
+import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
+import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.bouncycastle.bcpg.HashAlgorithmTags;
+import org.bouncycastle.crypto.digests.MD5Digest;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openpgp.PGPSignature;
+import org.bouncycastle.openpgp.PGPSignatureGenerator;
+import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
+import org.bouncycastle.util.encoders.Hex;
+import org.vafer.jdeb.changes.ChangeSet;
+import org.vafer.jdeb.changes.ChangesProvider;
+import org.vafer.jdeb.changes.TextfileChangesProvider;
+import org.vafer.jdeb.debian.BinaryPackageControlFile;
+import org.vafer.jdeb.debian.ChangesFile;
+import org.vafer.jdeb.signing.PGPSigner;
+import org.vafer.jdeb.utils.PGPSignatureOutputStream;
+import org.vafer.jdeb.utils.Utils;
+import org.vafer.jdeb.utils.VariableResolver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -33,33 +56,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
-import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.bouncycastle.crypto.digests.MD5Digest;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openpgp.PGPSignature;
-import org.bouncycastle.openpgp.PGPSignatureGenerator;
-import org.bouncycastle.openpgp.PGPUtil;
-import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
-import org.bouncycastle.util.encoders.Hex;
-import org.vafer.jdeb.changes.ChangeSet;
-import org.vafer.jdeb.changes.ChangesProvider;
-import org.vafer.jdeb.changes.TextfileChangesProvider;
-import org.vafer.jdeb.debian.BinaryPackageControlFile;
-import org.vafer.jdeb.debian.ChangesFile;
-import org.vafer.jdeb.signing.PGPSigner;
-import org.vafer.jdeb.utils.PGPSignatureOutputStream;
-import org.vafer.jdeb.utils.Utils;
-import org.vafer.jdeb.utils.VariableResolver;
-
 /**
  * A generic class for creating Debian archives. Even supports signed changes
  * files.
- *
- * @author Torsten Curdt
- * @author Bryan Sant
  */
 public class DebMaker {
 
@@ -78,8 +77,8 @@ public class DebMaker {
     /** The section of the package. Default value if not specified in the control file */
     private String section = "java";
 
-    /** The dependencies of the package. Default value if not specified in the control file */
-    private String depends = "default-jre | java6-runtime";
+    /** The dependencies of the package. */
+    private String depends;
 
     /** The description of the package. Default value if not specified in the control file */
     private String description;
@@ -111,11 +110,20 @@ public class DebMaker {
     /** Whether to sign the package that is created */
     private boolean signPackage;
 
+    /** Whether to sign the changes file that is created */
+    private boolean signChanges;
+
     /** Defines which utility is used to verify the signed package */
     private String signMethod;
 
     /** Defines the role to sign with */
     private String signRole;
+
+    /** Defines the longFileMode of the tar file that is built */
+    private String tarLongFileMode;
+
+    /** Defines the bigNumberMode of the tar file that is built */
+    private String tarBigNumberMode;
 
     private VariableResolver variableResolver;
     private String openReplaceToken;
@@ -124,7 +132,7 @@ public class DebMaker {
     private final Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
 
     private final Collection<DataProducer> conffilesProducers = new ArrayList<DataProducer>();
-
+    private String digest = "SHA1";
 
     public DebMaker(Console console, Collection<DataProducer> dataProducers, Collection<DataProducer> conffileProducers) {
         this.console = console;
@@ -182,6 +190,10 @@ public class DebMaker {
         this.signPackage = signPackage;
     }
 
+    public void setSignChanges(boolean signChanges) {
+        this.signChanges = signChanges;
+    }
+
     public void setSignMethod(String signMethod) {
         this.signMethod = signMethod;
     }
@@ -214,12 +226,28 @@ public class DebMaker {
         return !file.exists() || file.isFile() && file.canWrite();
     }
 
+    public String getDigest() {
+        return digest;
+    }
+
+    public void setDigest(String digest) {
+        this.digest = digest;
+    }
+
+    public void setTarLongFileMode(String tarLongFileMode) {
+        this.tarLongFileMode = tarLongFileMode;
+    }
+
+    public void setTarBigNumberMode(String tarBigNumberMode) {
+        this.tarBigNumberMode = tarBigNumberMode;
+    }
+
     /**
      * Validates the input parameters.
      */
     public void validate() throws PackagingException {
         if (control == null || !control.isDirectory()) {
-            throw new PackagingException("The 'control' attribute doesn't point to a directory.");
+            throw new PackagingException("The 'control' attribute doesn't point to a directory. " + control);
         }
 
         if (changesIn != null) {
@@ -248,6 +276,30 @@ public class DebMaker {
 
         if (deb == null) {
             throw new PackagingException("You need to specify where the deb file is supposed to be created.");
+        }
+
+        getDigestCode(digest);
+    }
+
+    static int getDigestCode(String digestName) throws PackagingException {
+        if ("SHA1".equals(digestName)) {
+            return HashAlgorithmTags.SHA1;
+        } else if ("MD2".equals(digestName)) {
+            return HashAlgorithmTags.MD2;
+        } else if ("MD5".equals(digestName)) {
+            return HashAlgorithmTags.MD5;
+        } else if ("RIPEMD160".equals(digestName)) {
+            return HashAlgorithmTags.RIPEMD160;
+        } else if ("SHA256".equals(digestName)) {
+            return HashAlgorithmTags.SHA256;
+        } else if ("SHA384".equals(digestName)) {
+            return HashAlgorithmTags.SHA384;
+        } else if ("SHA512".equals(digestName)) {
+            return HashAlgorithmTags.SHA512;
+        } else if ("SHA224".equals(digestName)) {
+            return HashAlgorithmTags.SHA224;
+        } else {
+            throw new PackagingException("unknown hash algorithm tag in digestName: " + digestName);
         }
     }
 
@@ -279,14 +331,12 @@ public class DebMaker {
                 FileInputStream keyRingInput = new FileInputStream(keyring);
                 PGPSigner signer = null;
                 try {
-                    signer = new PGPSigner(new FileInputStream(keyring), key, passphrase);
+                    signer = new PGPSigner(new FileInputStream(keyring), key, passphrase, getDigestCode(digest));
                 } finally {
                     keyRingInput.close();
                 }
 
-                int digest = PGPUtil.SHA1;
-
-                PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(signer.getSecretKey().getPublicKey().getAlgorithm(), digest));
+                PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(signer.getSecretKey().getPublicKey().getAlgorithm(), getDigestCode(digest)));
                 signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, signer.getPrivateKey());
 
                 packageControlFile = createSignedDeb(Compression.toEnum(compression), signatureGenerator, signer);
@@ -303,7 +353,7 @@ public class DebMaker {
 
     private void makeChangesFiles(final BinaryPackageControlFile packageControlFile) throws PackagingException {
         if (changesOut == null) {
-            changesOut = new File(deb.getParentFile(), deb.getName().replace(".deb", ".changes"));
+            changesOut = new File(deb.getParentFile(), FilenameUtils.getBaseName(deb.getName()) + ".changes");
         }
 
         ChangesProvider changesProvider;
@@ -320,7 +370,6 @@ public class DebMaker {
             } else {
                 // create an empty changelog
                 changesProvider = new ChangesProvider() {
-                    @Override
                     public ChangeSet[] getChangesSets() {
                         return new ChangeSet[] {
                                 new ChangeSet(packageControlFile.get("Package"),
@@ -338,9 +387,10 @@ public class DebMaker {
             ChangesFileBuilder builder = new ChangesFileBuilder();
             ChangesFile changesFile = builder.createChanges(packageControlFile, deb, changesProvider);
 
-            if (keyring != null && key != null && passphrase != null) {
+            //(signChanges || signPackage) - for backward compatibility. signPackage is signing both changes and deb.
+            if ((signChanges || signPackage) && keyring != null && key != null && passphrase != null) {
                 console.info("Signing the changes file with the key " + key);
-                PGPSigner signer = new PGPSigner(new FileInputStream(keyring), key, passphrase);
+                PGPSigner signer = new PGPSigner(new FileInputStream(keyring), key, passphrase, getDigestCode(digest));
                 signer.clearSign(changesFile.toString(), out);
             } else {
                 out.write(changesFile.toString().getBytes("UTF-8"));
@@ -375,12 +425,8 @@ public class DebMaker {
         }
 
         final DataConsumer receiver = new DataConsumer() {
-            public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
-                //
-            }
-
-            public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
-                String tempConffileItem = filename;
+            public void onEachFile(InputStream input, TarArchiveEntry entry)  {
+                String tempConffileItem = entry.getName();
                 if (tempConffileItem.startsWith(".")) {
                     tempConffileItem = tempConffileItem.substring(1);
                 }
@@ -388,8 +434,10 @@ public class DebMaker {
                 result.add(tempConffileItem);
             }
 
-            public void onEachLink(String path, String linkname, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
-                //
+            public void onEachLink(TarArchiveEntry entry)  {
+            }
+
+            public void onEachDir(TarArchiveEntry tarArchiveEntry)  {
             }
         };
 
@@ -407,9 +455,6 @@ public class DebMaker {
     /**
      * Create the debian archive with from the provided control files and data producers.
      *
-     * @param pControlFiles
-     * @param pData
-     * @param deb
      * @param compression   the compression method used for the data file
      * @return BinaryPackageControlFile
      * @throws PackagingException
@@ -437,7 +482,11 @@ public class DebMaker {
             console.debug("Building data");
             DataBuilder dataBuilder = new DataBuilder(console);
             StringBuilder md5s = new StringBuilder();
-            BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, compression);
+            TarOptions options = new TarOptions()
+                .compression(compression)
+                .longFileMode(tarLongFileMode)
+                .bigNumberMode(tarBigNumberMode);
+            BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, options);
 
             console.info("Building conffiles");
             List<String> tempConffiles = populateConffiles(conffilesProducers);
@@ -447,9 +496,6 @@ public class DebMaker {
             BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size);
             if (packageControlFile.get("Package") == null) {
                 packageControlFile.set("Package", packageName);
-            }
-            if (packageControlFile.get("Depends") == null) {
-                packageControlFile.set("Depends", depends);
             }
             if (packageControlFile.get("Section") == null) {
                 packageControlFile.set("Section", section);
@@ -597,7 +643,7 @@ public class DebMaker {
         try
         {
             //prepare the input
-            MessageDigest hash = MessageDigest.getInstance("SHA1");
+            MessageDigest hash = MessageDigest.getInstance(digest);
             hash.update(input);
 
             //proceed ....

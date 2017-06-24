@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,17 +74,23 @@ public class DataProducerPathTemplateTestCase extends TestCase {
             invocations = new ArrayList<Invocation>();
         }
 
-        @Override
-        public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
-            invocations.add(new Invocation(dirname, linkname, user, uid, group, gid, mode, size));
+        public void onEachDir(TarArchiveEntry dirEntry) throws IOException {
+            invocations.add(new Invocation(
+                dirEntry.getName(),
+                dirEntry.getLinkName(),
+                dirEntry.getUserName(),
+                dirEntry.getLongUserId(),
+                dirEntry.getGroupName(),
+                dirEntry.getLongGroupId(),
+                dirEntry.getMode(),
+                dirEntry.getSize()
+            ));
         }
 
-        @Override
-        public void onEachFile( InputStream input, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+        public void onEachFile(InputStream input, TarArchiveEntry entry) throws IOException {
         }
 
-        @Override
-        public void onEachLink(String path, String linkName, boolean symlink, String user, int uid, String group, int gid, int mode) throws IOException {
+        public void onEachLink(TarArchiveEntry entry) throws IOException {
         }
 
         private class Invocation {
@@ -92,13 +98,13 @@ public class DataProducerPathTemplateTestCase extends TestCase {
             private String dirname;
             private String linkname;
             private String user;
-            private int uid;
+            private long uid;
             private String group;
-            private int gid;
+            private long gid;
             private int mode;
             private long size;
 
-            private Invocation( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
+            private Invocation( String dirname, String linkname, String user, long uid, String group, long gid, int mode, long size ) throws IOException {
                 this.dirname = dirname;
                 this.linkname = linkname;
                 this.user = user;

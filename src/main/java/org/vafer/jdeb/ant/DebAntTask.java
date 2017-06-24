@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,6 @@ import org.vafer.jdeb.producers.DataProducerFileSet;
 
 /**
  * AntTask for creating debian archives.
- *
- * @author Torsten Curdt
  */
 public class DebAntTask extends MatchingTask {
 
@@ -65,6 +63,13 @@ public class DebAntTask extends MatchingTask {
 
     /** The compression method used for the data file (none, gzip, bzip2 or xz) */
     private String compression = "gzip";
+
+    /**
+     * The digest algorithm to use.
+     *
+     * @see org.bouncycastle.bcpg.HashAlgorithmTags
+     */
+    private String digest = "SHA1";
 
     /** Trigger the verbose mode detailing all operations */
     private boolean verbose;
@@ -131,12 +136,16 @@ public class DebAntTask extends MatchingTask {
         links.add(link);
     }
 
+    public void setDigest(String digest) {
+        this.digest = digest;
+    }
+
     public void execute() {
         // add the data producers for the links
         for (Link link : links) {
             dataProducers.add(link.toDataProducer());
         }
-        
+
         // validate the type of the <data> elements
         for (DataProducer dataProducer : dataProducers) {
             if (dataProducer instanceof Data) {
@@ -151,9 +160,9 @@ public class DebAntTask extends MatchingTask {
                 }
             }
         }
-        
+
         Console console = new TaskConsole(this, verbose);
-        
+
         DebMaker debMaker = new DebMaker(console, dataProducers, conffilesProducers);
         debMaker.setDeb(deb);
         debMaker.setControl(control);
@@ -164,11 +173,12 @@ public class DebAntTask extends MatchingTask {
         debMaker.setKey(key);
         debMaker.setPassphrase(passphrase);
         debMaker.setCompression(compression);
-        
+        debMaker.setDigest(digest);
+
         try {
             debMaker.validate();
             debMaker.makeDeb();
-            
+
         } catch (PackagingException e) {
             log("Failed to create the Debian package " + deb, e, Project.MSG_ERR);
             throw new BuildException("Failed to create the Debian package " + deb, e);

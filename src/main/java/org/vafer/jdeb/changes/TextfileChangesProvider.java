@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,23 +36,22 @@ import org.vafer.jdeb.debian.BinaryPackageControlFile;
  * Gets the changes from a changes file. The first entry are the current changes.
  * The release line will be added. Example:
  *
- * release date=22:13 19.08.2007,version=1.5+r90114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
+ * release date=22:13 19.08.2007,version=1.5+r90114,urgency=low,by=Torsten Curdt &lt;torsten@vafer.org&gt;
  *   * debian changes support
- * release date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
+ * release date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt &lt;torsten@vafer.org&gt;
  *   * debian changes support
  *
- * @author Torsten Curdt
  */
 public final class TextfileChangesProvider implements ChangesProvider {
 
     private final ChangeSet[] changeSets;
-    
+
     private DateFormat fmt = new SimpleDateFormat("HH:mm dd.MM.yyyy");
 
     public TextfileChangesProvider( final InputStream pInput, final BinaryPackageControlFile packageControlFile ) throws IOException, ParseException {
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
-        
+
         String packageName = packageControlFile.get("Package");
         String version = packageControlFile.get("Version");
         Date date = new Date();

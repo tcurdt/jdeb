@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@ import org.vafer.jdeb.utils.Utils;
 
 /**
  * Applies a uniform set of permissions and ownership to all entries.
- *
- * @author Bryan Sant
  */
 public final class PermMapper implements Mapper {
 
@@ -59,49 +57,33 @@ public final class PermMapper implements Mapper {
 
     public TarArchiveEntry map( final TarArchiveEntry entry ) {
         final String name = entry.getName();
-
-        final TarArchiveEntry newEntry = new TarArchiveEntry(prefix + '/' + Utils.stripPath(strip, name), true);
+        entry.setName(prefix + '/' + Utils.stripPath(strip, name));
 
         // Set ownership
         if (uid > -1) {
-            newEntry.setUserId(uid);
-        } else {
-            newEntry.setUserId(entry.getUserId());
+            entry.setUserId(uid);
         }
         if (gid > -1) {
-            newEntry.setGroupId(gid);
-        } else {
-            newEntry.setGroupId(entry.getGroupId());
+            entry.setGroupId(gid);
         }
         if (user != null) {
-            newEntry.setUserName(user);
-        } else {
-            newEntry.setUserName(entry.getUserName());
+            entry.setUserName(user);
         }
         if (group != null) {
-            newEntry.setGroupName(group);
-        } else {
-            newEntry.setGroupName(entry.getGroupName());
+            entry.setGroupName(group);
         }
 
         // Set permissions
-        if (newEntry.isDirectory()) {
+        if (entry.isDirectory()) {
             if (dirMode > -1) {
-                newEntry.setMode(dirMode);
-            } else {
-                newEntry.setMode(entry.getMode());
+                entry.setMode(dirMode);
             }
         } else {
             if (fileMode > -1) {
-                newEntry.setMode(fileMode);
-            } else {
-                newEntry.setMode(entry.getMode());
-
+                entry.setMode(fileMode);
             }
         }
 
-        newEntry.setSize(entry.getSize());
-
-        return newEntry;
+        return entry;
     }
 }

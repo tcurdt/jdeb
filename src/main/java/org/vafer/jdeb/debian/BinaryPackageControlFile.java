@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import java.text.ParseException;
  * Binary package control file.
  *
  * @see <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html#s-binarycontrolfiles">Debian Policy Manual - Binary package control files</a>
- * @author Torsten Curdt
  */
 public final class BinaryPackageControlFile extends ControlFile {
 
@@ -48,7 +47,8 @@ public final class BinaryPackageControlFile extends ControlFile {
             new ControlField("Installed-Size"),
             new ControlField("Maintainer", true),
             new ControlField("Description", true, ControlField.Type.MULTILINE),
-            new ControlField("Homepage")
+            new ControlField("Homepage"),
+            new ControlField("Multi-Arch")
     };
 
     public BinaryPackageControlFile() {
@@ -64,12 +64,10 @@ public final class BinaryPackageControlFile extends ControlFile {
         parse(input);
     }
 
-    @Override
     public void set(final String field, final String value) {
         super.set(field, value);
     }
 
-    @Override
     protected ControlField[] getFields() {
         return FIELDS;
     }
@@ -88,7 +86,6 @@ public final class BinaryPackageControlFile extends ControlFile {
         return get("Description").split("\n")[0];
     }
 
-    @Override
     protected char getUserDefinedFieldLetter() {
         return 'B';
     }

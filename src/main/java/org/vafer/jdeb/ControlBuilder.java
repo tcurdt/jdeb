@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ import org.vafer.jdeb.utils.VariableResolver;
  * Builds the control archive of the Debian package.
  */
 class ControlBuilder {
-    
+
     /** The name of the package maintainer scripts */
     private static final Set<String> MAINTAINER_SCRIPTS = new HashSet<String>(Arrays.asList("preinst", "postinst", "prerm", "postrm", "config"));
 
@@ -87,9 +87,9 @@ class ControlBuilder {
 
         final TarArchiveOutputStream outputStream = new TarArchiveOutputStream(new GZIPOutputStream(new FileOutputStream(output)));
         outputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
-        
+
         boolean foundConffiles = false;
-        
+
         // create the final package control file out of the "control" file, copy all other files, ignore the directories
         for (File file : controlFiles) {
             if (file.isDirectory()) {
@@ -103,7 +103,7 @@ class ControlBuilder {
             if ("conffiles".equals(file.getName())) {
                 foundConffiles = true;
             }
-            
+
             if (CONFIGURATION_FILENAMES.contains(file.getName()) || MAINTAINER_SCRIPTS.contains(file.getName())) {
                 FilteredFile configurationFile = new FilteredFile(new FileInputStream(file), resolver);
                 configurationFile.setOpenToken(openReplaceToken);
@@ -122,36 +122,34 @@ class ControlBuilder {
                     byte[] buf = Utils.toUnixLineEndings(in);
                     in = new ByteArrayInputStream(buf);
                 }
-                
+
                 addControlEntry(file.getName(), IOUtils.toString(in), outputStream);
-                
+
                 in.close();
             }
         }
-        
-        if ((conffiles != null) && (conffiles.size() > 0)) {
-            if (foundConffiles) {
-                console.info("Found file 'conffiles' in the control directory. Skipping conffiles generation.");
-            } else {
-                addControlEntry("conffiles", createPackageConffilesFile(conffiles), outputStream);
-            }
-        } else if ((conffiles != null) && (conffiles.size() == 0)) {
-            console.info("Skipping 'conffiles' generation. No entries provided.");
+
+        if (foundConffiles) {
+            console.info("Found file 'conffiles' in the control directory. Skipping conffiles generation.");
+        } else if ((conffiles != null) && (conffiles.size() > 0)) {
+            addControlEntry("conffiles", createPackageConffilesFile(conffiles), outputStream);
+        } else {
+            console.info("Skipping 'conffiles' generation. No entries defined in maven/pom or ant/build.xml.");
         }
 
         if (packageControlFile == null) {
             throw new FileNotFoundException("No 'control' file found in " + controlFiles.toString());
         }
-        
+
         addControlEntry("control", packageControlFile.toString(), outputStream);
         addControlEntry("md5sums", checksums.toString(), outputStream);
 
         outputStream.close();
     }
-    
+
     private String createPackageConffilesFile(final List<String> conffiles) {
         StringBuilder content = new StringBuilder();
-        
+
         if (conffiles != null && !conffiles.isEmpty()) {
             for (String nextFileName : conffiles) {
                 content.append(nextFileName).append("\n");
@@ -160,22 +158,22 @@ class ControlBuilder {
 
         return content.toString();
     }
-    
-    
+
+
     /**
      * Creates a package control file from the specified file and adds the
      * <tt>Date</tt>, <tt>Distribution</tt> and <tt>Urgency</tt> fields if missing.
      * The <tt>Installed-Size</tt> field is also initialized to the actual size of
      * the package. The <tt>Maintainer</tt> field is overridden by the <tt>DEBEMAIL</tt>
      * and <tt>DEBFULLNAME</tt> environment variables if defined.
-     * 
+     *
      * @param file       the control file
      * @param pDataSize  the size of the installed package
      */
     public BinaryPackageControlFile createPackageControlFile(File file, BigInteger pDataSize) throws IOException, ParseException {
         FilteredFile controlFile = new FilteredFile(new FileInputStream(file), resolver);
         BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile(controlFile.toString());
-        
+
         if (packageControlFile.get("Distribution") == null) {
             packageControlFile.set("Distribution", "unknown");
         }
@@ -203,7 +201,7 @@ class ControlBuilder {
             packageControlFile.set("Maintainer", maintainer);
             console.debug("Using maintainer '" + maintainer + "' from the environment variables.");
         }
-        
+
         return packageControlFile;
     }
 
@@ -214,21 +212,21 @@ class ControlBuilder {
         final TarArchiveEntry entry = new TarArchiveEntry("./" + pName, true);
         entry.setSize(data.length);
         entry.setNames("root", "root");
-        
+
         if (MAINTAINER_SCRIPTS.contains(pName)) {
             entry.setMode(PermMapper.toMode("755"));
         } else {
             entry.setMode(PermMapper.toMode("644"));
         }
-        
+
         pOutput.putArchiveEntry(entry);
         pOutput.write(data);
         pOutput.closeArchiveEntry();
     }
-    
+
     /**
      * Tells if the specified directory is ignored by default (.svn, cvs, etc)
-     * 
+     *
      * @param directory
      */
     private boolean isDefaultExcludes(File directory) {
@@ -237,7 +235,7 @@ class ControlBuilder {
                 return true;
             }
         }
-        
+
         return false;
     }
 }

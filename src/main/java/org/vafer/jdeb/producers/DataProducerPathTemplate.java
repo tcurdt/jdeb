@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.vafer.jdeb.producers;
 
 import java.io.IOException;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The jdeb developers.
+ * Copyright 2016 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,6 @@ import java.io.IOException;
 
 /**
  * Base Producer class providing including/excluding.
- *
- * @author Torsten Curdt
  */
 public abstract class AbstractDataProducer implements DataProducer {
 
@@ -73,8 +71,8 @@ public abstract class AbstractDataProducer implements DataProducer {
     }
 
     public void produceDir( final DataConsumer consumer,
-                            final String dirname ) throws IOException {
-        TarArchiveEntry entry = Producers.defaultDirEntryWithName(dirname);
+                            final String dirName ) throws IOException {
+        TarArchiveEntry entry = Producers.defaultDirEntryWithName(dirName);
         entry = map(entry);
         entry.setSize(0);
         Producers.produceDirEntry(consumer, entry);
@@ -82,11 +80,11 @@ public abstract class AbstractDataProducer implements DataProducer {
 
     public void produceFile( final DataConsumer consumer,
                              final File file,
-                             final String entryName ) throws IOException {
-        TarArchiveEntry entry = Producers.defaultFileEntryWithName(entryName);
-        entry.setSize(file.length());
-        entry = map(entry);
-        Producers.produceInputStreamWithEntry(consumer, new FileInputStream(file), entry);
+                             final String fileName ) throws IOException {
+        TarArchiveEntry fileEntry = Producers.defaultFileEntryWithName(fileName);
+        fileEntry.setSize(file.length());
+        fileEntry = map(fileEntry);
+        Producers.produceInputStreamWithEntry(consumer, new FileInputStream(file), fileEntry);
     }
 
     public TarArchiveEntry map( final TarArchiveEntry pEntry ) {
