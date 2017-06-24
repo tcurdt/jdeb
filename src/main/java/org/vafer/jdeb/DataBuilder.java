@@ -112,7 +112,7 @@ class DataBuilder {
                 // Check group name
                 checkField(dirEntry.getUserName(), TarConstants.GNAMELEN);
 
-                dirEntry.setName(fixPath(dirEntry.getName()));
+                dirEntry.setName(fixPathTar(dirEntry.getName()));
 
                 createParentDirectories(dirEntry.getName(), dirEntry.getUserName(), dirEntry.getLongUserId(), dirEntry.getGroupName(), dirEntry.getLongGroupId());
 
@@ -132,7 +132,10 @@ class DataBuilder {
                 // Check group name
                 checkField(fileEntry.getGroupName(), TarConstants.GNAMELEN);
 
-                fileEntry.setName(fixPath(fileEntry.getName()));
+                // For md5sum
+                String rawFileEntryName = fileEntry.getName();
+
+                fileEntry.setName(fixPathTar(fileEntry.getName()));
 
                 createParentDirectories(fileEntry.getName(), fileEntry.getUserName(), fileEntry.getLongUserId(), fileEntry.getGroupName(), fileEntry.getLongGroupId());
 
@@ -161,7 +164,7 @@ class DataBuilder {
                 );
 
                 // append to file md5 list, two spaces to be compatible with GNU coreutils md5sum
-                checksums.append(md5).append("  ").append(fileEntry.getName()).append('\n');
+                checksums.append(md5).append("  ").append(fixPathMd5(rawFileEntryName)).append('\n');
             }
 
             public void onEachLink(TarArchiveEntry entry) throws IOException {
@@ -172,7 +175,7 @@ class DataBuilder {
                 // Check group name
                 checkField(entry.getGroupName(), TarConstants.GNAMELEN);
 
-                entry.setName(fixPath(entry.getName()));
+                entry.setName(fixPathTar(entry.getName()));
 
                 createParentDirectories(entry.getName(), entry.getUserName(), entry.getLongUserId(), entry.getGroupName(), entry.getLongGroupId());
 
@@ -216,7 +219,7 @@ class DataBuilder {
             }
 
             private void createParentDirectories( String filename, String user, long uid, String group, long gid ) throws IOException {
-                String dirname = fixPath(new File(filename).getParent());
+                String dirname = fixPathTar(new File(filename).getParent());
 
                 // Debian packages must have parent directories created
                 // before sub-directories or files can be installed.
@@ -270,7 +273,7 @@ class DataBuilder {
         return dataSize.count;
     }
 
-    private String fixPath( String path ) {
+    private String fixPathBase( String path ) {
         if (path == null || path.equals(".")) {
             return path;
         }
@@ -281,11 +284,37 @@ class DataBuilder {
         if (path.contains("\\")) {
             path = path.replace('\\', '/');
         }
+        return path;
+    }
+
+    private String fixPathTar( String path ) {
+        if (path == null || path.equals(".")) {
+            return path;
+        }
+
+        path = fixPathBase(path)
+
         // ensure the path is like : ./foo/bar
         if (path.startsWith("/")) {
             path = "." + path;
         } else if (!path.startsWith("./")) {
             path = "./" + path;
+        }
+        return path;
+    }
+
+    private String fixPathMd5( String path ) {
+        if (path == null || path.equals(".")) {
+            return path;
+        }
+
+        path = fixPathBase(path)
+
+        // ensure the path is like : foo/bar
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        } else if (path.startsWith("./")) {
+            path = path.substring(2);
         }
         return path;
     }
