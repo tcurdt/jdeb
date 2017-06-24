@@ -292,7 +292,7 @@ class DataBuilder {
             return path;
         }
 
-        path = fixPathBase(path)
+        path = fixPathBase(path);
 
         // ensure the path is like : ./foo/bar
         if (path.startsWith("/")) {
@@ -308,7 +308,7 @@ class DataBuilder {
             return path;
         }
 
-        path = fixPathBase(path)
+        path = fixPathBase(path);
 
         // ensure the path is like : foo/bar
         if (path.startsWith("/")) {
