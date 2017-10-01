@@ -17,12 +17,13 @@ package org.vafer.jdeb.mapping;
 
 import java.io.ByteArrayInputStream;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Assert;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.mapping.LsMapper.ParseError;
 
-public final class LsMapperTestCase extends TestCase {
+public final class LsMapperTestCase extends Assert {
 
     private final static String output =
         "total 0\n" +
@@ -46,6 +47,7 @@ public final class LsMapperTestCase extends TestCase {
             "drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes\n" +
             "\n";
 
+    @Test
     public void testModes() throws Exception {
         final ByteArrayInputStream is = new ByteArrayInputStream(output.getBytes("UTF-8"));
 
@@ -64,6 +66,7 @@ public final class LsMapperTestCase extends TestCase {
         assertEquals("tcurdt", entry2.getGroupName());
     }
 
+    @Test
     public void testSuccessfulParsing() throws Exception {
         final ByteArrayInputStream is = new ByteArrayInputStream(output.getBytes("UTF-8"));
 
@@ -79,6 +82,7 @@ public final class LsMapperTestCase extends TestCase {
 
     }
 
+    @Test
     public void testPrematureEOF() throws Exception {
         final ByteArrayInputStream is = new ByteArrayInputStream(output.substring(0, 200).getBytes("UTF-8"));
 
@@ -89,6 +93,7 @@ public final class LsMapperTestCase extends TestCase {
         }
     }
 
+    @Test
     public void testWrongFormat() throws Exception {
         final ByteArrayInputStream is = new ByteArrayInputStream("asas\n".getBytes("UTF-8"));
 

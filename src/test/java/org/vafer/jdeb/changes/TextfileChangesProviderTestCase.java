@@ -17,11 +17,14 @@ package org.vafer.jdeb.changes;
 
 import java.io.ByteArrayInputStream;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Assert;
+
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 
-public final class TextfileChangesProviderTestCase extends TestCase {
+public final class TextfileChangesProviderTestCase extends Assert {
 
+    @Test
     public void testParsing() throws Exception {
 
         final String input =
@@ -47,6 +50,7 @@ public final class TextfileChangesProviderTestCase extends TestCase {
         assertEquals(3, changeSets.length);
     }
 
+    @Test
     public void testDistributionFromChangesProvider() throws Exception {
 
         final String input =

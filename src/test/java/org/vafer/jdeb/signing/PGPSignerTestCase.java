@@ -20,11 +20,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Assert;
+
 import org.bouncycastle.openpgp.PGPUtil;
 
-public final class PGPSignerTestCase extends TestCase {
+public final class PGPSignerTestCase extends Assert {
 
+    @Test
     public void testClearSign() throws Exception {
 
         final InputStream ring = getClass().getClassLoader().getResourceAsStream("org/vafer/gpg/secring.gpg");
@@ -65,6 +68,7 @@ public final class PGPSignerTestCase extends TestCase {
         assertEquals(new String(expectedOutput), new String(output));
     }
 
+    @Test
     public void testKeyLoading() throws Exception {
         InputStream ring = getClass().getClassLoader().getResourceAsStream("org/vafer/gpg/secring.gpg");
         PGPSigner signer = new PGPSigner(ring, "2E074D8F", "test", PGPUtil.SHA1);

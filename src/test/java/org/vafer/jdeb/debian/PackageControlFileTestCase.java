@@ -19,10 +19,12 @@ package org.vafer.jdeb.debian;
 import java.io.FileInputStream;
 import java.text.ParseException;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Assert;
 
-public final class PackageControlFileTestCase extends TestCase {
+public final class PackageControlFileTestCase extends Assert {
 
+    @Test
     public void testParse() throws Exception {
         String input =
                 "Key1: Value1\n" +
@@ -39,6 +41,7 @@ public final class PackageControlFileTestCase extends TestCase {
         assertEquals("key 3", "Value3", d.get("Key3"));
     }
 
+    @Test
     public void testComments() throws Exception {
         String input =
                 "Key1: Value1\n" +
@@ -64,6 +67,7 @@ public final class PackageControlFileTestCase extends TestCase {
         assertEquals("key 5", null, d.get("Key5"));
     }
 
+    @Test
     public void testToString() throws Exception {
         BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile();
         packageControlFile.set("Package", "test-package");
@@ -78,6 +82,7 @@ public final class PackageControlFileTestCase extends TestCase {
         assertEquals("Version 3", packageControlFile.get("Version"), packageControlFile2.get("Version"));
     }
 
+    @Test
     public void testEmptyLines() throws Exception {
         String input =
                 "Key1: Value1\n" +
@@ -90,6 +95,7 @@ public final class PackageControlFileTestCase extends TestCase {
         }
     }
 
+    @Test
     public void testGetShortDescription() {
         BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile();
 
@@ -104,6 +110,7 @@ public final class PackageControlFileTestCase extends TestCase {
         assertEquals("short description", "", packageControlFile.getShortDescription());
     }
 
+    @Test
     public void testGetDescription() throws Exception {
         BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile();
         packageControlFile.parse(new FileInputStream("target/test-classes/org/vafer/jdeb/deb/control/control"));
@@ -114,6 +121,7 @@ public final class PackageControlFileTestCase extends TestCase {
                 packageControlFile.get("Description"));
     }
 
+    @Test
     public void testGetUserDefinedFields() throws Exception {
         BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile();
         packageControlFile.parse(new FileInputStream("target/test-classes/org/vafer/jdeb/deb/control/control"));

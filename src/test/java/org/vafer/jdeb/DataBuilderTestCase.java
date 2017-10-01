@@ -20,19 +20,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Assert;
+
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileSet;
 import org.vafer.jdeb.producers.DataProducerFile;
 import org.vafer.jdeb.producers.DataProducerFileSet;
 
-public class DataBuilderTestCase extends TestCase {
+public final class DataBuilderTestCase extends Assert {
 
     /**
      * Checks if the file paths in the md5sums file use only unix file separators
      * (this test can only fail on Windows)
      */
+    @Test
     public void testBuildDataWithFileSet() throws Exception {
         DataBuilder builder = new DataBuilder(new NullConsole());
 
@@ -53,6 +56,7 @@ public class DataBuilderTestCase extends TestCase {
         assertTrue("two spaces between md5 and file, no leading slash, or dot, on file path", md5s.toString().equals("8bc944dbd052ef51652e70a5104492e3  test/testfile\n"));
     }
 
+    @Test
     public void testCreateParentDirectories() throws Exception {
         File archive = new File("target/data.tar");
         if (archive.exists()) {

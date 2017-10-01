@@ -16,18 +16,19 @@
 
 package org.vafer.jdeb.utils;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Assert;
 
-public class InformationInputStreamTestCase extends TestCase {
+public class InformationInputStreamTestCase extends Assert {
 
     private InputStream getStream( String file ) {
         return getClass().getClassLoader().getResourceAsStream("org/vafer/jdeb/utils/" + file);
     }
 
+    @Test
     public void testUTF8CRLF() throws Exception {
         InformationInputStream informationStream = new InformationInputStream(getStream("utf8-crlf.txt"));
         Utils.copy(informationStream, new ByteArrayOutputStream());
@@ -37,6 +38,7 @@ public class InformationInputStreamTestCase extends TestCase {
         assertEquals("Encoding", null, informationStream.getEncoding());
     }
 
+    @Test
     public void testUTF8() throws Exception {
         InformationInputStream informationStream = new InformationInputStream(getStream("utf8-lf.txt"));
         Utils.copy(informationStream, new ByteArrayOutputStream());
@@ -45,6 +47,7 @@ public class InformationInputStreamTestCase extends TestCase {
         assertEquals("Encoding", null, informationStream.getEncoding());
     }
 
+    @Test
     public void testUTF8BOM() throws Exception {
         InformationInputStream informationStream = new InformationInputStream(getStream("utf8-lf-bom.txt"));
         Utils.copy(informationStream, new ByteArrayOutputStream());
@@ -53,6 +56,7 @@ public class InformationInputStreamTestCase extends TestCase {
         assertEquals("Encoding", "UTF-8", informationStream.getEncoding());
     }
 
+    @Test
     public void testUTF16BE() throws Exception {
         InformationInputStream informationStream = new InformationInputStream(getStream("utf16be-lf.txt"));
         Utils.copy(informationStream, new ByteArrayOutputStream());
@@ -61,6 +65,7 @@ public class InformationInputStreamTestCase extends TestCase {
         assertEquals("Encoding", "UTF-16BE", informationStream.getEncoding());
     }
 
+    @Test
     public void testUTF16BEBOM() throws Exception {
         InformationInputStream informationStream = new InformationInputStream(getStream("utf16be-lf-bom.txt"));
         Utils.copy(informationStream, new ByteArrayOutputStream());
@@ -69,6 +74,7 @@ public class InformationInputStreamTestCase extends TestCase {
         assertEquals("Encoding", "UTF-16BE", informationStream.getEncoding());
     }
 
+    @Test
     public void testUTF16LE() throws Exception {
         InformationInputStream informationStream = new InformationInputStream(getStream("utf16le-lf.txt"));
         Utils.copy(informationStream, new ByteArrayOutputStream());
@@ -77,6 +83,7 @@ public class InformationInputStreamTestCase extends TestCase {
         assertEquals("Encoding", "UTF-16LE", informationStream.getEncoding());
     }
 
+    @Test
     public void testUTF16LEBOM() throws Exception {
         InformationInputStream informationStream = new InformationInputStream(getStream("utf16le-lf-bom.txt"));
         Utils.copy(informationStream, new ByteArrayOutputStream());

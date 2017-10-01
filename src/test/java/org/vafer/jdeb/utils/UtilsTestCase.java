@@ -16,7 +16,6 @@
 
 package org.vafer.jdeb.utils;
 
-
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,10 +23,12 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Assert;
 
-public class UtilsTestCase extends TestCase {
+public final class UtilsTestCase extends Assert {
 
+    @Test
     public void testStripPath() throws Exception {
         assertEquals("foo/bar", Utils.stripPath(0, "foo/bar"));
 
@@ -46,24 +47,28 @@ public class UtilsTestCase extends TestCase {
         return new String(data, "UTF-8");
     }
 
+    @Test
     public void testNewlineConversionLF() throws Exception {
         String expected = "test\ntest\n\ntest\n";
         String actual = convert("test\ntest\n\ntest");
         assertEquals(expected, actual);
     }
 
+    @Test
     public void testNewlineConversionCRLF() throws Exception {
         String expected = "test\ntest\n\ntest\n";
         String actual = convert("test\r\ntest\r\n\r\ntest");
         assertEquals(expected, actual);
     }
 
+    @Test
     public void testNewlineConversionCR() throws Exception {
         String expected = "test\ntest\n\ntest\n";
         String actual = convert("test\rtest\r\rtest");
         assertEquals(expected, actual);
     }
 
+    @Test
     public void testReplaceVariables() {
         Map<String, String> variables = new HashMap<String, String>();
         variables.put("version", "1.2.3");
@@ -103,6 +108,7 @@ public class UtilsTestCase extends TestCase {
         assertEquals("VAR [[ VAR [[ VAR ]] VAR ]]", result);
     }
 
+    @Test
     public void testReplaceVariablesWithinOpenCloseTokens() throws Exception {
         Map<String, String> variables = new HashMap<String, String>();
         variables.put("artifactId", "jdeb");
@@ -115,6 +121,7 @@ public class UtilsTestCase extends TestCase {
 
     }
 
+    @Test
     public void testVersionConversion() {
         Calendar cal = new GregorianCalendar(2013, Calendar.FEBRUARY, 17);
         cal.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -161,6 +168,7 @@ public class UtilsTestCase extends TestCase {
         assertEquals("should match", "1.0aaa+3", Utils.convertToDebianVersion("1.0aaa-3", true, "SNAPSHOT", cal.getTime()));
     }
 
+    @Test
     public void testMovePath() {
         assertEquals("/usr/share/file.txt", Utils.movePath("file.txt", "/usr/share"));
         assertEquals("/usr/share/file.txt", Utils.movePath("file.txt", "/usr/share/"));

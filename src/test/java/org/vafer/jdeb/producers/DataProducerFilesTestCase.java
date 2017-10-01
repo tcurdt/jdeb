@@ -10,7 +10,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.Assert;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.hamcrest.BaseMatcher;
@@ -20,20 +23,24 @@ import org.vafer.jdeb.DataConsumer;
 /**
  * Tests for {@link org.vafer.jdeb.producers.DataProducerFiles}.
  */
-public class DataProducerFilesTestCase extends TestCase {
+public final class DataProducerFilesTestCase extends Assert {
+
     File file1;
     File file2;
 
+    @Before
     public void setUp() throws Exception {
         file1 = File.createTempFile(getClass().getSimpleName() + ".1", "txt");
         file2 = File.createTempFile(getClass().getSimpleName() + ".2", "txt");
     }
 
+    @After
     public void tearDown() throws Exception {
         file1.delete();
         file2.delete();
     }
 
+    @Test
     public void testProducesMultiplePaths() throws IOException {
         DataConsumer consumer = mock(DataConsumer.class);
         new DataProducerFiles(
@@ -70,6 +77,7 @@ public class DataProducerFilesTestCase extends TestCase {
         }
     }
 
+    @Test
     public void testProducesMultiplePathsNoDestination() throws IOException {
         DataConsumer consumer = mock(DataConsumer.class);
         new DataProducerFiles(

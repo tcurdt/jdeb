@@ -23,7 +23,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Assert;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.io.FileUtils;
@@ -42,8 +43,9 @@ import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
 import org.vafer.jdeb.producers.DataProducerLink;
 
-public class DebMakerTestCase extends TestCase {
+public final class DebMakerTestCase extends Assert {
 
+    @Test
     public void testCreation() throws Exception {
 
         File control = new File(getClass().getResource("../deb/control/control").toURI());

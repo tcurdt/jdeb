@@ -25,7 +25,10 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.Assert;
+
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -40,11 +43,12 @@ import org.vafer.jdeb.ArchiveVisitor;
 import org.vafer.jdeb.ArchiveWalker;
 import org.vafer.jdeb.Compression;
 
-public final class DebAntTaskTestCase extends TestCase {
+public final class DebAntTaskTestCase extends Assert {
 
     private Project project;
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         project = new Project();
         project.setCoreLoader(getClass().getClassLoader());
         project.init();
@@ -62,6 +66,7 @@ public final class DebAntTaskTestCase extends TestCase {
         }
     }
 
+    @Test
     public void testMissingControl() {
         try {
             project.executeTarget("missing-control");
@@ -71,6 +76,7 @@ public final class DebAntTaskTestCase extends TestCase {
         }
     }
 
+    @Test
     public void testInvalidControl() {
         try {
             project.executeTarget("invalid-control");
@@ -80,6 +86,7 @@ public final class DebAntTaskTestCase extends TestCase {
         }
     }
 
+    @Test
     public void testMissingDestFile() {
         try {
             project.executeTarget("missing-destfile");
@@ -89,18 +96,21 @@ public final class DebAntTaskTestCase extends TestCase {
         }
     }
 
+    @Test
     public void testEmptyPackage() {
         project.executeTarget("empty-package");
 
         assertTrue("package not build", new File("target/test-classes/test.deb").exists());
     }
 
+    @Test
     public void testPackageWithArchive() {
         project.executeTarget("with-archive");
 
         assertTrue("package not build", new File("target/test-classes/test.deb").exists());
     }
 
+    @Test
     public void testPackageWithMissingArchive() {
         try {
             project.executeTarget("with-missing-archive");
@@ -110,12 +120,14 @@ public final class DebAntTaskTestCase extends TestCase {
         }
     }
 
+    @Test
     public void testPackageWithDirectory() {
         project.executeTarget("with-directory");
 
         assertTrue("package not build", new File("target/test-classes/test.deb").exists());
     }
 
+    @Test
     public void testPackageWithMissingDirectory() {
         try {
             project.executeTarget("with-missing-directory");
@@ -135,6 +147,7 @@ public final class DebAntTaskTestCase extends TestCase {
         project.addBuildListener(logger);
     }
 
+    @Test
     public void testVerboseEnabled() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         redirectOutput(out);
@@ -144,6 +157,7 @@ public final class DebAntTaskTestCase extends TestCase {
         assertTrue(out.toString().contains("Total size"));
     }
 
+    @Test
     public void testVerboseDisabled() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         redirectOutput(out);
@@ -153,6 +167,7 @@ public final class DebAntTaskTestCase extends TestCase {
         assertTrue(!out.toString().contains("Total size"));
     }
 
+    @Test
     public void testMissingDataType() {
         try {
             project.executeTarget("missing-data-type");
@@ -162,6 +177,7 @@ public final class DebAntTaskTestCase extends TestCase {
         }
     }
 
+    @Test
     public void testUnknownDataType() {
         try {
             project.executeTarget("unknown-data-type");
@@ -171,12 +187,14 @@ public final class DebAntTaskTestCase extends TestCase {
         }
     }
 
+    @Test
     public void testFileSet() {
         project.executeTarget("fileset");
 
         assertTrue("package not build", new File("target/test-classes/test.deb").exists());
     }
 
+    @Test
     public void testTarFileSet() throws Exception {
         project.executeTarget("tarfileset");
 
@@ -197,6 +215,7 @@ public final class DebAntTaskTestCase extends TestCase {
         }, Compression.GZIP);
     }
 
+    @Test
     public void testLink() throws Exception {
         project.executeTarget("link");
 
@@ -219,6 +238,7 @@ public final class DebAntTaskTestCase extends TestCase {
         assertTrue("Link not found", linkFound.get());
     }
 
+    @Test
     public void testMapper() throws Exception {
         project.executeTarget("perm-mapper");
 
@@ -234,6 +254,7 @@ public final class DebAntTaskTestCase extends TestCase {
         }, Compression.GZIP);
     }
 
+    @Test
     public void testUnkownCompression() throws Exception {
         try {
             project.executeTarget("unknown-compression");
@@ -243,6 +264,7 @@ public final class DebAntTaskTestCase extends TestCase {
         }
     }
 
+    @Test
     public void testBZip2Compression() throws Exception {
         project.executeTarget("bzip2-compression");
 
@@ -270,6 +292,7 @@ public final class DebAntTaskTestCase extends TestCase {
         assertTrue("bz2 file not found", found.get());
     }
 
+    @Test
     public void testXZCompression() throws Exception {
         project.executeTarget("xz-compression");
 
@@ -301,6 +324,7 @@ public final class DebAntTaskTestCase extends TestCase {
         assertTrue("xz file not found", found.get());
     }
 
+    @Test
     public void testNoCompression() throws Exception {
         project.executeTarget("no-compression");
 
@@ -315,6 +339,7 @@ public final class DebAntTaskTestCase extends TestCase {
         assertTrue("tar file not found", found);
     }
 
+    @Test
     public void testPackageConffiles() {
         project.executeTarget("conffiles");
 

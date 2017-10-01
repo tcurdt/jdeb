@@ -16,11 +16,14 @@
 
 package org.vafer.jdeb.ant;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Assert;
+
 import org.apache.tools.ant.types.selectors.SelectorUtils;
 
-public final class AntSelectorTestCase extends TestCase {
+public final class AntSelectorTestCase extends Assert {
 
+    @Test
     public void testExclusion() throws Exception {
         assertTrue("should match",
             SelectorUtils.matchPath("**/bin/**", "/some/bin/stuff"));

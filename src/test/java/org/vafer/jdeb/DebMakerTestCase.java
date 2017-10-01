@@ -24,7 +24,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Assert;
+
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
@@ -35,8 +37,9 @@ import org.vafer.jdeb.producers.DataProducerLink;
 import org.vafer.jdeb.utils.InformationInputStream;
 import org.vafer.jdeb.utils.MapVariableResolver;
 
-public class DebMakerTestCase extends TestCase {
+public final class DebMakerTestCase extends Assert {
 
+    @Test
     public void testCreation() throws Exception {
 
         File control = new File(getClass().getResource("deb/control/control").toURI());
@@ -81,6 +84,7 @@ public class DebMakerTestCase extends TestCase {
         assertTrue("Cannot delete the file " + deb, deb.delete());
     }
 
+    @Test
     public void testControlFilesPermissions() throws Exception {
         File deb = new File("target/test-classes/test-control.deb");
         if (deb.exists() && !deb.delete()) {
@@ -122,6 +126,7 @@ public class DebMakerTestCase extends TestCase {
         assertTrue("Control files not found in the package", found);
     }
 
+    @Test
     public void testControlFilesVariables() throws Exception {
         File deb = new File("target/test-classes/test-control.deb");
         if (deb.exists() && !deb.delete()) {
@@ -161,6 +166,7 @@ public class DebMakerTestCase extends TestCase {
         assertTrue("Control files not found in the package", found);
     }
 
+    @Test
     public void testDependsIsOmittedWhenEmpty() throws Exception {
         File deb = new File("target/test-classes/test-control.deb");
         if (deb.exists() && !deb.delete()) {

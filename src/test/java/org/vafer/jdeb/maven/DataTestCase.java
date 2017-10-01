@@ -19,30 +19,36 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.Assert;
 
 /*
  * Admittedly not the nicest way to assert that failOnMissingSrc functions. However, the best that can be done without
  * refactoring, mocking, or extending the scope of the test beyond this unit.
  */
-public class DataTestCase extends TestCase {
+public final class DataTestCase extends Assert {
 
     private Data data;
     private File missingFile;
     private File file;
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         data = new Data();
         missingFile = new File("this-file-does-not-exist");
         file = File.createTempFile(getClass().getSimpleName(), "dat");
     }
 
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         if (file != null) {
             file.delete();
         }
     }
 
+    @Test
     public void testFailOnUnknownValue() throws IOException {
         try {
             data.setSrc(missingFile);
@@ -53,6 +59,7 @@ public class DataTestCase extends TestCase {
         }
     }
 
+    @Test
     public void testFailOnMissingSrcDefaultFileMissing() throws IOException {
         try {
             data.setSrc(missingFile);
@@ -62,18 +69,21 @@ public class DataTestCase extends TestCase {
         }
     }
 
+    @Test
     public void testFailOnMissingSrcIgnoreFileMissing() throws IOException {
         data.setSrc(missingFile);
         data.setMissingSrc("ignore");
         data.produce(null);
     }
 
+    @Test
     public void testFailOnMissingSrcIgnoreFileMissingVaryInput() throws IOException {
         data.setSrc(missingFile);
         data.setMissingSrc(" IGNORE ");
         data.produce(null);
     }
 
+    @Test
     public void testFailOnMissingSrcFailFileMissing() throws IOException {
         try {
             data.setSrc(missingFile);
@@ -84,6 +94,7 @@ public class DataTestCase extends TestCase {
         }
     }
 
+    @Test
     public void testFailOnMissingSrcDefaultFileExists() throws IOException {
         IOException unknownTypeException = null;
         try {
@@ -95,6 +106,7 @@ public class DataTestCase extends TestCase {
         assertTrue(unknownTypeException.getMessage().startsWith("Unknown type"));
     }
 
+    @Test
     public void testFailOnMissingSrcIgnoreFileExists() throws IOException {
         IOException unknownTypeException = null;
         try {
@@ -107,6 +119,7 @@ public class DataTestCase extends TestCase {
         assertTrue(unknownTypeException.getMessage().startsWith("Unknown type"));
     }
 
+    @Test
     public void testFailOnMissingSrcFailFileExists() throws IOException {
         IOException unknownTypeException = null;
         try {

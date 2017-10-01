@@ -16,11 +16,14 @@
 
 package org.vafer.jdeb.debian;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Assert;
+
 import org.vafer.jdeb.changes.ChangeSet;
 
-public final class ChangesFileTestCase extends TestCase {
+public final class ChangesFileTestCase extends Assert {
 
+    @Test
     public void testToString() throws Exception {
         BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile();
         packageControlFile.set("Package", "test-package");

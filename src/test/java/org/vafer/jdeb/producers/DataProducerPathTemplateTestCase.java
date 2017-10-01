@@ -20,14 +20,16 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Assert;
+
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
 
-public class DataProducerPathTemplateTestCase extends TestCase {
+public final class DataProducerPathTemplateTestCase extends Assert {
 
     private static final String[] INCLUDES = { };
     private static final String[] EXCLUDES = { };
@@ -37,6 +39,7 @@ public class DataProducerPathTemplateTestCase extends TestCase {
     private Mapper[] mappers = new Mapper[0];
     private DataProducer dataProducer;
 
+    @Test
     public void testTypical() throws Exception {
 
         String[] paths = { "/var/log", "/var/lib" };

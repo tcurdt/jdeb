@@ -21,15 +21,19 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.Assert;
+
 import org.apache.tools.ant.util.ReaderInputStream;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 
-public class FilteredFileTestCase extends TestCase {
+public final class FilteredFileTestCase extends Assert {
 
     private VariableResolver variableResolver;
 
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         Map<String, String> map = new HashMap<String, String>();
         map.put("artifactId", "jdeb");
         map.put("myProperty1", "custom1");
@@ -37,6 +41,7 @@ public class FilteredFileTestCase extends TestCase {
         variableResolver = new MapVariableResolver(map);
     }
 
+    @Test
     public void testTokenSubstitution() throws Exception {
         InputStream in = new ReaderInputStream(new StringReader("#!/bin/sh\ncat [[artifactId]][[myProperty1]] \necho '[[myProperty2]]'\n"));
 
@@ -46,6 +51,7 @@ public class FilteredFileTestCase extends TestCase {
         assertEquals("#!/bin/sh\ncat jdebcustom1 \necho 'custom2'\n", actual);
     }
 
+    @Test
     public void testTokenSubstitutionWithinOpenCloseTokens() throws Exception {
         InputStream in = new ReaderInputStream(new StringReader("#!/bin/bash\nif [[ -z \"$(grep [[artifactId]] /etc/passwd )\" ]] ; then\n"));
 
@@ -55,6 +61,7 @@ public class FilteredFileTestCase extends TestCase {
         assertEquals("", "#!/bin/bash\nif [[ -z \"$(grep jdeb /etc/passwd )\" ]] ; then\n", actual);
     }
 
+    @Test
     public void testVariableSubstitution() throws Exception {
         Map<String, String> map = new HashMap<String, String>();
         map.put("VERSION", "1.2");
