@@ -6,7 +6,7 @@
     <maven.compiler.source>1.6</maven.compiler.source>
     <maven.compiler.target>1.6</maven.compiler.target>
     <additionalparam>-Xdoclint:none</additionalparam>
-    <mavenVersion>3.5.0</mavenVersion>
+    <mavenVersion>3.5.2</mavenVersion>
     <mavenPluginPluginVersion>3.5</mavenPluginPluginVersion>
   </properties>
   <modelVersion>4.0.0</modelVersion>
@@ -339,13 +339,13 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.5</version>
+      <version>2.6</version>
       <!-- <scope>provided</scope> -->
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
-      <version>1.14</version>
+      <version>1.15</version>
       <!-- <scope>provided</scope> -->
     </dependency>
     <dependency>
