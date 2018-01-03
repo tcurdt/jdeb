@@ -199,7 +199,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-invoker-plugin</artifactId>
-        <version>1.9</version>
+        <version>3.0.1</version>
         <configuration>
           <!-- <cloneClean>true</cloneClean> -->
           <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
