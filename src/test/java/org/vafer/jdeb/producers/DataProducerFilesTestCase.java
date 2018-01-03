@@ -98,12 +98,19 @@ public final class DataProducerFilesTestCase extends Assert {
                                 return false;
                             }
                             final TarArchiveEntry e = (TarArchiveEntry) o;
+
+                            // Turns out compress is stripping the drive letter
+                            // https://github.com/apache/commons-compress/blob/master/src/main/java/org/apache/commons/compress/archivers/tar/TarArchiveEntry.java#L1337
+                            // Which is bad - but needs to be fixed there.
+                            // We have to work around in the test for now.
+                            final String s = f.getAbsolutePath().replace(File.separator, "/").replace("C:/", "/");
+
                             return e.getSize() == f.length()
                                     && e.getLongGroupId() == 0
                                     && e.getLongUserId() == 0
                                     && "root".equals(e.getUserName())
                                     && "root".equals(e.getGroupName())
-                                    && (f.getAbsolutePath()).equals(e.getName())
+                                    && s.equals(e.getName())
                                     ;
                         }
 
