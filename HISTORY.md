@@ -1,10 +1,10 @@
-## Version 1.6, in progress
+## Version 1.6, released 03.01.2018
 
 * [CHG] Upgraded Commons Compress
-* [ADD] Added support for the fullpath attribute in Ant (Thanks to (Daniel Ivan Ruiz Barranco)
 * [FIX] Fixed the maintainer name according to Debian standards (Thanks to Bogdan Artyushenko)
 * [FIX] Fixed deriving the changes file (Thanks to Reinhard Pointner)
-* [CHG] Default to posix style tar archives (Thanks to Kevin Conaway)
+* [ADD] Added support for the fullpath attribute in Ant (Thanks to (Daniel Ivan Ruiz Barranco)
+* [ADD] Allow different styles of tar archives (Thanks to Kevin Conaway)
 
 ## Version 1.5, released 01.02.2016
 
@@ -48,10 +48,16 @@
 
 ## Version 1.1, released 28.02.2014
 
+* [CHG] Links are now symbolic by default
+* [CHG] Alpha, Beta and RC versions are transformed to a package version ordered before the final release (ex: 1.0~RC1)
 * [CHG] Renamed configuration option 'disabled' to 'skip'
+* [FIX] Better token parsing
+* [FIX] On Windows, parent directories are now created automatically when adding files to the data archive
+* [FIX] Permission mappers now work properly with Ant (Thanks to Christian Egli)
+* [FIX] Symbolic links longer than 100 characters are now supported
+* [FIX] The signed changes files now pass the validation with gpg --verify (Thanks to Max Garmash and Roman Kashitsyn)
 * [ADD] Added support for conffiles (Thanks to Lukas Roedl)
 * [ADD] Added "files" data producer (Thanks to Roman Kashitsyn)
-* [FIX] Better token parsing
 * [ADD] Added support "Distribution" field
 * [ADD] Added support of maven-encrypted passphrases
 * [ADD] xz compression support
@@ -60,46 +66,41 @@
 * [ADD] Support permission in (hard) link setup
 * [ADD] User defined fields in the control file are now supported (Thanks to Marco Soeima)
 * [ADD] Added the ability to disable an execution during Maven build (Thanks to  Jonathan Piron)
-* [FIX] On Windows, parent directories are now created automatically when adding files to the data archive
-* [CHG] Links are now symbolic by default
-* [CHG] Alpha, Beta and RC versions are transformed to a package version ordered before the final release (ex: 1.0~RC1)
-* [FIX] Permission mappers now work properly with Ant (Thanks to Christian Egli)
-* [FIX] Symbolic links longer than 100 characters are now supported
-* [FIX] The signed changes files now pass the validation with gpg --verify (Thanks to Max Garmash and Roman Kashitsyn)
+
 
 ## Version 1.0.1, released 28.02.2013
 
-* [ADD] Override version via environment variable DEBVERSION
 * [FIX] Use the joint copyright
 * [FIX] Fixed the maven to debian version mapping
+* [ADD] Override version via environment variable DEBVERSION
 
 
 ## Version 1.0, released 10.01.2013
 
-* [ADD] Support for symbolic links (Maven only)
-* [FIX] Unresolved variables in package maintainer scripts no longer break the build
 * [CHG] Use "_all" as architecture postfix by default
+* [FIX] Unresolved variables in package maintainer scripts no longer break the build
+* [ADD] Support for symbolic links (Maven only)
 
 
 ## Version 0.11, released 14.07.2012
 
+* [REM] Deprecated PrefixMapper was removed (use PermMapper instead)
+* [CHG] Use "~" instead of "+" when converting from a SNAPSHOT version
 * [ADD] Added "timestamped" maven config to turn "SNAPSHOT" into a timestamp
 * [ADD] Added "verbose" maven config option to show/hide INFO logs
 * [ADD] Expand variables in configuration files "conffiles", "preinst", "postinst", "prerm", "postrm"
 * [ADD] Added a "template" data type to create dirs
 * [ADD] Added "missingSrc" maven config to control behavior on missing files/folders
-* [CHG] Use "~" instead of "+" when converting from a SNAPSHOT version
-* [REM] Deprecated PrefixMapper was removed (use PermMapper instead)
 
 
 ## Version 0.10, released 18.02.2012
 
 Polishing and regression fixes
 
-* [FIX] Don't throw exception when detecting zip archives
-* [FIX] Make sure to close the tar output stream
 * [CHG] Have warn/info level on messages
 * [CHG] Fix line endings for control files
+* [FIX] Don't throw exception when detecting zip archives
+* [FIX] Make sure to close the tar output stream
 * [ADD] Access to all Maven variables
 
 
@@ -107,12 +108,12 @@ Polishing and regression fixes
 
 Some smaller fixes, Support for the 1.8 format, Changes support working.
 
-* [FIX] Default path for changes file with Maven
-* [FIX] Unresolved variables are now treated as null
+* [REM] InvalidDescriptorException, wasn't really used anyway
 * [CHG] "Changes" support version 1.8
 * [CHG] Warn if control files have non-unix line endings
 * [CHG] Throw an exception for unknown mappers
-* [REM] InvalidDescriptorException, wasn't really used anyway
+* [FIX] Default path for changes file with Maven
+* [FIX] Unresolved variables are now treated as null
 * [ADD] Added an "attach" attribute to specify whether maven artifact should be attached to project.
 * [ADD] Provide SHA1, SHA256 and not just MD5 for descriptors
 * [ADD] Provide "project.version" when using maven
@@ -158,17 +159,17 @@ Support for bzip2 and more descriptor keys.
 
 ## Version 0.5, released 26.11.2007
 
-* [FIX] Fixed the 'ls' parsing.
-* [CHG] Switched to ArInputStream/ArOutputStream.
 * [REM] Removed deprecated ant task delegate.
+* [CHG] Switched to ArInputStream/ArOutputStream.
+* [FIX] Fixed the 'ls' parsing.
 * [ADD] Added "changesSave" attribute to save release information to. No longer saving those information to "changesIn".
 
 
 ## Version 0.4, released 20.09.2007
 
-* [FIX] Fixed mapper support.
-* [CHG] Changed lookup from environment (DEBEMAIL, DEBFULLNAME) to overrule the descriptor.
 * [REM] Removed deprecated prefix/strip syntax.
+* [CHG] Changed lookup from environment (DEBEMAIL, DEBFULLNAME) to overrule the descriptor.
+* [FIX] Fixed mapper support.
 * [ADD] Added support for multiple mappers.
 * [ADD] Added more fields to the package descriptor.
 
