@@ -1,0 +1,50 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  config.vm.guest = :windows
+  config.vm.hostname = 'windows-jdeb'
+  config.vm.box = "talisker/windows10pro"
+  # download from https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/
+  # config.vm.box_url = "file:///Users/tcurdt/Vagrant/IE11 - Win7.box"
+  # config.vm.box = "Microsoft/EdgeOnWindows10"
+  # config.vm.box_version = "1.0"
+  # config.vm.box = "sbrumley/windows10"
+  # config.vm.box_version = "10.0"
+
+  config.vm.network :private_network, type: "dhcp"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.gui = true
+    vb.name = "windows-jdeb"
+    vb.memory = "1536"
+  end
+
+  # config.vm.communicator = :winrm
+  # config.winrm.username = "vagrant"
+  # config.winrm.password = "vagrant"
+  # config.vm.boot_timeout = 600
+  # config.vm.graceful_halt_timeout = 600
+  # config.ssh.username = "IEUser"
+  # config.ssh.password = "Passw0rd!"
+  # config.ssh.insert_key = false
+
+  # config.vm.provision :shell,
+  #   inline: "echo TEST",
+  #   privileged: false
+
+  # config.vm.provision :shell,
+  #   path: "provision-chocolatey.ps1",
+  #   privileged: false
+
+  config.vm.provision :shell,
+    path: "provision-bootstrap.cmd"
+
+  config.vm.provision :shell,
+    path: "provision-packages.cmd"
+
+  config.vm.provision :shell,
+    path: "provision-checkout.cmd"
+
+end
