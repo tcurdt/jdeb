@@ -53,12 +53,14 @@ public final class FilteredFileTestCase extends Assert {
 
     @Test
     public void testTokenSubstitutionWithinOpenCloseTokens() throws Exception {
-        InputStream in = new ReaderInputStream(new StringReader("#!/bin/bash\nif [[ -z \"$(grep [[artifactId]] /etc/passwd )\" ]] ; then\n"));
+        // The line below is a extract from my postinst script.
+        InputStream in = new ReaderInputStream(new StringReader("#!/usr/bin/python3 -B\nline = line.replace(\'@ALLOW_BATCH_FILTER@\', config[self.client][\'ALLOW_BATCH_FILTER\'])"));
 
+        // This method should only replace values enclosed inside "[[ ]]" tags, however it is incorrectly mutating the string above
+        // config[self.client]['ALLOW_BATCH_FILTER'] ----> config[self.client[]'ALLOW_BATCH_FILTER']  (THIS IS SHOULD NOT HAPPEN !!!)
         FilteredFile placeHolder = new FilteredFile(in, variableResolver);
-
         String actual = placeHolder.toString();
-        assertEquals("", "#!/bin/bash\nif [[ -z \"$(grep jdeb /etc/passwd )\" ]] ; then\n", actual);
+        assertEquals("", "#!/usr/bin/python3 -B\nline = line.replace(\'@ALLOW_BATCH_FILTER@\', config[self.client][\'ALLOW_BATCH_FILTER\'])", actual);
     }
 
     @Test
