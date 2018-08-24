@@ -53,14 +53,25 @@ public final class FilteredFileTestCase extends Assert {
 
     @Test
     public void testTokenSubstitutionWithinOpenCloseTokens() throws Exception {
-        // The line below is a extract from my postinst script.
-        InputStream in = new ReaderInputStream(new StringReader("#!/usr/bin/python3 -B\nline = line.replace(\'@ALLOW_BATCH_FILTER@\', config[self.client][\'ALLOW_BATCH_FILTER\'])"));
+        HashMap<String, String> table = new HashMap<String, String>() {{
+            put("#!/bin/bash\nif [[ -z \"$(grep [[artifactId]] /etc/passwd )\" ]] ; then\n",
+                    "#!/bin/bash\nif [[ -z \"$(grep jdeb /etc/passwd )\" ]] ; then\n");
+            put("#!/usr/bin/python3 -B\nline = line.replace(\'@ALLOW_BATCH_FILTER@\', config[self.client][\'ALLOW_BATCH_FILTER\'])",
+                    "#!/usr/bin/python3 -B\nline = line.replace(\'@ALLOW_BATCH_FILTER@\', config[self.client][\'ALLOW_BATCH_FILTER\'])");
+        }};
 
-        // This method should only replace values enclosed inside "[[ ]]" tags, however it is incorrectly mutating the string above
-        // config[self.client]['ALLOW_BATCH_FILTER'] ----> config[self.client[]'ALLOW_BATCH_FILTER']  (THIS IS SHOULD NOT HAPPEN !!!)
-        FilteredFile placeHolder = new FilteredFile(in, variableResolver);
-        String actual = placeHolder.toString();
-        assertEquals("", "#!/usr/bin/python3 -B\nline = line.replace(\'@ALLOW_BATCH_FILTER@\', config[self.client][\'ALLOW_BATCH_FILTER\'])", actual);
+        for (Map.Entry<String,String> pair : table.entrySet()){
+            String input = pair.getKey();
+            String expected = pair.getValue();
+
+            InputStream in = new ReaderInputStream(new StringReader(input));
+            FilteredFile placeHolder = new FilteredFile(in, variableResolver);
+            String actual = placeHolder.toString();
+
+            assertEquals("unexpected resolve for " + input, expected, actual);
+        }
+
+
     }
 
     @Test
