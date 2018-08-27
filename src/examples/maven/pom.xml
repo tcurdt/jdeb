@@ -38,6 +38,7 @@
                                     <prefix>/usr/share/jdeb/lib</prefix>
                                     <user>loader</user>
                                     <group>loader</group>
+                                    <filemode>640</filemode>
                                   </mapper>
                                 </data>
 
@@ -71,6 +72,7 @@
                                     <type>perm</type>
                                     <user>loader</user>
                                     <group>loader</group>
+                                    <filemode>750</filemode>
                                   </mapper>
                                 </data>
 
