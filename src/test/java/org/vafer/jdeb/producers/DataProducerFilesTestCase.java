@@ -73,7 +73,7 @@ public final class DataProducerFilesTestCase extends Assert {
                                 && name.equals(e.getName())
                                    ;
 
-                            System.out.println("matches:" + matches);
+                            // System.out.println("matches:" + matches);
 
                             return matches;
                         }
@@ -107,11 +107,7 @@ public final class DataProducerFilesTestCase extends Assert {
                             }
                             final TarArchiveEntry e = (TarArchiveEntry) o;
 
-                            // Turns out compress is stripping the drive letter
-                            // https://github.com/apache/commons-compress/blob/master/src/main/java/org/apache/commons/compress/archivers/tar/TarArchiveEntry.java#L1337
-                            // Which is bad - but needs to be fixed there.
-                            // We have to work around in the test for now.
-                            final String name  = f.getAbsolutePath(); //.replace(File.separator, "/");
+                            final String name  = f.getAbsolutePath().replace(File.separator, "/");
 
                             boolean matches =
                                    e.getSize() == f.length()
@@ -122,21 +118,21 @@ public final class DataProducerFilesTestCase extends Assert {
                                 && name.equals(e.getName())
                                 ;
 
-                            System.out.println("matches:" + matches);
+                            // System.out.println("matches:" + matches);
 
-                            if (!matches) {
-                                System.out.println("f.size:" + f.length());
-                                System.out.println("e.size:" + e.getSize());
+                            // if (!matches) {
+                            //     System.out.println("f.size:" + f.length());
+                            //     System.out.println("e.size:" + e.getSize());
 
-                                System.out.println("f.name:" + name);
-                                System.out.println("e.name:" + e.getName());
+                            //     System.out.println("f.name:" + name);
+                            //     System.out.println("e.name:" + e.getName());
 
-                                System.out.println("e.uid:" + e.getLongUserId());
-                                System.out.println("e.gid:" + e.getLongGroupId());
+                            //     System.out.println("e.uid:" + e.getLongUserId());
+                            //     System.out.println("e.gid:" + e.getLongGroupId());
 
-                                System.out.println("e.uid:" + e.getUserName());
-                                System.out.println("e.gid:" + e.getGroupName());
-                            }
+                            //     System.out.println("e.uid:" + e.getUserName());
+                            //     System.out.println("e.gid:" + e.getGroupName());
+                            // }
 
                             return matches;
                         }
