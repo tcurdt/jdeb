@@ -61,14 +61,31 @@ public final class DataProducerFilesTestCase extends Assert {
                                 return false;
                             }
                             final TarArchiveEntry e = (TarArchiveEntry) o;
-                            System.out.println("f:" + f.getName() + "e:" + e.getName());
-                            return e.getSize() == f.length()
+
+                            System.out.println("f.size:" + f.length());
+                            System.out.println("e.size:" + e.getSize());
+
+                            System.out.println("f.name:" + "/usr/include/" + f.getName());
+                            System.out.println("e.name:" + e.getName());
+
+                            System.out.println("e.uid:" + e.getLongUserId());
+                            System.out.println("e.gid:" + e.getLongGroupId());
+
+                            System.out.println("e.uid:" + e.getUserName());
+                            System.out.println("e.gid:" + e.getGroupName());
+
+                            boolean matches =
+                                   e.getSize() == f.length()
                                 && e.getLongGroupId() == 0
                                 && e.getLongUserId() == 0
                                 && "root".equals(e.getUserName())
                                 && "root".equals(e.getGroupName())
                                 && ("/usr/include/" + f.getName()).equals(e.getName())
                                    ;
+
+                            System.out.println("matches:" + matches);
+
+                            return matches;
                         }
 
                         public void describeTo(final Description description) {
