@@ -62,17 +62,7 @@ public final class DataProducerFilesTestCase extends Assert {
                             }
                             final TarArchiveEntry e = (TarArchiveEntry) o;
 
-                            System.out.println("f.size:" + f.length());
-                            System.out.println("e.size:" + e.getSize());
-
-                            System.out.println("f.name:" + "/usr/include/" + f.getName());
-                            System.out.println("e.name:" + e.getName());
-
-                            System.out.println("e.uid:" + e.getLongUserId());
-                            System.out.println("e.gid:" + e.getLongGroupId());
-
-                            System.out.println("e.uid:" + e.getUserName());
-                            System.out.println("e.gid:" + e.getGroupName());
+                            final String name = "/usr/include/" + f.getName();
 
                             boolean matches =
                                    e.getSize() == f.length()
@@ -80,7 +70,7 @@ public final class DataProducerFilesTestCase extends Assert {
                                 && e.getLongUserId() == 0
                                 && "root".equals(e.getUserName())
                                 && "root".equals(e.getGroupName())
-                                && ("/usr/include/" + f.getName()).equals(e.getName())
+                                && name.equals(e.getName())
                                    ;
 
                             System.out.println("matches:" + matches);
@@ -121,15 +111,34 @@ public final class DataProducerFilesTestCase extends Assert {
                             // https://github.com/apache/commons-compress/blob/master/src/main/java/org/apache/commons/compress/archivers/tar/TarArchiveEntry.java#L1337
                             // Which is bad - but needs to be fixed there.
                             // We have to work around in the test for now.
-                            final String s = f.getAbsolutePath().replace(File.separator, "/").replace("C:/", "/");
+                            final String name  = f.getAbsolutePath().replace(File.separator, "/").replace("C:/", "/");
 
-                            return e.getSize() == f.length()
-                                    && e.getLongGroupId() == 0
-                                    && e.getLongUserId() == 0
-                                    && "root".equals(e.getUserName())
-                                    && "root".equals(e.getGroupName())
-                                    && s.equals(e.getName())
-                                    ;
+                            boolean matches =
+                                   e.getSize() == f.length()
+                                && e.getLongGroupId() == 0
+                                && e.getLongUserId() == 0
+                                && "root".equals(e.getUserName())
+                                && "root".equals(e.getGroupName())
+                                && name.equals(e.getName())
+                                ;
+
+                            System.out.println("matches:" + matches);
+
+                            if (!matches) {
+                                System.out.println("f.size:" + f.length());
+                                System.out.println("e.size:" + e.getSize());
+
+                                System.out.println("f.name:" + name);
+                                System.out.println("e.name:" + e.getName());
+
+                                System.out.println("e.uid:" + e.getLongUserId());
+                                System.out.println("e.gid:" + e.getLongGroupId());
+
+                                System.out.println("e.uid:" + e.getUserName());
+                                System.out.println("e.gid:" + e.getGroupName());
+                            }
+
+                            return matches;
                         }
 
                         public void describeTo(final Description description) {
