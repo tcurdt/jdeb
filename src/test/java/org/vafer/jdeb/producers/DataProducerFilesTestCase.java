@@ -111,7 +111,7 @@ public final class DataProducerFilesTestCase extends Assert {
                             // https://github.com/apache/commons-compress/blob/master/src/main/java/org/apache/commons/compress/archivers/tar/TarArchiveEntry.java#L1337
                             // Which is bad - but needs to be fixed there.
                             // We have to work around in the test for now.
-                            final String name  = f.getAbsolutePath().replace(File.separator, "/").replace("C:/", "/");
+                            final String name  = f.getAbsolutePath(); //.replace(File.separator, "/");
 
                             boolean matches =
                                    e.getSize() == f.length()
