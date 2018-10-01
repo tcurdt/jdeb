@@ -61,6 +61,7 @@ public final class DataProducerFilesTestCase extends Assert {
                                 return false;
                             }
                             final TarArchiveEntry e = (TarArchiveEntry) o;
+                            System.out.println("f:" + f.getName() + "e:" + e.getName());
                             return e.getSize() == f.length()
                                 && e.getLongGroupId() == 0
                                 && e.getLongUserId() == 0
