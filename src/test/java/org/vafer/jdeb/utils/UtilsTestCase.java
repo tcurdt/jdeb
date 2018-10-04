@@ -77,8 +77,10 @@ public final class UtilsTestCase extends Assert {
 
         VariableResolver resolver = new MapVariableResolver(variables);
 
+        String input, result;
+
         // main case
-        String result = Utils.replaceVariables(resolver, "Version: [[version]]", "[[", "]]");
+        result = Utils.replaceVariables(resolver, "Version: [[version]]", "[[", "]]");
         assertEquals("Version: 1.2.3", result);
 
         // multiple variables in the same expression
@@ -89,8 +91,13 @@ public final class UtilsTestCase extends Assert {
         result = Utils.replaceVariables(resolver, "if [[ \"${HOST_TYPE}\" -eq \"admin\" ]] ; then", "[[", "]]");
         assertEquals("if [[ \"${HOST_TYPE}\" -eq \"admin\" ]] ; then", result);
 
+        // collision with python syntax
+        input = "c[t][\'A\']";
+        result = Utils.replaceVariables(resolver, input, "[[", "]]");
+        assertEquals(input, result);
+
         // end of line https://github.com/tcurdt/jdeb/issues/154
-        String input = "if [ -e some_file ]";
+        input = "if [ -e some_file ]";
         result = Utils.replaceVariables(resolver, input, "[[", "]]");
         assertEquals(input, result);
 

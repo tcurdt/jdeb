@@ -116,6 +116,10 @@ public final class Utils {
         int level = 0;
         for (char c : pExpression.toCharArray()) {
             if (c == open[wo]) {
+                if (wc > 0) {
+                    sb.append(close, 0, wc);
+                }
+                wc = 0;
                 wo++;
                 if (open.length == wo) {
                     // found open
@@ -129,6 +133,10 @@ public final class Utils {
                     last = open;
                 }
             } else if (c == close[wc]) {
+                if (wo > 0) {
+                    sb.append(open, 0, wo);
+                }
+                wo = 0;
                 wc++;
                 if (close.length == wc) {
                     // found close
