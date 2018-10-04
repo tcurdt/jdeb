@@ -72,7 +72,8 @@ public abstract class AbstractDataProducer implements DataProducer {
 
     public void produceDir( final DataConsumer consumer,
                             final String dirName ) throws IOException {
-        TarArchiveEntry entry = Producers.defaultDirEntryWithName(dirName);
+        final String name = dirName.endsWith("/") ? dirName : dirName + "/";
+        TarArchiveEntry entry = Producers.defaultDirEntryWithName(name);
         entry = map(entry);
         entry.setSize(0);
         Producers.produceDirEntry(consumer, entry);

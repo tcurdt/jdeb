@@ -42,14 +42,14 @@ public final class DataProducerPathTemplateTestCase extends Assert {
     @Test
     public void testTypical() throws Exception {
 
-        String[] paths = { "/var/log", "/var/lib" };
+        String[] paths = { "/var/log/", "/var/lib/" };
         dataProducer = new DataProducerPathTemplate(paths, INCLUDES, EXCLUDES, mappers);
         dataProducer.produce(captureDataConsumer);
 
         assertEquals(2, captureDataConsumer.invocations.size());
 
         CaptureDataConsumer.Invocation invocation = captureDataConsumer.invocations.get(0);
-        assertEquals(invocation.dirname, "/var/log");
+        assertEquals(invocation.dirname, "/var/log/");
         assertEquals(invocation.gid, 0);
         assertEquals(invocation.group, "root");
         assertEquals(invocation.linkname, "");
@@ -59,7 +59,7 @@ public final class DataProducerPathTemplateTestCase extends Assert {
         assertEquals(invocation.user, "root");
 
         invocation = captureDataConsumer.invocations.get(1);
-        assertEquals(invocation.dirname, "/var/lib");
+        assertEquals(invocation.dirname, "/var/lib/");
         assertEquals(invocation.gid, 0);
         assertEquals(invocation.group, "root");
         assertEquals(invocation.linkname, "");
