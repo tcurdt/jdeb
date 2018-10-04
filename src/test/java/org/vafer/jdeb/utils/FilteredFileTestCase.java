@@ -53,12 +53,25 @@ public final class FilteredFileTestCase extends Assert {
 
     @Test
     public void testTokenSubstitutionWithinOpenCloseTokens() throws Exception {
-        InputStream in = new ReaderInputStream(new StringReader("#!/bin/bash\nif [[ -z \"$(grep [[artifactId]] /etc/passwd )\" ]] ; then\n"));
+        HashMap<String, String> table = new HashMap<String, String>() {{
+            put("#!/bin/bash\nif [[ -z \"$(grep [[artifactId]] /etc/passwd )\" ]] ; then\n",
+                    "#!/bin/bash\nif [[ -z \"$(grep jdeb /etc/passwd )\" ]] ; then\n");
+            put("#!/usr/bin/python3 -B\nline = line.replace(\'@ALLOW_BATCH_FILTER@\', config[self.client][\'ALLOW_BATCH_FILTER\'])",
+                    "#!/usr/bin/python3 -B\nline = line.replace(\'@ALLOW_BATCH_FILTER@\', config[self.client][\'ALLOW_BATCH_FILTER\'])");
+        }};
 
-        FilteredFile placeHolder = new FilteredFile(in, variableResolver);
+        for (Map.Entry<String,String> pair : table.entrySet()){
+            String input = pair.getKey();
+            String expected = pair.getValue();
 
-        String actual = placeHolder.toString();
-        assertEquals("", "#!/bin/bash\nif [[ -z \"$(grep jdeb /etc/passwd )\" ]] ; then\n", actual);
+            InputStream in = new ReaderInputStream(new StringReader(input));
+            FilteredFile placeHolder = new FilteredFile(in, variableResolver);
+            String actual = placeHolder.toString();
+
+            assertEquals("unexpected resolve for " + input, expected, actual);
+        }
+
+
     }
 
     @Test
