@@ -29,6 +29,13 @@ import org.junit.Assert;
 public final class UtilsTestCase extends Assert {
 
     @Test
+    public void testJoinPath() throws Exception {
+        assertEquals("", "/foo/bar", Utils.joinUnixPath(null, "foo", "bar"));
+        assertEquals("", "/foo/bar", Utils.joinUnixPath(null, "/foo", "/bar"));
+        assertEquals("", "/foo/bar", Utils.joinUnixPath(null, "foo/bar"));
+    }
+
+        @Test
     public void testStripPath() throws Exception {
         assertEquals("foo/bar", Utils.stripPath(0, "foo/bar"));
 

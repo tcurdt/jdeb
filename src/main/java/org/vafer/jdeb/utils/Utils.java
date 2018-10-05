@@ -84,6 +84,28 @@ public final class Utils {
         return s.substring(x + 1);
     }
 
+    private static String joinPath(char sep, String ...paths) {
+        final StringBuilder sb = new StringBuilder();
+        for (String p : paths) {
+            if (p == null) continue;
+            if (p.startsWith("/")) {
+                sb.append(p);
+            } else {
+                sb.append(sep);
+                sb.append(p);
+            }
+        }
+        return sb.toString();
+    }
+
+    public static String joinUnixPath(String ...paths) {
+        return joinPath('/', paths);
+    }
+
+    public static String joinLocalPath(String ...paths) {
+        return joinPath(File.separatorChar, paths);
+    }
+
     public static String stripLeadingSlash( final String s ) {
         if (s == null) {
             return s;
@@ -291,20 +313,20 @@ public final class Utils {
             // The user's roaming profile on Windows, via environment
             final String windowsRoaming = System.getenv("APPDATA");
             if (windowsRoaming != null) {
-                locations.add(joinPaths(windowsRoaming, "gnupg", "secring.gpg"));
+                locations.add(joinLocalPath(windowsRoaming, "gnupg", "secring.gpg"));
             }
 
             // The user's local profile on Windows, via environment
             final String windowsLocal = System.getenv("LOCALAPPDATA");
             if (windowsLocal != null) {
-                locations.add(joinPaths(windowsLocal, "gnupg", "secring.gpg"));
+                locations.add(joinLocalPath(windowsLocal, "gnupg", "secring.gpg"));
             }
 
             // The Windows installation directory
             final String windir = System.getProperty("WINDIR");
             if (windir != null) {
                 // Local Profile on Windows 98 and ME
-                locations.add(joinPaths(windir, "Application Data", "gnupg", "secring.gpg"));
+                locations.add(joinLocalPath(windir, "Application Data", "gnupg", "secring.gpg"));
             }
         }
 
@@ -315,18 +337,18 @@ public final class Utils {
             // if the environment variables above have failed
 
             // Roaming profile on Vista and later
-            locations.add(joinPaths(home, "AppData", "Roaming", "gnupg", "secring.gpg"));
+            locations.add(joinLocalPath(home, "AppData", "Roaming", "gnupg", "secring.gpg"));
             // Local profile on Vista and later
-            locations.add(joinPaths(home, "AppData", "Local", "gnupg", "secring.gpg"));
+            locations.add(joinLocalPath(home, "AppData", "Local", "gnupg", "secring.gpg"));
             // Roaming profile on 2000 and XP
-            locations.add(joinPaths(home, "Application Data", "gnupg", "secring.gpg"));
+            locations.add(joinLocalPath(home, "Application Data", "gnupg", "secring.gpg"));
             // Local profile on 2000 and XP
-            locations.add(joinPaths(home, "Local Settings", "Application Data", "gnupg", "secring.gpg"));
+            locations.add(joinLocalPath(home, "Local Settings", "Application Data", "gnupg", "secring.gpg"));
         }
 
         // *nix, including OS X
         if (home != null) {
-            locations.add(joinPaths(home, ".gnupg", "secring.gpg"));
+            locations.add(joinLocalPath(home, ".gnupg", "secring.gpg"));
         }
 
         return locations;
@@ -356,32 +378,6 @@ public final class Utils {
             }
         }
         throw new FileNotFoundException(message.toString());
-    }
-
-    /**
-     * Join together path elements with File.separator. Filters out null
-     * elements.
-     *
-     * @param elements The path elements to join
-     * @return elements concatenated together with File.separator
-     */
-    public static String joinPaths(String... elements) {
-        StringBuilder builder = new StringBuilder();
-        boolean first = true;
-        for (String element : elements) {
-            // Skip null elements
-            if (element == null) {
-                // This won't change the value of first if we skip elements
-                // in the beginning of the array
-                continue;
-            }
-            if (!first) {
-                builder.append(File.separatorChar);
-            }
-            builder.append(element);
-            first = false;
-        }
-        return builder.toString();
     }
 
     /**

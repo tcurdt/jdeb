@@ -56,8 +56,10 @@ public final class PermMapper implements Mapper {
     }
 
     public TarArchiveEntry map( final TarArchiveEntry entry ) {
-        final String name = entry.getName();
-        entry.setName(prefix + '/' + Utils.stripPath(strip, name));
+        entry.setName(Utils.joinUnixPath(
+                prefix,
+                Utils.stripPath(strip, entry.getName()
+                )));
 
         // Set ownership
         if (uid > -1) {
