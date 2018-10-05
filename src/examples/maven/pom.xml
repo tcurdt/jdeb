@@ -46,7 +46,7 @@
                                   <type>link</type>
                                   <symlink>true</symlink>
                                   <linkName>/usr/share/java/jdeb.jar</linkName>
-                                  <linkTarget>/usr/share/jdeb/lib/${project.build.finalName}.jar</linkTarget>
+                                  <linkTarget>lib/${project.build.finalName}.jar</linkTarget>
                                 </data>
 
                                 <data>
