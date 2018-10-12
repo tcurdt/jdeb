@@ -253,6 +253,13 @@ public class DebMojo extends AbstractMojo {
     private String snapshotEnv;
 
     /**
+     * Template for replacing the SNAPSHOT value. A timestamp format can be provided in brackets.
+     * prefix[yyMMdd]suffix -> prefix151230suffix
+     */
+    @Parameter
+    private String snapshotTemplate;
+
+    /**
      * If verbose is true more build messages are logged.
      */
     @Parameter(defaultValue = "false")
@@ -419,7 +426,7 @@ public class DebMojo extends AbstractMojo {
      * @return the Maven project version
      */
     private String getProjectVersion() {
-        return Utils.convertToDebianVersion(getProject().getVersion(), this.snapshotExpand, this.snapshotEnv, session.getStartTime());
+        return Utils.convertToDebianVersion(getProject().getVersion(), this.snapshotExpand, this.snapshotEnv, this.snapshotTemplate, session.getStartTime());
     }
 
     /**

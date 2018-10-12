@@ -228,6 +228,20 @@ public final class Utils {
         return filteredFile.toByteArray();
     }
 
+    private static String formatSnapshotTemplate( String template, Date timestamp ) {
+        int startBracket = template.indexOf('[');
+        int endBracket = template.indexOf(']');
+        if(startBracket == -1 || endBracket == -1) {
+            return template;
+        } else {
+            // prefix[yyMMdd]suffix
+            final String date = new SimpleDateFormat(template.substring(startBracket + 1, endBracket)).format(timestamp);
+            String datePrefix = startBracket == 0 ? "" : template.substring(0, startBracket);
+            String dateSuffix = endBracket == template.length() ? "" : template.substring(endBracket + 1);
+            return datePrefix + date + dateSuffix;
+        }
+    }
+
     /**
      * Convert the project version to a version suitable for a Debian package.
      * -SNAPSHOT suffixes are replaced with a timestamp (~yyyyMMddHHmmss).
@@ -235,21 +249,26 @@ public final class Utils {
      * such that the version is always ordered before the final or GA release.
      *
      * @param version the project version to convert to a Debian package version
+     * @param template the template used to replace -SNAPSHOT, the timestamp format is in brackets,
+     *        the rest of the string is preserved (prefix[yyMMdd]suffix -> prefix151230suffix)
      * @param timestamp the UTC date used as the timestamp to replace the SNAPSHOT suffix.
      */
-    public static String convertToDebianVersion( String version, boolean apply, String envName, Date timestamp ) {
+    public static String convertToDebianVersion( String version, boolean apply, String envName, String template, Date timestamp ) {
         Matcher matcher = SNAPSHOT_PATTERN.matcher(version);
         if (matcher.matches()) {
             version = matcher.group(1) + "~";
 
             if (apply) {
                 final String envValue = System.getenv(envName);
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                final String snapshot = (envValue != null && envValue.length() > 0)
-                        ? envValue
-                        : dateFormat.format(timestamp);
-                version += snapshot;
+                if(template != null && template.length() > 0) {
+                    version += formatSnapshotTemplate(template, timestamp);
+                } else if (envValue != null && envValue.length() > 0) {
+                    version += envValue;
+                } else {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    version += dateFormat.format(timestamp);
+                }
             } else {
                 version += "SNAPSHOT";
             }
