@@ -228,6 +228,20 @@ public final class Utils {
         return filteredFile.toByteArray();
     }
 
+    private static String formatSnapshotTemplate( String template, Date timestamp ) {
+        int startBracket = template.indexOf('[');
+        int endBracket = template.indexOf(']');
+        if(startBracket == -1 || endBracket == -1) {
+            return template;
+        } else {
+            // prefix[yyMMdd]suffix
+            final String date = new SimpleDateFormat(template.substring(startBracket + 1, endBracket)).format(timestamp);
+            String datePrefix = startBracket == 0 ? "" : template.substring(0, startBracket);
+            String dateSuffix = endBracket == template.length() ? "" : template.substring(endBracket + 1);
+            return datePrefix + date + dateSuffix;
+        }
+    }
+
     /**
      * Convert the project version to a version suitable for a Debian package.
      * -SNAPSHOT suffixes are replaced with a timestamp (~yyyyMMddHHmmss).
@@ -247,17 +261,7 @@ public final class Utils {
             if (apply) {
                 final String envValue = System.getenv(envName);
                 if(template != null && template.length() > 0) {
-                    int startBracket = template.indexOf('[');
-                    int endBracket = template.indexOf(']');
-                    if(startBracket == -1 || endBracket == -1) {
-                      version += template;
-                    } else {
-                        // prefix[yyMMdd]suffix
-                        final String date = new SimpleDateFormat(template.substring(startBracket + 1, endBracket)).format(timestamp);
-                        String datePrefix = startBracket == 0 ? "" : template.substring(0, startBracket);
-                        String dateSuffix = endBracket == template.length() ? "" : template.substring(endBracket + 1);
-                        version += datePrefix + date + dateSuffix;
-                    }
+                    version += formatSnapshotTemplate(template, timestamp);
                 } else if (envValue != null && envValue.length() > 0) {
                     version += envValue;
                 } else {

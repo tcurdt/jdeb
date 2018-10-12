@@ -113,33 +113,33 @@ configuration options provide the same features available in the jdeb ant
 task. To configure the jdeb maven plugin, populate the jdeb configuration
 section with any of the following options:
 
-Element       | Description                                                                  | Required
-------------- | ---------------------------------------------------------------------------- | -----------------------------------------------------------------
-deb           | The debian package to be generated                                           | No; defaults to `${buildDirectory}/${artifactId}_${version}.deb`
-type          | Artifact type                                                                | No; defaults to `deb`
-classifier    | Artifact classifier                                                          | No; defaults to ''
-controlDir    | The directory containing the control files                                   | No; defaults to `src/deb/control`
-installDir    | The default directory for the project artifact if no data section is present | No; defaults to `/opt/${artifactId}`
-dataSet       | A list of directories, tarballs, or files to include in the deb package      | No; defaults to include your maven artifact
-changesIn     | The changes to add                                                           | No
-changesOut    | The changes file generated                                                   | No
-changesSave   | (NYI) The merged changes file                                                | No
-compression   | (NYI) Compression method for the data file (`gzip`, `bzip2`, `xz` or `none`) | No; defaults to `gzip`
-signPackage   | If the debian package should be signed                                       | No
-signMethod    | Which utility is used for verification (`dpkg-sig`, `debsig-verify`)         | No; defaults to `debsig-verify`
-signRole      | Determines the filename of the signature, debsig only verifies `origin`      | No; defaults to `origin`
-signCfgPrefix | Prefix for when reading keyring, key and passphrase from settings.xml        | No; defaults to `jdeb.`
-keyring       | The file containing the PGP keys                                             | No
-key           | The name of the key to be used in the keyring                                | No
-passphrase    | The passphrase to use the key                                                | No
-attach        | Attach artifact to project                                                   | No; defaults to `true`
-snapshotExpand| Expand SNAPSHOT into the content of an environment variable or timestamp.    | No; defaults to `false`
-snapshotEnv   | Name of the environment variable. If it's empty defaults to a timestamp.     | No; defaults to `SNAPSHOT`
-verbose       | Verbose logging                                                              | No; defaults to `true`, will be `false` in the future
-skip          | Indicates if an execution should be skipped                                  | No; defaults to `false`
-skipSubmodules| Skip goal on all submodules                                                  | No; defaults to `false`
-skipPOMs      | Skip goal on POM artifacts                                                   | No; defaults to `true`
-
+Element          | Description                                                                                | Required
+---------------- | ------------------------------------------------------------------------------------------ | -----------------------------------------------------------------
+deb              | The debian package to be generated                                                         | No; defaults to `${buildDirectory}/${artifactId}_${version}.deb`
+type             | Artifact type                                                                              | No; defaults to `deb`
+classifier       | Artifact classifier                                                                        | No; defaults to ''
+controlDir       | The directory containing the control files                                                 | No; defaults to `src/deb/control`
+installDir       | The default directory for the project artifact if no data section is present               | No; defaults to `/opt/${artifactId}`
+dataSet          | A list of directories, tarballs, or files to include in the deb package                    | No; defaults to include your maven artifact
+changesIn        | The changes to add                                                                         | No
+changesOut       | The changes file generated                                                                 | No
+changesSave      | (NYI) The merged changes file                                                              | No
+compression      | (NYI) Compression method for the data file (`gzip`, `bzip2`, `xz` or `none`)               | No; defaults to `gzip`
+signPackage      | If the debian package should be signed                                                     | No
+signMethod       | Which utility is used for verification (`dpkg-sig`, `debsig-verify`)                       | No; defaults to `debsig-verify`
+signRole         | Determines the filename of the signature, debsig only verifies `origin`                    | No; defaults to `origin`
+signCfgPrefix    | Prefix for when reading keyring, key and passphrase from settings.xml                      | No; defaults to `jdeb.`
+keyring          | The file containing the PGP keys                                                           | No
+key              | The name of the key to be used in the keyring                                              | No
+passphrase       | The passphrase to use the key                                                              | No
+attach           | Attach artifact to project                                                                 | No; defaults to `true`
+snapshotExpand   | Expand SNAPSHOT into the content of an environment variable or timestamp.                  | No; defaults to `false`
+snapshotEnv      | Name of the environment variable. If it's empty defaults to a timestamp.                   | No; defaults to `SNAPSHOT`
+snapshotTemplate | Template for replacing the SNAPSHOT value. A timestamp format can be provided in brackets. | No;
+verbose          | Verbose logging                                                                            | No; defaults to `true`, will be `false` in the future
+skip             | Indicates if an execution should be skipped                                                | No; defaults to `false`
+skipSubmodules   | Skip goal on all submodules                                                                | No; defaults to `false`
+skipPOMs         | Skip goal on POM artifacts                                                                 | No; defaults to `true`
 
 If you use the `dataSet` element, you'll need to populate it with a one or
 more `data` elements. A `data` element is used to specify a directory, a
