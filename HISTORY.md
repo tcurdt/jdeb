@@ -1,3 +1,11 @@
+## Version 1.7, released xx.xx.2018
+
+* [FIX] Fixed a regression. Always provide the proper relative paths in archives.
+* [FIX] Upgraded deps
+* [FIX] Windows fixes
+* [ADD] Added example to show file and dirmode
+* [ADD] Added support custom snapshot patterns (Thanks to Jamie Magee)
+
 ## Version 1.6, released 03.01.2018
 
 * [CHG] Upgraded Commons Compress
