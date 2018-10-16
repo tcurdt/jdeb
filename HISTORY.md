@@ -1,4 +1,4 @@
-## Version 1.7, released xx.xx.2018
+## Version 1.7, released 16.10.2018
 
 * [FIX] Fixed a regression. Always provide the proper relative paths in archives.
 * [FIX] Upgraded deps
