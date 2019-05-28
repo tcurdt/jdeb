@@ -503,6 +503,12 @@ public class DebMaker {
             if (packageControlFile.get("Description") == null) {
                 packageControlFile.set("Description", description);
             }
+            if (packageControlFile.get("Depends") == null) {
+                // Only add a depends entry to the control file if the field in this object has actually been set
+                if (depends != null && depends.length() > 0) {
+                    packageControlFile.set("Depends", depends);
+                }
+            }
             if (packageControlFile.get("Homepage") == null) {
                 packageControlFile.set("Homepage", homepage);
             }
