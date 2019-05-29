@@ -188,9 +188,48 @@ public final class DebMakerTestCase extends Assert {
             public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
                 if (entry.getName().contains("control")) {
                     String control = new String(content, "ISO-8859-1");
-                    assertFalse("Depends should be omitted" + entry.getName(), control.contains("Depends:"));
+                    assertFalse("Depends should be omitted in the control file " + entry.getName(), control.contains("Depends:"));
                 }
             }
         });
+
+        assertTrue("Control files not found in the package", found);
+    }
+
+    @Test
+    public void testDependsIsIncludedIfSet() throws Exception {
+        File deb = new File("target/test-classes/test-control.deb");
+        if (deb.exists() && !deb.delete()) {
+            fail("Couldn't delete " + deb);
+        }
+        // Reuse the no-depends-set controlwithoutdepends file then programatically add a depends
+
+        Collection<DataProducer> producers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
+        Collection<DataProducer> conffileProducers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
+        DebMaker maker = new DebMaker(new NullConsole(), producers, conffileProducers);
+        maker.setDeb(deb);
+        maker.setControl(new File("target/test-classes/org/vafer/jdeb/deb/controlwithoutdepends"));
+
+        final String dependsString = "important-dependency ( > 5)";
+        maker.setDepends(dependsString);
+
+        maker.createDeb(Compression.NONE);
+
+        // now reopen the package and check the control files
+        assertTrue("package not build", deb.exists());
+
+        boolean found = ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
+            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
+                if (entry.getName().contains("control")) {
+                    String control = new String(content, "ISO-8859-1");
+
+                    assertTrue("Depends should be present in the control file " + entry.getName(), control.contains("Depends:"));
+                    assertTrue("The control file " + entry.getName() + " should specify intended dependency '" + dependsString + "'",
+                        control.contains("Depends: " + dependsString));
+                }
+            }
+        });
+
+        assertTrue("Control files not found in the package", found);
     }
 }
