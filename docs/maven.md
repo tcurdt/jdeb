@@ -115,7 +115,7 @@ section with any of the following options:
 
 Element          | Description                                                                                | Required
 ---------------- | ------------------------------------------------------------------------------------------ | -----------------------------------------------------------------
-deb              | The debian package to be generated                                                         | No; defaults to `${buildDirectory}/${artifactId}_${version}.deb`
+deb              | The debian package to be generated                                                         | No; defaults to `${buildDirectory}/${artifactId}_${version}_all.deb`
 type             | Artifact type                                                                              | No; defaults to `deb`
 classifier       | Artifact classifier                                                                        | No; defaults to ''
 controlDir       | The directory containing the control files                                                 | No; defaults to `src/deb/control`
