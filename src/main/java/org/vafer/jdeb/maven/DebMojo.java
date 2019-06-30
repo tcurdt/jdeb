@@ -270,13 +270,13 @@ public class DebMojo extends AbstractMojo {
      *
      * @since 1.1
      */
-    @Parameter(defaultValue = "false")
+    @Parameter(property = "jdeb.skip", defaultValue = "false")
     private boolean skip;
 
-    @Parameter(defaultValue = "true")
+    @Parameter(property = "jdeb.skipPOMs", defaultValue = "true")
     private boolean skipPOMs;
 
-    @Parameter(defaultValue = "false")
+    @Parameter(property = "jdeb.skipSubmodules", defaultValue = "false")
     private boolean skipSubmodules;
 
     /**
