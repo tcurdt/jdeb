@@ -1,6 +1,6 @@
 language: java
 jdk:
-  - oraclejdk8
+  - openjdk8
 
 before_install:
   - sudo hostname "$(hostname | cut -c1-63)"
