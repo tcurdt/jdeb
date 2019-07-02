@@ -69,7 +69,6 @@ public final class ChangesFile extends ControlFile {
         set("Architecture", packageControlFile.get("Architecture"));
         set("Version",      packageControlFile.get("Version"));
         set("Maintainer",   packageControlFile.get("Maintainer"));
-        set("Changed-By",   packageControlFile.get("Maintainer"));
         set("Distribution", packageControlFile.get("Distribution"));
 
         for (Entry<String, String> entry : packageControlFile.getUserDefinedFields().entrySet()) {
