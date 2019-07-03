@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Marko.koren.
+ * Copyright 2019 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,6 @@ import org.junit.Test;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 import org.vafer.jdeb.debian.ChangesFile;
 
-/**
- *
- * @author Marko.koren
- */
 public class ChangesFileBuilderTestCase {
     
     @Test
