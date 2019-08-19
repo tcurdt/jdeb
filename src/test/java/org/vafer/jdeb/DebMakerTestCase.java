@@ -22,31 +22,22 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.Assert;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
-import org.junit.rules.TemporaryFolder;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
-import org.vafer.jdeb.mapping.Mapper;
-import org.vafer.jdeb.mapping.PermMapper;
 import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
 import org.vafer.jdeb.producers.DataProducerLink;
-import org.vafer.jdeb.producers.DataProducerPathTemplate;
 import org.vafer.jdeb.utils.InformationInputStream;
 import org.vafer.jdeb.utils.MapVariableResolver;
 
 public final class DebMakerTestCase extends Assert {
-
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
 
     @Test
     public void testCreation() throws Exception {
@@ -240,89 +231,5 @@ public final class DebMakerTestCase extends Assert {
         });
 
         assertTrue("Control files not found in the package", found);
-    }
-
-    @Test
-    public void testLongLinkNameGnu() throws Exception {
-        String longPathDirName = "/var/log/" + longPathSuffix();
-        Mapper mapper = new PermMapper(-1, -1, "root", "root", -1, -1, 0, null);
-        String[] directories = { longPathDirName };
-        Mapper[] mappers = { mapper };
-        DataProducerPathTemplate dataProducer =  new DataProducerPathTemplate(directories, null, null, mappers);
-
-        DataProducer linkProducer = new DataProducerLink("/var/log/short", longPathDirName, true, null, null, null);
-
-        File deb = folder.newFile("file.deb");
-
-        List<DataProducer> producers = Arrays.asList(linkProducer, dataProducer);
-
-        DebMaker maker = new DebMaker(new NullConsole(), producers, null);
-        maker.setControl(new File(getClass().getResource("deb/control").toURI()));
-        maker.setTarLongFileMode("posix");
-        maker.setDeb(deb);
-        maker.setCompression(Compression.GZIP.toString());
-
-        BinaryPackageControlFile packageControlFile = maker.createDeb(Compression.GZIP);
-
-        assertTrue(packageControlFile.isValid());
-
-        final Map<String, TarArchiveEntry> filesInDeb = new HashMap<String, TarArchiveEntry>();
-
-        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                filesInDeb.put(entry.getName(), entry);
-            }
-        }, Compression.GZIP);
-
-        assertTrue("longname file wasn't found in the package", filesInDeb.containsKey("." + File.separator + longPathDirName + File.separator));
-        assertTrue("short wasn't found in the package", filesInDeb.containsKey("./var/log/short"));
-        assertTrue("Cannot delete the file " + deb, deb.delete());
-    }
-
-    @Test
-    public void testLongLinkNamePosix() throws Exception {
-        String longPathDirName = "/var/log/" + longPathSuffix();
-        Mapper mapper = new PermMapper(-1, -1, "root", "root", -1, -1, 0, null);
-        String[] directories = { longPathDirName };
-        Mapper[] mappers = { mapper };
-        DataProducerPathTemplate dataProducer =  new DataProducerPathTemplate(directories, null, null, mappers);
-
-        DataProducer linkProducer = new DataProducerLink("/var/log/short", longPathDirName, true, null, null, null);
-
-        File deb = folder.newFile("file.deb");
-
-        List<DataProducer> producers = Arrays.asList(linkProducer, dataProducer);
-
-        DebMaker maker = new DebMaker(new NullConsole(), producers, null);
-        maker.setControl(new File(getClass().getResource("deb/control").toURI()));
-        maker.setTarLongFileMode("posix");
-        maker.setDeb(deb);
-        maker.setCompression(Compression.GZIP.toString());
-
-        BinaryPackageControlFile packageControlFile = maker.createDeb(Compression.GZIP);
-
-        assertTrue(packageControlFile.isValid());
-
-        final Map<String, TarArchiveEntry> filesInDeb = new HashMap<String, TarArchiveEntry>();
-
-        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                filesInDeb.put(entry.getName(), entry);
-            }
-        }, Compression.GZIP);
-
-        assertTrue("longname file wasn't found in the package", filesInDeb.containsKey("." + File.separator + longPathDirName + File.separator));
-        assertTrue("short wasn't found in the package", filesInDeb.containsKey("./var/log/short"));
-        assertTrue("Cannot delete the file " + deb, deb.delete());
-    }
-
-    private String longPathSuffix() {
-        StringBuilder builder = new StringBuilder();
-
-        for(int i = 0; i < 20; ++i) {
-            builder.append("loooongname");
-        }
-
-        return builder.toString();
     }
 }
