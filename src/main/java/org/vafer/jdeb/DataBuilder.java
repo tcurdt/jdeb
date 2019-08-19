@@ -168,8 +168,6 @@ class DataBuilder {
             }
 
             public void onEachLink(TarArchiveEntry entry) throws IOException {
-                // Check link name
-                checkField(entry.getLinkName(), TarConstants.NAMELEN);
                 // Check user name
                 checkField(entry.getUserName(), TarConstants.UNAMELEN);
                 // Check group name
