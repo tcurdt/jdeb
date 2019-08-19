@@ -243,106 +243,14 @@ public final class DebMakerTestCase extends Assert {
     }
 
     @Test
-    public void testLongFilePosix() throws Exception {
-
-        File control = new File(getClass().getResource("deb/control/control").toURI());
-        File archive1 = new File(getClass().getResource("deb/data.tgz").toURI());
-        File archive2 = new File(getClass().getResource("deb/data.tar.bz2").toURI());
-        File archive3 = new File(getClass().getResource("deb/data.zip").toURI());
-        File directory = new File(getClass().getResource("deb/data").toURI());
-
-        DataProducer[] data = new DataProducer[] {
-                new DataProducerArchive(archive1, null, null, null),
-                new DataProducerArchive(archive2, null, null, null),
-                new DataProducerArchive(archive3, null, null, null),
-                new DataProducerDirectory(directory, null, new String[] { "**/.svn/**" }, null),
-                new DataProducerLink("/link/path-element.ext", "/link/target-element.ext", true, null, null, null)
-        };
-
-        File deb = File.createTempFile("jdeb", ".deb");
-
-        DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data), null);
-        maker.setTarLongFileMode("posix");
-        maker.setControl(new File(getClass().getResource("deb/control").toURI()));
-        maker.setDeb(deb);
-
-        BinaryPackageControlFile packageControlFile = maker.createDeb(Compression.GZIP);
-
-        assertTrue(packageControlFile.isValid());
-
-        final Map<String, TarArchiveEntry> filesInDeb = new HashMap<String, TarArchiveEntry>();
-
-        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                filesInDeb.put(entry.getName(), entry);
-            }
-        }, Compression.GZIP);
-
-        assertTrue("testfile wasn't found in the package", filesInDeb.containsKey("./test/testfile"));
-        assertTrue("testfile2 wasn't found in the package", filesInDeb.containsKey("./test/testfile2"));
-        assertTrue("testfile3 wasn't found in the package", filesInDeb.containsKey("./test/testfile3"));
-        assertTrue("testfile4 wasn't found in the package", filesInDeb.containsKey("./test/testfile4"));
-        assertTrue("/link/path-element.ext wasn't found in the package", filesInDeb.containsKey("./link/path-element.ext"));
-        assertEquals("/link/path-element.ext has wrong link target", "/link/target-element.ext", filesInDeb.get("./link/path-element.ext").getLinkName());
-
-        assertTrue("Cannot delete the file " + deb, deb.delete());
-    }
-
-    @Test
-    public void testLongFileGnu() throws Exception {
-
-        File control = new File(getClass().getResource("deb/control/control").toURI());
-        File archive1 = new File(getClass().getResource("deb/data.tgz").toURI());
-        File archive2 = new File(getClass().getResource("deb/data.tar.bz2").toURI());
-        File archive3 = new File(getClass().getResource("deb/data.zip").toURI());
-        File directory = new File(getClass().getResource("deb/data").toURI());
-
-        DataProducer[] data = new DataProducer[] {
-                new DataProducerArchive(archive1, null, null, null),
-                new DataProducerArchive(archive2, null, null, null),
-                new DataProducerArchive(archive3, null, null, null),
-                new DataProducerDirectory(directory, null, new String[] { "**/.svn/**" }, null),
-                new DataProducerLink("/link/path-element.ext", "/link/target-element.ext", true, null, null, null)
-        };
-
-        File deb = File.createTempFile("jdeb", ".deb");
-
-        DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data), null);
-        maker.setTarLongFileMode("gnu");
-        maker.setControl(new File(getClass().getResource("deb/control").toURI()));
-        maker.setDeb(deb);
-
-        BinaryPackageControlFile packageControlFile = maker.createDeb(Compression.GZIP);
-
-        assertTrue(packageControlFile.isValid());
-
-        final Map<String, TarArchiveEntry> filesInDeb = new HashMap<String, TarArchiveEntry>();
-
-        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                filesInDeb.put(entry.getName(), entry);
-            }
-        }, Compression.GZIP);
-
-        assertTrue("testfile wasn't found in the package", filesInDeb.containsKey("./test/testfile"));
-        assertTrue("testfile2 wasn't found in the package", filesInDeb.containsKey("./test/testfile2"));
-        assertTrue("testfile3 wasn't found in the package", filesInDeb.containsKey("./test/testfile3"));
-        assertTrue("testfile4 wasn't found in the package", filesInDeb.containsKey("./test/testfile4"));
-        assertTrue("/link/path-element.ext wasn't found in the package", filesInDeb.containsKey("./link/path-element.ext"));
-        assertEquals("/link/path-element.ext has wrong link target", "/link/target-element.ext", filesInDeb.get("./link/path-element.ext").getLinkName());
-
-        assertTrue("Cannot delete the file " + deb, deb.delete());
-    }
-
-    @Test
     public void testLongLinkNameGnu() throws Exception {
-        String directoryName = "/var/log/" + longPathSuffix();
+        String longPathDirName = "/var/log/" + longPathSuffix();
         Mapper mapper = new PermMapper(-1, -1, "root", "root", -1, -1, 0, null);
-        String[] directories = { directoryName };
+        String[] directories = { longPathDirName };
         Mapper[] mappers = { mapper };
         DataProducerPathTemplate dataProducer =  new DataProducerPathTemplate(directories, null, null, mappers);
 
-        DataProducer linkProducer = new DataProducerLink("/var/log/short", directoryName, true, null, null, null);
+        DataProducer linkProducer = new DataProducerLink("/var/log/short", longPathDirName, true, null, null, null);
 
         File deb = folder.newFile("file.deb");
 
@@ -366,20 +274,20 @@ public final class DebMakerTestCase extends Assert {
             }
         }, Compression.GZIP);
 
-        assertTrue("longname file wasn't found in the package", filesInDeb.containsKey(".//var/log/loooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongname/"));
+        assertTrue("longname file wasn't found in the package", filesInDeb.containsKey("." + File.separator + longPathDirName + File.separator));
         assertTrue("short wasn't found in the package", filesInDeb.containsKey("./var/log/short"));
         assertTrue("Cannot delete the file " + deb, deb.delete());
     }
 
     @Test
     public void testLongLinkNamePosix() throws Exception {
-        String directoryName = "/var/log/" + longPathSuffix();
+        String longPathDirName = "/var/log/" + longPathSuffix();
         Mapper mapper = new PermMapper(-1, -1, "root", "root", -1, -1, 0, null);
-        String[] directories = { directoryName };
+        String[] directories = { longPathDirName };
         Mapper[] mappers = { mapper };
         DataProducerPathTemplate dataProducer =  new DataProducerPathTemplate(directories, null, null, mappers);
 
-        DataProducer linkProducer = new DataProducerLink("/var/log/short", directoryName, true, null, null, null);
+        DataProducer linkProducer = new DataProducerLink("/var/log/short", longPathDirName, true, null, null, null);
 
         File deb = folder.newFile("file.deb");
 
@@ -403,7 +311,7 @@ public final class DebMakerTestCase extends Assert {
             }
         }, Compression.GZIP);
 
-        assertTrue("longname file wasn't found in the package", filesInDeb.containsKey(".//var/log/loooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongnameloooongname/"));
+        assertTrue("longname file wasn't found in the package", filesInDeb.containsKey("." + File.separator + longPathDirName + File.separator));
         assertTrue("short wasn't found in the package", filesInDeb.containsKey("./var/log/short"));
         assertTrue("Cannot delete the file " + deb, deb.delete());
     }
