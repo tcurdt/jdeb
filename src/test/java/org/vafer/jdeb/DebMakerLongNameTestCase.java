@@ -52,6 +52,7 @@ public class DebMakerLongNameTestCase extends Assert {
     @Parameter(2)
     public int nameLength;
 
+    private final String FOLDER_SEPARATOR = "/";
 
     @Test
     public void testLongLinkName() throws Exception {
@@ -86,17 +87,17 @@ public class DebMakerLongNameTestCase extends Assert {
             }
         }, Compression.GZIP);
 
-        assertTrue("longname file wasn't found in the package", filesInDeb.containsKey("." + File.separator + longPathDirName + File.separator));
+        assertTrue("longname file wasn't found in the package", filesInDeb.containsKey("." + FOLDER_SEPARATOR + longPathDirName + FOLDER_SEPARATOR));
         assertTrue("short wasn't found in the package", filesInDeb.containsKey("." + shortPathDirName));
         assertTrue("Cannot delete the file " + deb, deb.delete());
     }
 
     private String createLongPath(int numDirectories, int nameLength) {
         StringBuilder builder = new StringBuilder();
-        builder.append(File.separator);
+        builder.append(FOLDER_SEPARATOR);
         for(int i = 0; i < numDirectories; ++i) {
             builder.append(i);
-            builder.append(File.separator);
+            builder.append(FOLDER_SEPARATOR);
         }
         for(int i = 0; i < nameLength; ++i) {
             builder.append(i);
