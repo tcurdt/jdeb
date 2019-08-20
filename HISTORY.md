@@ -1,3 +1,5 @@
+* [FIX] Removed unnessary file/path limitation (Thanks to Roberto Perez Alcolea)
+
 ## Version 1.7, released 16.10.2018
 
 * [FIX] Fixed a regression. Always provide the proper relative paths in archives.
