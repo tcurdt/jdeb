@@ -1,4 +1,7 @@
+## Version 1.8, released 24.08.2019
+
 * [FIX] Removed unnessary file/path limitation (Thanks to Roberto Perez Alcolea)
+* [FIX] Upgraded deps
 
 ## Version 1.7, released 16.10.2018
 
