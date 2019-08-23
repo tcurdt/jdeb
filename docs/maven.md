@@ -9,7 +9,7 @@ the plugin to your POM like this
       <plugin>
         <artifactId>jdeb</artifactId>
         <groupId>org.vafer</groupId>
-        <version>1.7</version>
+        <version>1.8</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -47,7 +47,7 @@ Or if you want to build a custom deb file
       <extension>
         <groupId>org.vafer</groupId>
         <artifactId>jdeb</artifactId>
-        <version>1.7</version>
+        <version>1.8</version>
       </extension>
     </extensions>
     <pluginManagement>
@@ -185,7 +185,7 @@ include a directory, a tarball, and a file in your deb package and then sign it 
       <plugin>
         <artifactId>jdeb</artifactId>
         <groupId>org.vafer</groupId>
-        <version>1.7</version>
+        <version>1.8</version>
         <executions>
           <execution>
             <phase>package</phase>
