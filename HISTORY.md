@@ -1,3 +1,7 @@
+## Version 1.9, released xx.03.2020
+
+* [CHG] Upgraded plugins and dependencies, now requires maven 3.3.9 and java 1.7
+
 ## Version 1.8, released 24.08.2019
 
 * [FIX] Removed unnessary file/path limitation (Thanks to Roberto Perez Alcolea)
