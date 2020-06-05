@@ -232,11 +232,11 @@ public class DebMojo extends AbstractMojo {
     @Parameter
     private Data[] dataSet;
 
-    /**
-     * @deprecated
-    @Parameter(defaultValue = "false")
-    private boolean timestamped;
-     */
+//    /**
+//     * @deprecated
+//     */
+//    @Parameter(defaultValue = "false")
+//    private boolean timestamped;
 
     /**
      * When enabled SNAPSHOT inside the version gets replaced with current timestamp or
