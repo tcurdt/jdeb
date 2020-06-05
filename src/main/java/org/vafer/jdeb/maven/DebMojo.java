@@ -411,6 +411,19 @@ public class DebMojo extends AbstractMojo {
         variables.put("baseDir", getProject().getBasedir().getAbsolutePath());
         variables.put("buildDir", buildDirectory.getAbsolutePath());
         variables.put("project.version", getProject().getVersion());
+
+        if (getProject().getInceptionYear() != null) {
+            variables.put("project.inceptionYear", getProject().getInceptionYear());
+        }
+        if (getProject().getOrganization() != null) {
+            if (getProject().getOrganization().getName() != null) {
+                variables.put("project.organization.name", getProject().getOrganization().getName());
+            }
+            if (getProject().getOrganization().getUrl() != null) {
+                variables.put("project.organization.url", getProject().getOrganization().getUrl());
+            }
+        }
+
         variables.put("url", getProject().getUrl());
 
         return new MapVariableResolver(variables);
