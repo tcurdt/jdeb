@@ -232,11 +232,11 @@ public class DebMojo extends AbstractMojo {
     @Parameter
     private Data[] dataSet;
 
-    /**
-     * @deprecated
-    @Parameter(defaultValue = "false")
-    private boolean timestamped;
-     */
+//    /**
+//     * @deprecated
+//     */
+//    @Parameter(defaultValue = "false")
+//    private boolean timestamped;
 
     /**
      * When enabled SNAPSHOT inside the version gets replaced with current timestamp or
@@ -411,6 +411,19 @@ public class DebMojo extends AbstractMojo {
         variables.put("baseDir", getProject().getBasedir().getAbsolutePath());
         variables.put("buildDir", buildDirectory.getAbsolutePath());
         variables.put("project.version", getProject().getVersion());
+
+        if (getProject().getInceptionYear() != null) {
+            variables.put("project.inceptionYear", getProject().getInceptionYear());
+        }
+        if (getProject().getOrganization() != null) {
+            if (getProject().getOrganization().getName() != null) {
+                variables.put("project.organization.name", getProject().getOrganization().getName());
+            }
+            if (getProject().getOrganization().getUrl() != null) {
+                variables.put("project.organization.url", getProject().getOrganization().getUrl());
+            }
+        }
+
         variables.put("url", getProject().getUrl());
 
         return new MapVariableResolver(variables);
