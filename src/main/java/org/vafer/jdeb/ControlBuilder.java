@@ -52,7 +52,7 @@ class ControlBuilder {
     private static final Set<String> MAINTAINER_SCRIPTS = new HashSet<String>(Arrays.asList("preinst", "postinst", "prerm", "postrm", "config"));
 
     /** The name of the other control files subject to token substitution */
-    private static final Set<String> CONFIGURATION_FILENAMES = new HashSet<String>(Arrays.asList("conffiles", "templates", "triggers"));
+    private static final Set<String> CONFIGURATION_FILENAMES = new HashSet<String>(Arrays.asList("conffiles", "templates", "triggers", "copyright"));
 
     private Console console;
     private VariableResolver resolver;
