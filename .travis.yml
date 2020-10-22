@@ -1,6 +1,10 @@
 language: java
-jdk:
-  - openjdk8
+matrix:
+  include:
+    - jdk: openjdk8
+    - arch: ppc64le
+      addons: [ apt: [ packages: maven ]]
+      jdk: openjdk8
 
 before_install:
   - sudo hostname "$(hostname | cut -c1-63)"
