@@ -1,0 +1,41 @@
+name: ossrh
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  ossrh:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup
+      uses: actions/setup-java@v1
+      with:
+        java-version: 14
+        server-id: ossrh
+        server-username: MAVEN_USERNAME
+        server-password: MAVEN_PASSWORD
+
+    # - name: Deploy
+    #     uses: samuelmeuli/action-maven-publish@v1
+    #     with:
+    #       gpg_private_key: ${{ secrets.gpg_private_key }}
+    #       gpg_passphrase: ${{ secrets.gpg_passphrase }}
+    #       nexus_username: ${{ secrets.nexus_username }}
+    #       nexus_password: ${{ secrets.nexus_password }}
+
+    - name: Deploy
+      run: mvn -B deploy site
+      env:
+        MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+        MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+
+    # - name: Docs
+    #   uses: peaceiris/actions-gh-pages@v3
+    #   with:
+    #     github_token: ${{ secrets.GITHUB_TOKEN }}
+    #     publish_dir: ./target/site
