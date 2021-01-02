@@ -1,8 +1,7 @@
-[![Linux/Mac Build Status](https://secure.travis-ci.org/tcurdt/jdeb.png)](http://travis-ci.org/tcurdt/jdeb)
-[![Windows Build Status](https://img.shields.io/appveyor/ci/tcurdt/jdeb/master.svg?label=windows)](https://ci.appveyor.com/project/tcurdt/jdeb/branch/master)
-[![Coverage Status](https://coveralls.io/repos/tcurdt/jdeb/badge.svg?branch=master&service=github)](https://coveralls.io/github/tcurdt/jdeb?branch=master)
-[![Maven Central](https://img.shields.io/maven-central/v/org.vafer/jdeb.svg?maxAge=86400)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.vafer%22%20AND%20a%3A%22jdeb%22)
-[![Join the chat at https://gitter.im/tcurdt/jdeb](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/tcurdt/jdeb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://img.shields.io/github/workflow/status/tcurdt/jdeb/ci?style=for-the-badge)](https://github.com/tcurdt/jdeb/actions)
+[![Coverage Status](https://img.shields.io/codecov/c/github/tcurdt/jdeb/master?style=for-the-badge)](https://codecov.io/gh/tcurdt/jdeb)
+[![Maven Central](https://img.shields.io/maven-central/v/org.vafer/jdeb.svg?style=for-the-badge&maxAge=86400)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.vafer%22%20AND%20a%3A%22jdeb%22)
+[![Join the chat](https://img.shields.io/gitter/room/tcurdt/jdeb?style=for-the-badge)](https://gitter.im/tcurdt/jdeb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # Debian packages in Java
 

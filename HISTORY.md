@@ -1,4 +1,4 @@
-## Version 1.9, released xx.03.2020
+## Version 1.9, released xx.01.2021
 
 * [CHG] Upgraded plugins and dependencies, now requires maven 3.3.9 and java 1.7
 
