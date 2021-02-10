@@ -6,11 +6,11 @@
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
     <additionalparam>-Xdoclint:none</additionalparam>
-    <mavenVersion>3.6.3</mavenVersion>
+    <mavenVersion>3.6.0</mavenVersion>
     <mavenPluginPluginVersion>3.6.0</mavenPluginPluginVersion>
   </properties>
   <prerequisites>
-    <maven>3.6.3</maven>
+    <maven>3.6.0</maven>
   </prerequisites>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.vafer</groupId>
