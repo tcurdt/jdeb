@@ -1,0 +1,50 @@
+name: docs
+
+env:
+  project: 'jdeb'
+
+on:
+  push:
+    tags:
+      - jdeb-*
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Version
+      uses: tcurdt/action-verify-version-maven@main
+      with:
+        prefix: refs/tags/${{ env.project }}-
+      id: version
+
+    - name: Setup
+      uses: actions/setup-java@v1
+      with:
+        java-version: 14
+
+    - name: Build
+      run: mvn -B site
+
+    - name: Prepare
+      env:
+        VERSION: ${{ steps.version.outputs.version }}
+      run: |
+        mkdir -p site/release/$VERSION site/xref site/apidocs
+        mv target/site/xref site/release/$VERSION/xref
+        mv target/site/apidocs site/release/$VERSION/apidocs
+        echo "<meta http-equiv='refresh' content='0; URL=/jdeb/release/$VERSION/xref' />" > site/xref/index.html
+        echo "<meta http-equiv='refresh' content='0; URL=/jdeb/release/$VERSION/apidocs' />" > site/apidocs/index.html
+
+    - name: Publish
+      uses: peaceiris/actions-gh-pages@v3
+      env:
+        VERSION: ${{ steps.version.outputs.version }}
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./site
+        keep_files: true
