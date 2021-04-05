@@ -17,6 +17,7 @@
 package org.vafer.jdeb.utils;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Calendar;
@@ -29,14 +30,14 @@ import org.junit.Assert;
 public final class UtilsTestCase extends Assert {
 
     @Test
-    public void testJoinPath() throws Exception {
-        assertEquals("", "/foo/bar", Utils.joinUnixPath(null, "foo", "bar"));
+    public void testJoinPath() {
+        assertEquals("", "foo/bar", Utils.joinUnixPath(null, "foo", "bar"));
         assertEquals("", "/foo/bar", Utils.joinUnixPath(null, "/foo", "/bar"));
-        assertEquals("", "/foo/bar", Utils.joinUnixPath(null, "foo/bar"));
+        assertEquals("", "foo/bar", Utils.joinUnixPath(null, "foo/bar"));
     }
 
-        @Test
-    public void testStripPath() throws Exception {
+    @Test
+    public void testStripPath() {
         assertEquals("foo/bar", Utils.stripPath(0, "foo/bar"));
 
         assertEquals("bar", Utils.stripPath(1, "foo/bar"));
@@ -50,8 +51,8 @@ public final class UtilsTestCase extends Assert {
     }
 
     private String convert(String s) throws Exception {
-        byte[] data = Utils.toUnixLineEndings(new ByteArrayInputStream(s.getBytes("UTF-8")));
-        return new String(data, "UTF-8");
+        byte[] data = Utils.toUnixLineEndings(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
+        return new String(data, StandardCharsets.UTF_8);
     }
 
     @Test
@@ -77,7 +78,7 @@ public final class UtilsTestCase extends Assert {
 
     @Test
     public void testReplaceVariables() {
-        Map<String, String> variables = new HashMap<String, String>();
+        Map<String, String> variables = new HashMap<>();
         variables.put("version", "1.2.3");
         variables.put("name", "jdeb");
         variables.put("url", "https://github.com/tcurdt/jdeb");
@@ -99,7 +100,7 @@ public final class UtilsTestCase extends Assert {
         assertEquals("if [[ \"${HOST_TYPE}\" -eq \"admin\" ]] ; then", result);
 
         // collision with python syntax
-        input = "c[t][\'A\']";
+        input = "c[t]['A']";
         result = Utils.replaceVariables(resolver, input, "[[", "]]");
         assertEquals(input, result);
 
@@ -123,8 +124,8 @@ public final class UtilsTestCase extends Assert {
     }
 
     @Test
-    public void testReplaceVariablesWithinOpenCloseTokens() throws Exception {
-        Map<String, String> variables = new HashMap<String, String>();
+    public void testReplaceVariablesWithinOpenCloseTokens() {
+        Map<String, String> variables = new HashMap<>();
         variables.put("artifactId", "jdeb");
 
         VariableResolver resolver = new MapVariableResolver(variables);
