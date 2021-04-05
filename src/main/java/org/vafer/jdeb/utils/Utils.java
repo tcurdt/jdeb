@@ -88,12 +88,10 @@ public final class Utils {
         final StringBuilder sb = new StringBuilder();
         for (String p : paths) {
             if (p == null) continue;
-            if (p.startsWith("/")) {
-                sb.append(p);
-            } else {
+            if (!p.startsWith("/") && sb.length() > 0) {
                 sb.append(sep);
-                sb.append(p);
             }
+            sb.append(p);
         }
         return sb.toString();
     }

@@ -16,7 +16,6 @@ import org.vafer.jdeb.producers.DataProducerLink;
 import org.vafer.jdeb.producers.DataProducerPathTemplate;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -79,10 +78,10 @@ public class DebMakerLongNameTestCase extends Assert {
 
         assertTrue(packageControlFile.isValid());
 
-        final Map<String, TarArchiveEntry> filesInDeb = new HashMap<String, TarArchiveEntry>();
+        final Map<String, TarArchiveEntry> filesInDeb = new HashMap<>();
 
         ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
+            public void visit(TarArchiveEntry entry, byte[] content) {
                 filesInDeb.put(entry.getName(), entry);
             }
         }, Compression.GZIP);
@@ -94,7 +93,6 @@ public class DebMakerLongNameTestCase extends Assert {
 
     private String createLongPath(int numDirectories, int nameLength) {
         StringBuilder builder = new StringBuilder();
-        builder.append(FOLDER_SEPARATOR);
         for(int i = 0; i < numDirectories; ++i) {
             builder.append(i);
             builder.append(FOLDER_SEPARATOR);
