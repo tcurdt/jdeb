@@ -6,7 +6,7 @@
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
     <additionalparam>-Xdoclint:none</additionalparam>
-    <mavenVersion>3.6.0</mavenVersion>
+    <mavenVersion>3.8.1</mavenVersion>
     <mavenPluginPluginVersion>3.6.0</mavenPluginPluginVersion>
   </properties>
   <prerequisites>
