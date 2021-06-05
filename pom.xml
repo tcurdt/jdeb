@@ -89,6 +89,12 @@
     <developerConnection>scm:git:git://github.com:tcurdt/jdeb.git</developerConnection>
     <url>http://github.com/tcurdt/jdeb/tree/master</url>
   </scm>
+  <distributionManagement>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+    </repository>
+  </distributionManagement>
 
   <dependencies>
     <!-- mvn versions:display-dependency-updates -->
