@@ -1,0 +1,11 @@
+- mvn versions:display-dependency-updates
+- mvn versions:display-plugin-updates
+- update HISTORY.md
+- change version in pom.xml
+- push and wait for build
+- create tag jdependency-VERSION
+- push and wait for build
+- login to https://oss.sonatype.org/
+- staging repositories
+- close
+- release
