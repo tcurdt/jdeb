@@ -1,6 +1,8 @@
-## Version 1.9, released xx.01.2021
+## Version 1.9, released 05.06.2021
 
-* [CHG] Upgraded plugins and dependencies, now requires maven 3.3.9 and java 1.7
+* [CHG] Upgraded plugins and dependencies, now requires maven 3.6.0 and java 1.7
+* [ADD] Added project.inceptionYear, project.organization.name, and project.organization.url to the variable expansions (Thanks to Adam Retter)
+* [ADD] Also interpolate the copyright file (Thanks to Adam Retter)
 
 ## Version 1.8, released 24.08.2019
 
