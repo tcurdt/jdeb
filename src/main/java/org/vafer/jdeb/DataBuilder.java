@@ -46,6 +46,8 @@ class DataBuilder {
 
     private ZipEncoding encoding;
 
+    private final Long modifiedTimeMs;
+
     private static final class Total {
         private BigInteger count = BigInteger.valueOf(0);
 
@@ -58,9 +60,10 @@ class DataBuilder {
         }
     }
 
-    DataBuilder(Console console) {
+    DataBuilder(Console console, Long modifiedTimeMs) {
         this.console = console;
         this.encoding = ZipEncodingHelper.getZipEncoding(null);
+        this.modifiedTimeMs = modifiedTimeMs;
     }
 
     private void checkField(String name, int length) throws IOException {
@@ -136,6 +139,9 @@ class DataBuilder {
                 String rawFileEntryName = fileEntry.getName();
 
                 fileEntry.setName(fixPathTar(fileEntry.getName()));
+                if (modifiedTimeMs != null) {
+                    fileEntry.setModTime(modifiedTimeMs);
+                }
 
                 createParentDirectories(fileEntry.getName(), fileEntry.getUserName(), fileEntry.getLongUserId(), fileEntry.getGroupName(), fileEntry.getLongGroupId());
 
@@ -174,6 +180,9 @@ class DataBuilder {
                 checkField(entry.getGroupName(), TarConstants.GNAMELEN);
 
                 entry.setName(fixPathTar(entry.getName()));
+                if (modifiedTimeMs != null) {
+                    entry.setModTime(modifiedTimeMs);
+                }
 
                 createParentDirectories(entry.getName(), entry.getUserName(), entry.getLongUserId(), entry.getGroupName(), entry.getLongGroupId());
 
@@ -209,6 +218,10 @@ class DataBuilder {
                     entry.setGroupId(gid);
                     entry.setMode(mode);
                     entry.setSize(size);
+
+                    if (modifiedTimeMs != null) {
+                        entry.setModTime(modifiedTimeMs);
+                    }
 
                     tarOutputStream.putArchiveEntry(entry);
                     tarOutputStream.closeArchiveEntry();

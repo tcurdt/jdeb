@@ -359,6 +359,12 @@ public class DebMojo extends AbstractMojo {
     @Parameter(defaultValue = "gnu")
     private String tarBigNumberMode;
 
+    /**
+     * Epoch time in milliseconds that will be used as 'modified time' for all files and folders.
+     */
+    @Parameter
+    private Long modifiedTimeMs;
+
     /* end of parameters */
 
     private static final String KEY = "key";
@@ -591,6 +597,7 @@ public class DebMojo extends AbstractMojo {
             debMaker.setDigest(digest);
             debMaker.setTarBigNumberMode(tarBigNumberMode);
             debMaker.setTarLongFileMode(tarLongFileMode);
+            debMaker.setConstantModifiedTime(modifiedTimeMs);
             debMaker.validate();
             debMaker.makeDeb();
 

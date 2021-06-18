@@ -140,6 +140,7 @@ verbose          | Verbose logging                                              
 skip             | Indicates if an execution should be skipped                                                | No; defaults to `false`
 skipSubmodules   | Skip goal on all submodules                                                                | No; defaults to `false`
 skipPOMs         | Skip goal on POM artifacts                                                                 | No; defaults to `true`
+modifiedTimeMs   | Sets specified modified time in epoch milliseconds to all files and folders                | No; defaults to current time
 
 If you use the `dataSet` element, you'll need to populate it with a one or
 more `data` elements. A `data` element is used to specify a directory, a

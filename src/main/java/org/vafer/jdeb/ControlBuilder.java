@@ -60,12 +60,14 @@ class ControlBuilder {
     private VariableResolver resolver;
     private final String openReplaceToken;
     private final String closeReplaceToken;
+    private final Long modifiedTimeMs;
 
-    ControlBuilder(Console console, VariableResolver resolver, String openReplaceToken, String closeReplaceToken) {
+    ControlBuilder(Console console, VariableResolver resolver, String openReplaceToken, String closeReplaceToken, Long modifiedTimeMs) {
         this.console = console;
         this.resolver = resolver;
         this.openReplaceToken = openReplaceToken;
         this.closeReplaceToken = closeReplaceToken;
+        this.modifiedTimeMs = modifiedTimeMs;
     }
 
     /**
@@ -208,12 +210,15 @@ class ControlBuilder {
     }
 
 
-    private static void addControlEntry(final String pName, final String pContent, final TarArchiveOutputStream pOutput) throws IOException {
+    private void addControlEntry(final String pName, final String pContent, final TarArchiveOutputStream pOutput) throws IOException {
         final byte[] data = pContent.getBytes(UTF_8);
 
         final TarArchiveEntry entry = new TarArchiveEntry("./" + pName, true);
         entry.setSize(data.length);
         entry.setNames("root", "root");
+        if (modifiedTimeMs != null) {
+            entry.setModTime(modifiedTimeMs);
+        }
 
         if (MAINTAINER_SCRIPTS.contains(pName)) {
             entry.setMode(PermMapper.toMode("755"));
