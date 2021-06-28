@@ -42,7 +42,7 @@ import static java.nio.charset.StandardCharsets.*;
 
 public final class DebMakerTestCase extends Assert {
 
-    private static final long MODIFIED_TIME = 1609455600000L;
+    private static final long EXPECTED_MODIFIED_TIME = 1609455600000L;
 
     @Test
     public void testCreation() throws Exception {
@@ -233,7 +233,7 @@ public final class DebMakerTestCase extends Assert {
         DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data), confFileProducers);
         maker.setControl(new File(getClass().getResource("deb/control").toURI()));
         maker.setDeb(deb);
-        maker.setConstantModifiedTime(MODIFIED_TIME);
+        maker.setOutputTimestampMs(EXPECTED_MODIFIED_TIME);
 
         BinaryPackageControlFile packageControlFile = maker.createDeb(Compression.GZIP);
 
@@ -262,13 +262,13 @@ public final class DebMakerTestCase extends Assert {
 
     private static class ModifiedTimeAssert implements ArchiveVisitor<TarArchiveEntry> {
         public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-            assertEquals("Modified time does not match the expected value for " + entry.getName(), entry.getModTime().getTime(), MODIFIED_TIME);
+            assertEquals("Modified time does not match the expected value for " + entry.getName(), entry.getModTime().getTime(), EXPECTED_MODIFIED_TIME);
         }
     }
 
     private static class ArchiveModifiedTimeAssert implements ArchiveVisitor<ArArchiveEntry> {
         public void visit(ArArchiveEntry entry, byte[] content) throws IOException {
-            assertEquals("Modified time does not match the expected value for " + entry.getName(), entry.getLastModified(), MODIFIED_TIME / 1000);
+            assertEquals("Modified time does not match the expected value for " + entry.getName(), entry.getLastModified(), EXPECTED_MODIFIED_TIME / 1000);
         }
     }
 }

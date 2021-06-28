@@ -140,7 +140,6 @@ verbose          | Verbose logging                                              
 skip             | Indicates if an execution should be skipped                                                | No; defaults to `false`
 skipSubmodules   | Skip goal on all submodules                                                                | No; defaults to `false`
 skipPOMs         | Skip goal on POM artifacts                                                                 | No; defaults to `true`
-modifiedTimeMs   | Sets specified modified time in epoch milliseconds to all files and folders                | No; defaults to current time
 
 If you use the `dataSet` element, you'll need to populate it with a one or
 more `data` elements. A `data` element is used to specify a directory, a
@@ -317,3 +316,15 @@ If you don't want to store your key information in the POM you can store this in
   </settings>
 ```
 keyring, key and passphrase can then be omitted from the POM entirely.
+
+Starting with version 1.9, the jdeb supports reproducible builds. You can add `project.build.outputTimestamp` to `properties` in your pom.xml,
+containing either string formatted as ISO 8601 `yyyy-MM-dd'T'HH:mm:ssXXX` or as an int representing seconds since the epoch.
+
+```xml
+  <properties>
+    <project.build.outputTimestamp>2021-01-01T12:00:00Z</project.build.outputTimestamp>
+  </properties>
+```
+You may also use `SOURCE_DATE_EPOCH` environment variable, containing int representing seconds since the epoch.
+
+Note that if you use both `project.build.outputTimestamp` in pom.xml and `SOURCE_DATE_EPOCH` environment variable, the value in pom.xml takes precedence.

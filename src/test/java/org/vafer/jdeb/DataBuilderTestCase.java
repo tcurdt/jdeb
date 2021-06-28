@@ -34,7 +34,7 @@ import org.vafer.jdeb.producers.DataProducerLink;
 
 public final class DataBuilderTestCase extends Assert {
 
-    private static final long MODIFIED_TIME = 1609455600000L;
+    private static final long EXPECTED_MODIFIED_TIME = 1609455600000L;
 
     /**
      * Checks if the file paths in the md5sums file use only unix file separators
@@ -89,7 +89,7 @@ public final class DataBuilderTestCase extends Assert {
         DataProducer linkProducer = new DataProducerLink("pomLink.xml", "/usr/share/myapp/pom.xml", true, null, null, null);
         File archive = prepareArchive();
 
-        DataBuilder builder = new DataBuilder(new NullConsole(), MODIFIED_TIME);
+        DataBuilder builder = new DataBuilder(new NullConsole(), EXPECTED_MODIFIED_TIME);
         builder.buildData(Arrays.asList(fileProducer, linkProducer, dirProducer), archive, new StringBuilder(), new TarOptions().compression(Compression.NONE));
 
         assertExpectedModTimeInArchive(archive);
@@ -123,7 +123,7 @@ public final class DataBuilderTestCase extends Assert {
         try (TarArchiveInputStream in = new TarArchiveInputStream(new FileInputStream(archive))) {
             ArchiveEntry entry = in.getNextEntry();
             while (entry != null) {
-                assertEquals(MODIFIED_TIME, entry.getLastModifiedDate().getTime());
+                assertEquals(EXPECTED_MODIFIED_TIME, entry.getLastModifiedDate().getTime());
 
                 entry = in.getNextEntry();
             }

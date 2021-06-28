@@ -56,6 +56,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A generic class for creating Debian archives. Even supports signed changes
@@ -64,7 +65,6 @@ import java.util.Locale;
 public class DebMaker {
 
     private static final int DEFAULT_MODE = 33188;
-    private static final int MILIS_IN_SECOND = 1000;
 
     /** A console to output log message with */
     private Console console;
@@ -129,7 +129,7 @@ public class DebMaker {
     /** Defines the bigNumberMode of the tar file that is built */
     private String tarBigNumberMode;
 
-    private Long modifiedTimeMs;
+    private Long outputTimestampMs;
 
     private VariableResolver variableResolver;
     private String openReplaceToken;
@@ -248,8 +248,8 @@ public class DebMaker {
         this.tarBigNumberMode = tarBigNumberMode;
     }
 
-    public void setConstantModifiedTime(Long modifiedTimeMs) {
-        this.modifiedTimeMs = modifiedTimeMs;
+    public void setOutputTimestampMs(Long outputTimestampMs) {
+        this.outputTimestampMs = outputTimestampMs;
     }
 
     /**
@@ -482,7 +482,7 @@ public class DebMaker {
             tempControl = File.createTempFile("deb", "control");
 
             console.debug("Building data");
-            DataBuilder dataBuilder = new DataBuilder(console, modifiedTimeMs);
+            DataBuilder dataBuilder = new DataBuilder(console, outputTimestampMs);
             StringBuilder md5s = new StringBuilder();
             TarOptions options = new TarOptions()
                 .compression(compression)
@@ -494,7 +494,7 @@ public class DebMaker {
             List<String> tempConffiles = populateConffiles(conffilesProducers);
 
             console.debug("Building control");
-            ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver, openReplaceToken, closeReplaceToken, modifiedTimeMs);
+            ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver, openReplaceToken, closeReplaceToken, outputTimestampMs);
             BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size);
             if (packageControlFile.get("Package") == null) {
                 packageControlFile.set("Package", packageName);
@@ -708,8 +708,8 @@ public class DebMaker {
     }
 
     private ArArchiveEntry createArArchiveEntry(String pName, long contentLength) {
-        if (modifiedTimeMs != null) {
-            return new ArArchiveEntry(pName, contentLength, 0, 0, DEFAULT_MODE, modifiedTimeMs / MILIS_IN_SECOND);
+        if (outputTimestampMs != null) {
+            return new ArArchiveEntry(pName, contentLength, 0, 0, DEFAULT_MODE, outputTimestampMs / TimeUnit.SECONDS.toMillis(1));
         }
 
         return new ArArchiveEntry(pName, contentLength);

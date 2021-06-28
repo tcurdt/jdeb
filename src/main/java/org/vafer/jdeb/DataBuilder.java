@@ -46,7 +46,7 @@ class DataBuilder {
 
     private ZipEncoding encoding;
 
-    private final Long modifiedTimeMs;
+    private final Long outputTimestampMs;
 
     private static final class Total {
         private BigInteger count = BigInteger.valueOf(0);
@@ -60,10 +60,10 @@ class DataBuilder {
         }
     }
 
-    DataBuilder(Console console, Long modifiedTimeMs) {
+    DataBuilder(Console console, Long outputTimestampMs) {
         this.console = console;
         this.encoding = ZipEncodingHelper.getZipEncoding(null);
-        this.modifiedTimeMs = modifiedTimeMs;
+        this.outputTimestampMs = outputTimestampMs;
     }
 
     private void checkField(String name, int length) throws IOException {
@@ -139,8 +139,8 @@ class DataBuilder {
                 String rawFileEntryName = fileEntry.getName();
 
                 fileEntry.setName(fixPathTar(fileEntry.getName()));
-                if (modifiedTimeMs != null) {
-                    fileEntry.setModTime(modifiedTimeMs);
+                if (outputTimestampMs != null) {
+                    fileEntry.setModTime(outputTimestampMs);
                 }
 
                 createParentDirectories(fileEntry.getName(), fileEntry.getUserName(), fileEntry.getLongUserId(), fileEntry.getGroupName(), fileEntry.getLongGroupId());
@@ -180,8 +180,8 @@ class DataBuilder {
                 checkField(entry.getGroupName(), TarConstants.GNAMELEN);
 
                 entry.setName(fixPathTar(entry.getName()));
-                if (modifiedTimeMs != null) {
-                    entry.setModTime(modifiedTimeMs);
+                if (outputTimestampMs != null) {
+                    entry.setModTime(outputTimestampMs);
                 }
 
                 createParentDirectories(entry.getName(), entry.getUserName(), entry.getLongUserId(), entry.getGroupName(), entry.getLongGroupId());
@@ -219,8 +219,8 @@ class DataBuilder {
                     entry.setMode(mode);
                     entry.setSize(size);
 
-                    if (modifiedTimeMs != null) {
-                        entry.setModTime(modifiedTimeMs);
+                    if (outputTimestampMs != null) {
+                        entry.setModTime(outputTimestampMs);
                     }
 
                     tarOutputStream.putArchiveEntry(entry);
