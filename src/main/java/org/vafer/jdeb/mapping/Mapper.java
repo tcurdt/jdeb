@@ -23,6 +23,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
  */
 public interface Mapper {
 
-    public TarArchiveEntry map( final TarArchiveEntry entry );
+    TarArchiveEntry map( final TarArchiveEntry entry );
 
 }

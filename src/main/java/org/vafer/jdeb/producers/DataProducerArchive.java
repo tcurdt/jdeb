@@ -142,6 +142,6 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
     }
 
     private interface EntryConverter {
-        public TarArchiveEntry convert( ArchiveEntry entry );
+        TarArchiveEntry convert( ArchiveEntry entry );
     }
 }
