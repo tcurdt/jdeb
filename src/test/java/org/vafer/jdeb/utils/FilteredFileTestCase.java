@@ -56,8 +56,8 @@ public final class FilteredFileTestCase extends Assert {
         HashMap<String, String> table = new HashMap<String, String>() {{
             put("#!/bin/bash\nif [[ -z \"$(grep [[artifactId]] /etc/passwd )\" ]] ; then\n",
                 "#!/bin/bash\nif [[ -z \"$(grep jdeb /etc/passwd )\" ]] ; then\n");
-            put("#!/usr/bin/python3 -B\nline = line.replace(\'@ALLOW_BATCH_FILTER@\', config[self.client][\'ALLOW_BATCH_FILTER\'])\n",
-                "#!/usr/bin/python3 -B\nline = line.replace(\'@ALLOW_BATCH_FILTER@\', config[self.client][\'ALLOW_BATCH_FILTER\'])\n");
+            put("#!/usr/bin/python3 -B\nline = line.replace('@ALLOW_BATCH_FILTER@', config[self.client]['ALLOW_BATCH_FILTER'])\n",
+                "#!/usr/bin/python3 -B\nline = line.replace('@ALLOW_BATCH_FILTER@', config[self.client]['ALLOW_BATCH_FILTER'])\n");
         }};
 
         for (Map.Entry<String,String> pair : table.entrySet()){

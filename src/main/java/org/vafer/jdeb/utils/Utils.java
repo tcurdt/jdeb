@@ -41,9 +41,9 @@ import org.apache.tools.ant.util.ReaderInputStream;
  * ATTENTION: don't use outside of jdeb
  */
 public final class Utils {
-    private static final Pattern BETA_PATTERN = Pattern.compile("^(?:(?:(.*?)([\\.\\-_]))|(.*[^a-z]))(alpha|a|beta|b|milestone|m|cr|rc)([^a-z].*)?$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern BETA_PATTERN = Pattern.compile("^(?:(?:(.*?)([.\\-_]))|(.*[^a-z]))(alpha|a|beta|b|milestone|m|cr|rc)([^a-z].*)?$", Pattern.CASE_INSENSITIVE);
 
-    private static final Pattern SNAPSHOT_PATTERN = Pattern.compile("(.*)[\\-\\+]SNAPSHOT");
+    private static final Pattern SNAPSHOT_PATTERN = Pattern.compile("(.*)[\\-+]SNAPSHOT");
 
     public static int copy( final InputStream pInput, final OutputStream pOutput ) throws IOException {
         final byte[] buffer = new byte[2048];
@@ -283,7 +283,7 @@ public final class Utils {
 
         // safest upstream_version should only contain full stop, plus, tilde, and alphanumerics
         // https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-Version
-        version = version.replaceAll("[^\\.+~A-Za-z0-9]", "+").replaceAll("\\++", "+");
+        version = version.replaceAll("[^.+~A-Za-z0-9]", "+").replaceAll("\\++", "+");
 
         return version;
     }

@@ -64,7 +64,7 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 
     final private Pattern basePattern = Pattern.compile("^\\./(.*):$");
     final private Pattern totalPattern = Pattern.compile("^total ([0-9]+)$");
-    final private Pattern dirPattern = Pattern.compile("^d([rwx-]{9})\\s+([0-9]+)\\s+(\\S*)\\s+(\\S*)\\s+([0-9]+)\\s+(.*)\\s+[\\.]{1,2}$");
+    final private Pattern dirPattern = Pattern.compile("^d([rwx-]{9})\\s+([0-9]+)\\s+(\\S*)\\s+(\\S*)\\s+([0-9]+)\\s+(.*)\\s+[.]{1,2}$");
     final private Pattern filePattern = Pattern.compile("^([d-])([rwx-]{9})\\s+([0-9]+)\\s+(\\S*)\\s+(\\S*)\\s+([0-9]+)\\s+(.*)\\s+(.*)$");
     final private Pattern newlinePattern = Pattern.compile("$");
 
