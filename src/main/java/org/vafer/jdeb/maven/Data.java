@@ -67,11 +67,7 @@ public final class Data implements DataProducer {
     private MissingSourceBehavior missingSrc = FAIL;
 
     public void setMissingSrc( String missingSrc ) {
-        MissingSourceBehavior value = MissingSourceBehavior.valueOf(missingSrc.trim().toUpperCase());
-        if (value == null) {
-            throw new IllegalArgumentException("Unknown " + MissingSourceBehavior.class.getSimpleName() + ": " + missingSrc);
-        }
-        this.missingSrc = value;
+        this.missingSrc = MissingSourceBehavior.valueOf(missingSrc.trim().toUpperCase());
     }
 
     @Parameter

@@ -80,11 +80,7 @@ public final class Data extends PatternSet implements DataProducer {
 
 
     public void setMissingSrc( String missingSrc ) {
-        MissingSourceBehavior value = MissingSourceBehavior.valueOf(missingSrc.trim().toUpperCase());
-        if (value == null) {
-            throw new IllegalArgumentException("Unknown " + MissingSourceBehavior.class.getSimpleName() + ": " + missingSrc);
-        }
-        this.missingSrc = value;
+        this.missingSrc = MissingSourceBehavior.valueOf(missingSrc.trim().toUpperCase());
     }
 
     public void produce( final DataConsumer pReceiver ) throws IOException {
