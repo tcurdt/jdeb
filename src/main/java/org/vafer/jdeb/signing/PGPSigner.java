@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.security.GeneralSecurityException;
 import java.util.Iterator;
 
 import org.apache.commons.io.LineIterator;
@@ -69,7 +68,7 @@ public class PGPSigner {
      * @param input      the content to be signed
      * @param output     the output destination of the signature
      */
-    public void clearSign(String input, OutputStream output) throws IOException, PGPException, GeneralSecurityException {
+    public void clearSign(String input, OutputStream output) throws IOException, PGPException {
         clearSign(new ByteArrayInputStream(input.getBytes(UTF_8)), output);
     }
 
@@ -79,7 +78,7 @@ public class PGPSigner {
      * @param input      the content to be signed
      * @param output     the output destination of the signature
      */
-    public void clearSign(InputStream input, OutputStream output) throws IOException, PGPException, GeneralSecurityException {
+    public void clearSign(InputStream input, OutputStream output) throws IOException, PGPException {
 
         PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(privateKey.getPublicKeyPacket().getAlgorithm(), digest));
         signatureGenerator.init(PGPSignature.CANONICAL_TEXT_DOCUMENT, privateKey);
