@@ -310,22 +310,17 @@ public class DebMaker {
             console.info("Creating debian package: " + deb);
 
             // If we should sign the package
-            boolean doSign = signPackage;
-
-            if (doSign) {
+            if (signPackage) {
 
                 if (keyring == null || !keyring.exists()) {
-                    doSign = false;
                     console.warn("Signing requested, but no keyring supplied");
                 }
 
                 if (key == null) {
-                    doSign = false;
                     console.warn("Signing requested, but no key supplied");
                 }
 
                 if (passphrase == null) {
-                    doSign = false;
                     console.warn("Signing requested, but no passphrase supplied");
                 }
 
