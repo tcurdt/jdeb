@@ -137,14 +137,14 @@ public class PGPSigner {
     private PGPSecretKey getSecretKey(InputStream input, String keyId) throws IOException, PGPException {
         PGPSecretKeyRingCollection keyrings = new PGPSecretKeyRingCollection(PGPUtil.getDecoderStream(input), new JcaKeyFingerprintCalculator());
 
-        Iterator rIt = keyrings.getKeyRings();
+        Iterator<PGPSecretKeyRing> rIt = keyrings.getKeyRings();
 
         while (rIt.hasNext()) {
-            PGPSecretKeyRing kRing = (PGPSecretKeyRing) rIt.next();
-            Iterator kIt = kRing.getSecretKeys();
+            PGPSecretKeyRing kRing = rIt.next();
+            Iterator<PGPSecretKey> kIt = kRing.getSecretKeys();
 
             while (kIt.hasNext()) {
-                PGPSecretKey key = (PGPSecretKey) kIt.next();
+                PGPSecretKey key = kIt.next();
 
                 if (key.isSigningKey() && String.format("%08x", key.getKeyID() & 0xFFFFFFFFL).equals(keyId.toLowerCase())) {
                     return key;
