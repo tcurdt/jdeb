@@ -73,7 +73,7 @@ class ControlBuilder {
      *
      * @param packageControlFile the package control file
      * @param controlFiles the other control information files (maintainer scripts, etc)
-     * @param dataSize  the size of the installed package
+     * @param conffiles    the configuration files
      * @param checksums the md5 checksums of the files in the data archive
      * @param output
      * @return
