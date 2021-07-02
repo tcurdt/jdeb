@@ -33,7 +33,7 @@ public enum Compression {
 
     private String extension;
 
-    private Compression(String extension) {
+    Compression(String extension) {
         this.extension = extension;
     }
 

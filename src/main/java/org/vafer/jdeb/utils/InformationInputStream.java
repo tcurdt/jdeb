@@ -46,7 +46,7 @@ public final class InformationInputStream extends FilterInputStream {
         int[] sequence;
         String encoding;
 
-        private BOM( String encoding, int... sequence ) {
+        BOM( String encoding, int... sequence ) {
             this.encoding = encoding;
             this.sequence = sequence;
         }
@@ -63,7 +63,7 @@ public final class InformationInputStream extends FilterInputStream {
 
         int[] header;
 
-        private Shell( int... header ) {
+        Shell( int... header ) {
             this.header = header;
         }
     }
