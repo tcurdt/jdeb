@@ -58,8 +58,8 @@ public final class TextfileChangesProvider implements ChangesProvider {
         String distribution = packageControlFile.get("Distribution");
         String urgency = packageControlFile.get("Urgency");
         String changedBy = packageControlFile.get("Maintainer");
-        Collection<String> changesColl = new ArrayList<String>();
-        Collection<ChangeSet> changeSetColl = new ArrayList<ChangeSet>();
+        Collection<String> changesColl = new ArrayList<>();
+        Collection<ChangeSet> changeSetColl = new ArrayList<>();
 
 
         while (true) {

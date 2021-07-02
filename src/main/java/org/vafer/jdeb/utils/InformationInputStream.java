@@ -31,8 +31,8 @@ public final class InformationInputStream extends FilterInputStream {
     private long lf;
     private long zero;
 
-    private final Map<BOM, Integer> bomPositions = new HashMap<BOM, Integer>();
-    private final Map<Shell, Integer> shellPositions = new HashMap<Shell, Integer>();
+    private final Map<BOM, Integer> bomPositions = new HashMap<>();
+    private final Map<Shell, Integer> shellPositions = new HashMap<>();
 
     /**
      * Byte Order Marks

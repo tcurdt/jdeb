@@ -74,10 +74,10 @@ public class DebAntTask extends MatchingTask {
     /** Trigger the verbose mode detailing all operations */
     private boolean verbose;
 
-    private Collection<Link> links = new ArrayList<Link>();
+    private Collection<Link> links = new ArrayList<>();
 
-    private Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
-    private Collection<DataProducer> conffilesProducers = new ArrayList<DataProducer>();
+    private Collection<DataProducer> dataProducers = new ArrayList<>();
+    private Collection<DataProducer> conffilesProducers = new ArrayList<>();
 
 
     public void setDestfile( File deb ) {

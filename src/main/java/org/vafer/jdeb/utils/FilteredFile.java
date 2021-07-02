@@ -27,7 +27,7 @@ public class FilteredFile {
 
     private String openToken = "[[";
     private String closeToken = "]]";
-    private List<String> lines = new ArrayList<String>();
+    private List<String> lines = new ArrayList<>();
 
     public FilteredFile(InputStream in, VariableResolver resolver) throws IOException {
         parse(in, resolver);

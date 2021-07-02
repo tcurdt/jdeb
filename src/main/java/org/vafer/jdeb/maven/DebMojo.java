@@ -368,8 +368,8 @@ public class DebMojo extends AbstractMojo {
     private String openReplaceToken = "[[";
     private String closeReplaceToken = "]]";
     private Console console;
-    private Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
-    private Collection<DataProducer> conffileProducers = new ArrayList<DataProducer>();
+    private Collection<DataProducer> dataProducers = new ArrayList<>();
+    private Collection<DataProducer> conffileProducers = new ArrayList<>();
 
     public void setOpenReplaceToken( String openReplaceToken ) {
         this.openReplaceToken = openReplaceToken;
@@ -519,7 +519,7 @@ public class DebMojo extends AbstractMojo {
         if (dataProducers.isEmpty()) {
 
             if (hasMainArtifact()) {
-                Set<Artifact> artifacts = new HashSet<Artifact>();
+                Set<Artifact> artifacts = new HashSet<>();
 
                 artifacts.add(project.getArtifact());
 
@@ -727,8 +727,8 @@ public class DebMojo extends AbstractMojo {
             return Collections.emptyMap();
         }
 
-        final Map<String, String> map = new HashMap<String, String>();
-        final Set<String> activeProfiles = new HashSet<String>(activeProfilesList);
+        final Map<String, String> map = new HashMap<>();
+        final Set<String> activeProfiles = new HashSet<>(activeProfilesList);
 
         // Iterate over all active profiles in order
         for (final Profile profile : settings.getProfiles()) {

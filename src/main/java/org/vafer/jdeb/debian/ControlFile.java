@@ -37,9 +37,9 @@ import static java.nio.charset.StandardCharsets.*;
  */
 public abstract class ControlFile {
 
-    protected final Map<String, String> values = new LinkedHashMap<String, String>();
-    protected final Map<String, String> userDefinedFields = new LinkedHashMap<String, String>();
-    protected final Set<ControlField> userDefinedFieldNames = new HashSet<ControlField>();
+    protected final Map<String, String> values = new LinkedHashMap<>();
+    protected final Map<String, String> userDefinedFields = new LinkedHashMap<>();
+    protected final Set<ControlField> userDefinedFieldNames = new HashSet<>();
 
     public void parse(String input) throws IOException, ParseException {
         parse(new ByteArrayInputStream(input.getBytes(UTF_8)));
@@ -134,7 +134,7 @@ public abstract class ControlFile {
     }
 
     public List<String> getMandatoryFields() {
-        List<String> fields = new ArrayList<String>();
+        List<String> fields = new ArrayList<>();
 
         for (ControlField field : getFields()) {
             if (field.isMandatory()) {
@@ -150,7 +150,7 @@ public abstract class ControlFile {
     }
 
     public Set<String> invalidFields() {
-        Set<String> invalid = new HashSet<String>();
+        Set<String> invalid = new HashSet<>();
 
         for (ControlField field : getFields()) {
             if (field.isMandatory() && get(field.getName()) == null) {
@@ -171,7 +171,7 @@ public abstract class ControlFile {
     }
 
     public String toString() {
-        List<ControlField> fields = new ArrayList<ControlField>();
+        List<ControlField> fields = new ArrayList<>();
         fields.addAll(Arrays.asList(getFields()));
         fields.addAll(getUserDefinedFieldNames());
         return toString(fields.toArray(new ControlField[fields.size()]));

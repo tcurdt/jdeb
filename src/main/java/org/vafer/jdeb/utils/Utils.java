@@ -321,7 +321,7 @@ public final class Utils {
     *         null otherwise
     */
     public static Collection<String> getKnownPGPSecureRingLocations() {
-        final LinkedHashSet<String> locations = new LinkedHashSet<String>();
+        final LinkedHashSet<String> locations = new LinkedHashSet<>();
 
         final String os = System.getProperty("os.name");
         final boolean runOnWindows = os == null || os.toLowerCase().contains("win");

@@ -74,7 +74,7 @@ public final class DataProducerPathTemplateTestCase extends Assert {
         private List<Invocation> invocations;
 
         public CaptureDataConsumer() {
-            invocations = new ArrayList<Invocation>();
+            invocations = new ArrayList<>();
         }
 
         public void onEachDir(TarArchiveEntry dirEntry) throws IOException {

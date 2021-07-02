@@ -34,7 +34,7 @@ public final class FilteredFileTestCase extends Assert {
 
     @Before
     public void setUp() throws Exception {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("artifactId", "jdeb");
         map.put("myProperty1", "custom1");
         map.put("myProperty2", "custom2");
@@ -76,7 +76,7 @@ public final class FilteredFileTestCase extends Assert {
 
     @Test
     public void testVariableSubstitution() throws Exception {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("VERSION", "1.2");
         map.put("MAINTAINER", "Torsten Curdt <tcurdt@vafer.org>");
 

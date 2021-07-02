@@ -85,7 +85,7 @@ public final class DebMakerTestCase extends Assert {
 
 	        assertTrue(packageControlFile.isValid());
 
-	        final Map<String, TarArchiveEntry> filesInDeb = new HashMap<String, TarArchiveEntry>();
+	        final Map<String, TarArchiveEntry> filesInDeb = new HashMap<>();
 
 	        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
 	            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {

@@ -38,7 +38,7 @@ import static org.vafer.jdeb.ant.MissingSourceBehavior.*;
  */
 public final class Data extends PatternSet implements DataProducer {
 
-    private final Collection<Mapper> mapperWrapper = new ArrayList<Mapper>();
+    private final Collection<Mapper> mapperWrapper = new ArrayList<>();
 
     private File src;
 

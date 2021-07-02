@@ -130,9 +130,9 @@ public class DebMaker {
     private String openReplaceToken;
     private String closeReplaceToken;
 
-    private final Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
+    private final Collection<DataProducer> dataProducers = new ArrayList<>();
 
-    private final Collection<DataProducer> conffilesProducers = new ArrayList<DataProducer>();
+    private final Collection<DataProducer> conffilesProducers = new ArrayList<>();
     private String digest = "SHA1";
 
     public DebMaker(Console console, Collection<DataProducer> dataProducers, Collection<DataProducer> conffileProducers) {
@@ -419,7 +419,7 @@ public class DebMaker {
     }
 
     private List<String> populateConffiles(Collection<DataProducer> producers) {
-        final List<String> result = new ArrayList<String>();
+        final List<String> result = new ArrayList<>();
 
         if (producers == null || producers.isEmpty()) {
             return result;

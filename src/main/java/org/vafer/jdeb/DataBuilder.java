@@ -101,7 +101,7 @@ class DataBuilder {
 
         final Total dataSize = new Total();
 
-        final List<String> addedDirectories = new ArrayList<String>();
+        final List<String> addedDirectories = new ArrayList<>();
         final DataConsumer receiver = new DataConsumer() {
 
             public void onEachDir(TarArchiveEntry dirEntry) throws IOException {

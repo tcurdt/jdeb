@@ -176,7 +176,7 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
     }
 
     private Map<String, TarArchiveEntry> parse( final InputStream pInput ) throws IOException, ParseError {
-        final Map<String, TarArchiveEntry> mapping = new HashMap<String, TarArchiveEntry>();
+        final Map<String, TarArchiveEntry> mapping = new HashMap<>();
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
 
