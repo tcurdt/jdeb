@@ -616,7 +616,7 @@ public class DebMaker {
         return null;
     }
 
-    private String md5Hash(byte input[]){
+    private String md5Hash(byte[] input){
         //update the input of MD5
         MD5Digest md5 = new MD5Digest();
         md5.update(input, 0, input.length);
@@ -643,7 +643,7 @@ public class DebMaker {
         return null;
     }
 
-    private String sha1Hash(byte input[]){
+    private String sha1Hash(byte[] input){
         try
         {
             //prepare the input
