@@ -64,7 +64,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
             is = new BufferedInputStream(compressorInputStream);
         }
 
-        ArchiveInputStream archiveInputStream = null;
+        ArchiveInputStream archiveInputStream;
 
         try {
             archiveInputStream = new ArchiveStreamFactory().createArchiveInputStream(is);
@@ -72,7 +72,7 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
             throw new IOException("Unsupported archive format: " + archive, e);
         }
 
-        EntryConverter converter = null;
+        EntryConverter converter;
 
         if (archiveInputStream instanceof TarArchiveInputStream) {
 

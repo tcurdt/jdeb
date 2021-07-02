@@ -324,7 +324,7 @@ public class DebMaker {
                     console.warn("Signing requested, but no passphrase supplied");
                 }
 
-                PGPSigner signer = null;
+                PGPSigner signer;
                 try (FileInputStream keyRingInput = new FileInputStream(keyring)) {
                     signer = new PGPSigner(keyRingInput, key, passphrase, getDigestCode(digest));
                 }
