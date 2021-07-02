@@ -61,7 +61,7 @@ public final class DataProducerFileSet implements DataProducer {
             filemode = tarfileset.getMode();
             dirmode = tarfileset.getDirMode(tarfileset.getProject());
             prefix = tarfileset.getPrefix(tarfileset.getProject());
-            fullpath = tarfileset.getFullpath();
+            fullpath = tarfileset.getFullpath(tarfileset.getProject());
         }
 
         final DirectoryScanner scanner = fileset.getDirectoryScanner(fileset.getProject());
