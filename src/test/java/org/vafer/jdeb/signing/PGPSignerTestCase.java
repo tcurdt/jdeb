@@ -25,6 +25,8 @@ import org.junit.Assert;
 
 import org.bouncycastle.openpgp.PGPUtil;
 
+import static java.nio.charset.StandardCharsets.*;
+
 public final class PGPSignerTestCase extends Assert {
 
     @Test
@@ -52,7 +54,7 @@ public final class PGPSignerTestCase extends Assert {
                 "=aAAT\n" +
                 "-----END PGP SIGNATURE-----\n";
 
-        final byte[] expectedOutput = expectedOutputStr.getBytes("UTF-8");
+        final byte[] expectedOutput = expectedOutputStr.getBytes(UTF_8);
 
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
 

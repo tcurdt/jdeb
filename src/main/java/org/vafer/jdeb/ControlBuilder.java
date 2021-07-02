@@ -43,6 +43,8 @@ import org.vafer.jdeb.utils.InformationInputStream;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
+import static java.nio.charset.StandardCharsets.*;
+
 /**
  * Builds the control archive of the Debian package.
  */
@@ -207,7 +209,7 @@ class ControlBuilder {
 
 
     private static void addControlEntry(final String pName, final String pContent, final TarArchiveOutputStream pOutput) throws IOException {
-        final byte[] data = pContent.getBytes("UTF-8");
+        final byte[] data = pContent.getBytes(UTF_8);
 
         final TarArchiveEntry entry = new TarArchiveEntry("./" + pName, true);
         entry.setSize(data.length);

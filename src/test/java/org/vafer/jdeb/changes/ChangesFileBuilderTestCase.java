@@ -16,6 +16,8 @@
 package org.vafer.jdeb.changes;
 
 import java.io.ByteArrayInputStream;
+
+import static java.nio.charset.StandardCharsets.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
@@ -37,7 +39,7 @@ public class ChangesFileBuilderTestCase {
         packageControlFile.set("Version", "version");
         packageControlFile.set("Date", "Mon, 20 Aug 2007 15:25:57 +0200");
 
-        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes("UTF-8")), packageControlFile);
+        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes(UTF_8)), packageControlFile);
         final ChangeSet[] changeSets = provider.getChangesSets();
         
         assertNotNull(changeSets);
@@ -65,7 +67,7 @@ public class ChangesFileBuilderTestCase {
         packageControlFile.set("Maintainer", "tcurdt@joost.com");
         packageControlFile.set("Date", "Mon, 20 Aug 2007 15:25:57 +0200");
 
-        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes("UTF-8")), packageControlFile);
+        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes(UTF_8)), packageControlFile);
         final ChangeSet[] changeSets = provider.getChangesSets();
         
         assertNotNull(changeSets);
@@ -93,7 +95,7 @@ public class ChangesFileBuilderTestCase {
         packageControlFile.set("Maintainer", "tcurdt@joost.com");
         packageControlFile.set("Date", "Mon, 20 Aug 2007 15:25:57 +0200");
 
-        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes("UTF-8")), packageControlFile);
+        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes(UTF_8)), packageControlFile);
         final ChangeSet[] changeSets = provider.getChangesSets();
         
         assertNotNull(changeSets);

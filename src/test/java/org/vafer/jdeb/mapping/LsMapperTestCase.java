@@ -23,6 +23,8 @@ import org.junit.Assert;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.mapping.LsMapper.ParseError;
 
+import static java.nio.charset.StandardCharsets.*;
+
 public final class LsMapperTestCase extends Assert {
 
     private final static String output =
@@ -49,7 +51,7 @@ public final class LsMapperTestCase extends Assert {
 
     @Test
     public void testModes() throws Exception {
-        final ByteArrayInputStream is = new ByteArrayInputStream(output.getBytes("UTF-8"));
+        final ByteArrayInputStream is = new ByteArrayInputStream(output.getBytes(UTF_8));
 
         final Mapper mapper = new LsMapper(is);
 
@@ -68,7 +70,7 @@ public final class LsMapperTestCase extends Assert {
 
     @Test
     public void testSuccessfulParsing() throws Exception {
-        final ByteArrayInputStream is = new ByteArrayInputStream(output.getBytes("UTF-8"));
+        final ByteArrayInputStream is = new ByteArrayInputStream(output.getBytes(UTF_8));
 
         final Mapper mapper = new LsMapper(is);
 
@@ -84,7 +86,7 @@ public final class LsMapperTestCase extends Assert {
 
     @Test
     public void testPrematureEOF() throws Exception {
-        final ByteArrayInputStream is = new ByteArrayInputStream(output.substring(0, 200).getBytes("UTF-8"));
+        final ByteArrayInputStream is = new ByteArrayInputStream(output.substring(0, 200).getBytes(UTF_8));
 
         try {
             new LsMapper(is);
@@ -95,7 +97,7 @@ public final class LsMapperTestCase extends Assert {
 
     @Test
     public void testWrongFormat() throws Exception {
-        final ByteArrayInputStream is = new ByteArrayInputStream("asas\n".getBytes("UTF-8"));
+        final ByteArrayInputStream is = new ByteArrayInputStream("asas\n".getBytes(UTF_8));
 
         try {
             new LsMapper(is);

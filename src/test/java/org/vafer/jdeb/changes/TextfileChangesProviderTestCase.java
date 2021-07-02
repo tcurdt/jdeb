@@ -22,6 +22,8 @@ import org.junit.Assert;
 
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 
+import static java.nio.charset.StandardCharsets.*;
+
 public final class TextfileChangesProviderTestCase extends Assert {
 
     @Test
@@ -43,7 +45,7 @@ public final class TextfileChangesProviderTestCase extends Assert {
         packageControlFile.set("Distribution", "distribution");
         packageControlFile.set("Date", "Mon, 20 Aug 2007 15:25:57 +0200");
 
-        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes("UTF-8")), packageControlFile);
+        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes(UTF_8)), packageControlFile);
         final ChangeSet[] changeSets = provider.getChangesSets();
 
         assertNotNull(changeSets);
@@ -69,7 +71,7 @@ public final class TextfileChangesProviderTestCase extends Assert {
         packageControlFile.set("Version", "version");
         packageControlFile.set("Date", "Mon, 20 Aug 2007 15:25:57 +0200");
 
-        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes("UTF-8")), packageControlFile);
+        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes(UTF_8)), packageControlFile);
         final ChangeSet[] changeSets = provider.getChangesSets();
 
         assertNotNull(changeSets);

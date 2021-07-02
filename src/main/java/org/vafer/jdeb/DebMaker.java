@@ -46,6 +46,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
@@ -393,7 +394,7 @@ public class DebMaker {
                 PGPSigner signer = new PGPSigner(new FileInputStream(keyring), key, passphrase, getDigestCode(digest));
                 signer.clearSign(changesFile.toString(), out);
             } else {
-                out.write(changesFile.toString().getBytes("UTF-8"));
+                out.write(changesFile.toString().getBytes(StandardCharsets.UTF_8));
             }
             out.flush();
 

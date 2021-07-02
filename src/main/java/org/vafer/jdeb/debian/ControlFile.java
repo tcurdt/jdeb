@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.nio.charset.StandardCharsets.*;
+
 /**
  * A control file as specified by the <a href="http://www.debian.org/doc/debian-policy/ch-controlfields.html">Debian policy</a>.
  */
@@ -40,11 +42,11 @@ public abstract class ControlFile {
     protected final Set<ControlField> userDefinedFieldNames = new HashSet<ControlField>();
 
     public void parse(String input) throws IOException, ParseException {
-        parse(new ByteArrayInputStream(input.getBytes("UTF-8")));
+        parse(new ByteArrayInputStream(input.getBytes(UTF_8)));
     }
 
     public void parse(InputStream input) throws IOException, ParseException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input, UTF_8));
         StringBuilder buffer = new StringBuilder();
         String field = null;
         int linenr = 0;
