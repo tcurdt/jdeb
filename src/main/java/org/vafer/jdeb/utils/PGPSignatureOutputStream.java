@@ -44,7 +44,7 @@ public class PGPSignatureOutputStream extends OutputStream {
             ArmoredOutputStream armorStream = new ArmoredOutputStream(buffer);
             signature.encode(armorStream);
             armorStream.close();
-            return new String(buffer.toByteArray());
+            return buffer.toString();
         } catch(IOException e) {
             //Should never happen since we are just using a memory buffer
             throw new RuntimeException(e);

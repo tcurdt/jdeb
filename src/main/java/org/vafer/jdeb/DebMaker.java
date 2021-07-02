@@ -535,7 +535,7 @@ public class DebMaker {
                 }
 
                 // Use debsig-verify as default
-                if(signMethod == null || !"dpkg-sig".equals(signMethod)) {
+                if (!"dpkg-sig".equals(signMethod)) {
                     // Sign file to verify with debsig-verify
                     PGPSignatureOutputStream sigStream = new PGPSignatureOutputStream(signatureGenerator);
 

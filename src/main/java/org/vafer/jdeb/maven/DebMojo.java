@@ -394,14 +394,10 @@ public class DebMojo extends AbstractMojo {
         }
     }
 
+    @SuppressWarnings("unchecked,rawtypes")
     protected VariableResolver initializeVariableResolver( Map<String, String> variables ) {
-        @SuppressWarnings("unchecked")
-        final Map<String, String> projectProperties = Map.class.cast(getProject().getProperties());
-        @SuppressWarnings("unchecked")
-        final Map<String, String> systemProperties = Map.class.cast(System.getProperties());
-
-        variables.putAll(projectProperties);
-        variables.putAll(systemProperties);
+        variables.putAll((Map) getProject().getProperties());
+        variables.putAll((Map) System.getProperties());
         variables.put("name", name != null ? name : getProject().getName());
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
@@ -526,16 +522,12 @@ public class DebMojo extends AbstractMojo {
                 @SuppressWarnings("unchecked")
                 final Set<Artifact> projectArtifacts = project.getArtifacts();
 
-                for (Artifact artifact : projectArtifacts) {
-                    artifacts.add(artifact);
-                }
+                artifacts.addAll(projectArtifacts);
 
                 @SuppressWarnings("unchecked")
                 final List<Artifact> attachedArtifacts = project.getAttachedArtifacts();
 
-                for (Artifact artifact : attachedArtifacts) {
-                    artifacts.add(artifact);
-                }
+                artifacts.addAll(attachedArtifacts);
 
                 for (Artifact artifact : artifacts) {
                     final File file = artifact.getFile();

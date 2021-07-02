@@ -69,7 +69,7 @@ public final class DataProducerPathTemplateTestCase extends Assert {
         assertEquals(invocation.user, "root");
     }
 
-    public class CaptureDataConsumer implements DataConsumer {
+    public static class CaptureDataConsumer implements DataConsumer {
 
         private List<Invocation> invocations;
 
