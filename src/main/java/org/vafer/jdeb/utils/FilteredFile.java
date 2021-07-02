@@ -42,9 +42,7 @@ public class FilteredFile {
     }
 
     private void parse(InputStream in, VariableResolver resolver) throws IOException {
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(in));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (resolver != null) {
@@ -52,10 +50,6 @@ public class FilteredFile {
                 } else {
                     lines.add(line);
                 }
-            }
-        } finally {
-            if (reader != null) {
-                reader.close();
             }
         }
     }

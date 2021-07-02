@@ -329,12 +329,9 @@ public class DebMaker {
                     console.warn("Signing requested, but no passphrase supplied");
                 }
 
-                FileInputStream keyRingInput = new FileInputStream(keyring);
                 PGPSigner signer = null;
-                try {
-                    signer = new PGPSigner(new FileInputStream(keyring), key, passphrase, getDigestCode(digest));
-                } finally {
-                    keyRingInput.close();
+                try (FileInputStream keyRingInput = new FileInputStream(keyring)) {
+                    signer = new PGPSigner(keyRingInput, key, passphrase, getDigestCode(digest));
                 }
 
                 PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(signer.getSecretKey().getPublicKey().getAlgorithm(), getDigestCode(digest)));
@@ -677,11 +674,8 @@ public class DebMaker {
     private void addTo(ArArchiveOutputStream pOutput, String pName, File pContent) throws IOException {
         pOutput.putArchiveEntry(new ArArchiveEntry(pName, pContent.length()));
 
-        final InputStream input = new FileInputStream(pContent);
-        try {
+        try (InputStream input = new FileInputStream(pContent)) {
             Utils.copy(input, pOutput);
-        } finally {
-            input.close();
         }
 
         pOutput.closeArchiveEntry();
@@ -693,11 +687,8 @@ public class DebMaker {
     }
 
     private void addTo(final PGPSignatureOutputStream pOutput, final File pContent) throws IOException {
-        final InputStream input = new FileInputStream(pContent);
-        try {
+        try (InputStream input = new FileInputStream(pContent)) {
             Utils.copy(input, pOutput);
-        } finally {
-            input.close();
         }
     }
 

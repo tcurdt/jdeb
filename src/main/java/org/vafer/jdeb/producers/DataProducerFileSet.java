@@ -92,8 +92,7 @@ public final class DataProducerFileSet implements DataProducer {
             final String name = filename.replace('\\', '/');
             final File file = new File(basedir, name);
 
-            final InputStream inputStream = new FileInputStream(file);
-            try {
+            try (InputStream inputStream = new FileInputStream(file)) {
                 final String entryName = "".equals(fullpath) ? prefix + "/" + name : fullpath;
 
                 final File entryPath = new File(entryName);
@@ -115,8 +114,6 @@ public final class DataProducerFileSet implements DataProducer {
                 e.setSize(file.length());
 
                 pReceiver.onEachFile(inputStream, e);
-            } finally {
-                inputStream.close();
             }
         }
     }

@@ -70,15 +70,9 @@ public final class DataBuilderTestCase extends Assert {
         builder.buildData(Arrays.asList(producer), archive, new StringBuilder(), new TarOptions().compression(Compression.NONE));
 
         int count = 0;
-        TarArchiveInputStream in = null;
-        try {
-            in = new TarArchiveInputStream(new FileInputStream(archive));
+        try (TarArchiveInputStream in = new TarArchiveInputStream(new FileInputStream(archive))) {
             while (in.getNextTarEntry() != null) {
                 count++;
-            }
-        } finally {
-            if (in != null) {
-                in.close();
             }
         }
 
