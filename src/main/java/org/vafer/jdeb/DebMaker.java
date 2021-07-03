@@ -133,7 +133,7 @@ public class DebMaker {
     private final Collection<DataProducer> dataProducers = new ArrayList<>();
 
     private final Collection<DataProducer> conffilesProducers = new ArrayList<>();
-    private String digest = "SHA1";
+    private String digest = "SHA256";
 
     public DebMaker(Console console, Collection<DataProducer> dataProducers, Collection<DataProducer> conffileProducers) {
         this.console = console;

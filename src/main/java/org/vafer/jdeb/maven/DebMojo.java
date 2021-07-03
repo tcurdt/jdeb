@@ -171,7 +171,7 @@ public class DebMojo extends AbstractMojo {
      *
      * @see org.bouncycastle.bcpg.HashAlgorithmTags
      */
-    @Parameter(defaultValue = "SHA1")
+    @Parameter(defaultValue = "SHA256")
     private String digest;
 
     /**

@@ -69,7 +69,7 @@ public class DebAntTask extends MatchingTask {
      *
      * @see org.bouncycastle.bcpg.HashAlgorithmTags
      */
-    private String digest = "SHA1";
+    private String digest = "SHA256";
 
     /** Trigger the verbose mode detailing all operations */
     private boolean verbose;

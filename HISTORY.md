@@ -1,3 +1,7 @@
+## Version 1.10, in development
+
+* [CHG] The default digest algorithm for PGP signatures is now SHA-256 instead of SHA-1
+
 ## Version 1.9, released 05.06.2021
 
 * [CHG] Upgraded plugins and dependencies, now requires maven 3.6.0 and java 1.7
