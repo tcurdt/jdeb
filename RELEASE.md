@@ -1,6 +1,6 @@
 - mvn versions:display-dependency-updates
 - mvn versions:display-plugin-updates
-- mvn install
+- mvn clean install
 - update HISTORY.md
 - change version in pom.xml
 - push and wait for build
