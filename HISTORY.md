@@ -1,6 +1,9 @@
 ## Version 1.10, in development
 
+* [CHG] Breaking: The deps already required java8. Now also require java8 officially.
+* [CHG] Upgraded deps
 * [CHG] The default digest algorithm for PGP signatures is now SHA-256 instead of SHA-1
+* [ADD] Allow constant modified time to support reproducibility (Thanks to Michal Riha)
 
 ## Version 1.9, released 05.06.2021
 
@@ -11,7 +14,7 @@
 ## Version 1.8, released 24.08.2019
 
 * [FIX] Removed unnessary file/path limitation (Thanks to Roberto Perez Alcolea)
-* [FIX] Upgraded deps
+* [CHG] Upgraded deps
 
 ## Version 1.7, released 16.10.2018
 
