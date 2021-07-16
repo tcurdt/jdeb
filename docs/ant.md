@@ -182,3 +182,8 @@ the conffiles file. You only have to set the `conffile` attribute to `true`.
       </deb>
     </target>
 ```
+
+## Reproducible builds
+
+Starting with version 1.9, the jdeb supports reproducible builds. You can use `SOURCE_DATE_EPOCH`
+environment variable, containing int representing seconds since the epoch.

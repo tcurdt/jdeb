@@ -44,7 +44,12 @@ public class ArchiveWalker {
             while ((entry = in.getNextEntry()) != null) {
                 byte[] content = new byte[(int) entry.getSize()];
                 if (entry.getSize() > 0) {
-                    int length = in.read(content);
+                    int read;
+                    int length = 0;
+                    while (0 < (read = in.read(content, length, content.length - length))) {
+                        length += read;
+                    }
+
                     if (length != entry.getSize()) {
                         throw new IOException("Couldn't read entry " + entry.getName() + " : read " + length + ", expected " + entry.getSize());
                     }
@@ -65,10 +70,14 @@ public class ArchiveWalker {
         return walkEmbedded(deb, "data.tar", visitor, compression);
     }
 
+    public static void walkArchive(File deb, ArchiveVisitor<ArArchiveEntry> visitor) throws IOException {
+        ArArchiveInputStream in = new ArArchiveInputStream(new FileInputStream(deb));
+        ArchiveWalker.walk(in, visitor);
+    }
+
     public static boolean walkEmbedded(File deb, final String name, final ArchiveVisitor<TarArchiveEntry> visitor, final Compression compression) throws IOException {
         final AtomicBoolean found = new AtomicBoolean(false);
-        ArArchiveInputStream in = new ArArchiveInputStream(new FileInputStream(deb));
-        ArchiveWalker.walk(in, new ArchiveVisitor<ArArchiveEntry>() {
+        walkArchive(deb, new ArchiveVisitor<ArArchiveEntry>() {
             public void visit(ArArchiveEntry entry, byte[] content) throws IOException {
                 if (entry.getName().equals(name + compression.getExtension())) {
                     InputStream in = new ByteArrayInputStream(content);

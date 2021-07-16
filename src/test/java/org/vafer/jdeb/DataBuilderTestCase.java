@@ -18,18 +18,23 @@ package org.vafer.jdeb;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 
-import org.junit.Test;
-import org.junit.Assert;
-
+import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileSet;
+import org.junit.Assert;
+import org.junit.Test;
+import org.vafer.jdeb.producers.DataProducerDirectory;
 import org.vafer.jdeb.producers.DataProducerFile;
 import org.vafer.jdeb.producers.DataProducerFileSet;
+import org.vafer.jdeb.producers.DataProducerLink;
 
 public final class DataBuilderTestCase extends Assert {
+
+    private static final long EXPECTED_MODIFIED_TIME = 1609455600000L;
 
     /**
      * Checks if the file paths in the md5sums file use only unix file separators
@@ -37,7 +42,7 @@ public final class DataBuilderTestCase extends Assert {
      */
     @Test
     public void testBuildDataWithFileSet() throws Exception {
-        DataBuilder builder = new DataBuilder(new NullConsole());
+        DataBuilder builder = new DataBuilder(new NullConsole(), null);
 
         Project project = new Project();
         project.setCoreLoader(getClass().getClassLoader());
@@ -58,12 +63,9 @@ public final class DataBuilderTestCase extends Assert {
 
     @Test
     public void testCreateParentDirectories() throws Exception {
-        File archive = new File("target/data.tar");
-        if (archive.exists()) {
-            archive.delete();
-        }
+        File archive = prepareArchive();
 
-        DataBuilder builder = new DataBuilder(new NullConsole());
+        DataBuilder builder = new DataBuilder(new NullConsole(), null);
 
         DataProducer producer = new DataProducerFile(new File("pom.xml"), "/usr/share/myapp/pom.xml", null, null, null);
 
@@ -77,5 +79,54 @@ public final class DataBuilderTestCase extends Assert {
         }
 
         assertEquals("entries", 4, count);
+    }
+
+    @Test
+    public void testModifiedTimeIsSet() throws Exception {
+        File dir = prepareSubdir();
+        DataProducer dirProducer = new DataProducerDirectory(dir, null, null, null);
+        DataProducer fileProducer = new DataProducerFile(new File("pom.xml"), "/usr/share/myapp/pom.xml", null, null, null);
+        DataProducer linkProducer = new DataProducerLink("pomLink.xml", "/usr/share/myapp/pom.xml", true, null, null, null);
+        File archive = prepareArchive();
+
+        DataBuilder builder = new DataBuilder(new NullConsole(), EXPECTED_MODIFIED_TIME);
+        builder.buildData(Arrays.asList(fileProducer, linkProducer, dirProducer), archive, new StringBuilder(), new TarOptions().compression(Compression.NONE));
+
+        assertExpectedModTimeInArchive(archive);
+    }
+
+    private File prepareArchive() {
+        File archive = new File("target/data.tar");
+        if (archive.exists()) {
+            archive.delete();
+        }
+        return archive;
+    }
+
+    private File prepareSubdir() throws IOException {
+        File subDir = new File("target/subDir");
+        subDir.mkdir();
+
+        File file = new File(subDir, "file.txt");
+        file.createNewFile();
+
+        File nestedDir = new File(subDir, "nested-dir");
+        nestedDir.mkdir();
+
+        File file2 = new File(nestedDir, "file2.txt");
+        file2.createNewFile();
+
+        return subDir;
+    }
+
+    private void assertExpectedModTimeInArchive(File archive) throws IOException {
+        try (TarArchiveInputStream in = new TarArchiveInputStream(new FileInputStream(archive))) {
+            ArchiveEntry entry = in.getNextEntry();
+            while (entry != null) {
+                assertEquals(EXPECTED_MODIFIED_TIME, entry.getLastModifiedDate().getTime());
+
+                entry = in.getNextEntry();
+            }
+        }
     }
 }

@@ -51,6 +51,7 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.DebMaker;
 import org.vafer.jdeb.PackagingException;
 import org.vafer.jdeb.utils.MapVariableResolver;
+import org.vafer.jdeb.utils.OutputTimestampResolver;
 import org.vafer.jdeb.utils.SymlinkUtils;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
@@ -359,6 +360,16 @@ public class DebMojo extends AbstractMojo {
     @Parameter(defaultValue = "gnu")
     private String tarBigNumberMode;
 
+    /**
+     * Timestamp for reproducible output archive entries, either formatted as ISO 8601
+     * <code>yyyy-MM-dd'T'HH:mm:ssXXX</code> or as an int representing seconds since the epoch (like
+     * <a href="https://reproducible-builds.org/docs/source-date-epoch/">SOURCE_DATE_EPOCH</a>).
+     *
+     * @since 1.9
+     */
+    @Parameter(defaultValue = "${project.build.outputTimestamp}")
+    private String outputTimestamp;
+
     /* end of parameters */
 
     private static final String KEY = "key";
@@ -591,6 +602,8 @@ public class DebMojo extends AbstractMojo {
             debMaker.setDigest(digest);
             debMaker.setTarBigNumberMode(tarBigNumberMode);
             debMaker.setTarLongFileMode(tarLongFileMode);
+            Long outputTimestampMs = new OutputTimestampResolver(console).resolveOutputTimestamp(outputTimestamp);
+            debMaker.setOutputTimestampMs(outputTimestampMs);
             debMaker.validate();
             debMaker.makeDeb();
 

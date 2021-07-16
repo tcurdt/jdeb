@@ -19,17 +19,18 @@ package org.vafer.jdeb;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
-import org.junit.Assert;
-
+import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
+import org.junit.Assert;
+import org.junit.Test;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
@@ -41,23 +42,11 @@ import static java.nio.charset.StandardCharsets.*;
 
 public final class DebMakerTestCase extends Assert {
 
+    private static final long EXPECTED_MODIFIED_TIME = 1609455600000L;
+
     @Test
     public void testCreation() throws Exception {
-
-        File control = new File(getClass().getResource("deb/control/control").toURI());
-        File archive1 = new File(getClass().getResource("deb/data.tgz").toURI());
-        File archive2 = new File(getClass().getResource("deb/data.tar.bz2").toURI());
-        File archive3 = new File(getClass().getResource("deb/data.zip").toURI());
-        File directory = new File(getClass().getResource("deb/data").toURI());
-
-        DataProducer[] data = new DataProducer[] {
-            new DataProducerArchive(archive1, null, null, null),
-            new DataProducerArchive(archive2, null, null, null),
-            new DataProducerArchive(archive3, null, null, null),
-            new DataProducerDirectory(directory, null, new String[] { "**/.svn/**" }, null),
-            new DataProducerLink("/link/path-element.ext", "/link/target-element.ext", true, null, null, null)
-        };
-
+        DataProducer[] data = prepareData();
         File deb = File.createTempFile("jdeb", ".deb");
 
         DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data), null);
@@ -233,5 +222,53 @@ public final class DebMakerTestCase extends Assert {
         });
 
         assertTrue("Control files not found in the package", found);
+    }
+
+    @Test
+    public void testConstantModifiedTime() throws Exception {
+        DataProducer[] data = prepareData();
+        File deb = File.createTempFile("jdeb", ".deb");
+
+        Collection<DataProducer> confFileProducers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
+        DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data), confFileProducers);
+        maker.setControl(new File(getClass().getResource("deb/control").toURI()));
+        maker.setDeb(deb);
+        maker.setOutputTimestampMs(EXPECTED_MODIFIED_TIME);
+
+        BinaryPackageControlFile packageControlFile = maker.createDeb(Compression.GZIP);
+
+        assertTrue(packageControlFile.isValid());
+        ArchiveWalker.walkArchive(deb, new ArchiveModifiedTimeAssert());
+        ModifiedTimeAssert modifiedTimeAssert = new ModifiedTimeAssert();
+        ArchiveWalker.walkData(deb, modifiedTimeAssert, Compression.GZIP);
+        ArchiveWalker.walkControl(deb, modifiedTimeAssert);
+        assertTrue("Cannot delete the file " + deb, deb.delete());
+    }
+
+    private DataProducer[] prepareData() throws URISyntaxException {
+        File archive1 = new File(getClass().getResource("deb/data.tgz").toURI());
+        File archive2 = new File(getClass().getResource("deb/data.tar.bz2").toURI());
+        File archive3 = new File(getClass().getResource("deb/data.zip").toURI());
+        File directory = new File(getClass().getResource("deb/data").toURI());
+
+        return new DataProducer[] {
+                new DataProducerArchive(archive1, null, null, null),
+                new DataProducerArchive(archive2, null, null, null),
+                new DataProducerArchive(archive3, null, null, null),
+                new DataProducerDirectory(directory, null, new String[] { "**/.svn/**" }, null),
+                new DataProducerLink("/link/path-element.ext", "/link/target-element.ext", true, null, null, null)
+        };
+    }
+
+    private static class ModifiedTimeAssert implements ArchiveVisitor<TarArchiveEntry> {
+        public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
+            assertEquals("Modified time does not match the expected value for " + entry.getName(), entry.getModTime().getTime(), EXPECTED_MODIFIED_TIME);
+        }
+    }
+
+    private static class ArchiveModifiedTimeAssert implements ArchiveVisitor<ArArchiveEntry> {
+        public void visit(ArArchiveEntry entry, byte[] content) throws IOException {
+            assertEquals("Modified time does not match the expected value for " + entry.getName(), entry.getLastModified(), EXPECTED_MODIFIED_TIME / 1000);
+        }
     }
 }

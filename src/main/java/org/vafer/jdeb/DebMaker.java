@@ -56,12 +56,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A generic class for creating Debian archives. Even supports signed changes
  * files.
  */
 public class DebMaker {
+
+    private static final int DEFAULT_MODE = 33188;
 
     /** A console to output log message with */
     private Console console;
@@ -125,6 +128,8 @@ public class DebMaker {
 
     /** Defines the bigNumberMode of the tar file that is built */
     private String tarBigNumberMode;
+
+    private Long outputTimestampMs;
 
     private VariableResolver variableResolver;
     private String openReplaceToken;
@@ -241,6 +246,10 @@ public class DebMaker {
 
     public void setTarBigNumberMode(String tarBigNumberMode) {
         this.tarBigNumberMode = tarBigNumberMode;
+    }
+
+    public void setOutputTimestampMs(Long outputTimestampMs) {
+        this.outputTimestampMs = outputTimestampMs;
     }
 
     /**
@@ -473,7 +482,7 @@ public class DebMaker {
             tempControl = File.createTempFile("deb", "control");
 
             console.debug("Building data");
-            DataBuilder dataBuilder = new DataBuilder(console);
+            DataBuilder dataBuilder = new DataBuilder(console, outputTimestampMs);
             StringBuilder md5s = new StringBuilder();
             TarOptions options = new TarOptions()
                 .compression(compression)
@@ -485,7 +494,7 @@ public class DebMaker {
             List<String> tempConffiles = populateConffiles(conffilesProducers);
 
             console.debug("Building control");
-            ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver, openReplaceToken, closeReplaceToken);
+            ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver, openReplaceToken, closeReplaceToken, outputTimestampMs);
             BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size);
             if (packageControlFile.get("Package") == null) {
                 packageControlFile.set("Package", packageName);
@@ -661,15 +670,18 @@ public class DebMaker {
 
     private void addTo(ArArchiveOutputStream pOutput, String pName, String pContent) throws IOException {
         final byte[] content = pContent.getBytes();
-        pOutput.putArchiveEntry(new ArArchiveEntry(pName, content.length));
+        ArArchiveEntry archiveEntry = createArArchiveEntry(pName, content.length);
+
+        pOutput.putArchiveEntry(archiveEntry);
         pOutput.write(content);
         pOutput.closeArchiveEntry();
     }
 
     private void addTo(ArArchiveOutputStream pOutput, String pName, File pContent) throws IOException {
-        pOutput.putArchiveEntry(new ArArchiveEntry(pName, pContent.length()));
+        ArArchiveEntry archiveEntry = createArArchiveEntry(pName, pContent.length());
 
-        try (InputStream input = new FileInputStream(pContent)) {
+        pOutput.putArchiveEntry(archiveEntry);
+		try (InputStream input = new FileInputStream(pContent)) {
             Utils.copy(input, pOutput);
         }
 
@@ -693,5 +705,13 @@ public class DebMaker {
 
     public void setCloseReplaceToken(String closeReplaceToken) {
         this.closeReplaceToken = closeReplaceToken;
+    }
+
+    private ArArchiveEntry createArArchiveEntry(String pName, long contentLength) {
+        if (outputTimestampMs != null) {
+            return new ArArchiveEntry(pName, contentLength, 0, 0, DEFAULT_MODE, outputTimestampMs / TimeUnit.SECONDS.toMillis(1));
+        }
+
+        return new ArArchiveEntry(pName, contentLength);
     }
 }

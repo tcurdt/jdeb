@@ -31,6 +31,7 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.DebMaker;
 import org.vafer.jdeb.PackagingException;
 import org.vafer.jdeb.producers.DataProducerFileSet;
+import org.vafer.jdeb.utils.OutputTimestampResolver;
 
 /**
  * AntTask for creating debian archives.
@@ -174,6 +175,8 @@ public class DebAntTask extends MatchingTask {
         debMaker.setPassphrase(passphrase);
         debMaker.setCompression(compression);
         debMaker.setDigest(digest);
+        Long outputTimestampMs = new OutputTimestampResolver(console).resolveOutputTimestamp(null);
+        debMaker.setOutputTimestampMs(outputTimestampMs);
 
         try {
             debMaker.validate();
