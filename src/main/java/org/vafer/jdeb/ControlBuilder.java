@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -94,7 +95,10 @@ class ControlBuilder {
 
         boolean foundConffiles = false;
 
-        // create the final package control file out of the "control" file, copy all other files, ignore the directories
+        // sort files to have consistent/reproducible builds
+		Arrays.sort(controlFiles, Comparator.comparing(File::toString));
+
+		// create the final package control file out of the "control" file, copy all other files, ignore the directories
         for (File file : controlFiles) {
             if (file.isDirectory()) {
                 // warn about the misplaced directory, except for directories ignored by default (.svn, cvs, etc)
