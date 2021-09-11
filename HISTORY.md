@@ -4,6 +4,8 @@
 * [CHG] Upgraded deps
 * [CHG] The default digest algorithm for PGP signatures is now SHA-256 instead of SHA-1
 * [ADD] Allow constant modified time to support reproducibility (Thanks to Michal Riha)
+* [FIX] Sort control files for reproducibility (Thanks to Tomas Saghy)
+* [FIX] Ensure conffile paths are not absolute anymore
 
 ## Version 1.9, released 05.06.2021
 
