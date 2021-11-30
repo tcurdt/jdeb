@@ -1,4 +1,6 @@
-## Version 1.10, in development
+## Version 1.11, in development
+
+## Version 1.10, released 30.11.2021
 
 * [CHG] Breaking: The deps already required java8. Now also require java8 officially.
 * [CHG] Upgraded deps
