@@ -8,7 +8,7 @@ jobs:
   test:
     strategy:
       matrix:
-        java: [ 8, 16 ]
+        java: [ 8, 17 ]
     runs-on: ubuntu-latest
     steps:
 
