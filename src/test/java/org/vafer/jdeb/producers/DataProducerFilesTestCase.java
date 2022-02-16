@@ -1,7 +1,6 @@
 package org.vafer.jdeb.producers;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -16,8 +15,6 @@ import org.junit.Test;
 import org.junit.Assert;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.vafer.jdeb.DataConsumer;
 
 /**
@@ -54,9 +51,9 @@ public final class DataProducerFilesTestCase extends Assert {
 
         for (final File f : Arrays.asList(file1, file2)) {
             verify(consumer).onEachFile(
-                    any(FileInputStream.class),
-                    argThat(new BaseMatcher<TarArchiveEntry>() {
-                        public boolean matches(final Object o) {
+                    argThat(c -> c instanceof FileInputStream),
+                    argThat(o -> {
+
                             if (!(o instanceof TarArchiveEntry)) {
                                 return false;
                             }
@@ -76,10 +73,6 @@ public final class DataProducerFilesTestCase extends Assert {
                             // System.out.println("matches:" + matches);
 
                             return matches;
-                        }
-
-                        public void describeTo(final Description description) {
-                        }
                     })
             );
         }
@@ -99,9 +92,8 @@ public final class DataProducerFilesTestCase extends Assert {
 
         for (final File f : Arrays.asList(file1, file2)) {
             verify(consumer).onEachFile(
-                    any(FileInputStream.class),
-                    argThat(new BaseMatcher<TarArchiveEntry>() {
-                        public boolean matches(final Object o) {
+                    argThat(c -> c instanceof FileInputStream),
+                    argThat(o -> {
                             if (!(o instanceof TarArchiveEntry)) {
                                 return false;
                             }
@@ -135,10 +127,6 @@ public final class DataProducerFilesTestCase extends Assert {
                             // }
 
                             return matches;
-                        }
-
-                        public void describeTo(final Description description) {
-                        }
                     })
             );
         }
