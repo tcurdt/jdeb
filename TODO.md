@@ -1,1 +1,0 @@
-please see https://github.com/tcurdt/jdeb/issues
