@@ -1,7 +1,0 @@
-Package: [[name]]
-Version: [[version]]
-Section: misc
-Priority: low
-Architecture: all
-Description: [[description]]
-Maintainer: tcurdt@vafer.org

@@ -1,8 +1,0 @@
-Package: [[name]]
-Version: [[version]]
-Section: misc
-Priority: low
-Architecture: all
-Description: [[description]]
-Maintainer: Torsten Curdt <tcurdt@vafer.org>
-Depends: default-jre | java6-runtime
