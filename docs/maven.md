@@ -317,7 +317,7 @@ If you don't want to store your key information in the POM you can store this in
 ```
 keyring, key and passphrase can then be omitted from the POM entirely.
 
-Starting with version 1.9, the jdeb supports reproducible builds. You can add `project.build.outputTimestamp` to `properties` in your pom.xml,
+Starting with version 1.10, the jdeb supports reproducible builds. You can add `project.build.outputTimestamp` to `properties` in your pom.xml,
 containing either string formatted as ISO 8601 `yyyy-MM-dd'T'HH:mm:ssXXX` or as an int representing seconds since the epoch.
 
 ```xml
