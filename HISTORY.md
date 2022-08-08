@@ -1,4 +1,8 @@
-## Version 1.11, in development
+## Version 1.12, in development
+
+## Version 1.11, release xx.07.2022
+
+* [CHG] Upgraded deps
 
 ## Version 1.10, released 30.11.2021
 
