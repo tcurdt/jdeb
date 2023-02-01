@@ -26,6 +26,7 @@ import java.util.Iterator;
 import org.apache.commons.io.LineIterator;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.bcpg.BCPGOutputStream;
+import org.bouncycastle.bcpg.HashAlgorithmTags;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPSecretKey;
@@ -41,6 +42,8 @@ import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 
 import static java.nio.charset.StandardCharsets.*;
 
+import org.vafer.jdeb.PackagingException;
+
 /**
  * Signing with OpenPGP.
  */
@@ -51,6 +54,37 @@ public class PGPSigner {
     private PGPSecretKey secretKey;
     private PGPPrivateKey privateKey;
     private int digest;
+
+    private org.bouncycastle.crypto.digests.SHA1Digest keepSHA1;
+    private org.bouncycastle.crypto.digests.MD2Digest keepMD2;
+    private org.bouncycastle.crypto.digests.MD5Digest keepMD5;
+    private org.bouncycastle.crypto.digests.RIPEMD160Digest keepRIPEMD160;
+    private org.bouncycastle.crypto.digests.SHA256Digest keepSHA256;
+    private org.bouncycastle.crypto.digests.SHA384Digest keepSHA384;
+    private org.bouncycastle.crypto.digests.SHA512Digest keepSHA512;
+    private org.bouncycastle.crypto.digests.SHA224Digest keepSHA224;
+
+    public static int getDigestCode(String digestName) throws PackagingException {
+        if ("SHA1".equals(digestName)) {
+            return HashAlgorithmTags.SHA1;
+        } else if ("MD2".equals(digestName)) {
+            return HashAlgorithmTags.MD2;
+        } else if ("MD5".equals(digestName)) {
+            return HashAlgorithmTags.MD5;
+        } else if ("RIPEMD160".equals(digestName)) {
+            return HashAlgorithmTags.RIPEMD160;
+        } else if ("SHA256".equals(digestName)) {
+            return HashAlgorithmTags.SHA256;
+        } else if ("SHA384".equals(digestName)) {
+            return HashAlgorithmTags.SHA384;
+        } else if ("SHA512".equals(digestName)) {
+            return HashAlgorithmTags.SHA512;
+        } else if ("SHA224".equals(digestName)) {
+            return HashAlgorithmTags.SHA224;
+        } else {
+            throw new PackagingException("unknown hash algorithm tag in digestName: " + digestName);
+        }
+    }
 
     public PGPSigner(InputStream keyring, String keyId, String passphrase, int digest) throws IOException, PGPException {
         secretKey = getSecretKey(keyring, keyId);
