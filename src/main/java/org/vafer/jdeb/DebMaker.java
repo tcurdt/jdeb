@@ -23,7 +23,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.bcpg.HashAlgorithmTags;
 import org.bouncycastle.crypto.digests.MD5Digest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPSignature;
@@ -124,6 +123,9 @@ public class DebMaker {
     /** Defines the role to sign with */
     private String signRole;
 
+    /** Defines the digest for the signing */
+    private String signDigest = "SHA256";
+
     /** Defines the longFileMode of the tar file that is built */
     private String tarLongFileMode;
 
@@ -209,6 +211,15 @@ public class DebMaker {
         this.signRole = signRole;
     }
 
+    public String getSignDigest() {
+        return signDigest;
+    }
+
+    public void setSignDigest(String digest) {
+        this.signDigest = signDigest;
+    }
+
+
     public void setKeyring(File keyring) {
         this.keyring = keyring;
     }
@@ -289,29 +300,7 @@ public class DebMaker {
             throw new PackagingException("You need to specify where the deb file is supposed to be created.");
         }
 
-        getDigestCode(digest);
-    }
-
-    static int getDigestCode(String digestName) throws PackagingException {
-        if ("SHA1".equals(digestName)) {
-            return HashAlgorithmTags.SHA1;
-        } else if ("MD2".equals(digestName)) {
-            return HashAlgorithmTags.MD2;
-        } else if ("MD5".equals(digestName)) {
-            return HashAlgorithmTags.MD5;
-        } else if ("RIPEMD160".equals(digestName)) {
-            return HashAlgorithmTags.RIPEMD160;
-        } else if ("SHA256".equals(digestName)) {
-            return HashAlgorithmTags.SHA256;
-        } else if ("SHA384".equals(digestName)) {
-            return HashAlgorithmTags.SHA384;
-        } else if ("SHA512".equals(digestName)) {
-            return HashAlgorithmTags.SHA512;
-        } else if ("SHA224".equals(digestName)) {
-            return HashAlgorithmTags.SHA224;
-        } else {
-            throw new PackagingException("unknown hash algorithm tag in digestName: " + digestName);
-        }
+        PGPSigner.getDigestCode(digest);
     }
 
     public void makeDeb() throws PackagingException {
@@ -334,12 +323,14 @@ public class DebMaker {
                     console.warn("Signing requested, but no passphrase supplied");
                 }
 
+                final int digestCode = PGPSigner.getDigestCode(signDigest);
+
                 PGPSigner signer;
                 try (FileInputStream keyRingInput = new FileInputStream(keyring)) {
-                    signer = new PGPSigner(keyRingInput, key, passphrase, getDigestCode(digest));
+                    signer = new PGPSigner(keyRingInput, key, passphrase, digestCode);
                 }
 
-                PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(signer.getSecretKey().getPublicKey().getAlgorithm(), getDigestCode(digest)));
+                PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(signer.getSecretKey().getPublicKey().getAlgorithm(), digestCode));
                 signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, signer.getPrivateKey());
 
                 packageControlFile = createSignedDeb(Compression.toEnum(compression), signatureGenerator, signer);
@@ -390,10 +381,12 @@ public class DebMaker {
             ChangesFileBuilder builder = new ChangesFileBuilder();
             ChangesFile changesFile = builder.createChanges(packageControlFile, deb, changesProvider);
 
-            //(signChanges || signPackage) - for backward compatibility. signPackage is signing both changes and deb.
+            final int digestCode = PGPSigner.getDigestCode(signDigest);
+
+            // (signChanges || signPackage) - for backward compatibility. signPackage is signing both changes and deb.
             if ((signChanges || signPackage) && keyring != null && key != null && passphrase != null) {
                 console.info("Signing the changes file with the key " + key);
-                PGPSigner signer = new PGPSigner(new FileInputStream(keyring), key, passphrase, getDigestCode(digest));
+                PGPSigner signer = new PGPSigner(new FileInputStream(keyring), key, passphrase, digestCode);
                 signer.clearSign(changesFile.toString(), out);
             } else {
                 out.write(changesFile.toString().getBytes(StandardCharsets.UTF_8));

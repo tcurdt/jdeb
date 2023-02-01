@@ -125,9 +125,11 @@ changesIn        | The changes to add                                           
 changesOut       | The changes file generated                                                                 | No
 changesSave      | (NYI) The merged changes file                                                              | No
 compression      | (NYI) Compression method for the data file (`gzip`, `bzip2`, `xz` or `none`)               | No; defaults to `gzip`
+digest           | Digest to use when building the deb                                                        | No; defaults to `SHA256`
 signPackage      | If the debian package should be signed                                                     | No
 signMethod       | Which utility is used for verification (`dpkg-sig`, `debsig-verify`)                       | No; defaults to `debsig-verify`
 signRole         | Determines the filename of the signature, debsig only verifies `origin`                    | No; defaults to `origin`
+signDigest       | Digest to use for siging                                                                   | No; defaults to `SHA256`
 signCfgPrefix    | Prefix for when reading keyring, key and passphrase from settings.xml                      | No; defaults to `jdeb.`
 keyring          | The file containing the PGP keys                                                           | No
 key              | The name of the key to be used in the keyring                                              | No

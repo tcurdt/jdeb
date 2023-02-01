@@ -1,7 +1,9 @@
 ## Version 1.12, in development
 
-## Version 1.11, release xx.01.2023
+## Version 1.11, release xx.02.2023
 
+* [ADD] "signDigest" for setting just the signing digest
+* [CHG] Separate digest settings for creating the deb and signing it
 * [CHG] Upgraded deps
 
 ## Version 1.10, released 30.11.2021
