@@ -215,6 +215,9 @@ class ControlBuilder {
 
 
     private void addControlEntry(final String pName, final String pContent, final TarArchiveOutputStream pOutput) throws IOException {
+
+        console.info("Adding control: " + pName);
+
         final byte[] data = pContent.getBytes(UTF_8);
 
         final TarArchiveEntry entry = new TarArchiveEntry("./" + pName, true);
