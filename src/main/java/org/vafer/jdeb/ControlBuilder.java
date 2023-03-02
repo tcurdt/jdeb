@@ -85,6 +85,11 @@ class ControlBuilder {
      * @throws java.text.ParseException
      */
     void buildControl(BinaryPackageControlFile packageControlFile, File[] controlFiles, List<String> conffiles, StringBuilder checksums, File output) throws IOException, ParseException {
+
+        if (packageControlFile == null) {
+            throw new FileNotFoundException("No 'control' file found in " + controlFiles.toString());
+        }
+
         final File dir = output.getParentFile();
         if (dir != null && (!dir.exists() || !dir.isDirectory())) {
             throw new IOException("Cannot write control file at '" + output.getAbsolutePath() + "'");
@@ -112,13 +117,19 @@ class ControlBuilder {
                 foundConffiles = true;
             }
 
+            if ("control".equals(file.getName())) {
+                continue;
+            }
+
             if (CONFIGURATION_FILENAMES.contains(file.getName()) || MAINTAINER_SCRIPTS.contains(file.getName())) {
+
                 FilteredFile configurationFile = new FilteredFile(new FileInputStream(file), resolver);
                 configurationFile.setOpenToken(openReplaceToken);
                 configurationFile.setCloseToken(closeReplaceToken);
                 addControlEntry(file.getName(), configurationFile.toString(), outputStream);
 
-            } else if (!"control".equals(file.getName())) {
+            } else {
+
                 // initialize the information stream to guess the type of the file
                 InformationInputStream infoStream = new InformationInputStream(new FileInputStream(file));
                 Utils.copy(infoStream, NullOutputStream.NULL_OUTPUT_STREAM);
@@ -143,10 +154,6 @@ class ControlBuilder {
             addControlEntry("conffiles", createPackageConffilesFile(conffiles), outputStream);
         } else {
             console.info("Skipping 'conffiles' generation. No entries defined in maven/pom or ant/build.xml.");
-        }
-
-        if (packageControlFile == null) {
-            throw new FileNotFoundException("No 'control' file found in " + controlFiles.toString());
         }
 
         addControlEntry("control", packageControlFile.toString(), outputStream);
