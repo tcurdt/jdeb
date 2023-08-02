@@ -234,7 +234,7 @@ public class DebMojo extends AbstractMojo {
     private Data[] dataSet;
 
 //    /**
-//     * @deprecated
+//     * @ deprecated
 //     */
 //    @Parameter(defaultValue = "false")
 //    private boolean timestamped;
