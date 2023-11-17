@@ -440,7 +440,7 @@ public class DebMojo extends AbstractMojo {
      * @return the Maven project version
      */
     private String getProjectVersion() {
-        return Utils.convertToDebianVersion(getProject().getVersion(), this.snapshotExpand, this.snapshotEnv, this.snapshotTemplate, session.getStartTime());
+        return Utils.convertToDebianVersion(getProject().getVersion(), this.snapshotExpand, this.snapshotEnv, this.snapshotTemplate, session.getStartTime(), true);
     }
 
     /**
