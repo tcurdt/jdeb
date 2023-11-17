@@ -255,6 +255,12 @@ public class DebMojo extends AbstractMojo {
     private String snapshotTemplate;
 
     /**
+     * When enabled the separator before a rc, alpha or beta version is replaced with '~'.
+     */
+    @Parameter(defaultValue = "true")
+    private boolean betaExpand;
+
+    /**
      * If verbose is true more build messages are logged.
      */
     @Parameter(defaultValue = "false")
@@ -440,7 +446,7 @@ public class DebMojo extends AbstractMojo {
      * @return the Maven project version
      */
     private String getProjectVersion() {
-        return Utils.convertToDebianVersion(getProject().getVersion(), this.snapshotExpand, this.snapshotEnv, this.snapshotTemplate, session.getStartTime(), true);
+        return Utils.convertToDebianVersion(getProject().getVersion(), this.snapshotExpand, this.snapshotEnv, this.snapshotTemplate, session.getStartTime(), this.betaExpand);
     }
 
     /**
