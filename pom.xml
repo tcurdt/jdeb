@@ -87,8 +87,8 @@
     <contributor><name>Steven Bower</name></contributor>
   </contributors>
   <scm>
-    <connection>scm:git:git://github.com:tcurdt/jdeb.git</connection>
-    <developerConnection>scm:git:git://github.com:tcurdt/jdeb.git</developerConnection>
+    <connection>scm:git:https://github.com:tcurdt/jdeb.git</connection>
+    <developerConnection>scm:git:https://github.com:tcurdt/jdeb.git</developerConnection>
     <url>http://github.com/tcurdt/jdeb/tree/master</url>
   </scm>
   <distributionManagement>

@@ -24,7 +24,7 @@ The jars are available in the [Maven central repository](https://repo1.maven.org
 If you feel adventurous or want to help out feel free to get the latest code
 [via git](http://github.com/tcurdt/jdeb/tree/master).
 
-    git clone git://github.com/tcurdt/jdeb.git
+    git clone https://github.com/tcurdt/jdeb.git
 
 ## Where to ask questions
 
