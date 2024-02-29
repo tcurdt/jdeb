@@ -62,7 +62,8 @@ class DataBuilder {
 
     DataBuilder(Console console, Long outputTimestampMs) {
         this.console = console;
-        this.encoding = ZipEncodingHelper.getZipEncoding(null);
+        String empty = null;
+        this.encoding = ZipEncodingHelper.getZipEncoding(empty);
         this.outputTimestampMs = outputTimestampMs;
     }
 
