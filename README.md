@@ -29,10 +29,9 @@ If you feel adventurous or want to help out feel free to get the latest code
 
 [via git issue](https://github.com/tcurdt/jdeb/issues)
 
-
 ## Working towards jdeb 2.0
 
-Over the years jdeb has grown more and more powerful - but also got more complex. In order to simplify the usage and apply what we have learned we are taking a step back. If you want to help to shape the usage of jdeb 2.0 feel free to contribute to the [planning](https://github.com/tcurdt/jdeb/issues/195).
+Over the years jdeb has grown more and more powerful - but also got more complex. In order to simplify the usage and apply what we have learned we are taking a step back. If you want to help to shape the usage of jdeb 2.0 feel free to contribute to the [planning](https://github.com/tcurdt/jdeb/issues/195). I think it still could be worth but this needs a sponsor.
 
 ## Related projects
 
