@@ -1,0 +1,10 @@
+for wifi
+import as
+u=pwd=input("Enter password:")
+pwd= ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','0','1','2','3','4','5','6','7','8','9',]
+for wifi password (Cisco)
+pw=" "
+while (pw!=v-pwd):
+  pw=" "
+  for letter in range(1en(u-pwd)):
+  guess_pwd=pwd[radint(0,17)]
