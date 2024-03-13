@@ -44,11 +44,11 @@ class ChangesFileBuilder {
 
         try {
             // compute the checksums of the binary package
-            InformationOutputStream md5output = new InformationOutputStream(NullOutputStream.NULL_OUTPUT_STREAM, MessageDigest.getInstance("MD5"));
-            InformationOutputStream sha1output = new InformationOutputStream(md5output, MessageDigest.getInstance("SHA1"));
-            InformationOutputStream sha256output = new InformationOutputStream(sha1output, MessageDigest.getInstance("SHA-256"));
+           InformationOutputStream sha256output = new InformationOutputStream(NullOutputStream.NULL_OUTPUT_STREAM, MessageDigest.getInstance("SHA-256"));
+InformationOutputStream sha1output = new InformationOutputStream(sha256output, MessageDigest.getInstance("SHA1"));
+InformationOutputStream md5output = new InformationOutputStream(sha1output, MessageDigest.getInstance("MD5"));
 
-            FileUtils.copyFile(binaryPackage, sha256output);
+FileUtils.copyFile(binaryPackage, md5output);
 
             // Checksums-Sha1:
             //  56ef4c6249dc3567fd2967f809c42d1f9b61adf7 45964 jdeb.deb
