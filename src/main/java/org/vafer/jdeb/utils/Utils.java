@@ -250,8 +250,9 @@ public final class Utils {
      * @param template the template used to replace -SNAPSHOT, the timestamp format is in brackets,
      *        the rest of the string is preserved (prefix[yyMMdd]suffix -> prefix151230suffix)
      * @param timestamp the UTC date used as the timestamp to replace the SNAPSHOT suffix.
+     * @param betaExpand whether to process the rc, alpha or beta version
      */
-    public static String convertToDebianVersion( String version, boolean apply, String envName, String template, Date timestamp ) {
+    public static String convertToDebianVersion( String version, boolean apply, String envName, String template, Date timestamp, boolean betaExpand ) {
         Matcher matcher = SNAPSHOT_PATTERN.matcher(version);
         if (matcher.matches()) {
             version = matcher.group(1) + "~";
@@ -270,7 +271,7 @@ public final class Utils {
             } else {
                 version += "SNAPSHOT";
             }
-        } else {
+        } else if (betaExpand) {
             matcher = BETA_PATTERN.matcher(version);
             if (matcher.matches()) {
                 if (matcher.group(1) != null) {

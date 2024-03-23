@@ -138,6 +138,7 @@ attach           | Attach artifact to project                                   
 snapshotExpand   | Expand SNAPSHOT into the content of an environment variable or timestamp.                  | No; defaults to `false`
 snapshotEnv      | Name of the environment variable. If it's empty defaults to a timestamp.                   | No; defaults to `SNAPSHOT`
 snapshotTemplate | Template for replacing the SNAPSHOT value. A timestamp format can be provided in brackets. | No;
+betaExpand       | Prepend rc, alpha or beta version with `~`.                                                | No; defaults to `true`
 verbose          | Verbose logging                                                                            | No; defaults to `true`, will be `false` in the future
 skip             | Indicates if an execution should be skipped                                                | No; defaults to `false`
 skipSubmodules   | Skip goal on all submodules                                                                | No; defaults to `false`

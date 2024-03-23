@@ -4,6 +4,7 @@
 * [CHG] Separate digest settings for creating the deb and signing it
 * [CHG] Upgraded deps
 * [FIX] Removed invalid Maven Mojo Deprecation
+* [ADD] betaExpand to control rc, alpha and beta version processing
 
 ## Version 1.10, released 30.11.2021
 
