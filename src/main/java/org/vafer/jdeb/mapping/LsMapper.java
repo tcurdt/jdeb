@@ -112,12 +112,12 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
     }
 
 
-    private int convertModeFromString( final String mode ) {
-
-        final char[] m = mode.toCharArray();
+    private int convertModeFromString(final String mode) {
+        // Define the position values for each permission bit
+        final int[] positions = { 0400, 0200, 0100, 0040, 0020, 0010, 0004, 0002, 0001 };
         /*
            -rwxrwxrwx
-
+    
            4000    set-user-ID-on-execution bit
            2000    set-user-ID-on-execution bit
            1000    sticky bit
@@ -131,15 +131,18 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
            0002    allow write by others.
            0001    execute / search
          */
-        // TODO: simplified - needs fixing
+        // TODO: Simplified - needs fixing
         int sum = 0;
-        int bit = 1;
-        for (int i = m.length - 1; i >= 0; i--) {
-            if (m[i] != '-') {
-                sum += bit;
+    
+        // Iterate over each character in the mode string
+        for (int i = 0; i < mode.length(); i++) {
+            // If the character represents a permission bit (r, w, x, or -)
+            if (mode.charAt(i) != '-') {
+                // Add the corresponding position value to the sum
+                sum += positions[i];
             }
-            bit += bit;
         }
+    
         return sum;
     }
 

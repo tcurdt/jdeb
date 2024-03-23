@@ -90,11 +90,17 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
                     final TarArchiveEntry dst = new TarArchiveEntry(src.getName(), true);
                     //TODO: if (src.isUnixSymlink()) {
                     //}
-
-                    dst.setSize(src.getSize());
-                    dst.setMode(src.getUnixMode());
-                    dst.setModTime(src.getTime());
-
+                    //check if the entry name ends with a symbolic link extension (.symlink)
+                    if (src.getName().endsWith(".symlink")) {
+                        // symbolic link target from the entry name
+                        String symlinkTarget = src.getName().substring(0, src.getName().length() - ".symlink".length());
+                        dst.setMode(TarArchiveEntry.LF_SYMLINK); // set the entry type to symbolic link
+                        dst.setLinkName(symlinkTarget); // set the symbolic link target
+                    }else{
+                        dst.setSize(src.getSize());
+                        dst.setMode(src.getUnixMode());
+                        dst.setModTime(src.getTime());
+                    }
                     return dst;
                 }
             };

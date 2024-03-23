@@ -216,7 +216,7 @@ public class DebMaker {
     }
 
     public void setSignDigest(String digest) {
-        this.signDigest = signDigest;
+        this.signDigest = digest;
     }
 
 

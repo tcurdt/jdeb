@@ -461,9 +461,16 @@ public class DebMojo extends AbstractMojo {
     /**
      * @return whether or not Maven is currently operating in the execution root
      */
+    
+    // whether the current Maven project is a submodule or not
+    //checksif the project directory is different from the Maven execution root directory
     private boolean isSubmodule() {
         // FIXME there must be a better way
-        return !session.getExecutionRootDirectory().equalsIgnoreCase(baseDir.toString());
+        // return !session.getExecutionRootDirectory().equalsIgnoreCase(baseDir.toString());
+        if (project.getParent() != null) {
+            return true; // if the project has a parent, it is likely a submodule
+        }
+        return false;
     }
 
     /**
