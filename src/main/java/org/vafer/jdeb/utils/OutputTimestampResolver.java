@@ -1,6 +1,8 @@
 package org.vafer.jdeb.utils;
 
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.maven.archiver.MavenArchiver;
@@ -21,11 +23,9 @@ public class OutputTimestampResolver {
 
     public Long resolveOutputTimestamp(String paramValue) {
         if (paramValue != null) {
-            Date outputDate = new MavenArchiver().parseOutputTimestamp(paramValue);
-            if (outputDate != null) {
-                console.info("Accepted outputTimestamp parameter: " + paramValue);
-                return outputDate.getTime();
-            }
+            Instant outputInstant = Instant.from(new MavenArchiver().parseOutputTimestamp(paramValue).toInstant());
+            console.info("Accepted outputTimestamp parameter: " + paramValue);
+            return outputInstant.toEpochMilli();
         }
 
         String sourceDate = envReader.getSourceDateEpoch();
@@ -33,7 +33,7 @@ public class OutputTimestampResolver {
             try {
                 long sourceDateVal = Long.parseLong(sourceDate);
                 console.info("Accepted SOURCE_DATE_EPOCH environment variable: " + sourceDate);
-                return sourceDateVal * TimeUnit.SECONDS.toMillis(1);
+                return TimeUnit.SECONDS.toMillis(sourceDateVal);
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("Invalid SOURCE_DATE_EPOCH environment variable value: " + sourceDate, e);
             }
@@ -47,4 +47,6 @@ public class OutputTimestampResolver {
             return System.getenv("SOURCE_DATE_EPOCH");
         }
     }
+}
+
 }
