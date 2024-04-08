@@ -42,7 +42,7 @@ jobs:
         echo "<meta http-equiv='refresh' content='0; URL=/jdeb/release/$VERSION/apidocs' />" > site/apidocs/index.html
 
     - name: Publish
-      uses: peaceiris/actions-gh-pages@v3.9.3
+      uses: peaceiris/actions-gh-pages@v4.0.0
       env:
         VERSION: ${{ steps.version.outputs.version }}
       with:
