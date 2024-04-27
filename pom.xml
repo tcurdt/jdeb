@@ -8,7 +8,7 @@
     <maven.compiler.release>11</maven.compiler.release>
     <maven.scope>provided</maven.scope>
     <maven.version>3.8.2</maven.version>
-    <maven.plugin.version>3.10.2</maven.plugin.version>
+    <maven.plugin.version>3.12.0</maven.plugin.version>
     <plexus.sec.version>1.4</plexus.sec.version>
     <additionalparam>-Xdoclint:none</additionalparam>
   </properties>
@@ -284,12 +284,12 @@
           <artifactId>maven-gpg-plugin</artifactId>
           <version>3.2.4</version>
         </plugin>
-        <!--
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
           <version>${maven.plugin.version}</version>
           <configuration>
+            <goalPrefix>prefix</goalPrefix>
             <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
             <extractors>
               <extractor>java-annotations</extractor>
@@ -305,7 +305,6 @@
             </execution>
           </executions>
         </plugin>
-        -->
       </plugins>
     </pluginManagement>
 
