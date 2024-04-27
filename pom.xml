@@ -3,8 +3,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.release>11</maven.compiler.release>
     <maven.scope>provided</maven.scope>
     <maven.version>3.8.2</maven.version>
     <maven.plugin.version>3.10.2</maven.plugin.version>
@@ -283,6 +284,7 @@
           <artifactId>maven-gpg-plugin</artifactId>
           <version>3.2.4</version>
         </plugin>
+        <!--
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
@@ -303,6 +305,7 @@
             </execution>
           </executions>
         </plugin>
+        -->
       </plugins>
     </pluginManagement>
 
@@ -313,7 +316,13 @@
         <configuration>
           <source>${maven.compiler.source}</source>
           <target>${maven.compiler.target}</target>
+          <release>${maven.compiler.release}</release>
           <encoding>${project.build.sourceEncoding}</encoding>
+          <compilerArgs>
+            <arg>-Xlint:deprecation</arg>
+            <arg>-Xlint:unchecked</arg>
+            <arg>-proc:none</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
       <plugin>
