@@ -10,7 +10,6 @@
     <maven.version>3.9.6</maven.version>
     <maven.plugin.version>3.12.0</maven.plugin.version>
     <plexus.sec.version>1.4</plexus.sec.version>
-    <additionalparam>-Xdoclint:none</additionalparam>
   </properties>
   <prerequisites>
     <maven>3.6.0</maven>
