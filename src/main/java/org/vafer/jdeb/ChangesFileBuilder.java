@@ -44,9 +44,7 @@ class ChangesFileBuilder {
 
         try {
             // compute the checksums of the binary package
-           InformationOutputStream sha256output = new InformationOutputStream(NullOutputStream.NULL_OUTPUT_STREAM, MessageDigest.getInstance("SHA-256"));
-InformationOutputStream sha1output = new InformationOutputStream(sha256output, MessageDigest.getInstance("SHA1"));
-InformationOutputStream md5output = new InformationOutputStream(sha1output, MessageDigest.getInstance("MD5"));
+
 
 FileUtils.copyFile(binaryPackage, md5output);
 

@@ -73,7 +73,7 @@ public final class DataBuilderTestCase extends Assert {
 
         int count = 0;
         try (TarArchiveInputStream in = new TarArchiveInputStream(new FileInputStream(archive))) {
-            while (in.getNextTarEntry() != null) {
+            while (in.getNextEntry() != null) {
                 count++;
             }
         }

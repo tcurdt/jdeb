@@ -274,9 +274,7 @@ public class DebMojo extends AbstractMojo {
     @Parameter(property = "jdeb.skipSubmodules", defaultValue = "false")
     private boolean skipSubmodules;
 
-    /**
-     * @deprecated
-     */
+    @Deprecated
     @Parameter(defaultValue = "true")
     private boolean submodules;
 

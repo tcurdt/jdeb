@@ -30,7 +30,7 @@ import java.util.Set;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -142,7 +142,7 @@ public final class DebMakerTestCase extends Assert {
                 assertTrue("prefix", entry.getName().startsWith("./"));
 
                 InformationInputStream infoStream = new InformationInputStream(new ByteArrayInputStream(content));
-                IOUtils.copy(infoStream, NullOutputStream.NULL_OUTPUT_STREAM);
+                IOUtils.copy(infoStream, NullOutputStream.INSTANCE);
 
                 if (infoStream.isShell()) {
                     assertTrue("Permissions on " + entry.getName() + " should be 755", entry.getMode() == 0755);

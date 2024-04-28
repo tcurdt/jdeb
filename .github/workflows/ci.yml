@@ -10,7 +10,7 @@ jobs:
       max-parallel: 2
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-        java: [ 8, 20 ]
+        java: [ 11, 21 ]
     runs-on: ${{ matrix.os }}
     steps:
 
@@ -23,6 +23,11 @@ jobs:
           distribution: 'zulu'
           java-version: ${{ matrix.java }}
 
+      - name: Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 3.9.6
+
       - name: Cache
         uses: actions/cache@v4
         with:
@@ -34,6 +39,6 @@ jobs:
         run: mvn -B clean package install jacoco:report
 
       - name: Coverage
-        uses: codecov/codecov-action@v4.1.0
+        uses: codecov/codecov-action@v4.3.0
         with:
           file: target/site/jacoco/jacoco.xml

@@ -132,7 +132,7 @@ class ControlBuilder {
 
                 // initialize the information stream to guess the type of the file
                 InformationInputStream infoStream = new InformationInputStream(new FileInputStream(file));
-                Utils.copy(infoStream, NullOutputStream.NULL_OUTPUT_STREAM);
+                Utils.copy(infoStream, NullOutputStream.INSTANCE);
                 infoStream.close();
 
                 // fix line endings for shell scripts
@@ -142,7 +142,7 @@ class ControlBuilder {
                     in = new ByteArrayInputStream(buf);
                 }
 
-                addControlEntry(file.getName(), IOUtils.toString(in), outputStream);
+                addControlEntry(file.getName(), IOUtils.toString(in, java.nio.charset.StandardCharsets.UTF_8), outputStream);
 
                 in.close();
             }
