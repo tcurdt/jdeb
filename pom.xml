@@ -147,6 +147,12 @@
       <version>1.26.2</version>
     </dependency>
     <dependency>
+      <!-- this should not be required but somehow compress introduced the dep -->
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.14.0</version>
+    </dependency>
+    <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpg-jdk15on</artifactId>
       <version>1.70</version>
@@ -357,6 +363,7 @@
                   <include>org.apache.commons:commons-compress</include>
                   <include>commons-codec:commons-codec</include>
                   <include>commons-io:commons-io</include>
+                  <include>org.apache.commons:commons-lang3</include>
                   <include>org.bouncycastle:bcpg-jdk15on</include>
                   <include>org.bouncycastle:bcprov-jdk15on</include>
                   <include>org.tukaani:xz</include>
