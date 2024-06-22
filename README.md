@@ -1,6 +1,6 @@
 [![Build Status](https://img.shields.io/github/actions/workflow/status/tcurdt/jdeb/ci.yml?style=for-the-badge)](https://github.com/tcurdt/jdeb/actions)
 [![Coverage Status](https://img.shields.io/codecov/c/github/tcurdt/jdeb/master?style=for-the-badge)](https://codecov.io/gh/tcurdt/jdeb)
-[![Maven Central](https://img.shields.io/maven-central/v/org.vafer/jdeb.svg?style=for-the-badge&maxAge=86400)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.vafer%22%20AND%20a%3A%22jdeb%22)
+[![Maven Central](https://img.shields.io/maven-central/vin23/org.vafer/jdeb.svg?style=for-the-badge&maxAge=86400)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.vafer%22%20AND%20a%3A%22jdeb%22)
 
 # Debian packages in Java
 
@@ -40,3 +40,4 @@ Some links to other cross platform tools to package Linux applications:
 * [ant-deb-task](http://code.google.com/p/ant-deb-task)
 * [jRPM](http://jrpm.sourceforge.net)
 * [Install-Toolkit](http://install-toolkit.sourceforge.net)
+
