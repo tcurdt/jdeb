@@ -21,12 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -288,6 +283,23 @@ public final class DebMakerTestCase extends Assert {
         assertTrue("Cannot delete the file " + deb, deb.delete());
     }
 
+    @Test
+    public void testErrorPropagation() throws Exception {
+        File deb = File.createTempFile("jdeb", ".deb");
+        DebMaker maker = new DebMaker(new NullConsole(), List.of(new UseNullAsInputStream()), null);
+        maker.setControl(new File(getClass().getResource("deb/control").toURI()));
+        maker.setDeb(deb);
+
+        Exception producedException = assertThrows(PackagingException.class, () -> {
+            maker.makeDeb();
+        });
+        Throwable cause = producedException.getCause();
+        while (cause.getClass() != NullPointerException.class) {
+            cause = cause.getCause();
+            assertNotNull("expected NullPointerException cause was not found", cause);
+        }
+    }
+
     private DataProducer[] prepareData() throws URISyntaxException {
         File archive1 = new File(getClass().getResource("deb/data.tgz").toURI());
         File archive2 = new File(getClass().getResource("deb/data.tar.bz2").toURI());
@@ -314,4 +326,18 @@ public final class DebMakerTestCase extends Assert {
             assertEquals("Modified time does not match the expected value for " + entry.getName(), entry.getLastModified(), EXPECTED_MODIFIED_TIME / 1000);
         }
     }
+
+    private static class UseNullAsInputStream implements DataProducer {
+
+        @Override
+        public void produce(DataConsumer receiver) throws IOException {
+            receiver.onEachFile(null, createEntry());
+        }
+
+        private TarArchiveEntry createEntry() {
+            TarArchiveEntry entry = new TarArchiveEntry("missing_file");
+            return entry;
+        }
+    }
+
 }
