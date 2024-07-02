@@ -86,6 +86,7 @@
     <contributor><name>Scott Kuehn</name></contributor>
     <contributor><name>Sergio Fernández</name></contributor>
     <contributor><name>Steven Bower</name></contributor>
+    <contributor><name>Martin Chalupa</name></contributor>
   </contributors>
   <scm>
     <connection>scm:git:git://github.com:tcurdt/jdeb.git</connection>
