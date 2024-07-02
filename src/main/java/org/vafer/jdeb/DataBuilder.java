@@ -278,9 +278,9 @@ class DataBuilder {
             for (DataProducer data : producers) {
                 data.produce(receiver);
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             finishedWithoutErrors = false;
-            throw new RuntimeException("Couldn't process all data producers", e);
+            throw e;
         } finally {
             if (finishedWithoutErrors) {
                 tarOutputStream.close();
