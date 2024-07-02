@@ -22,6 +22,7 @@ import org.apache.commons.compress.archivers.tar.TarConstants;
 import org.apache.commons.compress.archivers.zip.ZipEncoding;
 import org.apache.commons.compress.archivers.zip.ZipEncodingHelper;
 import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.io.IOUtils;
 import org.vafer.jdeb.utils.Utils;
 
 import java.io.File;
@@ -272,12 +273,20 @@ class DataBuilder {
             }
         };
 
+        boolean finishedWithoutErrors = true;
         try {
             for (DataProducer data : producers) {
                 data.produce(receiver);
             }
+        } catch(Exception e) {
+            finishedWithoutErrors = false;
+            throw new RuntimeException("Couldn't process all data producers", e);
         } finally {
-            tarOutputStream.close();
+            if (finishedWithoutErrors) {
+                tarOutputStream.close();
+            } else {
+                IOUtils.closeQuietly(tarOutputStream);
+            }
         }
 
         console.debug("Total size: " + dataSize);
