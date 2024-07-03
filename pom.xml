@@ -7,7 +7,7 @@
     <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.release>11</maven.compiler.release>
     <maven.scope>provided</maven.scope>
-    <maven.version>3.9.6</maven.version>
+    <maven.version>3.9.8</maven.version>
     <maven.plugin.version>3.13.1</maven.plugin.version>
     <plexus.sec.version>1.4</plexus.sec.version>
   </properties>
