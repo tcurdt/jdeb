@@ -40,3 +40,26 @@ Some links to other cross platform tools to package Linux applications:
 * [ant-deb-task](http://code.google.com/p/ant-deb-task)
 * [jRPM](http://jrpm.sourceforge.net)
 * [Install-Toolkit](http://install-toolkit.sourceforge.net)
+
+# jdeb
+
+## Overview
+
+jdeb is a Java library that provides tools for creating Debian packages.
+
+## Usage
+
+### Example
+
+Here is an example of how to use `MyClass`:
+##enhancin READme,file
+```java
+import com.example.MyClass;
+
+public class Main {
+    public static void main(String[] args) {
+        MyClass myClass = new MyClass();
+        int result = myClass.myMethod(2, 3);
+        System.out.println("Result: " + result); // Output: Result: 5
+    }
+}
