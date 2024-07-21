@@ -38,116 +38,27 @@ import org.vafer.jdeb.utils.OutputTimestampResolver;
  */
 public class DebAntTask extends MatchingTask {
 
-    /** The Debian package produced */
     private File deb;
-
-    /** The directory containing the control files to build the package */
     private File control;
-
-    /** The file containing the PGP keys */
     private File keyring;
-
-    /** The key to use in the keyring */
     private String key;
-
-    /** The passphrase for the key to sign the changes file */
     private String passphrase;
-
-    /** The file to read the changes from */
     private File changesIn;
-
-    /** The file where to write the changes to */
     private File changesOut;
-
-    /** The file where to write the changes of the changes input to */
     private File changesSave;
-
-    /** The compression method used for the data file (none, gzip, bzip2 or xz) */
     private String compression = "gzip";
-
-    /**
-     * The digest algorithm to use.
-     *
-     * @see org.bouncycastle.bcpg.HashAlgorithmTags
-     */
     private String digest = "SHA256";
-
-    /** Trigger the verbose mode detailing all operations */
     private boolean verbose;
 
     private Collection<Link> links = new ArrayList<>();
-
     private Collection<DataProducer> dataProducers = new ArrayList<>();
     private Collection<DataProducer> conffilesProducers = new ArrayList<>();
 
-
-    public void setDestfile( File deb ) {
-        this.deb = deb;
-    }
-
-    public void setControl( File control ) {
-        this.control = control;
-    }
-
-    public void setChangesIn( File changes ) {
-        this.changesIn = changes;
-    }
-
-    public void setChangesOut( File changes ) {
-        this.changesOut = changes;
-    }
-
-    public void setChangesSave( File changes ) {
-        this.changesSave = changes;
-    }
-
-    public void setKeyring( File keyring ) {
-        this.keyring = keyring;
-    }
-
-    public void setKey( String key ) {
-        this.key = key;
-    }
-
-    public void setPassphrase( String passphrase ) {
-        this.passphrase = passphrase;
-    }
-
-    public void setCompression( String compression ) {
-        this.compression = compression;
-    }
-
-    public void setVerbose( boolean verbose ) {
-        this.verbose = verbose;
-    }
-
-    public void addFileSet( FileSet fileset ) {
-        dataProducers.add(new DataProducerFileSet(fileset));
-    }
-
-    public void addTarFileSet( Tar.TarFileSet fileset ) {
-        dataProducers.add(new DataProducerFileSet(fileset));
-    }
-
-    public void addData( Data data ) {
-        dataProducers.add(data);
-    }
-
-    public void addLink( Link link ) {
-        links.add(link);
-    }
-
-    public void setDigest(String digest) {
-        this.digest = digest;
-    }
+    // getters and setters
 
     public void execute() {
-        // add the data producers for the links
-        for (Link link : links) {
-            dataProducers.add(link.toDataProducer());
-        }
+        dataProducers.addAll(links.stream().map(Link::toDataProducer).collect(Collectors.toList()));
 
-        // validate the type of the <data> elements
         for (DataProducer dataProducer : dataProducers) {
             if (dataProducer instanceof Data) {
                 Data data = (Data) dataProducer;
