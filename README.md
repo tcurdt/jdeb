@@ -4,8 +4,8 @@
 
 # Debian packages in Java
 
-This library provides an Ant task and a Maven plugin to create Debian packages
-from Java builds in a truly cross platform manner. Build your Debian packages
+This library provides an Ant task along with a Maven plugin to create Debian packages
+from Java builds in a cross platform manner. Build your Debian packages
 on any platform that has Java support. Windows, Linux, OS X - it doesn't require
 additional native tools installed.
 
