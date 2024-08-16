@@ -1,4 +1,6 @@
-## Version 1.11, release 19.08.2024
+## Version 1.12, dev
+
+## Version 1.11, release 17.08.2024
 
 * [ADD] "signDigest" for setting just the signing digest
 * [CHG] Required java 11
