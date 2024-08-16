@@ -1,10 +1,11 @@
-## Version 1.11, release xx.08.2023
+## Version 1.11, release 19.08.2024
 
 * [ADD] "signDigest" for setting just the signing digest
+* [CHG] Required java 11
 * [CHG] Separate digest settings for creating the deb and signing it
 * [CHG] Upgraded deps
 * [FIX] Removed invalid Maven Mojo Deprecation
-* [CHG] Improve exception propagation for failures from package content processing 
+* [CHG] Improve exception propagation for failures from package content processing
 
 ## Version 1.10, released 30.11.2021
 
