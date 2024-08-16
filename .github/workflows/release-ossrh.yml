@@ -28,6 +28,11 @@ jobs:
         gpg-private-key: ${{ secrets.MAVEN_GPG_KEY }}
         gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
+    - name: Maven
+      uses: stCarolas/setup-maven@v5
+      with:
+        maven-version: 3.9.8
+
     - name: Publish to Maven Central
       run: mvn -B -Prelease --file pom.xml deploy
       env:

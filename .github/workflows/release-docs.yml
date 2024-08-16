@@ -28,6 +28,11 @@ jobs:
         distribution: 'zulu'
         java-version: 16
 
+    - name: Maven
+      uses: stCarolas/setup-maven@v5
+      with:
+        maven-version: 3.9.8
+
     - name: Build
       run: mvn -B site
 
