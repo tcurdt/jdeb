@@ -1,6 +1,7 @@
 package org.vafer.jdeb.utils;
 
-import java.util.Date;
+import java.time.Instant;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.maven.archiver.MavenArchiver;
@@ -21,10 +22,10 @@ public class OutputTimestampResolver {
 
     public Long resolveOutputTimestamp(String paramValue) {
         if (paramValue != null) {
-            Date outputDate = new MavenArchiver().parseOutputTimestamp(paramValue);
-            if (outputDate != null) {
+            Optional<Instant> outputDate = MavenArchiver.parseBuildOutputTimestamp(paramValue);
+            if (outputDate.isPresent()) {
                 console.info("Accepted outputTimestamp parameter: " + paramValue);
-                return outputDate.getTime();
+                return outputDate.get().toEpochMilli();
             }
         }
 
