@@ -484,6 +484,7 @@
           <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
           <streamLogs>true</streamLogs>
           <settingsFile>src/it/settings.xml</settingsFile>
+          <postBuildHookScript>verify</postBuildHookScript>
           <goals>
             <goal>clean</goal>
             <goal>package</goal>
