@@ -1,5 +1,8 @@
 ## Version 1.12, dev
 
+* [FIX] Re-add the maven archiver dependency (Thanks to Jeremy Norris)
+* [FIX] Fixed timestamp parsing deprecation (Thanks to Jeremy Norris)
+
 ## Version 1.11, release 17.08.2024
 
 * [ADD] "signDigest" for setting just the signing digest
