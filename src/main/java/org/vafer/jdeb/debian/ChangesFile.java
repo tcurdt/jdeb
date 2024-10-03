@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 
 /**
  * Reflecting a changes file
@@ -109,7 +110,17 @@ public final class ChangesFile extends ControlFile {
     }
 
     public static String formatDate(Date date) {
-        final DateFormat format = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // RFC 2822 format
+        final DateFormat format = createDateFormat();
         return format.format(date);
+    }
+
+    public static String formatDateUTC(Date date) {
+        final DateFormat format = createDateFormat();
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return format.format(date);
+    }
+
+    private static DateFormat createDateFormat() {
+        return new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // RFC 2822 format
     }
 }
