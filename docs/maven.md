@@ -74,7 +74,7 @@ Or if you want to build a custom deb file
   </build>
 ```
 
-At least the one main control file is required to control the creation of the
+The main control file is required to control the creation of the
 debian package. This required control file should be found in the control
 directory (inside the data dir). By default the control file name is also `control` which gives a path of `src/deb/control/control` by default. This control file contains the metadata about the Debian package. Usually it will look something along the lines of
 
