@@ -111,8 +111,7 @@ mode          | Permissions as octet                                   | No; def
 
 In order to also create a changes file you will need to provide the input and
 output of the changes. The input file is a much simpler file where you should
-list your changes. Every change should be starting with the " * " and one line
-only.
+list your changes. Every change start with the " * " and one line only.
 
     * changes for the next release
     release distribution=staging, date=20:13 17.08.2007,version=1.4+r89114,urgency=low,by=Torsten Curdt <torsten@vafer.org>
