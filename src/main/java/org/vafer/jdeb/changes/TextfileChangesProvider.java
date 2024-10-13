@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 
@@ -46,15 +47,24 @@ public final class TextfileChangesProvider implements ChangesProvider {
 
     private final ChangeSet[] changeSets;
 
-    private DateFormat fmt = new SimpleDateFormat("HH:mm dd.MM.yyyy");
+    private final DateFormat fmt;
 
     public TextfileChangesProvider( final InputStream pInput, final BinaryPackageControlFile packageControlFile ) throws IOException, ParseException {
+        this(pInput, packageControlFile, null);
+    }
+
+    public TextfileChangesProvider( final InputStream pInput, final BinaryPackageControlFile packageControlFile, final Long outputTimestampMs ) throws IOException, ParseException {
+
+        fmt = new SimpleDateFormat("HH:mm dd.MM.yyyy");
+        if (outputTimestampMs != null) {
+            fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
+        }
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
 
         String packageName = packageControlFile.get("Package");
         String version = packageControlFile.get("Version");
-        Date date = new Date();
+        Date date = outputTimestampMs == null ? new Date() : new Date(outputTimestampMs);
         String distribution = packageControlFile.get("Distribution");
         String urgency = packageControlFile.get("Urgency");
         String changedBy = packageControlFile.get("Maintainer");

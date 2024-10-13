@@ -359,7 +359,7 @@ public class DebMaker {
 
             if (changesIn != null && changesIn.exists()) {
                 // read the changes form a textfile provider
-                changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile);
+                changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile, outputTimestampMs);
             } else {
                 // create an empty changelog
                 changesProvider = new ChangesProvider() {
@@ -367,7 +367,7 @@ public class DebMaker {
                         return new ChangeSet[] {
                                 new ChangeSet(packageControlFile.get("Package"),
                                         packageControlFile.get("Version"),
-                                        new Date(),
+                                        outputTimestampMs == null ? new Date() : new Date(outputTimestampMs),
                                         packageControlFile.get("Distribution"),
                                         packageControlFile.get("Urgency"),
                                         packageControlFile.get("Maintainer"),
@@ -377,7 +377,7 @@ public class DebMaker {
                 };
             }
 
-            ChangesFileBuilder builder = new ChangesFileBuilder();
+            ChangesFileBuilder builder = new ChangesFileBuilder(outputTimestampMs);
             ChangesFile changesFile = builder.createChanges(packageControlFile, deb, changesProvider);
 
             final int digestCode = PGPSigner.getDigestCode(signDigest);
