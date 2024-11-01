@@ -1,5 +1,6 @@
 ## Version 1.12, dev
 
+* [FIX] Changes file is now reproducible (Thanks to Jeremy Norris)
 * [FIX] Re-add the maven archiver dependency (Thanks to Jeremy Norris)
 * [FIX] Fixed timestamp parsing deprecation (Thanks to Jeremy Norris)
 
