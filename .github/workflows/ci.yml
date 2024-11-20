@@ -39,6 +39,6 @@ jobs:
         run: mvn -B clean package install jacoco:report
 
       - name: Coverage
-        uses: codecov/codecov-action@v5.0.5
+        uses: codecov/codecov-action@v5.0.6
         with:
           file: target/site/jacoco/jacoco.xml
