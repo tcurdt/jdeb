@@ -7,7 +7,7 @@
     <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.release>11</maven.compiler.release>
     <maven.scope>provided</maven.scope>
-    <maven.version>3.9.8</maven.version>
+    <maven.version>3.9.9</maven.version>
     <maven.plugin.version>3.15.0</maven.plugin.version>
     <plexus.sec.version>1.4</plexus.sec.version>
   </properties>
@@ -126,7 +126,7 @@
       <!-- maven-archiver must be compile scope, see #736 -->
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-archiver</artifactId>
-      <version>3.6.2</version>
+      <version>3.6.3</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>
