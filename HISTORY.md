@@ -1,5 +1,8 @@
-## Version 1.12, dev
+## Version 1.13, dev
 
+## Version 1.12, release 22.11.2024
+
+* [CHG] Upgraded deps
 * [FIX] Changes file is now reproducible (Thanks to Jeremy Norris)
 * [FIX] Re-add the maven archiver dependency (Thanks to Jeremy Norris)
 * [FIX] Fixed timestamp parsing deprecation (Thanks to Jeremy Norris)
