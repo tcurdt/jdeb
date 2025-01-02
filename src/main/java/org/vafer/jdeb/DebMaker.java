@@ -131,6 +131,9 @@ public class DebMaker {
     /** Defines the bigNumberMode of the tar file that is built */
     private String tarBigNumberMode;
 
+    /** Whether to ignore broken symlinks in DataBuilder */
+    private boolean ignoreBrokenLinks;
+
     private Long outputTimestampMs;
 
     private VariableResolver variableResolver;
@@ -257,6 +260,10 @@ public class DebMaker {
 
     public void setTarBigNumberMode(String tarBigNumberMode) {
         this.tarBigNumberMode = tarBigNumberMode;
+    }
+
+    public void setIgnoreBrokenLinks(boolean ignore) {
+        this.ignoreBrokenLinks = ignore;
     }
 
     public void setOutputTimestampMs(Long outputTimestampMs) {
@@ -487,7 +494,7 @@ public class DebMaker {
                 .compression(compression)
                 .longFileMode(tarLongFileMode)
                 .bigNumberMode(tarBigNumberMode);
-            BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, options);
+            BigInteger size = dataBuilder.buildData(dataProducers, tempData, md5s, options, ignoreBrokenLinks);
 
             console.info("Building conffiles");
             List<String> tempConffiles = populateConffiles(conffilesProducers);
