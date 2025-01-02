@@ -18,7 +18,11 @@ package org.vafer.jdeb;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -54,7 +58,7 @@ public final class DataBuilderTestCase extends Assert {
         fileset.setProject(project);
 
         StringBuilder md5s = new StringBuilder();
-        builder.buildData(Arrays.asList((DataProducer) new DataProducerFileSet(fileset)), new File("target/data.tar"), md5s, new TarOptions().compression(Compression.GZIP));
+        builder.buildData(Arrays.asList((DataProducer) new DataProducerFileSet(fileset)), new File("target/data.tar"), md5s, new TarOptions().compression(Compression.GZIP), false);
 
         assertTrue("empty md5 file", md5s.length() > 0);
         assertFalse("windows path separator found", md5s.indexOf("\\") != -1);
@@ -69,7 +73,7 @@ public final class DataBuilderTestCase extends Assert {
 
         DataProducer producer = new DataProducerFile(new File("pom.xml"), "/usr/share/myapp/pom.xml", null, null, null);
 
-        builder.buildData(Arrays.asList(producer), archive, new StringBuilder(), new TarOptions().compression(Compression.NONE));
+        builder.buildData(Arrays.asList(producer), archive, new StringBuilder(), new TarOptions().compression(Compression.NONE), false);
 
         int count = 0;
         try (TarArchiveInputStream in = new TarArchiveInputStream(new FileInputStream(archive))) {
@@ -90,9 +94,29 @@ public final class DataBuilderTestCase extends Assert {
         File archive = prepareArchive();
 
         DataBuilder builder = new DataBuilder(new NullConsole(), EXPECTED_MODIFIED_TIME);
-        builder.buildData(Arrays.asList(fileProducer, linkProducer, dirProducer), archive, new StringBuilder(), new TarOptions().compression(Compression.NONE));
+        builder.buildData(Arrays.asList(fileProducer, linkProducer, dirProducer), archive, new StringBuilder(), new TarOptions().compression(Compression.NONE), false);
 
         assertExpectedModTimeInArchive(archive);
+    }
+
+    @Test
+    public void testIgnoreBrokenLinks() throws Exception {
+        File dir = prepareSubdirWithSymlink();
+        DataProducer dirProducer = new DataProducerDirectory(dir, null, null, null);
+        File archive = prepareArchive();
+
+        DataBuilder builder = new DataBuilder(new NullConsole(), null);
+
+        try {
+            builder.buildData(Arrays.asList(dirProducer), archive, new StringBuilder(), new TarOptions().compression(Compression.NONE), false);
+            fail("buildData should not be successful with ignoreBrokenLinks set to false");
+        }
+        catch (FileNotFoundException e) {
+            // ignoreBrokenLinks set to false, exception should be thrown.
+        }
+
+        // ignoreBrokenLinks set to true, should not throw exception.
+        builder.buildData(Arrays.asList(dirProducer), archive, new StringBuilder(), new TarOptions().compression(Compression.NONE), true);
     }
 
     private File prepareArchive() {
@@ -115,6 +139,22 @@ public final class DataBuilderTestCase extends Assert {
 
         File file2 = new File(nestedDir, "file2.txt");
         file2.createNewFile();
+
+        return subDir;
+    }
+
+    private File prepareSubdirWithSymlink() throws IOException {
+        File subDir = new File("target/subDirWithLinks");
+        subDir.mkdir();
+
+        File file1 = new File(subDir, "file1.txt");
+        file1.createNewFile();
+
+        Path targetPath = Paths.get("nonExistentFile.txt");
+        Path linkPath = Paths.get(subDir.getPath() + "/link.txt");
+
+        // Create broken symlink in data directory
+        Files.createSymbolicLink(linkPath, targetPath);
 
         return subDir;
     }

@@ -26,11 +26,14 @@ import org.apache.commons.io.IOUtils;
 import org.vafer.jdeb.utils.Utils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -84,12 +87,13 @@ class DataBuilder {
      * @param output
      * @param checksums
      * @param options Options used to build the data file
+     * @param ignoreBrokenLinks Whether to ignore broken symlinks in data directories
      * @return
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.IOException
      * @throws org.apache.commons.compress.compressors.CompressorException
      */
-    BigInteger buildData(Collection<DataProducer> producers, File output, final StringBuilder checksums, TarOptions options) throws NoSuchAlgorithmException, IOException, CompressorException {
+    BigInteger buildData(Collection<DataProducer> producers, File output, final StringBuilder checksums, TarOptions options, boolean ignoreBrokenLinks) throws NoSuchAlgorithmException, IOException, CompressorException {
 
         final File dir = output.getParentFile();
         if (dir != null && (!dir.exists() || !dir.isDirectory())) {
@@ -277,6 +281,17 @@ class DataBuilder {
         try {
             for (DataProducer data : producers) {
                 data.produce(receiver);
+            }
+        } catch (FileNotFoundException e) {
+            // Get the offending file name from the exception message to check
+            // if it's a symlink.
+            String[] arr = e.getMessage().split(" ");
+            if (Files.isSymbolicLink(Paths.get(arr[0])) && ignoreBrokenLinks) {
+                console.info("Ignoring broken symlink " + arr[0]);
+            }
+            else {
+                finishedWithoutErrors = false;
+                throw e;
             }
         } catch (Exception e) {
             finishedWithoutErrors = false;

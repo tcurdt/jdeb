@@ -121,6 +121,7 @@ classifier       | Artifact classifier                                          
 controlDir       | The directory containing the control files                                                 | No; defaults to `src/deb/control`
 installDir       | The default directory for the project artifact if no data section is present               | No; defaults to `/opt/${artifactId}`
 dataSet          | A list of directories, tarballs, or files to include in the deb package                    | No; defaults to include your maven artifact
+ignoreBrokenLinks| Indicates if broken symlinks should be ignored or cause build to fail                      | No; defaults to `false`
 changesIn        | The changes to add                                                                         | No
 changesOut       | The changes file generated                                                                 | No
 changesSave      | (NYI) The merged changes file                                                              | No
