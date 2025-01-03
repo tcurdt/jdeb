@@ -233,10 +233,11 @@ public final class Utils {
             return template;
         } else {
             // prefix[yyMMdd]suffix
-            final String date = new SimpleDateFormat(template.substring(startBracket + 1, endBracket)).format(timestamp);
+            SimpleDateFormat dateFormat = new SimpleDateFormat(template.substring(startBracket + 1, endBracket));
+            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
             String datePrefix = startBracket == 0 ? "" : template.substring(0, startBracket);
             String dateSuffix = endBracket == template.length() ? "" : template.substring(endBracket + 1);
-            return datePrefix + date + dateSuffix;
+            return datePrefix + dateFormat.format(timestamp) + dateSuffix;
         }
     }
 
