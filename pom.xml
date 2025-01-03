@@ -296,7 +296,7 @@
           <artifactId>maven-plugin-plugin</artifactId>
           <version>${maven.plugin.version}</version>
           <configuration>
-            <goalPrefix>prefix</goalPrefix>
+            <goalPrefix>jdeb</goalPrefix>
             <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
             <extractors>
               <extractor>java-annotations</extractor>
