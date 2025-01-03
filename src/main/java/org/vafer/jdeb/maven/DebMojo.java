@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -398,13 +399,13 @@ public class DebMojo extends AbstractMojo {
     }
 
     @SuppressWarnings("unchecked,rawtypes")
-    protected VariableResolver initializeVariableResolver( Map<String, String> variables ) {
+    protected VariableResolver initializeVariableResolver( Map<String, String> variables, Long outputTimestampMs ) {
         variables.putAll((Map) getProject().getProperties());
         variables.putAll((Map) System.getProperties());
         variables.put("name", name != null ? name : getProject().getName());
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
-        variables.put("version", getProjectVersion());
+        variables.put("version", getProjectVersion(outputTimestampMs));
         variables.put("description", getProject().getDescription());
         variables.put("extension", "deb");
         variables.put("baseDir", getProject().getBasedir().getAbsolutePath());
@@ -437,8 +438,9 @@ public class DebMojo extends AbstractMojo {
      *
      * @return the Maven project version
      */
-    private String getProjectVersion() {
-        return Utils.convertToDebianVersion(getProject().getVersion(), this.snapshotExpand, this.snapshotEnv, this.snapshotTemplate, session.getStartTime());
+    private String getProjectVersion(Long outputTimestampMs) {
+        Date buildTimeStamp = outputTimestampMs != null ? new Date(outputTimestampMs) : session.getStartTime();
+        return Utils.convertToDebianVersion(getProject().getVersion(), this.snapshotExpand, this.snapshotEnv, this.snapshotTemplate, buildTimeStamp);
     }
 
     /**
@@ -503,8 +505,10 @@ public class DebMojo extends AbstractMojo {
         console = new MojoConsole(getLog(), verbose);
 
         initializeSignProperties();
+        
+        Long outputTimestampMs = new OutputTimestampResolver(console).resolveOutputTimestamp(outputTimestamp);
 
-        final VariableResolver resolver = initializeVariableResolver(new HashMap<String, String>());
+        final VariableResolver resolver = initializeVariableResolver(new HashMap<String, String>(), outputTimestampMs);
 
         final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken));
         final File controlDirFile = new File(Utils.replaceVariables(resolver, controlDir, openReplaceToken, closeReplaceToken));
@@ -594,7 +598,6 @@ public class DebMojo extends AbstractMojo {
             debMaker.setDigest(digest);
             debMaker.setTarBigNumberMode(tarBigNumberMode);
             debMaker.setTarLongFileMode(tarLongFileMode);
-            Long outputTimestampMs = new OutputTimestampResolver(console).resolveOutputTimestamp(outputTimestamp);
             debMaker.setOutputTimestampMs(outputTimestampMs);
             debMaker.validate();
             debMaker.makeDeb();
@@ -615,7 +618,7 @@ public class DebMojo extends AbstractMojo {
         }
 
         if (!isBlank(propertyPrefix)) {
-          project.getProperties().put(propertyPrefix+"version", getProjectVersion() );
+          project.getProperties().put(propertyPrefix+"version", getProjectVersion(outputTimestampMs) );
           project.getProperties().put(propertyPrefix+"deb", debFile.getAbsolutePath());
           project.getProperties().put(propertyPrefix+"deb.name", debFile.getName());
           project.getProperties().put(propertyPrefix+"changes", changesOutFile.getAbsolutePath());
