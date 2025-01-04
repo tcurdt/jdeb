@@ -26,7 +26,6 @@ import org.apache.commons.io.IOUtils;
 import org.vafer.jdeb.utils.Utils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -282,12 +281,11 @@ class DataBuilder {
             for (DataProducer data : producers) {
                 data.produce(receiver);
             }
-        } catch (FileNotFoundException e) {
+        } catch (ProducerFileNotFoundException e) {
             // Get the offending file name from the exception message to check
             // if it's a symlink.
-            String[] arr = e.getMessage().split(" ");
-            if (Files.isSymbolicLink(Paths.get(arr[0])) && ignoreBrokenLinks) {
-                console.info("Ignoring broken symlink " + arr[0]);
+            if (Files.isSymbolicLink(Paths.get(e.getMessage())) && ignoreBrokenLinks) {
+                console.info("Ignoring broken symlink " + e.getMessage());
             }
             else {
                 finishedWithoutErrors = false;
