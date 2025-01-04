@@ -111,7 +111,7 @@ public final class DataBuilderTestCase extends Assert {
             builder.buildData(Arrays.asList(dirProducer), archive, new StringBuilder(), new TarOptions().compression(Compression.NONE), false);
             fail("buildData should not be successful with ignoreBrokenLinks set to false");
         }
-        catch (FileNotFoundException e) {
+        catch (ProducerFileNotFoundException e) {
             // ignoreBrokenLinks set to false, exception should be thrown.
         }
 

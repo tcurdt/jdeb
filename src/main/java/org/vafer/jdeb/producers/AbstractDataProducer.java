@@ -19,10 +19,12 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.tools.ant.types.selectors.SelectorUtils;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
+import org.vafer.jdeb.ProducerFileNotFoundException;
 import org.vafer.jdeb.mapping.Mapper;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -85,7 +87,13 @@ public abstract class AbstractDataProducer implements DataProducer {
         TarArchiveEntry fileEntry = Producers.defaultFileEntryWithName(fileName);
         fileEntry.setSize(file.length());
         fileEntry = map(fileEntry);
-        Producers.produceInputStreamWithEntry(consumer, new FileInputStream(file), fileEntry);
+        try {
+            Producers.produceInputStreamWithEntry(consumer, new FileInputStream(file), fileEntry);
+        }
+        catch (FileNotFoundException e) {
+            ProducerFileNotFoundException pe = new ProducerFileNotFoundException(file.getAbsolutePath(), e);
+            throw pe;
+        }
     }
 
     public TarArchiveEntry map( final TarArchiveEntry pEntry ) {
