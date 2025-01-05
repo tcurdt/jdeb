@@ -1,9 +1,10 @@
 package org.vafer.jdeb;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 
-public class ProducerFileNotFoundException extends IOException {
-    
+public class ProducerFileNotFoundException extends FileNotFoundException {
+
+
     public ProducerFileNotFoundException() {
         super();
     }
@@ -13,6 +14,7 @@ public class ProducerFileNotFoundException extends IOException {
     }
 
     public ProducerFileNotFoundException(String message, Throwable cause) {
-        super(message, cause);
+        super(message);
+        this.initCause(cause);
     }
 }
