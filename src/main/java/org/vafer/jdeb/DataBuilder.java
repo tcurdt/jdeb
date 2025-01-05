@@ -285,7 +285,7 @@ class DataBuilder {
             // Get the offending file name from the exception to check
             // if it's a symlink.
             if (Files.isSymbolicLink(Paths.get(e.getFilePath())) && ignoreBrokenLinks) {
-                console.info("Ignoring broken symlink " + e.getMessage());
+                console.info("Ignoring broken symlink " + e.getFilePath());
             }
             else {
                 finishedWithoutErrors = false;
