@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 
 public class ProducerFileNotFoundException extends FileNotFoundException {
 
+    private String filePath;
 
     public ProducerFileNotFoundException() {
         super();
@@ -16,5 +17,13 @@ public class ProducerFileNotFoundException extends FileNotFoundException {
     public ProducerFileNotFoundException(String message, Throwable cause) {
         super(message);
         this.initCause(cause);
+    }
+
+    public void setFilePath(String path) {
+        this.filePath = path;
+    }
+
+    public String getFilePath() {
+        return this.filePath;
     }
 }

@@ -91,7 +91,8 @@ public abstract class AbstractDataProducer implements DataProducer {
             Producers.produceInputStreamWithEntry(consumer, new FileInputStream(file), fileEntry);
         }
         catch (FileNotFoundException e) {
-            ProducerFileNotFoundException pe = new ProducerFileNotFoundException(file.getAbsolutePath(), e);
+            ProducerFileNotFoundException pe = new ProducerFileNotFoundException(e.getMessage(), e);
+            pe.setFilePath(file.getAbsolutePath());
             throw pe;
         }
     }

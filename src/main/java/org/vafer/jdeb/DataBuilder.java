@@ -282,9 +282,9 @@ class DataBuilder {
                 data.produce(receiver);
             }
         } catch (ProducerFileNotFoundException e) {
-            // Get the offending file name from the exception message to check
+            // Get the offending file name from the exception to check
             // if it's a symlink.
-            if (Files.isSymbolicLink(Paths.get(e.getMessage())) && ignoreBrokenLinks) {
+            if (Files.isSymbolicLink(Paths.get(e.getFilePath())) && ignoreBrokenLinks) {
                 console.info("Ignoring broken symlink " + e.getMessage());
             }
             else {
