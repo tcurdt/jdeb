@@ -374,6 +374,8 @@ public class DebMaker {
         try {
             console.info("Creating changes file: " + changesOut);
 
+            changesOut.getParentFile().mkdirs();
+
             out = new FileOutputStream(changesOut);
 
             if (changesIn != null && changesIn.exists()) {
