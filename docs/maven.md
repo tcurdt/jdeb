@@ -9,7 +9,7 @@ the plugin to your POM like this
       <plugin>
         <artifactId>jdeb</artifactId>
         <groupId>org.vafer</groupId>
-        <version>1.11</version>
+        <version>1.12</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -47,7 +47,7 @@ Or if you want to build a custom deb file
       <extension>
         <groupId>org.vafer</groupId>
         <artifactId>jdeb</artifactId>
-        <version>1.11</version>
+        <version>1.12</version>
       </extension>
     </extensions>
     <pluginManagement>
@@ -97,12 +97,15 @@ also be injected. If a changes file is used, the `Distribution` usually comes
 from that file. The default changes file is called `CHANGES.txt`. See below
 for the syntax of the content of the changes file.
 
-Property replacement will also occur in any of the standard debian control
-files: conffiles, preinst, postinst, prerm, postrm. This allows dynamic
-configuration of the form:
+Property replacement will also occur in the final filename, and any of the
+standard debian control files: conffiles, preinst, postinst, prerm, postrm.
+This allows dynamic configuration of the form:
 
     /etc/[[artifactId]]/[[artifactId]].properties
     /etc/[[artifactId]]/log4j.xml
+
+Possible substitutions are `[[baseDir]]`, `[[buildDir]]`, `[[artifactId]]`,
+`[[version]]`, `[[extension]]` and `[[groupId]]`.
 
 If you now do a `mvn clean install`, the `deb` goal will be called and
 artifacts consisting of the deb and potentially the changes file will
@@ -115,7 +118,7 @@ section with any of the following options:
 
 Element          | Description                                                                                | Required
 ---------------- | ------------------------------------------------------------------------------------------ | -----------------------------------------------------------------
-deb              | The debian package to be generated                                                         | No; defaults to `${buildDirectory}/${artifactId}_${version}_all.deb`
+deb              | The debian package to be generated                                                         | No; defaults to `[[buildDir]]/[[artifactId]]_[[version]]_all.[[extension]]`
 type             | Artifact type                                                                              | No; defaults to `deb`
 classifier       | Artifact classifier                                                                        | No; defaults to ''
 controlDir       | The directory containing the control files                                                 | No; defaults to `src/deb/control`
@@ -188,7 +191,7 @@ include a directory, a tarball, and a file in your deb package and then sign it 
       <plugin>
         <artifactId>jdeb</artifactId>
         <groupId>org.vafer</groupId>
-        <version>1.11</version>
+        <version>1.12</version>
         <executions>
           <execution>
             <phase>package</phase>
