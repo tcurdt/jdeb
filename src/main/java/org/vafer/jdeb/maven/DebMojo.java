@@ -112,6 +112,12 @@ public class DebMojo extends AbstractMojo {
     private String changesSave;
 
     /**
+     * Enable the creation of the changes file.
+     */
+    @Parameter(defaultValue = "true")
+    private boolean changesEnabled;
+
+    /**
      * The compression method used for the data file (none, gzip, bzip2 or xz)
      */
     @Parameter(defaultValue = "gzip")
@@ -587,6 +593,7 @@ public class DebMojo extends AbstractMojo {
             debMaker.setChangesIn(changesInFile);
             debMaker.setChangesOut(changesOutFile);
             debMaker.setChangesSave(changesSaveFile);
+            debMaker.setChangesEnabled(changesEnabled);
             debMaker.setCompression(compression);
             debMaker.setKeyring(keyringFile);
             debMaker.setKey(key);
@@ -638,7 +645,7 @@ public class DebMojo extends AbstractMojo {
      * and global settings.
      */
     private void initializeSignProperties() {
-        if (!signPackage && !signChanges) {
+        if (!signPackage && !(signChanges && changesEnabled)) {
             return;
         }
 

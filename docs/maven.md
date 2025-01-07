@@ -128,6 +128,7 @@ ignoreBrokenLinks| Indicates if broken symlinks should be ignored or cause build
 changesIn        | The changes to add                                                                         | No
 changesOut       | The changes file generated                                                                 | No
 changesSave      | (NYI) The merged changes file                                                              | No
+changesEnabled   | Enable the creation of the changes file                                                    | No; defaults to `true`
 compression      | (NYI) Compression method for the data file (`gzip`, `bzip2`, `xz` or `none`)               | No; defaults to `gzip`
 digest           | Digest to use when building the deb                                                        | No; defaults to `SHA256`
 signPackage      | If the debian package should be signed                                                     | No

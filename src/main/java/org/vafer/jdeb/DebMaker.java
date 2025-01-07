@@ -107,6 +107,9 @@ public class DebMaker {
     /** The file where to write the changes of the changes input to */
     private File changesSave;
 
+    /** Enable the creation of the changes file */
+    private boolean changesEnabled;
+
     /** The compression method used for the data file (none, gzip, bzip2 or xz) */
     private String compression = "gzip";
 
@@ -197,6 +200,10 @@ public class DebMaker {
         this.changesSave = changes;
     }
 
+    public void setChangesEnabled(boolean changesEnabled) {
+        this.changesEnabled = changesEnabled;
+    }
+
     public void setSignPackage(boolean signPackage) {
         this.signPackage = signPackage;
     }
@@ -278,23 +285,25 @@ public class DebMaker {
             throw new PackagingException("The 'control' attribute doesn't point to a directory. " + control);
         }
 
-        if (changesIn != null) {
+        if (changesEnabled) {
+            if (changesIn != null) {
 
-            if (changesIn.exists() && (!changesIn.isFile() || !changesIn.canRead())) {
-                throw new PackagingException("The 'changesIn' setting needs to point to a readable file. " + changesIn + " was not found/readable.");
-            }
+                if (changesIn.exists() && (!changesIn.isFile() || !changesIn.canRead())) {
+                    throw new PackagingException("The 'changesIn' setting needs to point to a readable file. " + changesIn + " was not found/readable.");
+                }
 
-            if (changesOut != null && !isWritableFile(changesOut)) {
-                throw new PackagingException("Cannot write the output for 'changesOut' to " + changesOut);
-            }
+                if (changesOut != null && !isWritableFile(changesOut)) {
+                    throw new PackagingException("Cannot write the output for 'changesOut' to " + changesOut);
+                }
 
-            if (changesSave != null && !isWritableFile(changesSave)) {
-                throw new PackagingException("Cannot write the output for 'changesSave' to " + changesSave);
-            }
+                if (changesSave != null && !isWritableFile(changesSave)) {
+                    throw new PackagingException("Cannot write the output for 'changesSave' to " + changesSave);
+                }
 
-        } else {
-            if (changesOut != null || changesSave != null) {
-                throw new PackagingException("The 'changesOut' or 'changesSave' settings may only be used when there is a 'changesIn' specified.");
+            } else {
+                if (changesOut != null || changesSave != null) {
+                    throw new PackagingException("The 'changesOut' or 'changesSave' settings may only be used when there is a 'changesIn' specified.");
+                }
             }
         }
 
@@ -348,7 +357,10 @@ public class DebMaker {
             throw new PackagingException("Failed to create debian package " + deb, e);
         }
 
-        makeChangesFiles(packageControlFile);
+        if(changesEnabled)
+        {
+            makeChangesFiles(packageControlFile);
+        }
     }
 
     private void makeChangesFiles(final BinaryPackageControlFile packageControlFile) throws PackagingException {

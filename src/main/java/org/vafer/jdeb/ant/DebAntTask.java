@@ -62,6 +62,9 @@ public class DebAntTask extends MatchingTask {
     /** The file where to write the changes of the changes input to */
     private File changesSave;
 
+    /** Enable the creation of the changes file */
+    private boolean changesEnabled = true;
+
     /** The compression method used for the data file (none, gzip, bzip2 or xz) */
     private String compression = "gzip";
 
@@ -170,6 +173,7 @@ public class DebAntTask extends MatchingTask {
         debMaker.setChangesIn(changesIn);
         debMaker.setChangesOut(changesOut);
         debMaker.setChangesSave(changesSave);
+        debMaker.setChangesEnabled(changesEnabled);
         debMaker.setKeyring(keyring);
         debMaker.setKey(key);
         debMaker.setPassphrase(passphrase);
