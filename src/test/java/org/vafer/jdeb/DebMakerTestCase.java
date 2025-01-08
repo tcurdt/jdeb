@@ -305,6 +305,49 @@ public final class DebMakerTestCase extends Assert {
         }
     }
 
+    @Test
+    public void testChangesValidation() throws Exception {
+        File deb = File.createTempFile("jdeb", ".deb");
+        File changesSave = File.createTempFile("changesSave", ".txt");
+        File directory = new File(getClass().getResource("deb/data").toURI());
+
+        DebMaker maker = new DebMaker(new NullConsole(), List.of(new UseNullAsInputStream()), null);
+        assertThrows(PackagingException.class, maker::validate);
+
+        maker.setControl(new File(getClass().getResource("deb/control").toURI()));
+        assertThrows(PackagingException.class, maker::validate);
+
+        maker.setDeb(deb);
+        maker.validate();
+        
+        maker.setChangesEnabled(true);
+        maker.validate();
+
+        maker.setChangesIn(directory);
+        assertThrows(PackagingException.class, maker::validate);
+
+        maker.setChangesIn(new File(getClass().getResource("changes/changes.txt").toURI()));
+        maker.validate();
+        
+        maker.setChangesSave(directory);
+        assertThrows(PackagingException.class, maker::validate);
+
+        maker.setChangesSave(null);
+        maker.setChangesOut(directory);
+        assertThrows(PackagingException.class, maker::validate);
+
+        maker.setChangesOut(null);
+        maker.setChangesSave(changesSave);
+        maker.validate();
+
+        maker.setChangesIn(null);
+        assertThrows(PackagingException.class, maker::validate);
+
+        maker.setChangesEnabled(false);
+        maker.setCompression(null);
+        assertThrows(PackagingException.class, maker::validate);
+    }
+
     private DataProducer[] prepareData() throws URISyntaxException {
         File archive1 = new File(getClass().getResource("deb/data.tgz").toURI());
         File archive2 = new File(getClass().getResource("deb/data.tar.bz2").toURI());
