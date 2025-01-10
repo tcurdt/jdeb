@@ -121,7 +121,7 @@ public final class DebMakerTestCase extends Assert {
     }
 
     @Test
-    public void testCreationUtf8() throws Exception {
+    public void testCreationEncoding() throws Exception {
         DataProducer[] data = prepareData();
         File deb = File.createTempFile("jdeb", ".deb");
 
@@ -144,7 +144,7 @@ public final class DebMakerTestCase extends Assert {
 
         DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data), Arrays.<DataProducer>asList(conffile1, conffile2));
         
-        maker.setControl(new File(getClass().getResource("deb/controlutf8").toURI()));
+        maker.setControl(new File(getClass().getResource("deb/controlencoding").toURI()));
         maker.setDeb(deb);
 
         // first step: invalid encoding
@@ -169,6 +169,28 @@ public final class DebMakerTestCase extends Assert {
                     try {
                         for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
                             if(line.startsWith("# P")) {
+                                assertFalse("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
+                            }
+                        }
+                    } catch(Exception e) {
+                        throw new IOException(e);
+                    }
+                }
+                else if (entry.getName().startsWith("./shell_")) {
+                    try {
+                        for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
+                            if(line.startsWith("# Custom script")) {
+                                assertFalse("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
+                            }
+                        }
+                    } catch(Exception e) {
+                        throw new IOException(e);
+                    }
+                }
+                else if (entry.getName().equals("./text.txt")) {
+                    try {
+                        for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
+                            if(line.startsWith("Text file")) {
                                 assertFalse("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
                             }
                         }
@@ -202,6 +224,28 @@ public final class DebMakerTestCase extends Assert {
                       for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
                           if(line.startsWith("# P")) {
                               assertTrue("the encoding is wrong", line.endsWith("created by ジョン"));
+                          }
+                      }
+                  } catch(Exception e) {
+                      throw new IOException(e);
+                  }
+              }
+              else if (entry.getName().startsWith("./shell_")) {
+                  try {
+                      for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
+                          if(line.startsWith("# Custom script")) {
+                              assertTrue("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
+                          }
+                      }
+                  } catch(Exception e) {
+                      throw new IOException(e);
+                  }
+              }
+              else if (entry.getName().equals("./text.txt")) {
+                  try {
+                      for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
+                          if(line.startsWith("Text file")) {
+                              assertTrue("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
                           }
                       }
                   } catch(Exception e) {
