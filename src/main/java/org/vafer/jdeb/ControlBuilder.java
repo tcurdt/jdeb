@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -84,7 +85,7 @@ class ControlBuilder {
      * @throws java.io.IOException
      * @throws java.text.ParseException
      */
-    void buildControl(BinaryPackageControlFile packageControlFile, File[] controlFiles, List<String> conffiles, StringBuilder checksums, File output) throws IOException, ParseException {
+    void buildControl(BinaryPackageControlFile packageControlFile, File[] controlFiles, List<String> conffiles, StringBuilder checksums, File output, Charset encoding) throws IOException, ParseException {
 
         if (packageControlFile == null) {
             throw new FileNotFoundException("No 'control' file found in " + controlFiles.toString());
@@ -123,7 +124,7 @@ class ControlBuilder {
 
             if (CONFIGURATION_FILENAMES.contains(file.getName()) || MAINTAINER_SCRIPTS.contains(file.getName())) {
 
-                FilteredFile configurationFile = new FilteredFile(new FileInputStream(file), resolver);
+                FilteredFile configurationFile = new FilteredFile(new FileInputStream(file), resolver, encoding);
                 configurationFile.setOpenToken(openReplaceToken);
                 configurationFile.setCloseToken(closeReplaceToken);
                 addControlEntry(file.getName(), configurationFile.toString(), outputStream);
@@ -174,6 +175,10 @@ class ControlBuilder {
         return content.toString();
     }
 
+    @Deprecated
+    public BinaryPackageControlFile createPackageControlFile(File file, BigInteger pDataSize) throws IOException, ParseException {
+        return createPackageControlFile(file, pDataSize, Charset.defaultCharset());
+    }
 
     /**
      * Creates a package control file from the specified file and adds the
@@ -184,9 +189,10 @@ class ControlBuilder {
      *
      * @param file       the control file
      * @param pDataSize  the size of the installed package
+     * @param encoding   the encoding used to read the files
      */
-    public BinaryPackageControlFile createPackageControlFile(File file, BigInteger pDataSize) throws IOException, ParseException {
-        FilteredFile controlFile = new FilteredFile(new FileInputStream(file), resolver);
+    public BinaryPackageControlFile createPackageControlFile(File file, BigInteger pDataSize, Charset encoding) throws IOException, ParseException {
+        FilteredFile controlFile = new FilteredFile(new FileInputStream(file), resolver, encoding);
         BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile(controlFile.toString());
 
         if (packageControlFile.get("Distribution") == null) {

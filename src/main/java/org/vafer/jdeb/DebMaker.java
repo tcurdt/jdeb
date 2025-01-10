@@ -531,7 +531,7 @@ public class DebMaker {
 
             console.debug("Building control");
             ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver, openReplaceToken, closeReplaceToken, outputTimestampMs);
-            BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size);
+            BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size, encoding);
             if (packageControlFile.get("Package") == null) {
                 packageControlFile.set("Package", packageName);
             }
@@ -551,7 +551,7 @@ public class DebMaker {
                 packageControlFile.set("Homepage", homepage);
             }
 
-            controlBuilder.buildControl(packageControlFile, control.listFiles(), tempConffiles , md5s, tempControl);
+            controlBuilder.buildControl(packageControlFile, control.listFiles(), tempConffiles , md5s, tempControl, encoding);
 
             if (!packageControlFile.isValid()) {
                 throw new PackagingException("Control file fields are invalid " + packageControlFile.invalidFields() +

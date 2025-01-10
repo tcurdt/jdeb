@@ -1,0 +1,13 @@
+Package: test
+Version: 1.0.1
+Section: misc
+Priority: optional
+Architecture: i386
+Depends: some-package
+Maintainer: ジョン Doe <john@doe.org>
+Distribution: development
+Description: revision @REVISION@, test package
+ This is a sample package control file.
+ .
+ Use for testing purposes only.
+XB-UserDefinedField: This is a user defined field.

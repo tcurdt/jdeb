@@ -18,6 +18,7 @@ package org.vafer.jdeb.utils;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ public final class FilteredFileTestCase extends Assert {
     public void testTokenSubstitution() throws Exception {
         InputStream in = new ReaderInputStream(new StringReader("#!/bin/sh\ncat [[artifactId]][[myProperty1]] \necho '[[myProperty2]]'\n"));
 
-        FilteredFile placeHolder = new FilteredFile(in, variableResolver);
+        FilteredFile placeHolder = new FilteredFile(in, variableResolver, StandardCharsets.UTF_8);
 
         String actual = placeHolder.toString();
         assertEquals("#!/bin/sh\ncat jdebcustom1 \necho 'custom2'\n", actual);
@@ -65,7 +66,7 @@ public final class FilteredFileTestCase extends Assert {
             String expected = pair.getValue();
 
             InputStream in = new ReaderInputStream(new StringReader(input));
-            FilteredFile placeHolder = new FilteredFile(in, variableResolver);
+            FilteredFile placeHolder = new FilteredFile(in, variableResolver, StandardCharsets.UTF_8);
             String actual = placeHolder.toString();
 
             assertEquals("unexpected resolve for " + input, expected, actual);
@@ -86,7 +87,7 @@ public final class FilteredFileTestCase extends Assert {
                 + "NoResolve1: test[[test\n"
                 + "NoResolve2: [[test]]\n";
 
-        FilteredFile filteredFile = new FilteredFile(new ByteArrayInputStream(controlFile.getBytes()), new MapVariableResolver(map));
+        FilteredFile filteredFile = new FilteredFile(new ByteArrayInputStream(controlFile.getBytes()), new MapVariableResolver(map), StandardCharsets.UTF_8);
 
         BinaryPackageControlFile d = new BinaryPackageControlFile(filteredFile.toString());
 

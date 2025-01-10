@@ -37,6 +37,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
+import org.vafer.jdeb.debian.ControlFile;
 import org.vafer.jdeb.maven.Data;
 import org.vafer.jdeb.maven.Mapper;
 import org.vafer.jdeb.producers.DataProducerArchive;
@@ -76,6 +77,7 @@ public final class DebMakerTestCase extends Assert {
 
         DebMaker maker =
             new DebMaker(new NullConsole(), Arrays.asList(data), Arrays.<DataProducer>asList(conffile1, conffile2));
+        maker.setEncoding(StandardCharsets.UTF_8);
         maker.setControl(new File(getClass().getResource("deb/control").toURI()));
         maker.setDeb(deb);
 
@@ -119,6 +121,98 @@ public final class DebMakerTestCase extends Assert {
     }
 
     @Test
+    public void testCreationUtf8() throws Exception {
+        DataProducer[] data = prepareData();
+        File deb = File.createTempFile("jdeb", ".deb");
+
+        File conffile = new File(getClass().getResource("deb/data.tgz").toURI());
+
+        Data conffile1 = new Data();
+        conffile1.setType("file");
+        conffile1.setSrc(conffile);
+        conffile1.setDst("/absolute/path/to/configuration");
+        conffile1.setConffile(true);
+        Data conffile2 = new Data();
+        conffile2.setType("file");
+        conffile2.setSrc(conffile);
+        conffile2.setConffile(true);
+
+        Mapper mapper = new Mapper();
+        FieldUtils.writeField(mapper, "type", "perm", true);
+        FieldUtils.writeField(mapper, "prefix", "/absolute/prefix", true);
+        FieldUtils.writeField(conffile2, "mapper", mapper, true);
+
+        DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data), Arrays.<DataProducer>asList(conffile1, conffile2));
+        
+        maker.setControl(new File(getClass().getResource("deb/controlutf8").toURI()));
+        maker.setDeb(deb);
+
+        // first step: invalid encoding
+        maker.setEncoding(StandardCharsets.ISO_8859_1);
+
+        BinaryPackageControlFile packageControlFile = maker.createDeb(Compression.GZIP);
+
+        assertTrue(packageControlFile.isValid());
+
+        ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
+            @Override
+            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
+                if (entry.getName().equals("./control")) {
+                    try {
+                        ControlFile controlFile = new BinaryPackageControlFile(org.apache.commons.io.IOUtils.toString(new ByteArrayInputStream(content), StandardCharsets.UTF_8));
+                        assertNotEquals("the encoding is valid but should be wrong", controlFile.get("Maintainer"), "ジョン Doe <john@doe.org>");
+                    } catch(Exception e) {
+                        throw new IOException(e);
+                    }
+                }
+                else if (entry.getName().equals("./postinst") || entry.getName().equals("./prerm")) {
+                    try {
+                        for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
+                            if(line.startsWith("# P")) {
+                                assertFalse("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
+                            }
+                        }
+                    } catch(Exception e) {
+                        throw new IOException(e);
+                    }
+                }
+            }
+        });
+        
+        // second step: valid encoding
+        maker.setEncoding(StandardCharsets.UTF_8);
+
+        packageControlFile = maker.createDeb(Compression.GZIP);
+
+        assertTrue(packageControlFile.isValid());
+
+        ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
+          @Override
+          public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
+              if (entry.getName().equals("./control")) {
+                  try {
+                      ControlFile controlFile = new BinaryPackageControlFile(org.apache.commons.io.IOUtils.toString(new ByteArrayInputStream(content), StandardCharsets.UTF_8));
+                      assertEquals("the encoding is wrong", controlFile.get("Maintainer"), "ジョン Doe <john@doe.org>");
+                  } catch(Exception e) {
+                      throw new IOException(e);
+                  }
+              }
+              else if (entry.getName().equals("./postinst") || entry.getName().equals("./prerm")) {
+                  try {
+                      for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
+                          if(line.startsWith("# P")) {
+                              assertTrue("the encoding is wrong", line.endsWith("created by ジョン"));
+                          }
+                      }
+                  } catch(Exception e) {
+                      throw new IOException(e);
+                  }
+              }
+          }
+      });
+    }
+
+    @Test
     public void testControlFilesPermissions() throws Exception {
         File deb = new File("target/test-classes/test-control.deb");
         if (deb.exists() && !deb.delete()) {
@@ -128,6 +222,7 @@ public final class DebMakerTestCase extends Assert {
         Collection<DataProducer> producers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
         Collection<DataProducer> conffileProducers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
         DebMaker maker = new DebMaker(new NullConsole(), producers, conffileProducers);
+        maker.setEncoding(StandardCharsets.UTF_8);
         maker.setDeb(deb);
         maker.setControl(new File("target/test-classes/org/vafer/jdeb/deb/control"));
 
@@ -174,6 +269,7 @@ public final class DebMakerTestCase extends Assert {
         Collection<DataProducer> producers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
         Collection<DataProducer> conffileProducers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
         DebMaker maker = new DebMaker(new NullConsole(), producers, conffileProducers);
+        maker.setEncoding(StandardCharsets.UTF_8);
         maker.setDeb(deb);
         maker.setControl(new File("target/test-classes/org/vafer/jdeb/deb/control"));
         maker.setResolver(new MapVariableResolver(variables));
@@ -210,6 +306,7 @@ public final class DebMakerTestCase extends Assert {
         Collection<DataProducer> producers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
         Collection<DataProducer> conffileProducers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
         DebMaker maker = new DebMaker(new NullConsole(), producers, conffileProducers);
+        maker.setEncoding(StandardCharsets.UTF_8);
         maker.setDeb(deb);
         maker.setControl(new File("target/test-classes/org/vafer/jdeb/deb/controlwithoutdepends"));
 
@@ -241,6 +338,7 @@ public final class DebMakerTestCase extends Assert {
         Collection<DataProducer> producers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
         Collection<DataProducer> conffileProducers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
         DebMaker maker = new DebMaker(new NullConsole(), producers, conffileProducers);
+        maker.setEncoding(StandardCharsets.UTF_8);
         maker.setDeb(deb);
         maker.setControl(new File("target/test-classes/org/vafer/jdeb/deb/controlwithoutdepends"));
 
@@ -274,6 +372,7 @@ public final class DebMakerTestCase extends Assert {
 
         Collection<DataProducer> confFileProducers = Arrays.asList(new DataProducer[] {new EmptyDataProducer()});
         DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data), confFileProducers);
+        maker.setEncoding(StandardCharsets.UTF_8);
         maker.setControl(new File(getClass().getResource("deb/control").toURI()));
         maker.setDeb(deb);
         maker.setOutputTimestampMs(EXPECTED_MODIFIED_TIME);
@@ -292,6 +391,7 @@ public final class DebMakerTestCase extends Assert {
     public void testErrorPropagation() throws Exception {
         File deb = File.createTempFile("jdeb", ".deb");
         DebMaker maker = new DebMaker(new NullConsole(), List.of(new UseNullAsInputStream()), null);
+        maker.setEncoding(StandardCharsets.UTF_8);
         maker.setControl(new File(getClass().getResource("deb/control").toURI()));
         maker.setDeb(deb);
 
@@ -312,6 +412,7 @@ public final class DebMakerTestCase extends Assert {
         File directory = new File(getClass().getResource("deb/data").toURI());
 
         DebMaker maker = new DebMaker(new NullConsole(), List.of(new UseNullAsInputStream()), null);
+        maker.setEncoding(StandardCharsets.UTF_8);
         assertThrows(PackagingException.class, maker::validate);
 
         maker.setControl(new File(getClass().getResource("deb/control").toURI()));
