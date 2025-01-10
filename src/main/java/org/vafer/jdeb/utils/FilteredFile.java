@@ -26,23 +26,34 @@ import java.util.List;
 
 public class FilteredFile {
 
-    private String openToken = "[[";
-    private String closeToken = "]]";
+    public static final String DEFAULT_OPEN_TOKEN = "[[";
+    public static final String DEFAULT_CLOSE_TOKEN = "]]";
+
+    private String openToken;
+    private String closeToken;
     private List<String> lines = new ArrayList<>();
 
     @Deprecated
     public FilteredFile(InputStream in, VariableResolver resolver) throws IOException {
-        parse(in, resolver, Charset.defaultCharset());
-      }
-
-    public FilteredFile(InputStream in, VariableResolver resolver, Charset encoding) throws IOException {
-      parse(in, resolver, encoding);
+        this(in, resolver, Charset.defaultCharset());
     }
 
+    public FilteredFile(InputStream in, VariableResolver resolver, Charset encoding) throws IOException {
+        this(in, resolver, encoding, DEFAULT_OPEN_TOKEN, DEFAULT_CLOSE_TOKEN);
+    }
+
+    public FilteredFile(InputStream in, VariableResolver resolver, Charset encoding, String openToken, String closeToken) throws IOException {
+        this.openToken = openToken;
+        this.closeToken = closeToken;
+        parse(in, resolver, encoding);
+    }
+
+    @Deprecated
     public void setOpenToken(String token) {
         openToken = token;
     }
 
+    @Deprecated
     public void setCloseToken(String token) {
         closeToken = token;
     }

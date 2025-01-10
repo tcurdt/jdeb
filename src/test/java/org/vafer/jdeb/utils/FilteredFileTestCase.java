@@ -53,6 +53,16 @@ public final class FilteredFileTestCase extends Assert {
     }
 
     @Test
+    public void testCustomTokenSubstitution() throws Exception {
+        InputStream in = new ReaderInputStream(new StringReader("#!/bin/sh\ncat {[{artifactId}]}{[{myProperty1}]} \necho '{[{myProperty2}]}'\n"));
+
+        FilteredFile placeHolder = new FilteredFile(in, variableResolver, StandardCharsets.UTF_8, "{[{", "}]}");
+
+        String actual = placeHolder.toString();
+        assertEquals("#!/bin/sh\ncat jdebcustom1 \necho 'custom2'\n", actual);
+    }
+
+    @Test
     public void testTokenSubstitutionWithinOpenCloseTokens() throws Exception {
         HashMap<String, String> table = new HashMap<String, String>() {{
             put("#!/bin/bash\nif [[ -z \"$(grep [[artifactId]] /etc/passwd )\" ]] ; then\n",

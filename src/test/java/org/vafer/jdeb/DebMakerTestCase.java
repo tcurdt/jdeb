@@ -214,7 +214,7 @@ public final class DebMakerTestCase extends Assert {
               if (entry.getName().equals("./control")) {
                   try {
                       ControlFile controlFile = new BinaryPackageControlFile(org.apache.commons.io.IOUtils.toString(new ByteArrayInputStream(content), StandardCharsets.UTF_8));
-                      assertEquals("the encoding is wrong", controlFile.get("Maintainer"), "ジョン Doe <john@doe.org>");
+                      assertEquals("the encoding is wrong", "ジョン Doe <john@doe.org>", controlFile.get("Maintainer"));
                   } catch(Exception e) {
                       throw new IOException(e);
                   }
@@ -254,6 +254,77 @@ public final class DebMakerTestCase extends Assert {
               }
           }
       });
+    }
+
+    @Test
+    public void testCreationCustomToken() throws Exception {
+        DataProducer[] data = prepareData();
+        File deb = File.createTempFile("jdeb", ".deb");
+
+        File conffile = new File(getClass().getResource("deb/data.tgz").toURI());
+
+        Map<String, String> map = new HashMap<>();
+        map.put("name", "actualName");
+        map.put("version", "actualVersion");
+        map.put("maintainer", "John Doe <john@doe.org>");
+        MapVariableResolver variableResolver = new MapVariableResolver(map);
+
+        Data conffile1 = new Data();
+        conffile1.setType("file");
+        conffile1.setSrc(conffile);
+        conffile1.setDst("/absolute/path/to/configuration");
+        conffile1.setConffile(true);
+        Data conffile2 = new Data();
+        conffile2.setType("file");
+        conffile2.setSrc(conffile);
+        conffile2.setConffile(true);
+
+        Mapper mapper = new Mapper();
+        FieldUtils.writeField(mapper, "type", "perm", true);
+        FieldUtils.writeField(mapper, "prefix", "/absolute/prefix", true);
+        FieldUtils.writeField(conffile2, "mapper", mapper, true);
+
+        DebMaker maker =
+            new DebMaker(new NullConsole(), Arrays.asList(data), Arrays.<DataProducer>asList(conffile1, conffile2));
+        maker.setEncoding(StandardCharsets.UTF_8);
+        maker.setControl(new File(getClass().getResource("deb/controlcustomtoken").toURI()));
+        maker.setDeb(deb);
+        maker.setResolver(variableResolver);
+        maker.setOpenReplaceToken("{[{");
+        maker.setCloseReplaceToken("}]}");
+
+        BinaryPackageControlFile packageControlFile = maker.createDeb(Compression.GZIP);
+
+        assertTrue(packageControlFile.isValid());
+
+        final Map<String, TarArchiveEntry> filesInDeb = new HashMap<>();
+
+        final Set<String> actualConffileContent = new HashSet<>();
+
+        ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
+            @Override
+            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
+                if (entry.getName().equals("./control")) {
+                    try {
+                        ControlFile controlFile = new BinaryPackageControlFile(org.apache.commons.io.IOUtils.toString(new ByteArrayInputStream(content), StandardCharsets.UTF_8));
+                        assertEquals("variable substitution failed", "John Doe <john@doe.org>", controlFile.get("Maintainer"));
+                    } catch(Exception e) {
+                        throw new IOException(e);
+                    }
+                }
+                else if (entry.getName().equals("./postinst") || entry.getName().equals("./prerm")) {
+                    try {
+                        for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
+                            if(line.startsWith("# P")) {
+                                assertTrue("variable substitution failed", line.endsWith("actualName actualVersion"));
+                            }
+                        }
+                    } catch(Exception e) {
+                        throw new IOException(e);
+                    }
+                }
+            }
+        });
     }
 
     @Test

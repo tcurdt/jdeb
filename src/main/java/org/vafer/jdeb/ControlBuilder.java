@@ -124,9 +124,7 @@ class ControlBuilder {
 
             if (CONFIGURATION_FILENAMES.contains(file.getName()) || MAINTAINER_SCRIPTS.contains(file.getName())) {
 
-                FilteredFile configurationFile = new FilteredFile(new FileInputStream(file), resolver, encoding);
-                configurationFile.setOpenToken(openReplaceToken);
-                configurationFile.setCloseToken(closeReplaceToken);
+                FilteredFile configurationFile = new FilteredFile(new FileInputStream(file), resolver, encoding, openReplaceToken, closeReplaceToken);
                 addControlEntry(file.getName(), configurationFile.toString(), outputStream);
 
             } else {
@@ -177,7 +175,7 @@ class ControlBuilder {
 
     @Deprecated
     public BinaryPackageControlFile createPackageControlFile(File file, BigInteger pDataSize) throws IOException, ParseException {
-        return createPackageControlFile(file, pDataSize, Charset.defaultCharset());
+        return createPackageControlFile(file, pDataSize, Charset.defaultCharset(), "[[", "]]");
     }
 
     /**
@@ -191,8 +189,8 @@ class ControlBuilder {
      * @param pDataSize  the size of the installed package
      * @param encoding   the encoding used to read the files
      */
-    public BinaryPackageControlFile createPackageControlFile(File file, BigInteger pDataSize, Charset encoding) throws IOException, ParseException {
-        FilteredFile controlFile = new FilteredFile(new FileInputStream(file), resolver, encoding);
+    public BinaryPackageControlFile createPackageControlFile(File file, BigInteger pDataSize, Charset encoding, String openToken, String closeToken) throws IOException, ParseException {
+        FilteredFile controlFile = new FilteredFile(new FileInputStream(file), resolver, encoding, openToken, closeToken);
         BinaryPackageControlFile packageControlFile = new BinaryPackageControlFile(controlFile.toString());
 
         if (packageControlFile.get("Distribution") == null) {

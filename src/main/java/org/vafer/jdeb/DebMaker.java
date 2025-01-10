@@ -34,6 +34,7 @@ import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 import org.vafer.jdeb.debian.ChangesFile;
 import org.vafer.jdeb.signing.PGPSigner;
+import org.vafer.jdeb.utils.FilteredFile;
 import org.vafer.jdeb.utils.PGPSignatureOutputStream;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
@@ -144,8 +145,8 @@ public class DebMaker {
     private Long outputTimestampMs;
 
     private VariableResolver variableResolver;
-    private String openReplaceToken;
-    private String closeReplaceToken;
+    private String openReplaceToken = FilteredFile.DEFAULT_OPEN_TOKEN;
+    private String closeReplaceToken = FilteredFile.DEFAULT_CLOSE_TOKEN;
 
     private final Collection<DataProducer> dataProducers = new ArrayList<>();
 
@@ -531,7 +532,7 @@ public class DebMaker {
 
             console.debug("Building control");
             ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver, openReplaceToken, closeReplaceToken, outputTimestampMs);
-            BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size, encoding);
+            BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size, encoding, openReplaceToken, closeReplaceToken);
             if (packageControlFile.get("Package") == null) {
                 packageControlFile.set("Package", packageName);
             }
