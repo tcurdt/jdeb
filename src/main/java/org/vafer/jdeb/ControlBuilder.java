@@ -139,11 +139,11 @@ class ControlBuilder {
                 // fix line endings for shell scripts
                 InputStream in = new FileInputStream(file);
                 if (infoStream.isShell() && !infoStream.hasUnixLineEndings()) {
-                    byte[] buf = Utils.toUnixLineEndings(in);
+                    byte[] buf = Utils.toUnixLineEndings(in, encoding);
                     in = new ByteArrayInputStream(buf);
                 }
 
-                addControlEntry(file.getName(), IOUtils.toString(in, java.nio.charset.StandardCharsets.UTF_8), outputStream);
+                addControlEntry(file.getName(), IOUtils.toString(in, encoding), outputStream);
 
                 in.close();
             }

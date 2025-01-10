@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -210,13 +211,18 @@ public final class Utils {
         return out.toString();
     }
 
+    @Deprecated
+    public static byte[] toUnixLineEndings( InputStream input ) throws IOException {
+        String encoding = "ISO-8859-1";
+        return toUnixLineEndings(input, Charset.forName(encoding));
+    }
+    
     /**
      * Replaces new line delimiters in the input stream with the Unix line feed.
      *
      * @param input
      */
-    public static byte[] toUnixLineEndings( InputStream input ) throws IOException {
-        String encoding = "ISO-8859-1";
+    public static byte[] toUnixLineEndings( InputStream input, Charset encoding ) throws IOException {
         FixCrLfFilter filter = new FixCrLfFilter(new InputStreamReader(input, encoding));
         filter.setEol(FixCrLfFilter.CrLf.newInstance("unix"));
 

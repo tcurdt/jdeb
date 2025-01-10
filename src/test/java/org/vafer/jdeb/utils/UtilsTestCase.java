@@ -51,7 +51,7 @@ public final class UtilsTestCase extends Assert {
     }
 
     private String convert(String s) throws Exception {
-        byte[] data = Utils.toUnixLineEndings(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
+        byte[] data = Utils.toUnixLineEndings(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
         return new String(data, StandardCharsets.UTF_8);
     }
 
