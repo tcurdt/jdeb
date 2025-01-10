@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -178,7 +179,7 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
     private Map<String, TarArchiveEntry> parse( final InputStream pInput ) throws IOException, ParseError {
         final Map<String, TarArchiveEntry> mapping = new HashMap<>();
 
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput, StandardCharsets.UTF_8));
 
         boolean first = true;
         while (true) {
