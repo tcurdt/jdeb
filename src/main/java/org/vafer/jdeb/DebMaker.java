@@ -396,7 +396,7 @@ public class DebMaker {
 
             if (changesIn != null && changesIn.exists()) {
                 // read the changes form a textfile provider
-                changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile, outputTimestampMs);
+                changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile, outputTimestampMs, encoding);
             } else {
                 // create an empty changelog
                 changesProvider = new ChangesProvider() {
