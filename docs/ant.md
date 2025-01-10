@@ -1,18 +1,19 @@
 # How to use jdeb with Ant
 
-Attribute      | Description                                                                  | Required
--------------- | ---------------------------------------------------------------------------- | --------------------------
-destfile       | The debian package to be generated                                           | Yes
-control        | The directory containing the control files                                   | Yes
-compression    | Compression method for the data file (`gzip`, `bzip2`, `xz` or `none`)       | No; defaults to `gzip`
-verbose        | Print detailed info during the package generation                            | No; defaults to `false`
-keyring        | The file containing the PGP keys                                             | No
-key            | The name of the key to be used in the keyring                                | No
-passphrase     | The passphrase to use the key                                                | No
-changesIn      | The changes to add                                                           | No
-changesOut     | The changes file generated                                                   | No
-changesSave    | The merged changes file                                                      | No
-changesEnabled | Enable the creation of the changes file                                      | No; defaults to `true`
+Attribute      | Description                                                                    | Required
+-------------- | ------------------------------------------------------------------------------ | --------------------------
+destfile       | The debian package to be generated                                             | Yes
+control        | The directory containing the control files                                     | Yes
+compression    | Compression method for the data file (`gzip`, `bzip2`, `xz` or `none`)         | No; defaults to `gzip`
+verbose        | Print detailed info during the package generation                              | No; defaults to `false`
+keyring        | The file containing the PGP keys                                               | No
+key            | The name of the key to be used in the keyring                                  | No
+passphrase     | The passphrase to use the key                                                  | No
+changesIn      | The changes to add                                                             | No
+changesOut     | The changes file generated                                                     | No
+changesSave    | The merged changes file                                                        | No
+changesEnabled | Enable the creation of the changes file                                        | No; defaults to `true`
+encoding       | The character character encoding to use when reading control and changes files | No; defaults to default charset of the JVM
 
 The jdeb Ant task can package up a directory as Debian package. You have to
 provide the control files defining meta information about the package (except
@@ -53,7 +54,9 @@ modifications like prefixing or stripping of paths though.
 
 For more complex permission and ownership adjustments you can use a "ls"
 mapper. It allows you to define permissions and ownerships in a text file and
-even under Windows you will be able to build your debian package.
+even under Windows you will be able to build your debian package. The encoding property 
+does not apply to the "ls" mapper. The mapping files must be encoded as UTF-8.
+
 
 ```xml
     <deb destfile="jdeb.deb" control="${deb}/control">
@@ -64,7 +67,7 @@ even under Windows you will be able to build your debian package.
 ```
 
 The mapper will apply the output of an "ls -laR > mapping.txt" command
-that should look like this
+that should look like this:
 
     ./trunk/target/test-classes/org/vafer/dependency:
     total 176
@@ -75,7 +78,7 @@ that should look like this
     drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 
 It's also possible to use a `fileset` or even a `tarfileset` to
-specify the set of files to include with their permissions :
+specify the set of files to include with their permissions:
 
 ```xml
     <deb destfile="jdeb.deb" control="${deb}/control">
@@ -106,7 +109,7 @@ uid           | Numerical uid                                          | No; def
 gid           | Numerical gid                                          | No; defaults to 0
 user          | User name                                              | No; defaults to "root"
 group         | User group                                             | No; defaults to "root"
-mode          | Permissions as octet                                   | No; deftauls to 777
+mode          | Permissions as octet                                   | No; defaults to 777
 
 ## Changes file
 
