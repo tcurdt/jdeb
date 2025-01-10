@@ -45,6 +45,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -73,6 +74,9 @@ public class DebMaker {
 
     /** The directory containing the control files to build the package */
     private File control;
+
+    /** The character character encoding to use when reading control and changes files */
+    private Charset encoding = Charset.defaultCharset();
 
     /** The name of the package. Default value if not specified in the control file */
     private String packageName;
@@ -166,6 +170,18 @@ public class DebMaker {
 
     public void setControl(File control) {
         this.control = control;
+    }
+
+    public void setEncoding(Charset encoding) {
+        this.encoding = encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        if (encoding == null || encoding.isEmpty()) {
+            this.encoding = Charset.defaultCharset();
+        } else {
+            this.encoding = Charset.forName(encoding);
+        }
     }
 
     public void setPackage(String packageName) {
