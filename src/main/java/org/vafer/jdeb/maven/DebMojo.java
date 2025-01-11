@@ -79,6 +79,14 @@ public class DebMojo extends AbstractMojo {
     private String name;
 
     /**
+     * The character character encoding to use when reading control and changes files.
+     * 
+     * @since 1.13
+     */
+    @Parameter(defaultValue = "${project.build.sourceEncoding}")
+    private String encoding;
+
+    /**
      * Defines the pattern of the name of final artifacts. Possible
      * substitutions are [[baseDir]] [[buildDir]] [[artifactId]] [[version]]
      * [[extension]] and [[groupId]].
@@ -587,6 +595,7 @@ public class DebMojo extends AbstractMojo {
             DebMaker debMaker = new DebMaker(console, dataProducers, conffileProducers);
             debMaker.setDeb(debFile);
             debMaker.setControl(controlDirFile);
+            debMaker.setEncoding(encoding);
             debMaker.setPackage(getProject().getArtifactId());
             debMaker.setDescription(getProject().getDescription());
             debMaker.setHomepage(getProject().getUrl());

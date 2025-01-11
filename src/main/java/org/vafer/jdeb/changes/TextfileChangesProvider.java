@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -49,18 +50,28 @@ public final class TextfileChangesProvider implements ChangesProvider {
 
     private final DateFormat fmt;
 
+    @Deprecated
     public TextfileChangesProvider( final InputStream pInput, final BinaryPackageControlFile packageControlFile ) throws IOException, ParseException {
-        this(pInput, packageControlFile, null);
+        this(pInput, packageControlFile, null, Charset.defaultCharset());
     }
 
+    @Deprecated
     public TextfileChangesProvider( final InputStream pInput, final BinaryPackageControlFile packageControlFile, final Long outputTimestampMs ) throws IOException, ParseException {
+        this(pInput, packageControlFile, outputTimestampMs, Charset.defaultCharset());
+    }
+
+    public TextfileChangesProvider( final InputStream pInput, final BinaryPackageControlFile packageControlFile, final Charset encoding ) throws IOException, ParseException {
+        this(pInput, packageControlFile, null, encoding);
+    }
+
+    public TextfileChangesProvider( final InputStream pInput, final BinaryPackageControlFile packageControlFile, final Long outputTimestampMs, final Charset encoding ) throws IOException, ParseException {
 
         fmt = new SimpleDateFormat("HH:mm dd.MM.yyyy");
         if (outputTimestampMs != null) {
             fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
         }
 
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput, encoding));
 
         String packageName = packageControlFile.get("Package");
         String version = packageControlFile.get("Version");

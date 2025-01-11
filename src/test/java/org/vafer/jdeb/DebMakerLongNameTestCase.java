@@ -16,6 +16,7 @@ import org.vafer.jdeb.producers.DataProducerLink;
 import org.vafer.jdeb.producers.DataProducerPathTemplate;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -69,6 +70,7 @@ public class DebMakerLongNameTestCase extends Assert {
         List<DataProducer> producers = Arrays.asList(linkProducer, dataProducer);
 
         DebMaker maker = new DebMaker(new NullConsole(), producers, null);
+        maker.setEncoding(StandardCharsets.UTF_8);
         maker.setControl(new File(getClass().getResource("deb/control").toURI()));
         maker.setTarLongFileMode(tarLongFileMode);
         maker.setDeb(deb);

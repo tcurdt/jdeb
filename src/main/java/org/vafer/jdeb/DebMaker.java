@@ -34,6 +34,7 @@ import org.vafer.jdeb.changes.TextfileChangesProvider;
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 import org.vafer.jdeb.debian.ChangesFile;
 import org.vafer.jdeb.signing.PGPSigner;
+import org.vafer.jdeb.utils.FilteredFile;
 import org.vafer.jdeb.utils.PGPSignatureOutputStream;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
@@ -45,6 +46,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -73,6 +75,9 @@ public class DebMaker {
 
     /** The directory containing the control files to build the package */
     private File control;
+
+    /** The character character encoding to use when reading control and changes files */
+    private Charset encoding = Charset.defaultCharset();
 
     /** The name of the package. Default value if not specified in the control file */
     private String packageName;
@@ -140,8 +145,8 @@ public class DebMaker {
     private Long outputTimestampMs;
 
     private VariableResolver variableResolver;
-    private String openReplaceToken;
-    private String closeReplaceToken;
+    private String openReplaceToken = FilteredFile.DEFAULT_OPEN_TOKEN;
+    private String closeReplaceToken = FilteredFile.DEFAULT_CLOSE_TOKEN;
 
     private final Collection<DataProducer> dataProducers = new ArrayList<>();
 
@@ -166,6 +171,18 @@ public class DebMaker {
 
     public void setControl(File control) {
         this.control = control;
+    }
+
+    public void setEncoding(Charset encoding) {
+        this.encoding = encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        if (encoding == null || encoding.isEmpty()) {
+            this.encoding = Charset.defaultCharset();
+        } else {
+            this.encoding = Charset.forName(encoding);
+        }
     }
 
     public void setPackage(String packageName) {
@@ -380,7 +397,7 @@ public class DebMaker {
 
             if (changesIn != null && changesIn.exists()) {
                 // read the changes form a textfile provider
-                changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile, outputTimestampMs);
+                changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile, outputTimestampMs, encoding);
             } else {
                 // create an empty changelog
                 changesProvider = new ChangesProvider() {
@@ -515,7 +532,7 @@ public class DebMaker {
 
             console.debug("Building control");
             ControlBuilder controlBuilder = new ControlBuilder(console, variableResolver, openReplaceToken, closeReplaceToken, outputTimestampMs);
-            BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size);
+            BinaryPackageControlFile packageControlFile = controlBuilder.createPackageControlFile(new File(control, "control"), size, encoding, openReplaceToken, closeReplaceToken);
             if (packageControlFile.get("Package") == null) {
                 packageControlFile.set("Package", packageName);
             }
@@ -535,7 +552,7 @@ public class DebMaker {
                 packageControlFile.set("Homepage", homepage);
             }
 
-            controlBuilder.buildControl(packageControlFile, control.listFiles(), tempConffiles , md5s, tempControl);
+            controlBuilder.buildControl(packageControlFile, control.listFiles(), tempConffiles , md5s, tempControl, encoding);
 
             if (!packageControlFile.isValid()) {
                 throw new PackagingException("Control file fields are invalid " + packageControlFile.invalidFields() +

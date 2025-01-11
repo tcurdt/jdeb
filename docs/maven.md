@@ -147,6 +147,9 @@ verbose          | Verbose logging                                              
 skip             | Indicates if an execution should be skipped                                                | No; defaults to `false`
 skipSubmodules   | Skip goal on all submodules                                                                | No; defaults to `false`
 skipPOMs         | Skip goal on POM artifacts                                                                 | No; defaults to `true`
+encoding         | The character character encoding to use when reading control and changes files.            | No; defaults to `${project.build.sourceEncoding}`
+
+The encoding property does not apply to the "ls" mapper. The mapping files must be encoded as UTF-8.
 
 If you use the `dataSet` element, you'll need to populate it with a one or
 more `data` elements. A `data` element is used to specify a directory, a

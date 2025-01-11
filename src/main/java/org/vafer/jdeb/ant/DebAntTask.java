@@ -44,6 +44,9 @@ public class DebAntTask extends MatchingTask {
     /** The directory containing the control files to build the package */
     private File control;
 
+    /** The character character encoding to use when reading control and changes files. */
+    private String encoding;
+
     /** The file containing the PGP keys */
     private File keyring;
 
@@ -90,6 +93,10 @@ public class DebAntTask extends MatchingTask {
 
     public void setControl( File control ) {
         this.control = control;
+    }
+
+    public void setEncoding( String encoding ) {
+        this.encoding = encoding;
     }
 
     public void setChangesIn( File changes ) {
@@ -170,6 +177,7 @@ public class DebAntTask extends MatchingTask {
         DebMaker debMaker = new DebMaker(console, dataProducers, conffilesProducers);
         debMaker.setDeb(deb);
         debMaker.setControl(control);
+        debMaker.setEncoding(encoding);
         debMaker.setChangesIn(changesIn);
         debMaker.setChangesOut(changesOut);
         debMaker.setChangesSave(changesSave);

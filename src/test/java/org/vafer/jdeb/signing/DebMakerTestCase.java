@@ -19,6 +19,7 @@ package org.vafer.jdeb.signing;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,6 +74,7 @@ public final class DebMakerTestCase extends Assert {
 	        File deb = File.createTempFile("jdeb", ".deb");
 
 	        DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data), null);
+	        maker.setEncoding(StandardCharsets.UTF_8);
 	        maker.setControl(new File(getClass().getResource("../deb/control").toURI()));
 	        maker.setDeb(deb);
 

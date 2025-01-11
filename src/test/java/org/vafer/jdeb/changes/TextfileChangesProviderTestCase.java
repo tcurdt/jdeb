@@ -16,6 +16,7 @@
 package org.vafer.jdeb.changes;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.TimeZone;
 
 import org.junit.After;
@@ -61,7 +62,7 @@ public final class TextfileChangesProviderTestCase extends Assert {
         packageControlFile.set("Distribution", "distribution");
         packageControlFile.set("Date", "Mon, 20 Aug 2007 15:25:57 +0200");
 
-        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes(UTF_8)), packageControlFile);
+        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes(UTF_8)), packageControlFile, StandardCharsets.UTF_8);
         final ChangeSet[] changeSets = provider.getChangesSets();
 
         assertNotNull(changeSets);
@@ -90,7 +91,7 @@ public final class TextfileChangesProviderTestCase extends Assert {
         packageControlFile.set("Version", "version");
         packageControlFile.set("Date", "Mon, 20 Aug 2007 15:25:57 +0200");
 
-        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes(UTF_8)), packageControlFile);
+        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes(UTF_8)), packageControlFile, StandardCharsets.UTF_8);
         final ChangeSet[] changeSets = provider.getChangesSets();
 
         assertNotNull(changeSets);
@@ -123,7 +124,7 @@ public final class TextfileChangesProviderTestCase extends Assert {
         packageControlFile.set("Distribution", "distribution");
         packageControlFile.set("Date", "Mon, 20 Aug 2007 15:25:57 +0200");
 
-        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes(UTF_8)), packageControlFile, 1175385600000L);
+        final TextfileChangesProvider provider = new TextfileChangesProvider(new ByteArrayInputStream(input.getBytes(UTF_8)), packageControlFile, 1175385600000L, StandardCharsets.UTF_8);
         final ChangeSet[] changeSets = provider.getChangesSets();
 
         assertNotNull(changeSets);
