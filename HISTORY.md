@@ -1,4 +1,15 @@
-## Version 1.13, dev
+## Version 1.14, dev
+
+## Version 1.13, release 1x.01.2025
+
+* [CHG] Allow specifying source file encoding, uses maven defaults, ls-mapper expects to be UTF8 (Thanks to Roman Huber)
+* [CHG] Use UTC for snapshot timestamps (Thanks to Roman Huber)
+* [CHG] Use maven outputTimestamp for snapshots (Thanks to Roman Huber)
+* [CHG] Upgraded deps
+* [FIX] Create parent directories for changes file (Thanks to Roman Huber)
+* [FIX] Changed goal prefix to jdeb (Thanks to Roman Huber)
+* [ADD] Enable/disable changes file (Thanks to Roman Huber)
+* [ADD] Control handling of broken symlinks (Thanks to Markus Wiik)
 
 ## Version 1.12, release 22.11.2024
 
@@ -9,21 +20,21 @@
 
 ## Version 1.11, release 17.08.2024
 
-* [ADD] "signDigest" for setting just the signing digest
+* [CHG] Improve exception propagation for failures from package content processing
 * [CHG] Required java 11
 * [CHG] Separate digest settings for creating the deb and signing it
 * [CHG] Upgraded deps
 * [FIX] Removed invalid Maven Mojo Deprecation
-* [CHG] Improve exception propagation for failures from package content processing
+* [ADD] "signDigest" for setting just the signing digest
 
 ## Version 1.10, released 30.11.2021
 
 * [CHG] Breaking: The deps already required java8. Now also require java8 officially.
 * [CHG] Upgraded deps
 * [CHG] The default digest algorithm for PGP signatures is now SHA-256 instead of SHA-1
-* [ADD] Allow constant modified time to support reproducibility (Thanks to Michal Riha)
 * [FIX] Sort control files for reproducibility (Thanks to Tomas Saghy)
 * [FIX] Ensure conffile paths are not absolute anymore
+* [ADD] Allow constant modified time to support reproducibility (Thanks to Michal Riha)
 
 ## Version 1.9, released 05.06.2021
 
@@ -33,8 +44,8 @@
 
 ## Version 1.8, released 24.08.2019
 
-* [FIX] Removed unnessary file/path limitation (Thanks to Roberto Perez Alcolea)
 * [CHG] Upgraded deps
+* [FIX] Removed unnessary file/path limitation (Thanks to Roberto Perez Alcolea)
 
 ## Version 1.7, released 16.10.2018
 
@@ -187,10 +198,10 @@ Many improvements on the Ant task.
 Quite a few fixes related to locale settings.
 Support for bzip2 and more descriptor keys.
 
+* [CHG] The Ant task now breaks on errors.
 * [FIX] English locale for date format.
 * [FIX] Proper installation size to be kbytes instead of bytes.
 * [FIX] Close streams properly.
-* [CHG] The Ant task now breaks on errors.
 * [ADD] Support for bzip2 compression in data element of the Ant task.
 * [ADD] Compression attribute to specify data file compression (bzip2, gzip, none).
 * [ADD] More package descriptor keys (Pre-Depends, Recommends, Suggests, Breaks, Enhances, Homepage>).
