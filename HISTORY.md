@@ -1,6 +1,6 @@
 ## Version 1.14, dev
 
-## Version 1.13, release 1x.01.2025
+## Version 1.13, release 25.01.2025
 
 * [CHG] Allow specifying source file encoding, uses maven defaults, ls-mapper expects to be UTF8 (Thanks to Roman Huber)
 * [CHG] Use UTC for snapshot timestamps (Thanks to Roman Huber)
