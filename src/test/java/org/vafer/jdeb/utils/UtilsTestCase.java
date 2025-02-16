@@ -114,11 +114,7 @@ public final class UtilsTestCase extends Assert {
         assertEquals("jdeb [[test]]", result);
 
         // nested vars
-        result = Utils.replaceVariables(new VariableResolver() {
-            public String get(String pKey) {
-                return "VAR";
-            }
-        }, "[[var]] [[ [[var]] [[ [[var]] ]] [[var]] ]]", "[[", "]]");
+        result = Utils.replaceVariables(pKey -> "VAR", "[[var]] [[ [[var]] [[ [[var]] ]] [[var]] ]]", "[[", "]]");
 
         assertEquals("VAR [[ VAR [[ VAR ]] VAR ]]", result);
     }

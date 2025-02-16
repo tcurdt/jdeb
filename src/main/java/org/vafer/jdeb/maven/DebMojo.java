@@ -47,7 +47,6 @@ import org.apache.tools.tar.TarEntry;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 import org.vafer.jdeb.Console;
-import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.DebMaker;
 import org.vafer.jdeb.PackagingException;
@@ -556,32 +555,30 @@ public class DebMojo extends AbstractMojo {
                 for (Artifact artifact : artifacts) {
                     final File file = artifact.getFile();
                     if (file != null) {
-                        dataProducers.add(new DataProducer() {
-                            public void produce( final DataConsumer receiver ) {
-                                try {
-                                    final File path = new File(installDirFile.getPath(), file.getName());
-                                    final String entryName = path.getPath();
+                        dataProducers.add(receiver -> {
+                            try {
+                                final File path = new File(installDirFile.getPath(), file.getName());
+                                final String entryName = path.getPath();
 
-                                    final boolean symbolicLink = SymlinkUtils.isSymbolicLink(path);
-                                    final TarArchiveEntry e;
-                                    if (symbolicLink) {
-                                        e = new TarArchiveEntry(entryName, TarConstants.LF_SYMLINK);
-                                        e.setLinkName(SymlinkUtils.readSymbolicLink(path));
-                                    } else {
-                                        e = new TarArchiveEntry(entryName, true);
-                                    }
-
-                                    e.setUserId(0);
-                                    e.setGroupId(0);
-                                    e.setUserName("root");
-                                    e.setGroupName("root");
-                                    e.setMode(TarEntry.DEFAULT_FILE_MODE);
-                                    e.setSize(file.length());
-
-                                    receiver.onEachFile(new FileInputStream(file), e);
-                                } catch (Exception e) {
-                                    getLog().error(e);
+                                final boolean symbolicLink = SymlinkUtils.isSymbolicLink(path);
+                                final TarArchiveEntry e;
+                                if (symbolicLink) {
+                                    e = new TarArchiveEntry(entryName, TarConstants.LF_SYMLINK);
+                                    e.setLinkName(SymlinkUtils.readSymbolicLink(path));
+                                } else {
+                                    e = new TarArchiveEntry(entryName, true);
                                 }
+
+                                e.setUserId(0);
+                                e.setGroupId(0);
+                                e.setUserName("root");
+                                e.setGroupName("root");
+                                e.setMode(TarEntry.DEFAULT_FILE_MODE);
+                                e.setSize(file.length());
+
+                                receiver.onEachFile(new FileInputStream(file), e);
+                            } catch (Exception e) {
+                                getLog().error(e);
                             }
                         });
                     } else {

@@ -400,18 +400,14 @@ public class DebMaker {
                 changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageControlFile, outputTimestampMs, encoding);
             } else {
                 // create an empty changelog
-                changesProvider = new ChangesProvider() {
-                    public ChangeSet[] getChangesSets() {
-                        return new ChangeSet[] {
-                                new ChangeSet(packageControlFile.get("Package"),
-                                        packageControlFile.get("Version"),
-                                        outputTimestampMs == null ? new Date() : new Date(outputTimestampMs),
-                                        packageControlFile.get("Distribution"),
-                                        packageControlFile.get("Urgency"),
-                                        packageControlFile.get("Maintainer"),
-                                        new String[0])
-                        };
-                    }
+                changesProvider = () -> new ChangeSet[] {
+                        new ChangeSet(packageControlFile.get("Package"),
+                                packageControlFile.get("Version"),
+                                outputTimestampMs == null ? new Date() : new Date(outputTimestampMs),
+                                packageControlFile.get("Distribution"),
+                                packageControlFile.get("Urgency"),
+                                packageControlFile.get("Maintainer"),
+                                new String[0])
                 };
             }
 

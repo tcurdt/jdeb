@@ -82,11 +82,7 @@ public class DebMakerLongNameTestCase extends Assert {
 
         final Map<String, TarArchiveEntry> filesInDeb = new HashMap<>();
 
-        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            public void visit(TarArchiveEntry entry, byte[] content) {
-                filesInDeb.put(entry.getName(), entry);
-            }
-        }, Compression.GZIP);
+        ArchiveWalker.walkData(deb, (entry, content) -> filesInDeb.put(entry.getName(), entry), Compression.GZIP);
 
         assertTrue("longname file wasn't found in the package", filesInDeb.containsKey("." + FOLDER_SEPARATOR + longPathDirName + FOLDER_SEPARATOR));
         assertTrue("short wasn't found in the package", filesInDeb.containsKey("." + shortPathDirName));

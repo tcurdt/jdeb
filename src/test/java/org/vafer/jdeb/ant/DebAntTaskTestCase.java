@@ -20,7 +20,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -31,7 +30,6 @@ import org.junit.Assert;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 import org.apache.commons.compress.archivers.ar.ArArchiveInputStream;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
 import org.apache.tools.ant.BuildException;
@@ -201,17 +199,15 @@ public final class DebAntTaskTestCase extends Assert {
         File deb = new File("target/test-classes/test.deb");
         assertTrue("package not build", deb.exists());
 
-        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                assertTrue("prefix: " + entry.getName(), entry.getName().startsWith("./foo/"));
-                if (entry.isDirectory()) {
-                    assertEquals("directory mode (" + entry.getName() + ")", 040700, entry.getMode());
-                } else {
-                    assertEquals("file mode (" + entry.getName() + ")", 0100600, entry.getMode());
-                }
-                assertEquals("user", "ebourg", entry.getUserName());
-                assertEquals("group", "ebourg", entry.getGroupName());
+        ArchiveWalker.walkData(deb, (entry, content) -> {
+            assertTrue("prefix: " + entry.getName(), entry.getName().startsWith("./foo/"));
+            if (entry.isDirectory()) {
+                assertEquals("directory mode (" + entry.getName() + ")", 040700, entry.getMode());
+            } else {
+                assertEquals("file mode (" + entry.getName() + ")", 0100600, entry.getMode());
             }
+            assertEquals("user", "ebourg", entry.getUserName());
+            assertEquals("group", "ebourg", entry.getGroupName());
         }, Compression.GZIP);
     }
 
@@ -224,15 +220,13 @@ public final class DebAntTaskTestCase extends Assert {
 
         final AtomicBoolean linkFound = new AtomicBoolean(false);
 
-        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                if (entry.isSymbolicLink()) {
-                    linkFound.set(true);
-                    assertEquals("link mode (" + entry.getName() + ")", 0120755, entry.getMode());
-                }
-                assertEquals("user", "ebourg", entry.getUserName());
-                assertEquals("group", "ebourg", entry.getGroupName());
+        ArchiveWalker.walkData(deb, (entry, content) -> {
+            if (entry.isSymbolicLink()) {
+                linkFound.set(true);
+                assertEquals("link mode (" + entry.getName() + ")", 0120755, entry.getMode());
             }
+            assertEquals("user", "ebourg", entry.getUserName());
+            assertEquals("group", "ebourg", entry.getGroupName());
         }, Compression.GZIP);
 
         assertTrue("Link not found", linkFound.get());
@@ -245,11 +239,9 @@ public final class DebAntTaskTestCase extends Assert {
         File deb = new File("target/test-classes/test.deb");
         assertTrue("package not build", deb.exists());
 
-        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                if (entry.isFile()) {
-                    assertEquals("file mode (" + entry.getName() + ")", 0700, entry.getMode());
-                }
+        ArchiveWalker.walkData(deb, (entry, content) -> {
+            if (entry.isFile()) {
+                assertEquals("file mode (" + entry.getName() + ")", 0700, entry.getMode());
             }
         }, Compression.GZIP);
     }
@@ -274,18 +266,16 @@ public final class DebAntTaskTestCase extends Assert {
         final AtomicBoolean found = new AtomicBoolean(false);
 
         ArArchiveInputStream in = new ArArchiveInputStream(new FileInputStream(deb));
-        ArchiveWalker.walk(in, new ArchiveVisitor<ArArchiveEntry>() {
-            public void visit(ArArchiveEntry entry, byte[] content) throws IOException {
-                if (entry.getName().equals("data.tar.bz2")) {
-                    found.set(true);
+        ArchiveWalker.walk(in, (ArchiveVisitor<ArArchiveEntry>) (entry, content) -> {
+            if (entry.getName().equals("data.tar.bz2")) {
+                found.set(true);
 
-                    assertEquals("header 0", (byte) 'B', content[0]);
-                    assertEquals("header 1", (byte) 'Z', content[1]);
+                assertEquals("header 0", (byte) 'B', content[0]);
+                assertEquals("header 1", (byte) 'Z', content[1]);
 
-                    TarInputStream tar = new TarInputStream(new BZip2CompressorInputStream(new ByteArrayInputStream(content)));
-                    while ((tar.getNextEntry()) != null) ;
-                    tar.close();
-                }
+                TarInputStream tar = new TarInputStream(new BZip2CompressorInputStream(new ByteArrayInputStream(content)));
+                while ((tar.getNextEntry()) != null) ;
+                tar.close();
             }
         });
 
@@ -302,22 +292,20 @@ public final class DebAntTaskTestCase extends Assert {
         final AtomicBoolean found = new AtomicBoolean(false);
 
         ArArchiveInputStream in = new ArArchiveInputStream(new FileInputStream(deb));
-        ArchiveWalker.walk(in, new ArchiveVisitor<ArArchiveEntry>() {
-            public void visit(ArArchiveEntry entry, byte[] content) throws IOException {
-                if (entry.getName().equals("data.tar.xz")) {
-                    found.set(true);
+        ArchiveWalker.walk(in, (ArchiveVisitor<ArArchiveEntry>) (entry, content) -> {
+            if (entry.getName().equals("data.tar.xz")) {
+                found.set(true);
 
-                    assertEquals("header 0", (byte) 0xFD, content[0]);
-                    assertEquals("header 1", (byte) '7', content[1]);
-                    assertEquals("header 2", (byte) 'z', content[2]);
-                    assertEquals("header 3", (byte) 'X', content[3]);
-                    assertEquals("header 4", (byte) 'Z', content[4]);
-                    assertEquals("header 5", (byte) '\0', content[5]);
+                assertEquals("header 0", (byte) 0xFD, content[0]);
+                assertEquals("header 1", (byte) '7', content[1]);
+                assertEquals("header 2", (byte) 'z', content[2]);
+                assertEquals("header 3", (byte) 'X', content[3]);
+                assertEquals("header 4", (byte) 'Z', content[4]);
+                assertEquals("header 5", (byte) '\0', content[5]);
 
-                    TarInputStream tar = new TarInputStream(new XZCompressorInputStream(new ByteArrayInputStream(content)));
-                    while ((tar.getNextEntry()) != null) ;
-                    tar.close();
-                }
+                TarInputStream tar = new TarInputStream(new XZCompressorInputStream(new ByteArrayInputStream(content)));
+                while ((tar.getNextEntry()) != null) ;
+                tar.close();
             }
         });
 
@@ -331,9 +319,7 @@ public final class DebAntTaskTestCase extends Assert {
         File deb = new File("target/test-classes/test.deb");
         assertTrue("package not build", deb.exists());
 
-        boolean found = ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-            }
+        boolean found = ArchiveWalker.walkData(deb, (entry, content) -> {
         }, Compression.NONE);
 
         assertTrue("tar file not found", found);

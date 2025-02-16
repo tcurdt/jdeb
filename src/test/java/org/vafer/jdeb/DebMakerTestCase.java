@@ -89,13 +89,10 @@ public final class DebMakerTestCase extends Assert {
 
         final Set<String> actualConffileContent = new HashSet<>();
 
-        ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            @Override
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                if (entry.getName().equals("./conffiles")) {
-                    actualConffileContent.addAll(org.apache.commons.io.IOUtils
-                        .readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8));
-                }
+        ArchiveWalker.walkControl(deb, (entry, content) -> {
+            if (entry.getName().equals("./conffiles")) {
+                actualConffileContent.addAll(IOUtils
+                    .readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8));
             }
         });
 
@@ -103,12 +100,7 @@ public final class DebMakerTestCase extends Assert {
             new HashSet<>(Arrays.asList("/absolute/path/to/configuration", "/absolute/prefix/data.tgz")),
             actualConffileContent);
 
-        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            @Override
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                filesInDeb.put(entry.getName(), entry);
-            }
-        }, Compression.GZIP);
+        ArchiveWalker.walkData(deb, (entry, content) -> filesInDeb.put(entry.getName(), entry), Compression.GZIP);
 
         assertTrue("testfile wasn't found in the package", filesInDeb.containsKey("./test/testfile"));
         assertTrue("testfile2 wasn't found in the package", filesInDeb.containsKey("./test/testfile2"));
@@ -154,49 +146,43 @@ public final class DebMakerTestCase extends Assert {
 
         assertTrue(packageControlFile.isValid());
 
-        ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            @Override
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                if (entry.getName().equals("./control")) {
-                    try {
-                        ControlFile controlFile = new BinaryPackageControlFile(org.apache.commons.io.IOUtils.toString(new ByteArrayInputStream(content), StandardCharsets.UTF_8));
-                        assertNotEquals("the encoding is valid but should be wrong", controlFile.get("Maintainer"), "ジョン Doe <john@doe.org>");
-                    } catch(Exception e) {
-                        throw new IOException(e);
-                    }
+        ArchiveWalker.walkControl(deb, (entry, content) -> {
+            if (entry.getName().equals("./control")) {
+                try {
+                    ControlFile controlFile = new BinaryPackageControlFile(IOUtils.toString(new ByteArrayInputStream(content), StandardCharsets.UTF_8));
+                    assertNotEquals("the encoding is valid but should be wrong", controlFile.get("Maintainer"), "ジョン Doe <john@doe.org>");
+                } catch (Exception e) {
+                    throw new IOException(e);
                 }
-                else if (entry.getName().equals("./postinst") || entry.getName().equals("./prerm")) {
-                    try {
-                        for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
-                            if(line.startsWith("# P")) {
-                                assertFalse("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
-                            }
+            } else if (entry.getName().equals("./postinst") || entry.getName().equals("./prerm")) {
+                try {
+                    for (String line : IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
+                        if (line.startsWith("# P")) {
+                            assertFalse("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
                         }
-                    } catch(Exception e) {
-                        throw new IOException(e);
                     }
+                } catch (Exception e) {
+                    throw new IOException(e);
                 }
-                else if (entry.getName().startsWith("./shell_")) {
-                    try {
-                        for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
-                            if(line.startsWith("# Custom script")) {
-                                assertFalse("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
-                            }
+            } else if (entry.getName().startsWith("./shell_")) {
+                try {
+                    for (String line : IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
+                        if (line.startsWith("# Custom script")) {
+                            assertFalse("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
                         }
-                    } catch(Exception e) {
-                        throw new IOException(e);
                     }
+                } catch (Exception e) {
+                    throw new IOException(e);
                 }
-                else if (entry.getName().equals("./text.txt")) {
-                    try {
-                        for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
-                            if(line.startsWith("Text file")) {
-                                assertFalse("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
-                            }
+            } else if (entry.getName().equals("./text.txt")) {
+                try {
+                    for (String line : IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
+                        if (line.startsWith("Text file")) {
+                            assertFalse("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
                         }
-                    } catch(Exception e) {
-                        throw new IOException(e);
                     }
+                } catch (Exception e) {
+                    throw new IOException(e);
                 }
             }
         });
@@ -208,52 +194,46 @@ public final class DebMakerTestCase extends Assert {
 
         assertTrue(packageControlFile.isValid());
 
-        ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
-          @Override
-          public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-              if (entry.getName().equals("./control")) {
-                  try {
-                      ControlFile controlFile = new BinaryPackageControlFile(org.apache.commons.io.IOUtils.toString(new ByteArrayInputStream(content), StandardCharsets.UTF_8));
-                      assertEquals("the encoding is wrong", "ジョン Doe <john@doe.org>", controlFile.get("Maintainer"));
-                  } catch(Exception e) {
-                      throw new IOException(e);
-                  }
-              }
-              else if (entry.getName().equals("./postinst") || entry.getName().equals("./prerm")) {
-                  try {
-                      for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
-                          if(line.startsWith("# P")) {
-                              assertTrue("the encoding is wrong", line.endsWith("created by ジョン"));
-                          }
-                      }
-                  } catch(Exception e) {
-                      throw new IOException(e);
-                  }
-              }
-              else if (entry.getName().startsWith("./shell_")) {
-                  try {
-                      for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
-                          if(line.startsWith("# Custom script")) {
-                              assertTrue("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
-                          }
-                      }
-                  } catch(Exception e) {
-                      throw new IOException(e);
-                  }
-              }
-              else if (entry.getName().equals("./text.txt")) {
-                  try {
-                      for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
-                          if(line.startsWith("Text file")) {
-                              assertTrue("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
-                          }
-                      }
-                  } catch(Exception e) {
-                      throw new IOException(e);
-                  }
-              }
-          }
-      });
+        ArchiveWalker.walkControl(deb, (entry, content) -> {
+            if (entry.getName().equals("./control")) {
+                try {
+                    ControlFile controlFile = new BinaryPackageControlFile(IOUtils.toString(new ByteArrayInputStream(content), StandardCharsets.UTF_8));
+                    assertEquals("the encoding is wrong", "ジョン Doe <john@doe.org>", controlFile.get("Maintainer"));
+                } catch (Exception e) {
+                    throw new IOException(e);
+                }
+            } else if (entry.getName().equals("./postinst") || entry.getName().equals("./prerm")) {
+                try {
+                    for (String line : IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
+                        if (line.startsWith("# P")) {
+                            assertTrue("the encoding is wrong", line.endsWith("created by ジョン"));
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new IOException(e);
+                }
+            } else if (entry.getName().startsWith("./shell_")) {
+                try {
+                    for (String line : IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
+                        if (line.startsWith("# Custom script")) {
+                            assertTrue("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new IOException(e);
+                }
+            } else if (entry.getName().equals("./text.txt")) {
+                try {
+                    for (String line : IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
+                        if (line.startsWith("Text file")) {
+                            assertTrue("the encoding is valid but should be wrong", line.endsWith("created by ジョン"));
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new IOException(e);
+                }
+            }
+        });
     }
 
     @Test
@@ -301,27 +281,23 @@ public final class DebMakerTestCase extends Assert {
 
         final Set<String> actualConffileContent = new HashSet<>();
 
-        ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            @Override
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                if (entry.getName().equals("./control")) {
-                    try {
-                        ControlFile controlFile = new BinaryPackageControlFile(org.apache.commons.io.IOUtils.toString(new ByteArrayInputStream(content), StandardCharsets.UTF_8));
-                        assertEquals("variable substitution failed", "John Doe <john@doe.org>", controlFile.get("Maintainer"));
-                    } catch(Exception e) {
-                        throw new IOException(e);
-                    }
+        ArchiveWalker.walkControl(deb, (entry, content) -> {
+            if (entry.getName().equals("./control")) {
+                try {
+                    ControlFile controlFile = new BinaryPackageControlFile(IOUtils.toString(new ByteArrayInputStream(content), StandardCharsets.UTF_8));
+                    assertEquals("variable substitution failed", "John Doe <john@doe.org>", controlFile.get("Maintainer"));
+                } catch (Exception e) {
+                    throw new IOException(e);
                 }
-                else if (entry.getName().equals("./postinst") || entry.getName().equals("./prerm")) {
-                    try {
-                        for(String line : org.apache.commons.io.IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
-                            if(line.startsWith("# P")) {
-                                assertTrue("variable substitution failed", line.endsWith("actualName actualVersion"));
-                            }
+            } else if (entry.getName().equals("./postinst") || entry.getName().equals("./prerm")) {
+                try {
+                    for (String line : IOUtils.readLines(new ByteArrayInputStream(content), StandardCharsets.UTF_8)) {
+                        if (line.startsWith("# P")) {
+                            assertTrue("variable substitution failed", line.endsWith("actualName actualVersion"));
                         }
-                    } catch(Exception e) {
-                        throw new IOException(e);
                     }
+                } catch (Exception e) {
+                    throw new IOException(e);
                 }
             }
         });
@@ -346,25 +322,23 @@ public final class DebMakerTestCase extends Assert {
         // now reopen the package and check the control files
         assertTrue("package not build", deb.exists());
 
-        boolean found = ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                assertFalse("directory found in the control archive", entry.isDirectory());
-                assertTrue("prefix", entry.getName().startsWith("./"));
+        boolean found = ArchiveWalker.walkControl(deb, (entry, content) -> {
+            assertFalse("directory found in the control archive", entry.isDirectory());
+            assertTrue("prefix", entry.getName().startsWith("./"));
 
-                InformationInputStream infoStream = new InformationInputStream(new ByteArrayInputStream(content));
-                IOUtils.copy(infoStream, NullOutputStream.INSTANCE);
+            InformationInputStream infoStream = new InformationInputStream(new ByteArrayInputStream(content));
+            IOUtils.copy(infoStream, NullOutputStream.INSTANCE);
 
-                if (infoStream.isShell()) {
-                    assertTrue("Permissions on " + entry.getName() + " should be 755", entry.getMode() == 0755);
-                } else {
-                    assertTrue("Permissions on " + entry.getName() + " should be 644", entry.getMode() == 0644);
-                }
-
-                assertTrue(entry.getName() + " doesn't have Unix line endings", infoStream.hasUnixLineEndings());
-
-                assertEquals("user", "root", entry.getUserName());
-                assertEquals("group", "root", entry.getGroupName());
+            if (infoStream.isShell()) {
+                assertTrue("Permissions on " + entry.getName() + " should be 755", entry.getMode() == 0755);
+            } else {
+                assertTrue("Permissions on " + entry.getName() + " should be 644", entry.getMode() == 0644);
             }
+
+            assertTrue(entry.getName() + " doesn't have Unix line endings", infoStream.hasUnixLineEndings());
+
+            assertEquals("user", "root", entry.getUserName());
+            assertEquals("group", "root", entry.getGroupName());
         });
 
         assertTrue("Control files not found in the package", found);
@@ -394,17 +368,15 @@ public final class DebMakerTestCase extends Assert {
         // now reopen the package and check the control files
         assertTrue("package not build", deb.exists());
 
-        boolean found = ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                if (entry.getName().contains("postinst") || entry.getName().contains("prerm")) {
-                    String body = new String(content, UTF_8);
-                    assertFalse("Variables not replaced in the control file " + entry.getName(), body.contains("[[name]] [[version]]"));
-                    assertTrue("Expected variables not found in the control file " + entry.getName(), body.contains("jdeb 1.0"));
-                }
-                if (entry.getName().contains("control")) {
-                    String control = new String(content, UTF_8);
-                    assertTrue("Depends missing" + entry.getName(), control.contains("Depends: some-package"));
-                }
+        boolean found = ArchiveWalker.walkControl(deb, (entry, content) -> {
+            if (entry.getName().contains("postinst") || entry.getName().contains("prerm")) {
+                String body = new String(content, UTF_8);
+                assertFalse("Variables not replaced in the control file " + entry.getName(), body.contains("[[name]] [[version]]"));
+                assertTrue("Expected variables not found in the control file " + entry.getName(), body.contains("jdeb 1.0"));
+            }
+            if (entry.getName().contains("control")) {
+                String control = new String(content, UTF_8);
+                assertTrue("Depends missing" + entry.getName(), control.contains("Depends: some-package"));
             }
         });
 
@@ -430,12 +402,10 @@ public final class DebMakerTestCase extends Assert {
         // now reopen the package and check the control files
         assertTrue("package not build", deb.exists());
 
-        boolean found = ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                if (entry.getName().contains("control")) {
-                    String control = new String(content, ISO_8859_1);
-                    assertFalse("Depends should be omitted in the control file " + entry.getName(), control.contains("Depends:"));
-                }
+        boolean found = ArchiveWalker.walkControl(deb, (entry, content) -> {
+            if (entry.getName().contains("control")) {
+                String control = new String(content, ISO_8859_1);
+                assertFalse("Depends should be omitted in the control file " + entry.getName(), control.contains("Depends:"));
             }
         });
 
@@ -465,15 +435,13 @@ public final class DebMakerTestCase extends Assert {
         // now reopen the package and check the control files
         assertTrue("package not build", deb.exists());
 
-        boolean found = ArchiveWalker.walkControl(deb, new ArchiveVisitor<TarArchiveEntry>() {
-            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                if (entry.getName().contains("control")) {
-                    String control = new String(content, ISO_8859_1);
+        boolean found = ArchiveWalker.walkControl(deb, (entry, content) -> {
+            if (entry.getName().contains("control")) {
+                String control = new String(content, ISO_8859_1);
 
-                    assertTrue("Depends should be present in the control file " + entry.getName(), control.contains("Depends:"));
-                    assertTrue("The control file " + entry.getName() + " should specify intended dependency '" + dependsString + "'",
-                        control.contains("Depends: " + dependsString));
-                }
+                assertTrue("Depends should be present in the control file " + entry.getName(), control.contains("Depends:"));
+                assertTrue("The control file " + entry.getName() + " should specify intended dependency '" + dependsString + "'",
+                    control.contains("Depends: " + dependsString));
             }
         });
 
@@ -510,9 +478,7 @@ public final class DebMakerTestCase extends Assert {
         maker.setControl(new File(getClass().getResource("deb/control").toURI()));
         maker.setDeb(deb);
 
-        Exception producedException = assertThrows(PackagingException.class, () -> {
-            maker.makeDeb();
-        });
+        Exception producedException = assertThrows(PackagingException.class, maker::makeDeb);
         Throwable cause = producedException.getCause();
         while (cause.getClass() != NullPointerException.class) {
             cause = cause.getCause();

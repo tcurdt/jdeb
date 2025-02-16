@@ -17,7 +17,6 @@
 package org.vafer.jdeb.signing;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -33,7 +32,6 @@ import org.bouncycastle.openpgp.PGPSignature;
 import org.bouncycastle.openpgp.PGPSignatureGenerator;
 import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
-import org.vafer.jdeb.ArchiveVisitor;
 import org.vafer.jdeb.ArchiveWalker;
 import org.vafer.jdeb.Compression;
 import org.vafer.jdeb.DataProducer;
@@ -89,11 +87,7 @@ public final class DebMakerTestCase extends Assert {
 
 	        final Map<String, TarArchiveEntry> filesInDeb = new HashMap<>();
 
-	        ArchiveWalker.walkData(deb, new ArchiveVisitor<TarArchiveEntry>() {
-	            public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-	                filesInDeb.put(entry.getName(), entry);
-	            }
-	        }, Compression.GZIP);
+	        ArchiveWalker.walkData(deb, (entry, content) -> filesInDeb.put(entry.getName(), entry), Compression.GZIP);
 
 	        assertTrue("_gpgorigin wasn't found in the package", ArchiveWalker.arArchiveContains(deb, "_gpgorigin"));
 	        assertTrue("debian-binary wasn't found in the package", ArchiveWalker.arArchiveContains(deb, "debian-binary"));

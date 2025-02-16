@@ -76,27 +76,21 @@ public final class DataProducerArchive extends AbstractDataProducer implements D
 
         if (archiveInputStream instanceof TarArchiveInputStream) {
 
-            converter = new EntryConverter() {
-                public TarArchiveEntry convert( ArchiveEntry entry ) {
-                    return (TarArchiveEntry) entry;
-                }
-            };
+            converter = entry -> (TarArchiveEntry) entry;
 
         } else if (archiveInputStream instanceof ZipArchiveInputStream) {
 
-            converter = new EntryConverter() {
-                public TarArchiveEntry convert( ArchiveEntry entry ) {
-                    ZipArchiveEntry src = (ZipArchiveEntry) entry;
-                    final TarArchiveEntry dst = new TarArchiveEntry(src.getName(), true);
-                    //TODO: if (src.isUnixSymlink()) {
-                    //}
+            converter = entry -> {
+                ZipArchiveEntry src = (ZipArchiveEntry) entry;
+                final TarArchiveEntry dst = new TarArchiveEntry(src.getName(), true);
+                //TODO: if (src.isUnixSymlink()) {
+                //}
 
-                    dst.setSize(src.getSize());
-                    dst.setMode(src.getUnixMode());
-                    dst.setModTime(src.getTime());
+                dst.setSize(src.getSize());
+                dst.setMode(src.getUnixMode());
+                dst.setModTime(src.getTime());
 
-                    return dst;
-                }
+                return dst;
             };
 
         } else {

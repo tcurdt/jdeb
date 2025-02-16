@@ -77,25 +77,21 @@ public class ArchiveWalker {
 
     public static boolean walkEmbedded(File deb, final String name, final ArchiveVisitor<TarArchiveEntry> visitor, final Compression compression) throws IOException {
         final AtomicBoolean found = new AtomicBoolean(false);
-        walkArchive(deb, new ArchiveVisitor<ArArchiveEntry>() {
-            public void visit(ArArchiveEntry entry, byte[] content) throws IOException {
-                if (entry.getName().equals(name + compression.getExtension())) {
-                    InputStream in = new ByteArrayInputStream(content);
-                    if (compression == Compression.GZIP) {
-                        in = new GZIPInputStream(in);
-                    } else if (compression == Compression.XZ) {
-                        in = new XZCompressorInputStream(in);
-                    } else if (compression == Compression.BZIP2) {
-                        in = new BZip2CompressorInputStream(in);
-                    }
-
-                    ArchiveWalker.walk(new TarArchiveInputStream(in), new ArchiveVisitor<TarArchiveEntry>() {
-                        public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-                            found.set(true);
-                            visitor.visit(entry, content);
-                        }
-                    });
+        walkArchive(deb, (entry, content) -> {
+            if (entry.getName().equals(name + compression.getExtension())) {
+                InputStream in = new ByteArrayInputStream(content);
+                if (compression == Compression.GZIP) {
+                    in = new GZIPInputStream(in);
+                } else if (compression == Compression.XZ) {
+                    in = new XZCompressorInputStream(in);
+                } else if (compression == Compression.BZIP2) {
+                    in = new BZip2CompressorInputStream(in);
                 }
+
+                ArchiveWalker.walk(new TarArchiveInputStream(in), (ArchiveVisitor<TarArchiveEntry>) (entry1, content1) -> {
+                    found.set(true);
+                    visitor.visit(entry1, content1);
+                });
             }
         });
         return found.get();
