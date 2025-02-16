@@ -546,13 +546,13 @@ public final class DebMakerTestCase extends Assert {
 
     private static class ModifiedTimeAssert implements ArchiveVisitor<TarArchiveEntry> {
         public void visit(TarArchiveEntry entry, byte[] content) throws IOException {
-            assertEquals("Modified time does not match the expected value for " + entry.getName(), entry.getModTime().getTime(), EXPECTED_MODIFIED_TIME);
+            assertEquals("Modified time does not match the expected value for " + entry.getName(), EXPECTED_MODIFIED_TIME, entry.getModTime().getTime());
         }
     }
 
     private static class ArchiveModifiedTimeAssert implements ArchiveVisitor<ArArchiveEntry> {
         public void visit(ArArchiveEntry entry, byte[] content) throws IOException {
-            assertEquals("Modified time does not match the expected value for " + entry.getName(), entry.getLastModified(), EXPECTED_MODIFIED_TIME / 1000);
+            assertEquals("Modified time does not match the expected value for " + entry.getName(), EXPECTED_MODIFIED_TIME / 1000, entry.getLastModified());
         }
     }
 

@@ -49,24 +49,24 @@ public final class DataProducerPathTemplateTestCase extends Assert {
         assertEquals(2, captureDataConsumer.invocations.size());
 
         CaptureDataConsumer.Invocation invocation = captureDataConsumer.invocations.get(0);
-        assertEquals(invocation.dirname, "/var/log/");
-        assertEquals(invocation.gid, 0);
-        assertEquals(invocation.group, "root");
-        assertEquals(invocation.linkname, "");
-        assertEquals(invocation.mode, TarArchiveEntry.DEFAULT_DIR_MODE);
-        assertEquals(invocation.size, 0);
-        assertEquals(invocation.uid, 0);
-        assertEquals(invocation.user, "root");
+        assertEquals("/var/log/", invocation.dirname);
+        assertEquals(0, invocation.gid);
+        assertEquals("root", invocation.group);
+        assertEquals("", invocation.linkname);
+        assertEquals(TarArchiveEntry.DEFAULT_DIR_MODE, invocation.mode);
+        assertEquals(0, invocation.size);
+        assertEquals(0, invocation.uid);
+        assertEquals("root", invocation.user);
 
         invocation = captureDataConsumer.invocations.get(1);
-        assertEquals(invocation.dirname, "/var/lib/");
-        assertEquals(invocation.gid, 0);
-        assertEquals(invocation.group, "root");
-        assertEquals(invocation.linkname, "");
-        assertEquals(invocation.mode, TarArchiveEntry.DEFAULT_DIR_MODE);
-        assertEquals(invocation.size, 0);
-        assertEquals(invocation.uid, 0);
-        assertEquals(invocation.user, "root");
+        assertEquals("/var/lib/", invocation.dirname);
+        assertEquals(0, invocation.gid);
+        assertEquals("root", invocation.group);
+        assertEquals("", invocation.linkname);
+        assertEquals(TarArchiveEntry.DEFAULT_DIR_MODE, invocation.mode);
+        assertEquals(0, invocation.size);
+        assertEquals(0, invocation.uid);
+        assertEquals("root", invocation.user);
     }
 
     public static class CaptureDataConsumer implements DataConsumer {
