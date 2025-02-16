@@ -505,7 +505,7 @@ public final class DebMakerTestCase extends Assert {
     @Test
     public void testErrorPropagation() throws Exception {
         File deb = File.createTempFile("jdeb", ".deb");
-        DebMaker maker = new DebMaker(new NullConsole(), List.of(new UseNullAsInputStream()), null);
+        DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(new UseNullAsInputStream()), null);
         maker.setEncoding(StandardCharsets.UTF_8);
         maker.setControl(new File(getClass().getResource("deb/control").toURI()));
         maker.setDeb(deb);
@@ -526,7 +526,7 @@ public final class DebMakerTestCase extends Assert {
         File changesSave = File.createTempFile("changesSave", ".txt");
         File directory = new File(getClass().getResource("deb/data").toURI());
 
-        DebMaker maker = new DebMaker(new NullConsole(), List.of(new UseNullAsInputStream()), null);
+        DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(new UseNullAsInputStream()), null);
         maker.setEncoding(StandardCharsets.UTF_8);
         assertThrows(PackagingException.class, maker::validate);
 
