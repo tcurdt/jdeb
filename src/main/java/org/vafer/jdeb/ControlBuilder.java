@@ -102,9 +102,9 @@ class ControlBuilder {
         boolean foundConffiles = false;
 
         // sort files to have consistent/reproducible builds
-		Arrays.sort(controlFiles, Comparator.comparing(File::toString));
+        Arrays.sort(controlFiles, Comparator.comparing(File::toString));
 
-		// create the final package control file out of the "control" file, copy all other files, ignore the directories
+        // create the final package control file out of the "control" file, copy all other files, ignore the directories
         for (File file : controlFiles) {
             if (file.isDirectory()) {
                 // warn about the misplaced directory, except for directories ignored by default (.svn, cvs, etc)

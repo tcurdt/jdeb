@@ -63,19 +63,15 @@ public final class PGPSignerTestCase extends Assert {
 
         final byte[] output = fixCRLF(os.toByteArray());
 
-	final int sign_from = expectedOutputStr.indexOf("iEYEAREC");
-	final int sign_until = expectedOutputStr.indexOf("=aAAT") + 5;
-	Arrays.fill(output,
-	    sign_from, sign_until, (byte) '?');
-	Arrays.fill(expectedOutput,
-	    sign_from, sign_until, (byte) '?');
+        final int sign_from = expectedOutputStr.indexOf("iEYEAREC");
+        final int sign_until = expectedOutputStr.indexOf("=aAAT") + 5;
+        Arrays.fill(output, sign_from, sign_until, (byte) '?');
+        Arrays.fill(expectedOutput, sign_from, sign_until, (byte) '?');
 
-	final int version_from = expectedOutputStr.indexOf("v1.");
-	final int version_until = expectedOutputStr.indexOf("\n", sign_from) - 1;
-	Arrays.fill(output,
-	    version_from, version_until, (byte) '?');
-	Arrays.fill(expectedOutput,
-	    version_from, version_until, (byte) '?');
+        final int version_from = expectedOutputStr.indexOf("v1.");
+        final int version_until = expectedOutputStr.indexOf("\n", sign_from) - 1;
+        Arrays.fill(output, version_from, version_until, (byte) '?');
+        Arrays.fill(expectedOutput, version_from, version_until, (byte) '?');
 
 
         assertEquals(new String(expectedOutput), new String(output));

@@ -714,7 +714,7 @@ public class DebMaker {
         ArArchiveEntry archiveEntry = createArArchiveEntry(pName, pContent.length());
 
         pOutput.putArchiveEntry(archiveEntry);
-		try (InputStream input = new FileInputStream(pContent)) {
+        try (InputStream input = new FileInputStream(pContent)) {
             Utils.copy(input, pOutput);
         }
 

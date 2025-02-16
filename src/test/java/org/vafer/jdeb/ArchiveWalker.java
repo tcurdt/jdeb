@@ -104,13 +104,13 @@ public class ArchiveWalker {
         tin = new ArArchiveInputStream(new FileInputStream (archive));
 
         while ((entry = tin.getNextEntry()) != null) {
-            if(entry.getName().equals(filename)){
-            	tin.close();
-            	return true;
+            if (entry.getName().equals(filename)) {
+                tin.close();
+                return true;
             }
         }
 
-    	tin.close();
+        tin.close();
         return false;
     }
 }

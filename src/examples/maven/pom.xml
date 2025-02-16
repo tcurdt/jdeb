@@ -6,10 +6,10 @@
     <version>1.0-SNAPSHOT</version>
     <description>description from pom</description>
     <properties>
-         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	 <maven.compiler.source>1.8</maven.compiler.source>
-  	 <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <build>
         <plugins>

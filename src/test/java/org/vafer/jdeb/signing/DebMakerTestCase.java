@@ -55,12 +55,12 @@ public final class DebMakerTestCase extends Assert {
 
         final InputStream ring = getClass().getClassLoader().getResourceAsStream("org/vafer/gpg/secring.gpg");
 
-        DataProducer[] data = new DataProducer[] {
-            new DataProducerArchive(archive1, null, null, null),
-            new DataProducerArchive(archive2, null, null, null),
-            new DataProducerArchive(archive3, null, null, null),
-            new DataProducerDirectory(directory, null, new String[] { "**/.svn/**" }, null),
-            new DataProducerLink("/link/path-element.ext", "/link/target-element.ext", true, null, null, null)
+        DataProducer[] data = new DataProducer[]{
+                new DataProducerArchive(archive1, null, null, null),
+                new DataProducerArchive(archive2, null, null, null),
+                new DataProducerArchive(archive3, null, null, null),
+                new DataProducerDirectory(directory, null, new String[]{"**/.svn/**"}, null),
+                new DataProducerLink("/link/path-element.ext", "/link/target-element.ext", true, null, null, null)
         };
 
         int digest = PGPUtil.SHA1;
@@ -68,44 +68,45 @@ public final class DebMakerTestCase extends Assert {
         PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new BcPGPContentSignerBuilder(signer.getSecretKey().getPublicKey().getAlgorithm(), digest));
         signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, signer.getPrivateKey());
 
-        for(int i = 0; i <=1; i++){
-	        File deb = File.createTempFile("jdeb", ".deb");
+        for (int i = 0; i <= 1; i++) {
+            File deb = File.createTempFile("jdeb", ".deb");
 
-	        DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data), null);
-	        maker.setEncoding(StandardCharsets.UTF_8);
-	        maker.setControl(new File(getClass().getResource("../deb/control").toURI()));
-	        maker.setDeb(deb);
+            DebMaker maker = new DebMaker(new NullConsole(), Arrays.asList(data), null);
+            maker.setEncoding(StandardCharsets.UTF_8);
+            maker.setControl(new File(getClass().getResource("../deb/control").toURI()));
+            maker.setDeb(deb);
 
-	        if(i==0)
-	        	maker.setSignMethod("debsig-verify");
-	        else
-	        	maker.setSignMethod("dpkg-sig");
+            if (i == 0) {
+                maker.setSignMethod("debsig-verify");
+            } else {
+                maker.setSignMethod("dpkg-sig");
+            }
 
-	        BinaryPackageControlFile packageControlFile = maker.createSignedDeb(Compression.GZIP, signatureGenerator, signer);
+            BinaryPackageControlFile packageControlFile = maker.createSignedDeb(Compression.GZIP, signatureGenerator, signer);
 
-	        assertTrue(packageControlFile.isValid());
+            assertTrue(packageControlFile.isValid());
 
-	        final Map<String, TarArchiveEntry> filesInDeb = new HashMap<>();
+            final Map<String, TarArchiveEntry> filesInDeb = new HashMap<>();
 
-	        ArchiveWalker.walkData(deb, (entry, content) -> filesInDeb.put(entry.getName(), entry), Compression.GZIP);
+            ArchiveWalker.walkData(deb, (entry, content) -> filesInDeb.put(entry.getName(), entry), Compression.GZIP);
 
-	        assertTrue("_gpgorigin wasn't found in the package", ArchiveWalker.arArchiveContains(deb, "_gpgorigin"));
-	        assertTrue("debian-binary wasn't found in the package", ArchiveWalker.arArchiveContains(deb, "debian-binary"));
-	        assertTrue("control.tar.gz wasn't found in the package", ArchiveWalker.arArchiveContains(deb, "control.tar.gz"));
-	        assertTrue("testfile wasn't found in the package", filesInDeb.containsKey("./test/testfile"));
-	        assertTrue("testfile2 wasn't found in the package", filesInDeb.containsKey("./test/testfile2"));
-	        assertTrue("testfile3 wasn't found in the package", filesInDeb.containsKey("./test/testfile3"));
-	        assertTrue("testfile4 wasn't found in the package", filesInDeb.containsKey("./test/testfile4"));
-	        assertTrue("/link/path-element.ext wasn't found in the package", filesInDeb.containsKey("./link/path-element.ext"));
-	        assertEquals("/link/path-element.ext has wrong link target", "/link/target-element.ext", filesInDeb.get("./link/path-element.ext").getLinkName());
+            assertTrue("_gpgorigin wasn't found in the package", ArchiveWalker.arArchiveContains(deb, "_gpgorigin"));
+            assertTrue("debian-binary wasn't found in the package", ArchiveWalker.arArchiveContains(deb, "debian-binary"));
+            assertTrue("control.tar.gz wasn't found in the package", ArchiveWalker.arArchiveContains(deb, "control.tar.gz"));
+            assertTrue("testfile wasn't found in the package", filesInDeb.containsKey("./test/testfile"));
+            assertTrue("testfile2 wasn't found in the package", filesInDeb.containsKey("./test/testfile2"));
+            assertTrue("testfile3 wasn't found in the package", filesInDeb.containsKey("./test/testfile3"));
+            assertTrue("testfile4 wasn't found in the package", filesInDeb.containsKey("./test/testfile4"));
+            assertTrue("/link/path-element.ext wasn't found in the package", filesInDeb.containsKey("./link/path-element.ext"));
+            assertEquals("/link/path-element.ext has wrong link target", "/link/target-element.ext", filesInDeb.get("./link/path-element.ext").getLinkName());
 
-	        if(i==0){
-	        	FileUtils.copyFile(deb, new File("./target/test_debsig-verify.deb"));
-	        }else{
-	        	FileUtils.copyFile(deb, new File("./target/test_dpkg-sig.deb"));
-	        }
+            if (i == 0) {
+                FileUtils.copyFile(deb, new File("./target/test_debsig-verify.deb"));
+            } else {
+                FileUtils.copyFile(deb, new File("./target/test_dpkg-sig.deb"));
+            }
 
-	        assertTrue("Cannot delete the file " + deb, deb.delete());
+            assertTrue("Cannot delete the file " + deb, deb.delete());
         }
     }
 }
