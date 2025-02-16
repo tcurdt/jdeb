@@ -158,8 +158,13 @@
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpg-jdk15on</artifactId>
-      <version>1.70</version>
+      <artifactId>bcpg-jdk18on</artifactId>
+      <version>1.80</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcutil-jdk18on</artifactId>
+      <version>1.80</version>
     </dependency>
     <dependency>
       <groupId>org.tukaani</groupId>
@@ -368,8 +373,7 @@
                   <include>commons-codec:commons-codec</include>
                   <include>commons-io:commons-io</include>
                   <include>org.apache.commons:commons-lang3</include>
-                  <include>org.bouncycastle:bcpg-jdk15on</include>
-                  <include>org.bouncycastle:bcprov-jdk15on</include>
+                  <include>org.bouncycastle:*</include>
                   <include>org.tukaani:xz</include>
                 </includes>
               </artifactSet>
