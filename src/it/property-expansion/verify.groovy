@@ -14,7 +14,6 @@ List<String> controlContent = []
 ArArchiveEntry entry
 while ((entry = arInput.getNextEntry()) != null) {
     if (entry.getName() == 'control.tar.gz') {
-        println "Found control.tar.gz, extracting..."
 
         // Save control.tar.gz to a temporary file
         File tempControlGz = File.createTempFile("control", ".tar.gz")
@@ -34,7 +33,6 @@ while ((entry = arInput.getNextEntry()) != null) {
         def tarEntry
         while ((tarEntry = tarIn.nextEntry) != null) {
             String name = tarEntry.name
-            println "control.tar.gz contains: $name"
 
             if (name == './control' || name == 'control') {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(tarIn, 'UTF-8'))
