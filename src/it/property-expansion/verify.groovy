@@ -9,6 +9,7 @@ assert deb.exists()
 
 InputStream debInput = new FileInputStream(deb)
 ArArchiveInputStream arInput = new ArArchiveInputStream(debInput)
+List<String> controlContent = []
 
 ArArchiveEntry entry
 while ((entry = arInput.getNextEntry()) != null) {
@@ -36,13 +37,11 @@ while ((entry = arInput.getNextEntry()) != null) {
             println "control.tar.gz contains: $name"
 
             if (name == './control' || name == 'control') {
-                println "\n=== Content of 'control' file ==="
                 BufferedReader reader = new BufferedReader(new InputStreamReader(tarIn, 'UTF-8'))
-                String line
-                while ((line = reader.readLine()) != null) {
-                    println line
+                while (reader.readLine() != null) {
+                   controlContent.add(reader.readLine());
                 }
-                println "=== End of 'control' file ===\n"
+                break
             }
         }
 
@@ -53,3 +52,5 @@ while ((entry = arInput.getNextEntry()) != null) {
 
 arInput.close()
 debInput.close()
+
+assert "Version: 2.0.0-1".equals(controlContent.get(0))
