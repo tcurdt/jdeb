@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -55,6 +56,10 @@ import org.vafer.jdeb.utils.OutputTimestampResolver;
 import org.vafer.jdeb.utils.SymlinkUtils;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
+
+import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
+import org.codehaus.plexus.interpolation.fixed.FixedStringSearchInterpolator;
 
 import static org.vafer.jdeb.utils.Utils.isBlank;
 import static org.vafer.jdeb.utils.Utils.lookupIfEmpty;
@@ -416,8 +421,28 @@ public class DebMojo extends AbstractMojo {
 
     @SuppressWarnings("unchecked,rawtypes")
     protected VariableResolver initializeVariableResolver( Map<String, String> variables, Long outputTimestampMs ) {
-        variables.putAll((Map) getProject().getProperties());
-        variables.putAll((Map) System.getProperties());
+
+        // Combine properties from the project and system
+        Properties projectProperties = getProject().getProperties();
+        Properties systemProperties = System.getProperties();
+
+        Map<String, String> combinedProperties = new HashMap<>();
+        combinedProperties.putAll((Map) projectProperties);
+        combinedProperties.putAll((Map) systemProperties);
+
+        // Expand (interpolate) values using RegexBasedInterpolator
+        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+        for (Map.Entry<String, String> entry : combinedProperties.entrySet()) {
+            interpolator.addValueSource(new org.codehaus.plexus.interpolation.MapBasedValueSource(combinedProperties));
+            try {
+                String expandedValue = interpolator.interpolate(entry.getValue(), "");
+                variables.put(entry.getKey(), expandedValue);
+            } catch (InterpolationException e) {
+                // Fallback to original value if interpolation fails
+                variables.put(entry.getKey(), entry.getValue());
+            }
+        }
+
         variables.put("name", name != null ? name : getProject().getName());
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
@@ -521,7 +546,7 @@ public class DebMojo extends AbstractMojo {
         console = new MojoConsole(getLog(), verbose);
 
         initializeSignProperties();
-        
+
         Long outputTimestampMs = new OutputTimestampResolver(console).resolveOutputTimestamp(outputTimestamp);
 
         final VariableResolver resolver = initializeVariableResolver(new HashMap<String, String>(), outputTimestampMs);

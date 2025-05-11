@@ -188,6 +188,11 @@
       <version>4.11.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>4.0.2</version>
+    </dependency>
   </dependencies>
 
   <build>
