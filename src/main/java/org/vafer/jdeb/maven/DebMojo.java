@@ -419,57 +419,6 @@ public class DebMojo extends AbstractMojo {
         }
     }
 
-    @SuppressWarnings("unchecked,rawtypes")
-    protected VariableResolver initializeVariableResolver( Map<String, String> variables, Long outputTimestampMs ) {
-
-        // Combine properties from the project and system
-        Properties projectProperties = getProject().getProperties();
-        Properties systemProperties = System.getProperties();
-
-        Map<String, String> combinedProperties = new HashMap<>();
-        combinedProperties.putAll((Map) projectProperties);
-        combinedProperties.putAll((Map) systemProperties);
-
-        // Expand (interpolate) values using RegexBasedInterpolator
-        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
-        for (Map.Entry<String, String> entry : combinedProperties.entrySet()) {
-            interpolator.addValueSource(new org.codehaus.plexus.interpolation.MapBasedValueSource(combinedProperties));
-            try {
-                String expandedValue = interpolator.interpolate(entry.getValue(), "");
-                variables.put(entry.getKey(), expandedValue);
-            } catch (InterpolationException e) {
-                // Fallback to original value if interpolation fails
-                variables.put(entry.getKey(), entry.getValue());
-            }
-        }
-
-        variables.put("name", name != null ? name : getProject().getName());
-        variables.put("artifactId", getProject().getArtifactId());
-        variables.put("groupId", getProject().getGroupId());
-        variables.put("version", getProjectVersion(outputTimestampMs));
-        variables.put("description", getProject().getDescription());
-        variables.put("extension", "deb");
-        variables.put("baseDir", getProject().getBasedir().getAbsolutePath());
-        variables.put("buildDir", buildDirectory.getAbsolutePath());
-        variables.put("project.version", getProject().getVersion());
-
-        if (getProject().getInceptionYear() != null) {
-            variables.put("project.inceptionYear", getProject().getInceptionYear());
-        }
-        if (getProject().getOrganization() != null) {
-            if (getProject().getOrganization().getName() != null) {
-                variables.put("project.organization.name", getProject().getOrganization().getName());
-            }
-            if (getProject().getOrganization().getUrl() != null) {
-                variables.put("project.organization.url", getProject().getOrganization().getUrl());
-            }
-        }
-
-        variables.put("url", getProject().getUrl());
-
-        return new MapVariableResolver(variables);
-    }
-
     /**
      * Doc some cleanup and conversion on the Maven project version.
      * <ul>
@@ -549,7 +498,13 @@ public class DebMojo extends AbstractMojo {
 
         Long outputTimestampMs = new OutputTimestampResolver(console).resolveOutputTimestamp(outputTimestamp);
 
-        final VariableResolver resolver = initializeVariableResolver(new HashMap<String, String>(), outputTimestampMs);
+        final VariableResolver resolver = MapVariableResolver.builder()
+            .withName(this.name)
+            .withVersion(getProjectVersion(outputTimestampMs))
+            .withMavenProject(getProject())
+            .withSystemProperties(System.getProperties())
+            .withBuildDirectory(buildDirectory.getAbsolutePath())
+            .build(new HashMap<String, String>(), outputTimestampMs);
 
         final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken));
         final File controlDirFile = new File(Utils.replaceVariables(resolver, controlDir, openReplaceToken, closeReplaceToken));
