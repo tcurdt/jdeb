@@ -76,7 +76,8 @@ public final class MapVariableResolver implements VariableResolver {
             return this;
         }
 
-        public MapVariableResolver build( Map<String, String> variables, Long outputTimestampMs) {
+        public MapVariableResolver build() {
+            Map<String, String> variables = new HashMap<String, String>() ;
 
             Map<String, String> combinedProperties = new HashMap<>();
             combinedProperties.putAll((Map) this.mavenProject.getProperties());
