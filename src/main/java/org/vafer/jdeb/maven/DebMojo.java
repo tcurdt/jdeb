@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -56,10 +55,6 @@ import org.vafer.jdeb.utils.OutputTimestampResolver;
 import org.vafer.jdeb.utils.SymlinkUtils;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
-
-import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
-import org.codehaus.plexus.interpolation.fixed.FixedStringSearchInterpolator;
 
 import static org.vafer.jdeb.utils.Utils.isBlank;
 import static org.vafer.jdeb.utils.Utils.lookupIfEmpty;
