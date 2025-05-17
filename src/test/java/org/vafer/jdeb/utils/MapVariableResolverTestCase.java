@@ -43,6 +43,7 @@ public final class MapVariableResolverTestCase extends Assert {
         mavenMap.put("maven.compiler.source", "1.8");
         mavenMap.put("maven.compiler.target", "1.8");
         mavenMap.put("meta.property", "${property.one}-${property.two}-${property.three}");
+        mavenMap.put("nested.meta.property", "${property.one}+${meta.property}");
         mavenMap.put("property.one", "one");
         mavenMap.put("property.three", "three");
         mavenMap.put("property.two", "two");
@@ -85,6 +86,7 @@ public final class MapVariableResolverTestCase extends Assert {
         expectedMap.put("maven.compiler.target", "1.8");
         expectedMap.put("meta.property", "one-two-three");
         expectedMap.put("name", "test");
+        expectedMap.put("nested.meta.property", "one+one-two-three");
         expectedMap.put("project.version", "2.0.0");
         expectedMap.put("property.one", "one");
         expectedMap.put("property.three", "three");
