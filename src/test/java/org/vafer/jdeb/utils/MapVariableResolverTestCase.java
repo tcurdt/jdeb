@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2025 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,9 @@ public final class MapVariableResolverTestCase extends Assert {
         expectedMap.put("url", "https://github.com/tcurdt/jdeb");
         expectedMap.put("version", "2.0.0");
 
-
-        assertTrue(String.format("Expected:\n%s\nFound:\n%s", expectedMap, resolver.getMap()), expectedMap.equals(resolver.getMap()));
+        assertTrue(
+            String.format("Expected:\n%s\nFound:\n%s", expectedMap, resolver.getMap()),
+            expectedMap.equals(resolver.getMap())
+        );
     }
 }
