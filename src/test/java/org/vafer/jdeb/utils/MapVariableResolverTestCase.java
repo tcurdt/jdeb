@@ -32,6 +32,48 @@ import org.vafer.jdeb.utils.MapVariableResolver.MapVariableResolverBuilder;
 public final class MapVariableResolverTestCase extends Assert {
 
     @Test
+    public void builderWorksWithNoProperties() throws Exception {
+        MapVariableResolverBuilder builder = MapVariableResolver.builder();
+
+        // Mock Maven Project
+        MavenProject mockMavenProject = Mockito.mock(MavenProject.class);
+        File expectedBaseDir = FileUtils.getTempDirectory();
+        Mockito.when(mockMavenProject.getBasedir()).thenReturn(expectedBaseDir);
+
+        Properties mockMavenProperties = new Properties();
+        Mockito.when(mockMavenProject.getProperties()).thenReturn(mockMavenProperties);
+
+        // Mock System properties
+        Properties mockSystemProperties = new Properties();
+
+        // Builder
+        MapVariableResolver resolver = builder
+            .withName("test")
+            .withVersion("2.0.0")
+            .withMavenProject(mockMavenProject)
+            .withSystemProperties(mockSystemProperties)
+            .withBuildDirectory("aDirectory")
+            .build();
+
+        Map<String, String> expectedMap = new HashMap<String, String>();
+        expectedMap.put("artifactId", null);
+        expectedMap.put("baseDir", expectedBaseDir.getAbsolutePath());
+        expectedMap.put("buildDir", "aDirectory");
+        expectedMap.put("description", null);
+        expectedMap.put("extension", "deb");
+        expectedMap.put("groupId", null);
+        expectedMap.put("name", "test");
+        expectedMap.put("project.version", null);
+        expectedMap.put("url", null);
+        expectedMap.put("version", "2.0.0");
+
+        assertTrue(
+            String.format("Expected:\n%s\nFound:\n%s", expectedMap, resolver.getMap()),
+            expectedMap.equals(resolver.getMap())
+        );
+    }
+
+    @Test
     public void builderWorksWithAllMandatoryProperties() throws Exception {
         MapVariableResolverBuilder builder = MapVariableResolver.builder();
 
