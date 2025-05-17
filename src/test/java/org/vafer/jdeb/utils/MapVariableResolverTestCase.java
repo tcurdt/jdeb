@@ -42,11 +42,9 @@ public final class MapVariableResolverTestCase extends Assert {
         LinkedHashMap<String, String> mavenMap = new LinkedHashMap<String, String>();
         mavenMap.put("maven.compiler.source", "1.8");
         mavenMap.put("maven.compiler.target", "1.8");
+        mavenMap.put("property.one", "one");
         mavenMap.put("meta.property", "${property.one}-${property.two}-${property.three}");
         mavenMap.put("nested.meta.property", "${property.one}+${meta.property}");
-        mavenMap.put("property.one", "one");
-        mavenMap.put("property.three", "three");
-        mavenMap.put("property.two", "two");
 
         Properties mockMavenProperties = new Properties();
         mockMavenProperties.putAll(mavenMap);
@@ -60,7 +58,10 @@ public final class MapVariableResolverTestCase extends Assert {
 
         // Mock System Properties
         LinkedHashMap<String, String> systemMap = new LinkedHashMap<String, String>();
-        // TODO
+        systemMap.put("meta.property.system", "${property.three}");
+        systemMap.put("property.three", "three");
+        systemMap.put("property.two", "two");
+        systemMap.put("java.specification.version", "17");
 
         Properties mockSystemProperties = new Properties();
         mockSystemProperties.putAll(systemMap);
@@ -82,6 +83,7 @@ public final class MapVariableResolverTestCase extends Assert {
         expectedMap.put("description", "anAwesomeDescription");
         expectedMap.put("extension", "deb");
         expectedMap.put("groupId", "anAwesomeGroupId");
+        expectedMap.put("java.specification.version", "17");
         expectedMap.put("maven.compiler.source", "1.8");
         expectedMap.put("maven.compiler.target", "1.8");
         expectedMap.put("meta.property", "one-two-three");
@@ -91,8 +93,10 @@ public final class MapVariableResolverTestCase extends Assert {
         expectedMap.put("property.one", "one");
         expectedMap.put("property.three", "three");
         expectedMap.put("property.two", "two");
+        expectedMap.put("meta.property.system", "three");
         expectedMap.put("url", "https://github.com/tcurdt/jdeb");
         expectedMap.put("version", "2.0.0");
+
 
         assertTrue(String.format("Expected:\n%s\nFound:\n%s", expectedMap, resolver.getMap()), expectedMap.equals(resolver.getMap()));
     }
