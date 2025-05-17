@@ -32,7 +32,7 @@ import org.vafer.jdeb.utils.MapVariableResolver.MapVariableResolverBuilder;
 public final class MapVariableResolverTestCase extends Assert {
 
     @Test
-    public void builderWorksWithNoProperties() throws Exception {
+    public void builderWorksWithNoData() throws Exception {
         MapVariableResolverBuilder builder = MapVariableResolver.builder();
 
         // Mock Maven Project
@@ -74,7 +74,7 @@ public final class MapVariableResolverTestCase extends Assert {
     }
 
     @Test
-    public void builderWorksWithAllMandatoryProperties() throws Exception {
+    public void builderWorksWithAllMandatoryData() throws Exception {
         MapVariableResolverBuilder builder = MapVariableResolver.builder();
 
         // Mock Maven Project
@@ -147,7 +147,7 @@ public final class MapVariableResolverTestCase extends Assert {
     }
 
     @Test
-    public void builderWorksWithOptionalProperties() throws Exception {
+    public void builderWorksWithOptionalData() throws Exception {
         MapVariableResolverBuilder builder = MapVariableResolver.builder();
 
         // Mock Maven Project
