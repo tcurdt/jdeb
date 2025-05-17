@@ -15,7 +15,10 @@
  */
 package org.vafer.jdeb.utils;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
@@ -31,42 +34,64 @@ public final class MapVariableResolverTestCase extends Assert {
     public void test() throws Exception {
         MapVariableResolverBuilder builder = MapVariableResolver.builder();
 
+        // Mock Maven Project
         MavenProject mockMavenProject = Mockito.mock(MavenProject.class);
-        Mockito.when(mockMavenProject.getBasedir()).thenReturn(FileUtils.getTempDirectory());
+        File expectedBaseDir = FileUtils.getTempDirectory();
+        Mockito.when(mockMavenProject.getBasedir()).thenReturn(expectedBaseDir);
 
-        // Mock Maven Properties
         LinkedHashMap<String, String> mavenMap = new LinkedHashMap<String, String>();
-        mavenMap.put("maven.compiler.target", "1.8");
-        mavenMap.put("release.version", "2.0.0");
-        mavenMap.put("property.project.version", "${release.version}-1");
-        mavenMap.put("property.package.revision", "1");
         mavenMap.put("maven.compiler.source", "1.8");
+        mavenMap.put("maven.compiler.target", "1.8");
+        mavenMap.put("property.package.revision", "1");
+        mavenMap.put("property.project.version", "${release.version}-1");
         mavenMap.put("property.upstream.version", "2.0.0-SNAPSHOT");
+        mavenMap.put("release.version", "2.0.0");
 
         Properties mockMavenProperties = new Properties();
         mockMavenProperties.putAll(mavenMap);
-
         Mockito.when(mockMavenProject.getProperties()).thenReturn(mockMavenProperties);
+
+        Mockito.when(mockMavenProject.getArtifactId()).thenReturn("anAwesomeArtifactId");
+        Mockito.when(mockMavenProject.getGroupId()).thenReturn("anAwesomeGroupId");
+        Mockito.when(mockMavenProject.getDescription()).thenReturn("anAwesomeDescription");
+        Mockito.when(mockMavenProject.getVersion()).thenReturn("2.0.0");
+        Mockito.when(mockMavenProject.getUrl()).thenReturn("https://github.com/tcurdt/jdeb");
 
         // Mock System Properties
         LinkedHashMap<String, String> systemMap = new LinkedHashMap<String, String>();
-        systemMap.put("key", "value");
+        // TODO
 
         Properties mockSystemProperties = new Properties();
         mockSystemProperties.putAll(systemMap);
 
         // Builder
-        VariableResolver resolver = builder
+        MapVariableResolver resolver = builder
             .withName("test")
-            .withVersion("1.0.0")
+            .withVersion("2.0.0")
             .withMavenProject(mockMavenProject)
             .withSystemProperties(mockSystemProperties)
             .withBuildDirectory("aDirectory")
             .build();
 
-        assertEquals("test", resolver.get("name"));
-        assertEquals("1.8", resolver.get("maven.compiler.source"));
-        assertEquals("2.0.0-1", resolver.get("property.project.version"));
+        // Expected Resolver
+        Map<String, String> expectedMap = new HashMap<String, String>();
+        expectedMap.put("artifactId", "anAwesomeArtifactId");
+        expectedMap.put("baseDir", expectedBaseDir.getAbsolutePath());
+        expectedMap.put("buildDir", "aDirectory");
+        expectedMap.put("description", "anAwesomeDescription");
+        expectedMap.put("extension", "deb");
+        expectedMap.put("groupId", "anAwesomeGroupId");
+        expectedMap.put("maven.compiler.source", "1.8");
+        expectedMap.put("maven.compiler.target", "1.8");
+        expectedMap.put("name", "test");
+        expectedMap.put("project.version", "2.0.0");
+        expectedMap.put("property.package.revision", "1");
+        expectedMap.put("property.project.version", "2.0.0-1");
+        expectedMap.put("property.upstream.version", "2.0.0-SNAPSHOT");
+        expectedMap.put("release.version", "2.0.0");
+        expectedMap.put("url", "https://github.com/tcurdt/jdeb");
+        expectedMap.put("version", "2.0.0");
 
+        assertTrue(String.format("Expected:\n%s\nFound:\n%s", expectedMap, resolver.getMap()), expectedMap.equals(resolver.getMap()));
     }
 }
