@@ -42,10 +42,10 @@ public final class MapVariableResolverTestCase extends Assert {
         LinkedHashMap<String, String> mavenMap = new LinkedHashMap<String, String>();
         mavenMap.put("maven.compiler.source", "1.8");
         mavenMap.put("maven.compiler.target", "1.8");
-        mavenMap.put("property.package.revision", "1");
-        mavenMap.put("property.project.version", "${release.version}-1");
-        mavenMap.put("property.upstream.version", "2.0.0-SNAPSHOT");
-        mavenMap.put("release.version", "2.0.0");
+        mavenMap.put("meta.property", "${property.one}-${property.two}-${property.three}");
+        mavenMap.put("property.one", "one");
+        mavenMap.put("property.three", "three");
+        mavenMap.put("property.two", "two");
 
         Properties mockMavenProperties = new Properties();
         mockMavenProperties.putAll(mavenMap);
@@ -83,12 +83,12 @@ public final class MapVariableResolverTestCase extends Assert {
         expectedMap.put("groupId", "anAwesomeGroupId");
         expectedMap.put("maven.compiler.source", "1.8");
         expectedMap.put("maven.compiler.target", "1.8");
+        expectedMap.put("meta.property", "one-two-three");
         expectedMap.put("name", "test");
         expectedMap.put("project.version", "2.0.0");
-        expectedMap.put("property.package.revision", "1");
-        expectedMap.put("property.project.version", "2.0.0-1");
-        expectedMap.put("property.upstream.version", "2.0.0-SNAPSHOT");
-        expectedMap.put("release.version", "2.0.0");
+        expectedMap.put("property.one", "one");
+        expectedMap.put("property.three", "three");
+        expectedMap.put("property.two", "two");
         expectedMap.put("url", "https://github.com/tcurdt/jdeb");
         expectedMap.put("version", "2.0.0");
 
