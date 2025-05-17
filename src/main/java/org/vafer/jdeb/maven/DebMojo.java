@@ -498,7 +498,7 @@ public class DebMojo extends AbstractMojo {
             .withVersion(getProjectVersion(outputTimestampMs))
             .withMavenProject(getProject())
             .withSystemProperties(System.getProperties())
-            .withBuildDirectory(buildDirectory.getAbsolutePath())
+            .withBuildDirectory(this.buildDirectory.getAbsolutePath())
             .build();
 
         final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken));
