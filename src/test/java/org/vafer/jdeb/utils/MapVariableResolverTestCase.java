@@ -31,6 +31,49 @@ import org.vafer.jdeb.utils.MapVariableResolver.MapVariableResolverBuilder;
 
 public final class MapVariableResolverTestCase extends Assert {
 
+    @Test(expected = IllegalStateException.class)
+    public void builderThrowsWithMissingMavenProject() throws Exception {
+        MapVariableResolverBuilder builder = MapVariableResolver.builder();
+
+        // Mock Maven Project
+        MavenProject mockMavenProject = Mockito.mock(MavenProject.class);
+        File expectedBaseDir = FileUtils.getTempDirectory();
+        Mockito.when(mockMavenProject.getBasedir()).thenReturn(expectedBaseDir);
+
+        Properties mockMavenProperties = new Properties();
+        Mockito.when(mockMavenProject.getProperties()).thenReturn(mockMavenProperties);
+
+        // Mock System properties
+        Properties mockSystemProperties = new Properties();
+
+        builder
+            .withName("Name")
+            .withVersion("2.0.0")
+            .withSystemProperties(mockSystemProperties)
+            .withBuildDirectory("aDirectory")
+            .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void builderThrowsWithMissingSystemProperties() throws Exception {
+        MapVariableResolverBuilder builder = MapVariableResolver.builder();
+
+        // Mock Maven Project
+        MavenProject mockMavenProject = Mockito.mock(MavenProject.class);
+        File expectedBaseDir = FileUtils.getTempDirectory();
+        Mockito.when(mockMavenProject.getBasedir()).thenReturn(expectedBaseDir);
+
+        Properties mockMavenProperties = new Properties();
+        Mockito.when(mockMavenProject.getProperties()).thenReturn(mockMavenProperties);
+
+        builder
+            .withName("Name")
+            .withVersion("2.0.0")
+            .withMavenProject(mockMavenProject)
+            .withBuildDirectory("aDirectory")
+            .build();
+    }
+
     @Test
     public void builderWorksWithNoData() throws Exception {
         MapVariableResolverBuilder builder = MapVariableResolver.builder();

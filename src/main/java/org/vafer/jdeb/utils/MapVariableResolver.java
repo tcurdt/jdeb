@@ -81,6 +81,10 @@ public final class MapVariableResolver implements VariableResolver {
         }
 
         public MapVariableResolver build() {
+            if( this.mavenProject == null || this.systemProperties == null ) {
+                throw new IllegalStateException("MavenProject and system properties must be set");
+            }
+
             Map<String, String> variables = new HashMap<String, String>() ;
 
             Map<String, String> combinedProperties = new HashMap<>();
