@@ -98,22 +98,16 @@ public final class MapVariableResolverTestCase extends Assert {
             .withBuildDirectory("aDirectory")
             .build();
 
-        Map<String, String> expectedMap = new HashMap<String, String>();
-        expectedMap.put("artifactId", null);
-        expectedMap.put("baseDir", expectedBaseDir.getAbsolutePath());
-        expectedMap.put("buildDir", "aDirectory");
-        expectedMap.put("description", null);
-        expectedMap.put("extension", "deb");
-        expectedMap.put("groupId", null);
-        expectedMap.put("name", "test");
-        expectedMap.put("project.version", null);
-        expectedMap.put("url", null);
-        expectedMap.put("version", "2.0.0");
-
-        assertTrue(
-            String.format("Expected:\n%s\nFound:\n%s", expectedMap, resolver.getMap()),
-            expectedMap.equals(resolver.getMap())
-        );
+        assertEquals(null, resolver.get("artifactId"));
+        assertEquals(expectedBaseDir.getAbsolutePath(), resolver.get("baseDir"));
+        assertEquals("aDirectory", resolver.get("buildDir"));
+        assertEquals(null, resolver.get("description"));
+        assertEquals("deb", resolver.get("extension"));
+        assertEquals(null, resolver.get("groupId"));
+        assertEquals("test", resolver.get("name"));
+        assertEquals(null, resolver.get("project.version"));
+        assertEquals(null, resolver.get("url"));
+        assertEquals("2.0.0", resolver.get("version"));
     }
 
     @Test
@@ -162,31 +156,25 @@ public final class MapVariableResolverTestCase extends Assert {
             .build();
 
         // Expected Resolver
-        Map<String, String> expectedMap = new HashMap<String, String>();
-        expectedMap.put("artifactId", "anAwesomeArtifactId");
-        expectedMap.put("baseDir", expectedBaseDir.getAbsolutePath());
-        expectedMap.put("buildDir", "aDirectory");
-        expectedMap.put("description", "anAwesomeDescription");
-        expectedMap.put("extension", "deb");
-        expectedMap.put("groupId", "anAwesomeGroupId");
-        expectedMap.put("java.specification.version", "17");
-        expectedMap.put("maven.compiler.source", "1.8");
-        expectedMap.put("maven.compiler.target", "1.8");
-        expectedMap.put("meta.property", "one-two-three");
-        expectedMap.put("name", "test");
-        expectedMap.put("nested.meta.property", "one+one-two-three");
-        expectedMap.put("project.version", "2.0.0");
-        expectedMap.put("property.one", "one");
-        expectedMap.put("property.three", "three");
-        expectedMap.put("property.two", "two");
-        expectedMap.put("meta.property.system", "three");
-        expectedMap.put("url", "https://github.com/tcurdt/jdeb");
-        expectedMap.put("version", "2.0.0");
-
-        assertTrue(
-            String.format("Expected:\n%s\nFound:\n%s", expectedMap, resolver.getMap()),
-            expectedMap.equals(resolver.getMap())
-        );
+        assertEquals("anAwesomeArtifactId", resolver.get("artifactId"));
+        assertEquals(expectedBaseDir.getAbsolutePath(), resolver.get("baseDir"));
+        assertEquals("aDirectory", resolver.get("buildDir"));
+        assertEquals("anAwesomeDescription", resolver.get("description"));
+        assertEquals("deb", resolver.get("extension"));
+        assertEquals("anAwesomeGroupId", resolver.get("groupId"));
+        assertEquals("17", resolver.get("java.specification.version"));
+        assertEquals("1.8", resolver.get("maven.compiler.source"));
+        assertEquals("1.8", resolver.get("maven.compiler.target"));
+        assertEquals("one-two-three", resolver.get("meta.property"));
+        assertEquals("test", resolver.get("name"));
+        assertEquals("one+one-two-three", resolver.get("nested.meta.property"));
+        assertEquals("2.0.0", resolver.get("project.version"));
+        assertEquals("one", resolver.get("property.one"));
+        assertEquals("three", resolver.get("property.three"));
+        assertEquals("two", resolver.get("property.two"));
+        assertEquals("three", resolver.get("meta.property.system"));
+        assertEquals("https://github.com/tcurdt/jdeb", resolver.get("url"));
+        assertEquals("2.0.0", resolver.get("version"));
     }
 
     @Test
@@ -228,25 +216,18 @@ public final class MapVariableResolverTestCase extends Assert {
             .build();
 
         // Expected Resolver
-        Map<String, String> expectedMap = new HashMap<String, String>();
-        expectedMap.put("artifactId", "anAwesomeArtifactId");
-        expectedMap.put("baseDir", expectedBaseDir.getAbsolutePath());
-        expectedMap.put("buildDir", "aDirectory");
-        expectedMap.put("description", "anAwesomeDescription");
-        expectedMap.put("extension", "deb");
-        expectedMap.put("groupId", "anAwesomeGroupId");
-        expectedMap.put("name", "test");
-        expectedMap.put("project.version", "2.0.0");
-        expectedMap.put("url", "https://github.com/tcurdt/jdeb");
-        expectedMap.put("version", "2.0.0");
-
-        expectedMap.put("project.inceptionYear", "1990");
-        expectedMap.put("project.organization.name", "anAwesomeOrganization");
-        expectedMap.put("project.organization.url", "https://www.awesome.org");
-
-        assertTrue(
-            String.format("Expected:\n%s\nFound:\n%s", expectedMap, resolver.getMap()),
-            expectedMap.equals(resolver.getMap())
-        );
+        assertEquals("anAwesomeArtifactId", resolver.get("artifactId"));
+        assertEquals(expectedBaseDir.getAbsolutePath(), resolver.get("baseDir"));
+        assertEquals("aDirectory", resolver.get("buildDir"));
+        assertEquals("anAwesomeDescription", resolver.get("description"));
+        assertEquals("deb", resolver.get("extension"));
+        assertEquals("anAwesomeGroupId", resolver.get("groupId"));
+        assertEquals("test", resolver.get("name"));
+        assertEquals("2.0.0", resolver.get("project.version"));
+        assertEquals("https://github.com/tcurdt/jdeb", resolver.get("url"));
+        assertEquals("2.0.0", resolver.get("version"));
+        assertEquals("1990", resolver.get("project.inceptionYear"));
+        assertEquals("anAwesomeOrganization", resolver.get("project.organization.name"));
+        assertEquals("https://www.awesome.org", resolver.get("project.organization.url"));
     }
 }

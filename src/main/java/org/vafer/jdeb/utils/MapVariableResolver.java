@@ -40,10 +40,6 @@ public final class MapVariableResolver implements VariableResolver {
         return map.get(key);
     }
 
-    public Map<String, String> getMap() {
-        return map;
-    }
-
     public static MapVariableResolverBuilder builder() {
         return new MapVariableResolverBuilder();
     }
