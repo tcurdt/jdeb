@@ -1,4 +1,6 @@
-## Version 1.14, dev
+## Version 1.15, dev
+
+## Version 1.14, release 14.06.2025
 
 * [ADD] Improved maven variable interpolatation (Thanks to Mattia Dal Ben)
 
