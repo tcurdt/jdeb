@@ -90,6 +90,7 @@
     <contributor><name>Jeremy Norris</name></contributor>
     <contributor><name>Roman Huber</name></contributor>
     <contributor><name>Markus Wiik</name></contributor>
+    <contributor><name>Mattia Dal Ben</name></contributor>
   </contributors>
   <scm>
     <connection>scm:git:git://github.com:tcurdt/jdeb.git</connection>

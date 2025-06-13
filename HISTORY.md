@@ -1,5 +1,7 @@
 ## Version 1.14, dev
 
+* [ADD] Improved maven variable interpolatation (Thanks to Mattia Dal Ben)
+
 ## Version 1.13, release 25.01.2025
 
 * [CHG] Allow specifying source file encoding, uses maven defaults, ls-mapper expects to be UTF8 (Thanks to Roman Huber)
