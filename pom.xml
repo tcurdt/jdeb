@@ -155,7 +155,7 @@
       <!-- this should not be required but somehow compress introduced the dep -->
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.17.0</version>
+      <version>3.18.0</version>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
