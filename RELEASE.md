@@ -7,7 +7,3 @@
 - push and wait for build
 - create tag jdeb-VERSION
 - push and wait for build
-- login to https://oss.sonatype.org/
-- staging repositories
-- close
-- release
