@@ -129,7 +129,7 @@
       <!-- maven-archiver must be compile scope, see #736 -->
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-archiver</artifactId>
-      <version>3.6.5</version>
+      <version>3.6.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>
