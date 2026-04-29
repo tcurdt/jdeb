@@ -134,7 +134,7 @@ digest           | Digest to use when building the deb                          
 signPackage      | If the debian package should be signed                                                     | No
 signMethod       | Which utility is used for verification (`dpkg-sig`, `debsig-verify`)                       | No; defaults to `debsig-verify`
 signRole         | Determines the filename of the signature, debsig only verifies `origin`                    | No; defaults to `origin`
-signDigest       | Digest to use for siging                                                                   | No; defaults to `SHA256`
+signDigest       | Digest to use for signing                                                                  | No; defaults to `SHA256`
 signCfgPrefix    | Prefix for when reading keyring, key and passphrase from settings.xml                      | No; defaults to `jdeb.`
 keyring          | The file containing the PGP keys                                                           | No
 key              | The name of the key to be used in the keyring                                              | No
@@ -147,7 +147,7 @@ verbose          | Verbose logging                                              
 skip             | Indicates if an execution should be skipped                                                | No; defaults to `false`
 skipSubmodules   | Skip goal on all submodules                                                                | No; defaults to `false`
 skipPOMs         | Skip goal on POM artifacts                                                                 | No; defaults to `true`
-encoding         | The character character encoding to use when reading control and changes files.            | No; defaults to `${project.build.sourceEncoding}`
+encoding         | The character encoding to use when reading control and changes files.            | No; defaults to `${project.build.sourceEncoding}`
 
 The encoding property does not apply to the "ls" mapper. The mapping files must be encoded as UTF-8.
 
@@ -163,11 +163,11 @@ src              | The directory, tarball, file to include in the package       
 dst              | New filename at destination (type must be `file`)                            | No
 linkName         | The path of the link (type must be `link`)                                   | Yes for link
 linkTarget       | The target of the link (type must be `link`)                                 | Yes for link
-symlink          | Indicate if the link is a symblolic link (type must be `link`)               | No; defaults to `true`
+symlink          | Indicate if the link is a symbolic link (type must be `link`)                | No; defaults to `true`
 type             | Type of the data source. (archive, directory, file, files, link or template) | No; but will be Yes in the future
 missingSrc       | Fail if src file/folder is missing (ignore or fail)                          | No; defaults to `fail`
-includes         | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files
-excludes         | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclusions
+includes         | A comma separated list of files to include from the directory or tarball     | No; defaults to all files
+excludes         | A comma separated list of files to exclude from the directory or tarball     | No; defaults to no exclusions
 conffile         | A boolean value to define if the files should be included in the conffiles   | No; defaults to `false`
 mapper           | The files to exclude from the directory or tarball                           | No
 paths/(path..)   | One or more string literal paths that will created in the package            | No; Yes for type `template`
