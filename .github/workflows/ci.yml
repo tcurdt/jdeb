@@ -28,7 +28,7 @@ jobs:
           maven-version: 3.9.8
 
       - name: Cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
