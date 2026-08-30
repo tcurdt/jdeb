@@ -32,13 +32,21 @@ public final class PermMapper implements Mapper {
     private int fileMode = -1;
     private int dirMode = -1;
 
-    public static int toMode( String modeString ) {
-        int mode = -1;
-        if (modeString != null && modeString.length() > 0) {
+   public static int toMode(String modeString) {
+    int mode = -1;
+    if (modeString != null && modeString.length() > 0) {
+        try {
             mode = Integer.parseInt(modeString, 8);
+        } catch (NumberFormatException e) {
+            // Handle invalid mode string
+            System.err.println("Invalid mode string: " + modeString);
+            // Return a default mode value
+            mode = 0;
         }
-        return mode;
     }
+    return mode;
+}
+
 
     public PermMapper( int uid, int gid, String user, String group, int fileMode, int dirMode, int strip, String prefix ) {
         this.strip = strip;
