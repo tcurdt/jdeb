@@ -153,6 +153,7 @@ public final class DataBuilderTestCase extends Assert {
         Path linkPath = Paths.get(subDir.getPath() + "/link.txt");
 
         // Create broken symlink in data directory
+        Files.deleteIfExists(linkPath);
         Files.createSymbolicLink(linkPath, targetPath);
 
         return subDir;
