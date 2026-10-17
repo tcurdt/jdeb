@@ -1,6 +1,6 @@
 ## Version 1.16, dev
 
-## Version 1.15, release 18.10.2026
+## Version 1.15, released 2026-10-18
 
 - [CHG] Upgraded deps.
 - [CHG] Pre-release qualifiers are lowercased in the Debian version (1.0-RC1 -> 1.0~rc1, 1.0-SNAPSHOT -> 1.0~snapshot) so dpkg orders them like maven does
@@ -8,11 +8,11 @@
 - [FIX] Letters inside a git hash (1.0-3-g1b4b40e) are no longer mistaken for a pre-release, #314
 - [FIX] Log a potential problem. (Thanks to Astitv Bajpai)
 
-## Version 1.14, release 14.06.2025
+## Version 1.14, released 2025-06-14
 
 - [ADD] Improved maven variable interpolation (Thanks to Mattia Dal Ben)
 
-## Version 1.13, release 25.01.2025
+## Version 1.13, released 2025-01-25
 
 - [CHG] Allow specifying source file encoding, uses maven defaults, ls-mapper expects to be UTF8 (Thanks to Roman Huber)
 - [CHG] Use UTC for snapshot timestamps (Thanks to Roman Huber)
@@ -23,14 +23,14 @@
 - [ADD] Enable/disable changes file (Thanks to Roman Huber)
 - [ADD] Control handling of broken symlinks (Thanks to Markus Wiik)
 
-## Version 1.12, release 22.11.2024
+## Version 1.12, released 2024-11-22
 
 - [CHG] Upgraded deps
 - [FIX] Changes file is now reproducible (Thanks to Jeremy Norris)
 - [FIX] Re-add the maven archiver dependency (Thanks to Jeremy Norris)
 - [FIX] Fixed timestamp parsing deprecation (Thanks to Jeremy Norris)
 
-## Version 1.11, release 17.08.2024
+## Version 1.11, released 2024-08-17
 
 - [CHG] Improve exception propagation for failures from package content processing
 - [CHG] Required java 11
@@ -39,7 +39,7 @@
 - [FIX] Removed invalid Maven Mojo Deprecation
 - [ADD] "signDigest" for setting just the signing digest
 
-## Version 1.10, released 30.11.2021
+## Version 1.10, released 2021-11-30
 
 - [CHG] Breaking: The deps already required java8. Now also require java8 officially.
 - [CHG] Upgraded deps
@@ -48,18 +48,18 @@
 - [FIX] Ensure conffile paths are not absolute anymore
 - [ADD] Allow constant modified time to support reproducibility (Thanks to Michal Riha)
 
-## Version 1.9, released 05.06.2021
+## Version 1.9, released 2021-06-05
 
 - [CHG] Upgraded plugins and dependencies, now requires maven 3.6.0 and java 1.7
 - [ADD] Added project.inceptionYear, project.organization.name, and project.organization.url to the variable expansions (Thanks to Adam Retter)
 - [ADD] Also interpolate the copyright file (Thanks to Adam Retter)
 
-## Version 1.8, released 24.08.2019
+## Version 1.8, released 2019-08-24
 
 - [CHG] Upgraded deps
 - [FIX] Removed unnessary file/path limitation (Thanks to Roberto Perez Alcolea)
 
-## Version 1.7, released 16.10.2018
+## Version 1.7, released 2018-10-16
 
 - [FIX] Fixed a regression. Always provide the proper relative paths in archives.
 - [FIX] Upgraded deps
@@ -67,7 +67,7 @@
 - [ADD] Added example to show file and dirmode
 - [ADD] Added support custom snapshot patterns (Thanks to Jamie Magee)
 
-## Version 1.6, released 03.01.2018
+## Version 1.6, released 2018-01-03
 
 - [CHG] Upgraded Commons Compress
 - [FIX] Fixed the maintainer name according to Debian standards (Thanks to Bogdan Artyushenko)
@@ -75,7 +75,7 @@
 - [ADD] Added support for the fullpath attribute in Ant (Thanks to (Daniel Ivan Ruiz Barranco)
 - [ADD] Allow different styles of tar archives (Thanks to Kevin Conaway)
 
-## Version 1.5, released 01.02.2016
+## Version 1.5, released 2016-02-01
 
 - [CHG] Breaking: No longer provides a default "Depends" add to your control as needed
 - [CHG] Breaking: Use TarArchiveEntry in DataConsumer interface
@@ -88,7 +88,7 @@
 - [ADD] Allow Multi-Arch declarations
 - [ADD] Allow overriding of Source
 
-## Version 1.4, released 20.02.2014
+## Version 1.4, released 2014-02-20
 
 - [FIX] Support comments in control files
 - [FIX] Fixed handling of links
@@ -96,13 +96,13 @@
 - [ADD] Provide jdeb build information back to maven (if propertyPrefix is set)
 - [ADD] Allow for Multi-Arch declaration in control files
 
-## Version 1.3, released 25.07.2014
+## Version 1.3, released 2014-07-25
 
 - [CHG] Switched from maven2 to maven3
 - [FIX] Fixed badly formatted version for "milestone", "m", "a", "b" and "cr" (they where not matched as beta versions)
 - [FIX] Add two spaces in the md5sums file between the checksum and the filename to be compatible with GNU coreutils md5sum
 
-## Version 1.2, released 22.06.2014
+## Version 1.2, released 2014-06-22
 
 - [CHG] Deprecated "submodules" in favour of "skipSubmodules"
 - [FIX] Warned about missing signing settings even when not signing
@@ -111,11 +111,11 @@
 - [ADD] Support for "signMethod" and "signRole"
 - [ADD] Added "skipPOMs"
 
-## Version 1.1.1, released 10.03.2014
+## Version 1.1.1, released 2014-03-10
 
 - [FIX] renamed SNAPSHOT handling to snapshotExpand & snapshotEnv
 
-## Version 1.1, released 28.02.2014
+## Version 1.1, released 2014-02-28
 
 - [CHG] Links are now symbolic by default
 - [CHG] Alpha, Beta and RC versions are transformed to a package version ordered before the final release (ex: 1.0~RC1)
@@ -136,19 +136,19 @@
 - [ADD] User defined fields in the control file are now supported (Thanks to Marco Soeima)
 - [ADD] Added the ability to disable an execution during Maven build (Thanks to Jonathan Piron)
 
-## Version 1.0.1, released 28.02.2013
+## Version 1.0.1, released 2013-02-28
 
 - [FIX] Use the joint copyright
 - [FIX] Fixed the maven to debian version mapping
 - [ADD] Override version via environment variable DEBVERSION
 
-## Version 1.0, released 10.01.2013
+## Version 1.0, released 2013-01-10
 
 - [CHG] Use "\_all" as architecture postfix by default
 - [FIX] Unresolved variables in package maintainer scripts no longer break the build
 - [ADD] Support for symbolic links (Maven only)
 
-## Version 0.11, released 14.07.2012
+## Version 0.11, released 2012-07-14
 
 - [REM] Deprecated PrefixMapper was removed (use PermMapper instead)
 - [CHG] Use "~" instead of "+" when converting from a SNAPSHOT version
@@ -158,7 +158,7 @@
 - [ADD] Added a "template" data type to create dirs
 - [ADD] Added "missingSrc" maven config to control behavior on missing files/folders
 
-## Version 0.10, released 18.02.2012
+## Version 0.10, released 2012-02-18
 
 Polishing and regression fixes
 
@@ -168,7 +168,7 @@ Polishing and regression fixes
 - [FIX] Make sure to close the tar output stream
 - [ADD] Access to all Maven variables
 
-## Version 0.9, released 17.12.2011
+## Version 0.9, released 2011-12-17
 
 Some smaller fixes, Support for the 1.8 format, Changes support working.
 
@@ -182,7 +182,7 @@ Some smaller fixes, Support for the 1.8 format, Changes support working.
 - [ADD] Provide SHA1, SHA256 and not just MD5 for descriptors
 - [ADD] Provide "project.version" when using maven
 
-## Version 0.8, released 27.06.2010
+## Version 0.8, released 2010-06-27
 
 Lot of refactoring and support for configuration on the maven plugin. Easier permission mapping.
 
@@ -196,7 +196,7 @@ Lot of refactoring and support for configuration on the maven plugin. Easier per
 - [ADD] Added Examples for ant and maven.
 - [ADD] New "file" data source.
 
-## Version 0.7, released 18.08.2008
+## Version 0.7, released 2008-08-18
 
 Proper closing of streams!
 Many improvements on the Ant task.
@@ -213,18 +213,18 @@ Support for bzip2 and more descriptor keys.
 - [ADD] Verbose attribute for the Ant task.
 - [ADD] The Ant task now accepts tarfileset elements.
 
-## Version 0.6, released 11.01.2008
+## Version 0.6, released 2008-01-11
 
 - [FIX] Fixed the trailing linefeed in the 'changes' section of the changes file.
 
-## Version 0.5, released 26.11.2007
+## Version 0.5, released 2007-11-26
 
 - [REM] Removed deprecated ant task delegate.
 - [CHG] Switched to ArInputStream/ArOutputStream.
 - [FIX] Fixed the 'ls' parsing.
 - [ADD] Added "changesSave" attribute to save release information to. No longer saving those information to "changesIn".
 
-## Version 0.4, released 20.09.2007
+## Version 0.4, released 2007-09-20
 
 - [REM] Removed deprecated prefix/strip syntax.
 - [CHG] Changed lookup from environment (DEBEMAIL, DEBFULLNAME) to overrule the descriptor.
@@ -232,18 +232,18 @@ Support for bzip2 and more descriptor keys.
 - [ADD] Added support for multiple mappers.
 - [ADD] Added more fields to the package descriptor.
 
-## Version 0.3, released 15.09.2007
+## Version 0.3, released 2007-09-15
 
 - [ADD] Added maintainer lookup from environment (DEBEMAIL, DEBFULLNAME).
 - [ADD] Added plugin implementation for maven.
 - [ADD] Added stricter descriptor validation.
 
-## Version 0.2, released 21.08.2007
+## Version 0.2, released 2007-08-21
 
 - [FIX] Fixed the delete of the temporary files.
 - [ADD] Added support for signed changes files.
 - [ADD] Added support for mapping ownerships and rights.
 
-## Version 0.1, released 19.02.2007
+## Version 0.1, released 2007-02-19
 
 Initial release.
