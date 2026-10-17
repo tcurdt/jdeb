@@ -1,7 +1,8 @@
 ## Version 1.16, dev
 
-## Version 1.15, release 07.03.2026
+## Version 1.15, release 18.10.2026
 
+- [FIX] Log a potential problem. (Thanks to Astitv Bajpai)
 - [CHG] Upgraded deps.
 
 ## Version 1.14, release 14.06.2025
