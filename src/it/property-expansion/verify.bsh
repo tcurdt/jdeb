@@ -1,0 +1,32 @@
+import java.util.zip.GZIPInputStream;
+import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
+import org.apache.commons.compress.archivers.ar.ArArchiveInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+
+File deb = new File(basedir, "target/jdeb-it_1.0_all.deb");
+if (!deb.exists()) throw new Exception("deb not found");
+
+List control = new ArrayList();
+ArArchiveInputStream ar = new ArArchiveInputStream(new FileInputStream(deb));
+ArArchiveEntry entry;
+while ((entry = ar.getNextEntry()) != null) {
+    if (entry.getName().equals("control.tar.gz")) {
+        TarArchiveInputStream tar = new TarArchiveInputStream(new GZIPInputStream(ar));
+        TarArchiveEntry tarEntry;
+        while ((tarEntry = tar.getNextTarEntry()) != null) {
+            if (tarEntry.getName().equals("./control") || tarEntry.getName().equals("control")) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(tar, "UTF-8"));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    control.add(line);
+                }
+                break;
+            }
+        }
+        break;
+    }
+}
+ar.close();
+
+if (!control.contains("Version: 2.0.0-1")) throw new Exception("version not expanded: " + control);

@@ -1,0 +1,17 @@
+import java.nio.file.Files;
+import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
+import org.apache.commons.compress.archivers.ar.ArArchiveInputStream;
+
+File deb = new File(basedir, "target/jdeb-it_1.0_all.deb");
+if (!deb.exists()) throw new Exception("deb not found");
+ArArchiveInputStream is = new ArArchiveInputStream(new FileInputStream(deb));
+ArArchiveEntry entry;
+while ((entry = is.getNextEntry()) != null) {
+    if (entry.getLastModifiedDate().getTime() != 1724680800000L) throw new Exception("wrong timestamp on " + entry.getName());
+}
+is.close();
+
+File changes = new File(basedir, "target/jdeb-it_1.0_all.changes");
+if (!changes.exists()) throw new Exception("changes not found");
+List lines = Files.readAllLines(changes.toPath());
+if (!"Date: Mon, 26 Aug 2024 14:00:00 +0000".equals(lines.get(1))) throw new Exception("wrong date: " + lines.get(1));
