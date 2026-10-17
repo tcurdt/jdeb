@@ -48,7 +48,7 @@ jobs:
         run: |
           # remove jdeb- prefix of the tag.
           release_name="${GITHUB_REF_NAME#jdeb-}"
-          gh release create ${GITHUB_REF_NAME} --title $release_name --notes-file HISTORY.md
+          gh release create ${GITHUB_REF_NAME} --title $release_name --notes-file CHANGES.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
