@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
@@ -43,7 +44,9 @@ import org.apache.tools.ant.util.ReaderInputStream;
 public final class Utils {
 
   private static final Pattern BETA_PATTERN = Pattern.compile(
-    "^(?:(?:(.*?)([.\\-_]))|(.*[^a-z]))(alpha|a|beta|b|milestone|m|cr|rc)([^a-z].*)?$",
+    // the qualifier has to follow a separator or the digits of a version
+    // part, so letters inside a prefixed hash (+g1b4b40e) do not match
+    "^(?:(?:(.*?)([.\\-_]))|((?:.*[^a-z0-9])?[0-9]+|.*[^a-z0-9]))(alpha|a|beta|b|milestone|m|cr|rc)([^a-z].*)?$",
     Pattern.CASE_INSENSITIVE
   );
 
@@ -273,6 +276,10 @@ public final class Utils {
    * -SNAPSHOT suffixes are replaced with a timestamp (~yyyyMMddHHmmss).
    * The separator before a rc, alpha or beta version is replaced with '~'
    * such that the version is always ordered before the final or GA release.
+   * The qualifier is lowercased (and SNAPSHOT becomes snapshot) as dpkg sorts
+   * uppercase before lowercase letters.
+   * Versions that already contain a '~' are expected to follow the Debian
+   * conventions and are only stripped of invalid characters.
    *
    * @param version the project version to convert to a Debian package version
    * @param template the template used to replace -SNAPSHOT, the timestamp format is in brackets,
@@ -286,33 +293,38 @@ public final class Utils {
     String template,
     Date timestamp
   ) {
-    Matcher matcher = SNAPSHOT_PATTERN.matcher(version);
-    if (matcher.matches()) {
-      version = matcher.group(1) + "~";
+    if (version.indexOf('~') == -1) {
+      Matcher matcher = SNAPSHOT_PATTERN.matcher(version);
+      if (matcher.matches()) {
+        version = matcher.group(1) + "~";
 
-      if (apply) {
-        final String envValue = System.getenv(envName);
-        if (template != null && template.length() > 0) {
-          version += formatSnapshotTemplate(template, timestamp);
-        } else if (envValue != null && envValue.length() > 0) {
-          version += envValue;
+        if (apply) {
+          final String envValue = System.getenv(envName);
+          if (template != null && template.length() > 0) {
+            version += formatSnapshotTemplate(template, timestamp);
+          } else if (envValue != null && envValue.length() > 0) {
+            version += envValue;
+          } else {
+            SimpleDateFormat dateFormat = new SimpleDateFormat(
+              "yyyyMMddHHmmss"
+            );
+            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            version += dateFormat.format(timestamp);
+          }
         } else {
-          SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-          dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-          version += dateFormat.format(timestamp);
+          version += "snapshot";
         }
       } else {
-        version += "SNAPSHOT";
-      }
-    } else {
-      matcher = BETA_PATTERN.matcher(version);
-      if (matcher.matches()) {
-        if (matcher.group(1) != null) {
-          version =
-            matcher.group(1) + "~" + matcher.group(4) + matcher.group(5);
-        } else {
-          version =
-            matcher.group(3) + "~" + matcher.group(4) + matcher.group(5);
+        matcher = BETA_PATTERN.matcher(version);
+        if (matcher.matches()) {
+          // dpkg orders uppercase before lowercase letters, so the
+          // qualifiers only sort like in maven when lowercase
+          String qualifier = matcher.group(4).toLowerCase(Locale.ROOT);
+          if (matcher.group(1) != null) {
+            version = matcher.group(1) + "~" + qualifier + matcher.group(5);
+          } else {
+            version = matcher.group(3) + "~" + qualifier + matcher.group(5);
+          }
         }
       }
     }

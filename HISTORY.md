@@ -2,8 +2,11 @@
 
 ## Version 1.15, release 18.10.2026
 
-- [FIX] Log a potential problem. (Thanks to Astitv Bajpai)
 - [CHG] Upgraded deps.
+- [CHG] Pre-release qualifiers are lowercased in the Debian version (1.0-RC1 -> 1.0~rc1, 1.0-SNAPSHOT -> 1.0~snapshot) so dpkg orders them like maven does
+- [FIX] Versions that already contain a '~' are no longer mangled, #314
+- [FIX] Letters inside a git hash (1.0-3-g1b4b40e) are no longer mistaken for a pre-release, #314
+- [FIX] Log a potential problem. (Thanks to Astitv Bajpai)
 
 ## Version 1.14, release 14.06.2025
 

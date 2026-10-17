@@ -151,6 +151,14 @@ encoding         | The character encoding to use when reading control and change
 
 The encoding property does not apply to the "ls" mapper. The mapping files must be encoded as UTF-8.
 
+The maven project version is converted into a Debian version: a separator before a
+pre-release qualifier (alpha, beta, milestone, rc) or SNAPSHOT is replaced with `~`
+and the qualifier is lowercased, so `1.0-RC1` becomes `1.0~rc1` and sorts before `1.0`.
+Versions that already contain a `~` are taken as Debian versions and are kept as they are.
+The default `snapshotExpand` timestamp starts with a digit and therefore sorts before
+alpha, beta and rc versions. If that matters, use a template starting with a letter,
+e.g. `snapshot[yyyyMMddHHmmss]`.
+
 If you use the `dataSet` element, you'll need to populate it with a one or
 more `data` elements. A `data` element is used to specify a directory, a
 tarball archive, or a file. You can add as many data

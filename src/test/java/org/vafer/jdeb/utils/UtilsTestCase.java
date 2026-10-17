@@ -179,7 +179,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0~SNAPSHOT",
+      "1.0~snapshot",
       Utils.convertToDebianVersion(
         "1.0+SNAPSHOT",
         false,
@@ -190,7 +190,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0~SNAPSHOT",
+      "1.0~snapshot",
       Utils.convertToDebianVersion(
         "1.0-SNAPSHOT",
         false,
@@ -212,7 +212,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0~RC2",
+      "1.0~rc2",
       Utils.convertToDebianVersion(
         "1.0-RC2",
         true,
@@ -234,7 +234,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0~Beta+4",
+      "1.0~beta+4",
       Utils.convertToDebianVersion(
         "1.0.Beta-4",
         true,
@@ -300,7 +300,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0~M1",
+      "1.0~m1",
       Utils.convertToDebianVersion(
         "1.0.M1",
         true,
@@ -311,7 +311,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0~M2",
+      "1.0~m2",
       Utils.convertToDebianVersion(
         "1.0-M2",
         true,
@@ -322,7 +322,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0~M3",
+      "1.0~m3",
       Utils.convertToDebianVersion(
         "1.0M3",
         true,
@@ -345,7 +345,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0+prj+3~SNAPSHOT",
+      "1.0+prj+3~snapshot",
       Utils.convertToDebianVersion(
         "1.0-prj_3+SNAPSHOT",
         false,
@@ -356,7 +356,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0+prj+3~SNAPSHOT",
+      "1.0+prj+3~snapshot",
       Utils.convertToDebianVersion(
         "1.0-prj_3-SNAPSHOT",
         false,
@@ -378,7 +378,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0+prj+3~RC2",
+      "1.0+prj+3~rc2",
       Utils.convertToDebianVersion(
         "1.0-prj_3-RC2",
         true,
@@ -400,7 +400,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0+prj+3~Beta+4",
+      "1.0+prj+3~beta+4",
       Utils.convertToDebianVersion(
         "1.0-prj_3.Beta-4",
         true,
@@ -455,7 +455,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0+prj+3~M1",
+      "1.0+prj+3~m1",
       Utils.convertToDebianVersion(
         "1.0-prj_3.M1",
         true,
@@ -466,7 +466,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0+prj+3~M2",
+      "1.0+prj+3~m2",
       Utils.convertToDebianVersion(
         "1.0-prj_3-M2",
         true,
@@ -477,7 +477,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0+prj~M3",
+      "1.0+prj~m3",
       Utils.convertToDebianVersion(
         "1.0-prj_M3",
         true,
@@ -489,7 +489,7 @@ public final class UtilsTestCase extends Assert {
 
     assertEquals(
       "should match",
-      "1.0+prj+~M3",
+      "1.0+prj+~m3",
       Utils.convertToDebianVersion(
         "1.0-prj__-M3",
         true,
@@ -500,7 +500,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0+prj+.+~M3",
+      "1.0+prj+.+~m3",
       Utils.convertToDebianVersion(
         "1.0-prj_._-M3",
         true,
@@ -511,7 +511,7 @@ public final class UtilsTestCase extends Assert {
     );
     assertEquals(
       "should match",
-      "1.0+prj+3+~M3",
+      "1.0+prj+3+~m3",
       Utils.convertToDebianVersion(
         "1.0-prj_3:M3",
         true,
@@ -589,8 +589,10 @@ public final class UtilsTestCase extends Assert {
     );
   }
 
+  @Test
   public void testVersionConversionWithTemplate() {
     Calendar cal = new GregorianCalendar(2013, Calendar.FEBRUARY, 17);
+    cal.setTimeZone(TimeZone.getTimeZone("UTC"));
     assertEquals(
       "should match",
       "1.0~20130217000000",
