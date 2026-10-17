@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,9 @@ package org.vafer.jdeb;
 
 public class NullConsole implements Console {
 
-    public void debug(String message) {
-    }
+  public void debug(String message) {}
 
-    public void info(String message) {
-    }
+  public void info(String message) {}
 
-    public void warn(String message) {
-    }
+  public void warn(String message) {}
 }

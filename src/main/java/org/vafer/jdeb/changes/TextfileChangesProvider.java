@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.TimeZone;
-
 import org.vafer.jdeb.debian.BinaryPackageControlFile;
 
 /**
@@ -46,118 +45,159 @@ import org.vafer.jdeb.debian.BinaryPackageControlFile;
  */
 public final class TextfileChangesProvider implements ChangesProvider {
 
-    private final ChangeSet[] changeSets;
+  private final ChangeSet[] changeSets;
 
-    private final DateFormat fmt;
+  private final DateFormat fmt;
 
-    @Deprecated
-    public TextfileChangesProvider( final InputStream pInput, final BinaryPackageControlFile packageControlFile ) throws IOException, ParseException {
-        this(pInput, packageControlFile, null, Charset.defaultCharset());
+  @Deprecated
+  public TextfileChangesProvider(
+    final InputStream pInput,
+    final BinaryPackageControlFile packageControlFile
+  ) throws IOException, ParseException {
+    this(pInput, packageControlFile, null, Charset.defaultCharset());
+  }
+
+  @Deprecated
+  public TextfileChangesProvider(
+    final InputStream pInput,
+    final BinaryPackageControlFile packageControlFile,
+    final Long outputTimestampMs
+  ) throws IOException, ParseException {
+    this(
+      pInput,
+      packageControlFile,
+      outputTimestampMs,
+      Charset.defaultCharset()
+    );
+  }
+
+  public TextfileChangesProvider(
+    final InputStream pInput,
+    final BinaryPackageControlFile packageControlFile,
+    final Charset encoding
+  ) throws IOException, ParseException {
+    this(pInput, packageControlFile, null, encoding);
+  }
+
+  public TextfileChangesProvider(
+    final InputStream pInput,
+    final BinaryPackageControlFile packageControlFile,
+    final Long outputTimestampMs,
+    final Charset encoding
+  ) throws IOException, ParseException {
+    fmt = new SimpleDateFormat("HH:mm dd.MM.yyyy");
+    if (outputTimestampMs != null) {
+      fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    @Deprecated
-    public TextfileChangesProvider( final InputStream pInput, final BinaryPackageControlFile packageControlFile, final Long outputTimestampMs ) throws IOException, ParseException {
-        this(pInput, packageControlFile, outputTimestampMs, Charset.defaultCharset());
-    }
+    final BufferedReader reader = new BufferedReader(
+      new InputStreamReader(pInput, encoding)
+    );
 
-    public TextfileChangesProvider( final InputStream pInput, final BinaryPackageControlFile packageControlFile, final Charset encoding ) throws IOException, ParseException {
-        this(pInput, packageControlFile, null, encoding);
-    }
+    String packageName = packageControlFile.get("Package");
+    String version = packageControlFile.get("Version");
+    Date date =
+      outputTimestampMs == null ? new Date() : new Date(outputTimestampMs);
+    String distribution = packageControlFile.get("Distribution");
+    String urgency = packageControlFile.get("Urgency");
+    String changedBy = packageControlFile.get("Maintainer");
+    Collection<String> changesColl = new ArrayList<>();
+    Collection<ChangeSet> changeSetColl = new ArrayList<>();
 
-    public TextfileChangesProvider( final InputStream pInput, final BinaryPackageControlFile packageControlFile, final Long outputTimestampMs, final Charset encoding ) throws IOException, ParseException {
+    while (true) {
+      final String line = reader.readLine();
+      if (line == null) {
+        final String[] changes = changesColl.toArray(
+          new String[changesColl.size()]
+        );
+        final ChangeSet changeSet = new ChangeSet(
+          packageName,
+          version,
+          date,
+          distribution,
+          urgency,
+          changedBy,
+          changes
+        );
+        changeSetColl.add(changeSet);
+        break;
+      }
 
-        fmt = new SimpleDateFormat("HH:mm dd.MM.yyyy");
-        if (outputTimestampMs != null) {
-            fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
+      if (line.startsWith("release ")) {
+        if (changesColl.size() > 0) {
+          final String[] changes = changesColl.toArray(
+            new String[changesColl.size()]
+          );
+          final ChangeSet changeSet = new ChangeSet(
+            packageName,
+            version,
+            date,
+            distribution,
+            urgency,
+            changedBy,
+            changes
+          );
+          changeSetColl.add(changeSet);
+          changesColl.clear();
         }
 
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput, encoding));
+        final String[] tokens = line.substring("release ".length()).split(",");
+        for (String token : tokens) {
+          final String[] lr = token.trim().split("=");
+          final String key = lr[0];
+          final String value = lr[1];
 
-        String packageName = packageControlFile.get("Package");
-        String version = packageControlFile.get("Version");
-        Date date = outputTimestampMs == null ? new Date() : new Date(outputTimestampMs);
-        String distribution = packageControlFile.get("Distribution");
-        String urgency = packageControlFile.get("Urgency");
-        String changedBy = packageControlFile.get("Maintainer");
-        Collection<String> changesColl = new ArrayList<>();
-        Collection<ChangeSet> changeSetColl = new ArrayList<>();
-
-
-        while (true) {
-            final String line = reader.readLine();
-            if (line == null) {
-                final String[] changes = changesColl.toArray(new String[changesColl.size()]);
-                final ChangeSet changeSet = new ChangeSet(packageName, version, date, distribution, urgency, changedBy, changes);
-                changeSetColl.add(changeSet);
-                break;
-            }
-
-            if (line.startsWith("release ")) {
-
-                if (changesColl.size() > 0) {
-                    final String[] changes = changesColl.toArray(new String[changesColl.size()]);
-                    final ChangeSet changeSet = new ChangeSet(packageName, version, date, distribution, urgency, changedBy, changes);
-                    changeSetColl.add(changeSet);
-                    changesColl.clear();
-                }
-
-                final String[] tokens = line.substring("release ".length()).split(",");
-                for (String token : tokens) {
-                    final String[] lr = token.trim().split("=");
-                    final String key = lr[0];
-                    final String value = lr[1];
-
-                    if ("urgency".equals(key)) {
-                        urgency = value;
-                    } else if ("by".equals(key)) {
-                        changedBy = value;
-                    } else if ("date".equals(key)) {
-                        date = fmt.parse(value);
-                    } else if ("version".equals(key)) {
-                        version = value;
-                    } else if ("distribution".equals(key)) {
-                        distribution = value;
-                    }
-                }
-                continue;
-            }
-
-            if (line.startsWith(" * ")) {
-                changesColl.add(line.substring(" * ".length()));
-                continue;
-            }
-
-            throw new ParseException("Unknown line syntax [" + line + "]", 0);
+          if ("urgency".equals(key)) {
+            urgency = value;
+          } else if ("by".equals(key)) {
+            changedBy = value;
+          } else if ("date".equals(key)) {
+            date = fmt.parse(value);
+          } else if ("version".equals(key)) {
+            version = value;
+          } else if ("distribution".equals(key)) {
+            distribution = value;
+          }
         }
+        continue;
+      }
 
-        reader.close();
+      if (line.startsWith(" * ")) {
+        changesColl.add(line.substring(" * ".length()));
+        continue;
+      }
 
-        changeSets = changeSetColl.toArray(new ChangeSet[changeSetColl.size()]);
+      throw new ParseException("Unknown line syntax [" + line + "]", 0);
     }
 
-    public void save(OutputStream pOutput) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(pOutput));
+    reader.close();
 
-        for (ChangeSet changeSet : changeSets) {
-            writer.write("release ");
-            writer.write("date=" + fmt.format(changeSet.getDate()) + ",");
-            writer.write("version=" + changeSet.getVersion() + ",");
-            writer.write("urgency=" + changeSet.getUrgency() + ",");
-            writer.write("by=" + changeSet.getChangedBy() + ",");
-            writer.write("distribution=" + changeSet.getDistribution());
-            writer.write("\n");
+    changeSets = changeSetColl.toArray(new ChangeSet[changeSetColl.size()]);
+  }
 
-            for (String change : changeSet.getChanges()) {
-                writer.write(" * ");
-                writer.write(change);
-                writer.write("\n");
-            }
-        }
+  public void save(OutputStream pOutput) throws IOException {
+    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(pOutput));
 
-        writer.close();
+    for (ChangeSet changeSet : changeSets) {
+      writer.write("release ");
+      writer.write("date=" + fmt.format(changeSet.getDate()) + ",");
+      writer.write("version=" + changeSet.getVersion() + ",");
+      writer.write("urgency=" + changeSet.getUrgency() + ",");
+      writer.write("by=" + changeSet.getChangedBy() + ",");
+      writer.write("distribution=" + changeSet.getDistribution());
+      writer.write("\n");
+
+      for (String change : changeSet.getChanges()) {
+        writer.write(" * ");
+        writer.write(change);
+        writer.write("\n");
+      }
     }
 
-    public ChangeSet[] getChangesSets() {
-        return changeSets;
-    }
+    writer.close();
+  }
+
+  public ChangeSet[] getChangesSets() {
+    return changeSets;
+  }
 }

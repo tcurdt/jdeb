@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,30 +27,30 @@ import java.security.MessageDigest;
  */
 public class InformationOutputStream extends DigestOutputStream {
 
-    private final MessageDigest digest;
-    private long size;
+  private final MessageDigest digest;
+  private long size;
 
-    public InformationOutputStream( OutputStream pStream, MessageDigest pDigest ) {
-        super(pStream, pDigest);
-        digest = pDigest;
-        size = 0;
-    }
+  public InformationOutputStream(OutputStream pStream, MessageDigest pDigest) {
+    super(pStream, pDigest);
+    digest = pDigest;
+    size = 0;
+  }
 
-    public String getHexDigest() {
-        return Utils.toHex(digest.digest());
-    }
+  public String getHexDigest() {
+    return Utils.toHex(digest.digest());
+  }
 
-    public void write( byte[] b, int off, int len ) throws IOException {
-        super.write(b, off, len);
-        size += len;
-    }
+  public void write(byte[] b, int off, int len) throws IOException {
+    super.write(b, off, len);
+    size += len;
+  }
 
-    public void write( int b ) throws IOException {
-        super.write(b);
-        size++;
-    }
+  public void write(int b) throws IOException {
+    super.write(b);
+    size++;
+  }
 
-    public long getSize() {
-        return size;
-    }
+  public long getSize() {
+    return size;
+  }
 }

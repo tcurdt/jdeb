@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,5 @@ import java.io.IOException;
  * Provides Data to a DataConsumer.
  */
 public interface DataProducer {
-
-    void produce( DataConsumer receiver ) throws IOException;
-
+  void produce(DataConsumer receiver) throws IOException;
 }

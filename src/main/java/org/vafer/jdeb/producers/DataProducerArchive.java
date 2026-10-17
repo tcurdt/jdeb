@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -39,103 +38,106 @@ import org.vafer.jdeb.mapping.Mapper;
 /**
  * Providing data from an archive keeping permissions and ownerships.
  */
-public final class DataProducerArchive extends AbstractDataProducer implements DataProducer {
+public final class DataProducerArchive
+  extends AbstractDataProducer
+  implements DataProducer
+{
 
-    private final File archive;
+  private final File archive;
 
-    public DataProducerArchive( final File pArchive, final String[] pIncludes, final String[] pExcludes, final Mapper[] pMappers ) {
-        super(pIncludes, pExcludes, pMappers);
-        archive = pArchive;
+  public DataProducerArchive(
+    final File pArchive,
+    final String[] pIncludes,
+    final String[] pExcludes,
+    final Mapper[] pMappers
+  ) {
+    super(pIncludes, pExcludes, pMappers);
+    archive = pArchive;
+  }
+
+  public void produce(final DataConsumer pReceiver) throws IOException {
+    InputStream is = new BufferedInputStream(new FileInputStream(archive));
+
+    CompressorInputStream compressorInputStream = null;
+
+    try {
+      compressorInputStream =
+        new CompressorStreamFactory().createCompressorInputStream(is);
+    } catch (CompressorException e) {
+      // expected if the input file is a zip archive
     }
 
-    public void produce( final DataConsumer pReceiver ) throws IOException {
-
-        InputStream is = new BufferedInputStream(new FileInputStream(archive));
-
-        CompressorInputStream compressorInputStream = null;
-
-        try {
-            compressorInputStream = new CompressorStreamFactory().createCompressorInputStream(is);
-        } catch (CompressorException e) {
-            // expected if the input file is a zip archive
-        }
-
-        if (compressorInputStream != null) {
-            is = new BufferedInputStream(compressorInputStream);
-        }
-
-        ArchiveInputStream archiveInputStream;
-
-        try {
-            archiveInputStream = new ArchiveStreamFactory().createArchiveInputStream(is);
-        } catch (ArchiveException e) {
-            throw new IOException("Unsupported archive format: " + archive, e);
-        }
-
-        EntryConverter converter;
-
-        if (archiveInputStream instanceof TarArchiveInputStream) {
-
-            converter = entry -> (TarArchiveEntry) entry;
-
-        } else if (archiveInputStream instanceof ZipArchiveInputStream) {
-
-            converter = entry -> {
-                ZipArchiveEntry src = (ZipArchiveEntry) entry;
-                final TarArchiveEntry dst = new TarArchiveEntry(src.getName(), true);
-                //TODO: if (src.isUnixSymlink()) {
-                //}
-
-                dst.setSize(src.getSize());
-                dst.setMode(src.getUnixMode());
-                dst.setModTime(src.getTime());
-
-                return dst;
-            };
-
-        } else {
-            throw new IOException("Unsupported archive format: " + archive);
-        }
-
-
-        try {
-            while (true) {
-
-                ArchiveEntry archiveEntry = archiveInputStream.getNextEntry();
-
-                if (archiveEntry == null) {
-                    break;
-                }
-
-                if (!isIncluded(archiveEntry.getName())) {
-                    continue;
-                }
-
-                TarArchiveEntry entry = converter.convert(archiveEntry);
-
-                entry = map(entry);
-
-                if (entry.isSymbolicLink()) {
-                    pReceiver.onEachLink(entry);
-                    continue;
-                }
-
-                if (entry.isDirectory()) {
-                    pReceiver.onEachDir(entry);
-                    continue;
-                }
-
-                pReceiver.onEachFile(archiveInputStream, entry);
-            }
-
-        } finally {
-            if (archiveInputStream != null) {
-                archiveInputStream.close();
-            }
-        }
+    if (compressorInputStream != null) {
+      is = new BufferedInputStream(compressorInputStream);
     }
 
-    private interface EntryConverter {
-        TarArchiveEntry convert( ArchiveEntry entry );
+    ArchiveInputStream archiveInputStream;
+
+    try {
+      archiveInputStream = new ArchiveStreamFactory().createArchiveInputStream(
+        is
+      );
+    } catch (ArchiveException e) {
+      throw new IOException("Unsupported archive format: " + archive, e);
     }
+
+    EntryConverter converter;
+
+    if (archiveInputStream instanceof TarArchiveInputStream) {
+      converter = entry -> (TarArchiveEntry) entry;
+    } else if (archiveInputStream instanceof ZipArchiveInputStream) {
+      converter = entry -> {
+        ZipArchiveEntry src = (ZipArchiveEntry) entry;
+        final TarArchiveEntry dst = new TarArchiveEntry(src.getName(), true);
+        //TODO: if (src.isUnixSymlink()) {
+        //}
+
+        dst.setSize(src.getSize());
+        dst.setMode(src.getUnixMode());
+        dst.setModTime(src.getTime());
+
+        return dst;
+      };
+    } else {
+      throw new IOException("Unsupported archive format: " + archive);
+    }
+
+    try {
+      while (true) {
+        ArchiveEntry archiveEntry = archiveInputStream.getNextEntry();
+
+        if (archiveEntry == null) {
+          break;
+        }
+
+        if (!isIncluded(archiveEntry.getName())) {
+          continue;
+        }
+
+        TarArchiveEntry entry = converter.convert(archiveEntry);
+
+        entry = map(entry);
+
+        if (entry.isSymbolicLink()) {
+          pReceiver.onEachLink(entry);
+          continue;
+        }
+
+        if (entry.isDirectory()) {
+          pReceiver.onEachDir(entry);
+          continue;
+        }
+
+        pReceiver.onEachFile(archiveInputStream, entry);
+      }
+    } finally {
+      if (archiveInputStream != null) {
+        archiveInputStream.close();
+      }
+    }
+  }
+
+  private interface EntryConverter {
+    TarArchiveEntry convert(ArchiveEntry entry);
+  }
 }

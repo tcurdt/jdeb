@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,11 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 public final class NullMapper implements Mapper {
 
-    public static final Mapper INSTANCE = new NullMapper();
+  public static final Mapper INSTANCE = new NullMapper();
 
-    private NullMapper() {
-    }
+  private NullMapper() {}
 
-    public TarArchiveEntry map( final TarArchiveEntry pEntry ) {
-        return pEntry;
-    }
-
+  public TarArchiveEntry map(final TarArchiveEntry pEntry) {
+    return pEntry;
+  }
 }

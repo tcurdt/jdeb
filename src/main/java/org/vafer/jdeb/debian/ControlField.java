@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,104 +25,108 @@ import java.io.StringReader;
  */
 public class ControlField {
 
-    /**
-     * The format of a field.
-     */
-    public enum Type {
-        /** Value on a single line */
-        SIMPLE,
-        /** Value on multiple lines, space characters are ignored */
-        FOLDED,
-        /** Value on multiple lines, space characters are preserved */
-        MULTILINE
-    }
+  /**
+   * The format of a field.
+   */
+  public enum Type {
+    /** Value on a single line */
+    SIMPLE,
+    /** Value on multiple lines, space characters are ignored */
+    FOLDED,
+    /** Value on multiple lines, space characters are preserved */
+    MULTILINE,
+  }
 
-    /** The name of the field */
-    private final String name;
+  /** The name of the field */
+  private final String name;
 
-    /** Tells if the field is mandatory */
-    private final boolean mandatory;
+  /** Tells if the field is mandatory */
+  private final boolean mandatory;
 
-    /** The type of the field */
-    private final Type type;
+  /** The type of the field */
+  private final Type type;
 
-    /** Tells is the first line of the field must be empty (for MULTILINE values only) */
-    private final boolean firstLineEmpty;
+  /** Tells is the first line of the field must be empty (for MULTILINE values only) */
+  private final boolean firstLineEmpty;
 
+  public ControlField(String name) {
+    this(name, false);
+  }
 
-    public ControlField(String name) {
-        this(name, false);
-    }
+  public ControlField(String name, boolean mandatory) {
+    this(name, mandatory, Type.SIMPLE);
+  }
 
-    public ControlField(String name, boolean mandatory) {
-        this(name, mandatory, Type.SIMPLE);
-    }
+  public ControlField(String name, boolean mandatory, Type type) {
+    this(name, mandatory, type, false);
+  }
 
-    public ControlField(String name, boolean mandatory, Type type) {
-        this(name, mandatory, type, false);
-    }
+  public ControlField(
+    String name,
+    boolean mandatory,
+    Type type,
+    boolean firstLineEmpty
+  ) {
+    this.name = name;
+    this.mandatory = mandatory;
+    this.type = type;
+    this.firstLineEmpty = firstLineEmpty;
+  }
 
-    public ControlField(String name, boolean mandatory, Type type, boolean firstLineEmpty) {
-        this.name = name;
-        this.mandatory = mandatory;
-        this.type = type;
-        this.firstLineEmpty = firstLineEmpty;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public boolean isMandatory() {
+    return mandatory;
+  }
 
-    public boolean isMandatory() {
-        return mandatory;
-    }
+  public Type getType() {
+    return type;
+  }
 
-    public Type getType() {
-        return type;
-    }
+  public boolean isFirstLineEmpty() {
+    return firstLineEmpty;
+  }
 
-    public boolean isFirstLineEmpty() {
-        return firstLineEmpty;
-    }
+  /**
+   * Returns the field with the specified value properly formatted. Multiline
+   * values are automatically indented, and dots are added on the empty lines.
+   *
+   * <pre>
+   * Field-Name: value
+   * </pre>
+   */
+  public String format(String value) {
+    StringBuilder s = new StringBuilder();
 
-    /**
-     * Returns the field with the specified value properly formatted. Multiline
-     * values are automatically indented, and dots are added on the empty lines.
-     *
-     * <pre>
-     * Field-Name: value
-     * </pre>
-     */
-    public String format(String value) {
-        StringBuilder s = new StringBuilder();
+    if (value != null && value.trim().length() > 0) {
+      boolean continuationLine = false;
 
-        if (value != null && value.trim().length() > 0) {
-            boolean continuationLine = false;
+      s.append(getName()).append(":");
+      if (isFirstLineEmpty()) {
+        s.append("\n");
+        continuationLine = true;
+      }
 
-            s.append(getName()).append(":");
-            if (isFirstLineEmpty()) {
-                s.append("\n");
-                continuationLine = true;
-            }
+      try {
+        BufferedReader reader = new BufferedReader(new StringReader(value));
+        String line;
+        while ((line = reader.readLine()) != null) {
+          if (continuationLine && line.trim().length() == 0) {
+            // put a dot on the empty continuation lines
+            s.append(" .\n");
+          } else {
+            s.append(" ").append(line).append("\n");
+          }
 
-            try {
-                BufferedReader reader = new BufferedReader(new StringReader(value));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    if (continuationLine && line.trim().length() == 0) {
-                        // put a dot on the empty continuation lines
-                        s.append(" .\n");
-                    } else {
-                        s.append(" ").append(line).append("\n");
-                    }
-
-                    continuationLine = true;
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+          continuationLine = true;
         }
-
-        return s.toString();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
+
+    return s.toString();
+  }
 }

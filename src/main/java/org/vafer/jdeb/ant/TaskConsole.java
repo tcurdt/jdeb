@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,26 +26,25 @@ import org.vafer.jdeb.Console;
  */
 class TaskConsole implements Console {
 
-    private final Task task;
-    private final boolean verbose;
+  private final Task task;
+  private final boolean verbose;
 
-    public TaskConsole(Task task, boolean verbose) {
-        this.task = task;
-        this.verbose = verbose;
+  public TaskConsole(Task task, boolean verbose) {
+    this.task = task;
+    this.verbose = verbose;
+  }
+
+  public void debug(String message) {
+    if (verbose) {
+      task.log(message);
     }
+  }
 
-    public void debug(String message) {
-        if (verbose) {
-            task.log(message);
-        }
-    }
+  public void info(String message) {
+    task.log(message);
+  }
 
-    public void info(String message) {
-        task.log(message);
-    }
-
-    public void warn(String message) {
-        task.log(message, Project.MSG_WARN);
-    }
-
+  public void warn(String message) {
+    task.log(message, Project.MSG_WARN);
+  }
 }

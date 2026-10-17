@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,30 @@
 package org.vafer.jdeb.producers;
 
 import java.io.IOException;
-
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
 
-public class DataProducerPathTemplate extends AbstractDataProducer implements DataProducer {
+public class DataProducerPathTemplate
+  extends AbstractDataProducer
+  implements DataProducer
+{
 
-    private final String[] literalPaths;
+  private final String[] literalPaths;
 
-    public DataProducerPathTemplate( String[] pLiteralPaths, String[] pIncludes, String[] pExcludes, Mapper[] pMapper ) {
-        super(pIncludes, pExcludes, pMapper);
-        literalPaths = pLiteralPaths;
+  public DataProducerPathTemplate(
+    String[] pLiteralPaths,
+    String[] pIncludes,
+    String[] pExcludes,
+    Mapper[] pMapper
+  ) {
+    super(pIncludes, pExcludes, pMapper);
+    literalPaths = pLiteralPaths;
+  }
+
+  public void produce(DataConsumer pReceiver) throws IOException {
+    for (String literalPath : literalPaths) {
+      produceDir(pReceiver, literalPath);
     }
-
-    public void produce( DataConsumer pReceiver ) throws IOException {
-        for (String literalPath : literalPaths) {
-            produceDir(pReceiver, literalPath);
-        }
-    }
-
+  }
 }

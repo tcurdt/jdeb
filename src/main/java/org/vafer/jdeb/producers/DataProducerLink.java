@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.vafer.jdeb.producers;
 
 import java.io.IOException;
-
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
@@ -26,35 +25,47 @@ import org.vafer.jdeb.mapping.Mapper;
  * DataProducer representing a single file
  * For cross-platform permissions and ownerships you probably want to use a Mapper, too.
  */
-public final class DataProducerLink extends AbstractDataProducer implements DataProducer {
+public final class DataProducerLink
+  extends AbstractDataProducer
+  implements DataProducer
+{
 
-    private final String path;
-    private final String linkName;
-    private final boolean symlink;
+  private final String path;
+  private final String linkName;
+  private final boolean symlink;
 
-    public DataProducerLink(final String path, final String linkName, final boolean symlink, String[] pIncludes, String[] pExcludes, Mapper[] pMapper) {
-        super(pIncludes, pExcludes, pMapper);
-        this.path = path;
-        this.symlink = symlink;
-        this.linkName = linkName;
-    }
+  public DataProducerLink(
+    final String path,
+    final String linkName,
+    final boolean symlink,
+    String[] pIncludes,
+    String[] pExcludes,
+    Mapper[] pMapper
+  ) {
+    super(pIncludes, pExcludes, pMapper);
+    this.path = path;
+    this.symlink = symlink;
+    this.linkName = linkName;
+  }
 
-    public void produce( final DataConsumer pReceiver ) throws IOException {
-        TarArchiveEntry entry = new TarArchiveEntry(path, symlink ? TarArchiveEntry.LF_SYMLINK : TarArchiveEntry.LF_LINK);
-        entry.setLinkName(linkName);
+  public void produce(final DataConsumer pReceiver) throws IOException {
+    TarArchiveEntry entry = new TarArchiveEntry(
+      path,
+      symlink ? TarArchiveEntry.LF_SYMLINK : TarArchiveEntry.LF_LINK
+    );
+    entry.setLinkName(linkName);
 
-        entry.setUserId(Producers.ROOT_UID);
-        entry.setUserName(Producers.ROOT_NAME);
-        entry.setGroupId(Producers.ROOT_UID);
-        entry.setGroupName(Producers.ROOT_NAME);
-        entry.setMode(TarArchiveEntry.DEFAULT_FILE_MODE);
+    entry.setUserId(Producers.ROOT_UID);
+    entry.setUserName(Producers.ROOT_NAME);
+    entry.setGroupId(Producers.ROOT_UID);
+    entry.setGroupName(Producers.ROOT_NAME);
+    entry.setMode(TarArchiveEntry.DEFAULT_FILE_MODE);
 
-        entry = map(entry);
+    entry = map(entry);
 
-        entry.setName(path);
-        entry.setLinkName(linkName);
+    entry.setName(path);
+    entry.setLinkName(linkName);
 
-        pReceiver.onEachLink(entry);
-    }
-
+    pReceiver.onEachLink(entry);
+  }
 }

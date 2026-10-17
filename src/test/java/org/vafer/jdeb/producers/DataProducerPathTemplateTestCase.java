@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,106 +19,116 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.junit.Test;
-import org.junit.Assert;
-
-
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.junit.Assert;
+import org.junit.Test;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
 
 public final class DataProducerPathTemplateTestCase extends Assert {
 
-    private static final String[] INCLUDES = { };
-    private static final String[] EXCLUDES = { };
+  private static final String[] INCLUDES = {};
+  private static final String[] EXCLUDES = {};
 
-    private CaptureDataConsumer captureDataConsumer = new CaptureDataConsumer();
+  private CaptureDataConsumer captureDataConsumer = new CaptureDataConsumer();
 
-    private Mapper[] mappers = new Mapper[0];
-    private DataProducer dataProducer;
+  private Mapper[] mappers = new Mapper[0];
+  private DataProducer dataProducer;
 
-    @Test
-    public void testTypical() throws Exception {
+  @Test
+  public void testTypical() throws Exception {
+    String[] paths = { "/var/log/", "/var/lib/" };
+    dataProducer = new DataProducerPathTemplate(
+      paths,
+      INCLUDES,
+      EXCLUDES,
+      mappers
+    );
+    dataProducer.produce(captureDataConsumer);
 
-        String[] paths = { "/var/log/", "/var/lib/" };
-        dataProducer = new DataProducerPathTemplate(paths, INCLUDES, EXCLUDES, mappers);
-        dataProducer.produce(captureDataConsumer);
+    assertEquals(2, captureDataConsumer.invocations.size());
 
-        assertEquals(2, captureDataConsumer.invocations.size());
+    CaptureDataConsumer.Invocation invocation =
+      captureDataConsumer.invocations.get(0);
+    assertEquals("/var/log/", invocation.dirname);
+    assertEquals(0, invocation.gid);
+    assertEquals("root", invocation.group);
+    assertEquals("", invocation.linkname);
+    assertEquals(TarArchiveEntry.DEFAULT_DIR_MODE, invocation.mode);
+    assertEquals(0, invocation.size);
+    assertEquals(0, invocation.uid);
+    assertEquals("root", invocation.user);
 
-        CaptureDataConsumer.Invocation invocation = captureDataConsumer.invocations.get(0);
-        assertEquals("/var/log/", invocation.dirname);
-        assertEquals(0, invocation.gid);
-        assertEquals("root", invocation.group);
-        assertEquals("", invocation.linkname);
-        assertEquals(TarArchiveEntry.DEFAULT_DIR_MODE, invocation.mode);
-        assertEquals(0, invocation.size);
-        assertEquals(0, invocation.uid);
-        assertEquals("root", invocation.user);
+    invocation = captureDataConsumer.invocations.get(1);
+    assertEquals("/var/lib/", invocation.dirname);
+    assertEquals(0, invocation.gid);
+    assertEquals("root", invocation.group);
+    assertEquals("", invocation.linkname);
+    assertEquals(TarArchiveEntry.DEFAULT_DIR_MODE, invocation.mode);
+    assertEquals(0, invocation.size);
+    assertEquals(0, invocation.uid);
+    assertEquals("root", invocation.user);
+  }
 
-        invocation = captureDataConsumer.invocations.get(1);
-        assertEquals("/var/lib/", invocation.dirname);
-        assertEquals(0, invocation.gid);
-        assertEquals("root", invocation.group);
-        assertEquals("", invocation.linkname);
-        assertEquals(TarArchiveEntry.DEFAULT_DIR_MODE, invocation.mode);
-        assertEquals(0, invocation.size);
-        assertEquals(0, invocation.uid);
-        assertEquals("root", invocation.user);
+  public static class CaptureDataConsumer implements DataConsumer {
+
+    private List<Invocation> invocations;
+
+    public CaptureDataConsumer() {
+      invocations = new ArrayList<>();
     }
 
-    public static class CaptureDataConsumer implements DataConsumer {
-
-        private List<Invocation> invocations;
-
-        public CaptureDataConsumer() {
-            invocations = new ArrayList<>();
-        }
-
-        public void onEachDir(TarArchiveEntry dirEntry) throws IOException {
-            invocations.add(new Invocation(
-                dirEntry.getName(),
-                dirEntry.getLinkName(),
-                dirEntry.getUserName(),
-                dirEntry.getLongUserId(),
-                dirEntry.getGroupName(),
-                dirEntry.getLongGroupId(),
-                dirEntry.getMode(),
-                dirEntry.getSize()
-            ));
-        }
-
-        public void onEachFile(InputStream input, TarArchiveEntry entry) throws IOException {
-        }
-
-        public void onEachLink(TarArchiveEntry entry) throws IOException {
-        }
-
-        private class Invocation {
-
-            private String dirname;
-            private String linkname;
-            private String user;
-            private long uid;
-            private String group;
-            private long gid;
-            private int mode;
-            private long size;
-
-            private Invocation( String dirname, String linkname, String user, long uid, String group, long gid, int mode, long size ) throws IOException {
-                this.dirname = dirname;
-                this.linkname = linkname;
-                this.user = user;
-                this.uid = uid;
-                this.group = group;
-                this.gid = gid;
-                this.mode = mode;
-                this.size = size;
-            }
-
-        }
-
+    public void onEachDir(TarArchiveEntry dirEntry) throws IOException {
+      invocations.add(
+        new Invocation(
+          dirEntry.getName(),
+          dirEntry.getLinkName(),
+          dirEntry.getUserName(),
+          dirEntry.getLongUserId(),
+          dirEntry.getGroupName(),
+          dirEntry.getLongGroupId(),
+          dirEntry.getMode(),
+          dirEntry.getSize()
+        )
+      );
     }
+
+    public void onEachFile(InputStream input, TarArchiveEntry entry)
+      throws IOException {}
+
+    public void onEachLink(TarArchiveEntry entry) throws IOException {}
+
+    private class Invocation {
+
+      private String dirname;
+      private String linkname;
+      private String user;
+      private long uid;
+      private String group;
+      private long gid;
+      private int mode;
+      private long size;
+
+      private Invocation(
+        String dirname,
+        String linkname,
+        String user,
+        long uid,
+        String group,
+        long gid,
+        int mode,
+        long size
+      ) throws IOException {
+        this.dirname = dirname;
+        this.linkname = linkname;
+        this.user = user;
+        this.uid = uid;
+        this.group = group;
+        this.gid = gid;
+        this.mode = mode;
+        this.size = size;
+      }
+    }
+  }
 }

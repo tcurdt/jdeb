@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,22 +22,21 @@ import java.io.IOException;
  * Simple utilities to deal with symbolic links
  */
 public final class SymlinkUtils {
-    private SymlinkUtils() {
-    }
 
-    public static boolean isSymbolicLink(final File file) throws IOException {
-        final File canon;
-        if (file.getParent() == null) {
-            canon = file;
-        } else {
-            final File canonDir = file.getParentFile().getCanonicalFile();
-            canon = new File(canonDir, file.getName());
-        }
-        return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
-    }
+  private SymlinkUtils() {}
 
-    public static String readSymbolicLink(final File file) throws IOException {
-        return file.getCanonicalFile().getPath();
+  public static boolean isSymbolicLink(final File file) throws IOException {
+    final File canon;
+    if (file.getParent() == null) {
+      canon = file;
+    } else {
+      final File canonDir = file.getParentFile().getCanonicalFile();
+      canon = new File(canonDir, file.getName());
     }
+    return !canon.getCanonicalFile().equals(canon.getAbsoluteFile());
+  }
 
+  public static String readSymbolicLink(final File file) throws IOException {
+    return file.getCanonicalFile().getPath();
+  }
 }

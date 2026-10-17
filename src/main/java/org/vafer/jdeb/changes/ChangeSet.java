@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,69 +36,85 @@ import java.util.Date;
  */
 public final class ChangeSet {
 
-    private final String packageName;
-    private final String version;
-    private final Date date;
-    private final String distribution;
-    private final String urgency;
-    private final String changedBy;
-    private final String[] changes;
+  private final String packageName;
+  private final String version;
+  private final Date date;
+  private final String distribution;
+  private final String urgency;
+  private final String changedBy;
+  private final String[] changes;
 
-    public ChangeSet(String packageName, String version, Date date, String distribution, String urgency, String changedBy, String[] changes) {
-        this.packageName = packageName;
-        this.version = version;
-        this.date = date;
-        this.distribution = distribution;
-        this.urgency = urgency;
-        this.changedBy = changedBy;
-        this.changes = changes;
+  public ChangeSet(
+    String packageName,
+    String version,
+    Date date,
+    String distribution,
+    String urgency,
+    String changedBy,
+    String[] changes
+  ) {
+    this.packageName = packageName;
+    this.version = version;
+    this.date = date;
+    this.distribution = distribution;
+    this.urgency = urgency;
+    this.changedBy = changedBy;
+    this.changes = changes;
+  }
+
+  public String getPackage() {
+    return packageName;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public Date getDate() {
+    return date;
+  }
+
+  public String getDistribution() {
+    return distribution;
+  }
+
+  public String getUrgency() {
+    return urgency;
+  }
+
+  public String getChangedBy() {
+    return changedBy;
+  }
+
+  public String[] getChanges() {
+    return changes;
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append(getTitle()).append('\n');
+
+    if (changes.length > 0) {
+      sb.append("\n");
     }
 
-    public String getPackage() {
-        return packageName;
+    for (String change : changes) {
+      sb.append("  * ").append(change).append('\n');
     }
 
-    public String getVersion() {
-        return version;
-    }
+    return sb.toString();
+  }
 
-    public Date getDate() {
-        return date;
-    }
-
-    public String getDistribution() {
-        return distribution;
-    }
-
-    public String getUrgency() {
-        return urgency;
-    }
-
-    public String getChangedBy() {
-        return changedBy;
-    }
-
-    public String[] getChanges() {
-        return changes;
-    }
-
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(getTitle()).append('\n');
-
-        if (changes.length > 0) {
-            sb.append("\n");
-        }
-
-        for (String change : changes) {
-            sb.append("  * ").append(change).append('\n');
-        }
-
-        return sb.toString();
-    }
-
-    private String getTitle() {
-        return getPackage() + " (" + getVersion() + ") " + getDistribution() + "; urgency=" + getUrgency();
-    }
+  private String getTitle() {
+    return (
+      getPackage() +
+      " (" +
+      getVersion() +
+      ") " +
+      getDistribution() +
+      "; urgency=" +
+      getUrgency()
+    );
+  }
 }

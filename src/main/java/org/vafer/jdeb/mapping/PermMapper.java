@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,73 +23,101 @@ import org.vafer.jdeb.utils.Utils;
  */
 public final class PermMapper implements Mapper {
 
-    private final int strip;
-    private final String prefix;
-    private int uid = -1;
-    private int gid = -1;
-    private String user;
-    private String group;
-    private int fileMode = -1;
-    private int dirMode = -1;
+  private final int strip;
+  private final String prefix;
+  private int uid = -1;
+  private int gid = -1;
+  private String user;
+  private String group;
+  private int fileMode = -1;
+  private int dirMode = -1;
 
-    public static int toMode( String modeString ) {
-        if (modeString != null && modeString.length() > 0) {
-            try {
-              return Integer.parseInt(modeString, 8);
-            } catch(NumberFormatException e) {
-              System.err.println("Invalid mode string: " + modeString);
-              return -1;
-            }
-        }
+  public static int toMode(String modeString) {
+    if (modeString != null && modeString.length() > 0) {
+      try {
+        return Integer.parseInt(modeString, 8);
+      } catch (NumberFormatException e) {
+        System.err.println("Invalid mode string: " + modeString);
         return -1;
+      }
+    }
+    return -1;
+  }
+
+  public PermMapper(
+    int uid,
+    int gid,
+    String user,
+    String group,
+    int fileMode,
+    int dirMode,
+    int strip,
+    String prefix
+  ) {
+    this.strip = strip;
+    this.prefix = prefix == null ? "" : prefix;
+    this.uid = uid;
+    this.gid = gid;
+    this.user = user;
+    this.group = group;
+    this.fileMode = fileMode;
+    this.dirMode = dirMode;
+  }
+
+  public PermMapper(
+    int uid,
+    int gid,
+    String user,
+    String group,
+    String fileMode,
+    String dirMode,
+    int strip,
+    String prefix
+  ) {
+    this(
+      uid,
+      gid,
+      user,
+      group,
+      toMode(fileMode),
+      toMode(dirMode),
+      strip,
+      prefix
+    );
+  }
+
+  public TarArchiveEntry map(final TarArchiveEntry entry) {
+    entry.setName(
+      Utils.stripLeadingSlash(
+        Utils.joinUnixPath(prefix, Utils.stripPath(strip, entry.getName()))
+      )
+    );
+
+    // Set ownership
+    if (uid > -1) {
+      entry.setUserId(uid);
+    }
+    if (gid > -1) {
+      entry.setGroupId(gid);
+    }
+    if (user != null) {
+      entry.setUserName(user);
+    }
+    if (group != null) {
+      entry.setGroupName(group);
     }
 
-    public PermMapper( int uid, int gid, String user, String group, int fileMode, int dirMode, int strip, String prefix ) {
-        this.strip = strip;
-        this.prefix = (prefix == null) ? "" : prefix;
-        this.uid = uid;
-        this.gid = gid;
-        this.user = user;
-        this.group = group;
-        this.fileMode = fileMode;
-        this.dirMode = dirMode;
+    // Set permissions
+    if (entry.isDirectory()) {
+      if (dirMode > -1) {
+        entry.setMode(dirMode);
+      }
+    } else {
+      if (fileMode > -1) {
+        entry.setMode(fileMode);
+      }
     }
 
-    public PermMapper( int uid, int gid, String user, String group, String fileMode, String dirMode, int strip, String prefix ) {
-        this(uid, gid, user, group, toMode(fileMode), toMode(dirMode), strip, prefix);
-    }
-
-    public TarArchiveEntry map( final TarArchiveEntry entry ) {
-        entry.setName(Utils.stripLeadingSlash(Utils.joinUnixPath(
-            prefix,
-            Utils.stripPath(strip, entry.getName())
-        )));
-
-        // Set ownership
-        if (uid > -1) {
-            entry.setUserId(uid);
-        }
-        if (gid > -1) {
-            entry.setGroupId(gid);
-        }
-        if (user != null) {
-            entry.setUserName(user);
-        }
-        if (group != null) {
-            entry.setGroupName(group);
-        }
-
-        // Set permissions
-        if (entry.isDirectory()) {
-            if (dirMode > -1) {
-                entry.setMode(dirMode);
-            }
-        } else {
-            if (fileMode > -1) {
-                entry.setMode(fileMode);
-            }
-        }
-
-        return entry;
-    }
+    return entry;
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package org.vafer.jdeb.maven;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
 import org.apache.maven.plugins.annotations.Parameter;
 import org.vafer.jdeb.mapping.LsMapper;
 import org.vafer.jdeb.mapping.NullMapper;
@@ -31,53 +30,59 @@ import org.vafer.jdeb.mapping.PermMapper;
  */
 public final class Mapper {
 
-    @Parameter(required = true)
-    private String type;
+  @Parameter(required = true)
+  private String type;
 
-    @Parameter
-    private int uid = -1;
+  @Parameter
+  private int uid = -1;
 
-    @Parameter
-    private int gid = -1;
+  @Parameter
+  private int gid = -1;
 
-    @Parameter
-    private String user;
+  @Parameter
+  private String user;
 
-    @Parameter
-    private String group;
+  @Parameter
+  private String group;
 
-    @Parameter
-    private String filemode;
+  @Parameter
+  private String filemode;
 
-    @Parameter
-    private String dirmode;
+  @Parameter
+  private String dirmode;
 
-    @Parameter
-    private String prefix;
+  @Parameter
+  private String prefix;
 
-    @Parameter
-    private int strip;
+  @Parameter
+  private int strip;
 
-    @Parameter
-    private File src;
+  @Parameter
+  private File src;
 
-
-    public org.vafer.jdeb.mapping.Mapper createMapper() throws IOException {
-
-        if ("ls".equalsIgnoreCase(type)) {
-            try {
-                return new LsMapper(new FileInputStream(src));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        if ("perm".equalsIgnoreCase(type)) {
-            return new PermMapper(uid, gid, user, group, filemode, dirmode, strip, prefix);
-        }
-
-        /* NullMapper required for DataProducerPathTemplate */
-        return NullMapper.INSTANCE;
+  public org.vafer.jdeb.mapping.Mapper createMapper() throws IOException {
+    if ("ls".equalsIgnoreCase(type)) {
+      try {
+        return new LsMapper(new FileInputStream(src));
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
 
+    if ("perm".equalsIgnoreCase(type)) {
+      return new PermMapper(
+        uid,
+        gid,
+        user,
+        group,
+        filemode,
+        dirmode,
+        strip,
+        prefix
+      );
+    }
+
+    /* NullMapper required for DataProducerPathTemplate */
+    return NullMapper.INSTANCE;
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.vafer.jdeb;
 
 import java.io.OutputStream;
-
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
@@ -25,56 +24,65 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
  * Compression method used for the data file.
  */
 public enum Compression {
+  NONE(""),
+  GZIP(".gz"),
+  BZIP2(".bz2"),
+  XZ(".xz");
 
-    NONE(""),
-    GZIP(".gz"),
-    BZIP2(".bz2"),
-    XZ(".xz");
+  private String extension;
 
-    private String extension;
+  Compression(String extension) {
+    this.extension = extension;
+  }
 
-    Compression(String extension) {
-        this.extension = extension;
+  /**
+   * Returns the extension of the compression method
+   */
+  public String getExtension() {
+    return extension;
+  }
+
+  public OutputStream toCompressedOutputStream(OutputStream out)
+    throws CompressorException {
+    switch (this) {
+      case GZIP:
+        return new CompressorStreamFactory().createCompressorOutputStream(
+          "gz",
+          out
+        );
+      case BZIP2:
+        return new CompressorStreamFactory().createCompressorOutputStream(
+          "bzip2",
+          out
+        );
+      case XZ:
+        return new CompressorStreamFactory().createCompressorOutputStream(
+          "xz",
+          out
+        );
+      default:
+        return out;
     }
+  }
 
-    /**
-     * Returns the extension of the compression method
-     */
-    public String getExtension() {
-        return extension;
+  /**
+   * Returns the compression method corresponding to the specified name.
+   * The matching is case insensitive.
+   *
+   * @param name the name of the compression method
+   * @return the compression method, or null if not recognized
+   */
+  public static Compression toEnum(String name) {
+    if ("gzip".equalsIgnoreCase(name) || "gz".equalsIgnoreCase(name)) {
+      return GZIP;
+    } else if ("bzip2".equalsIgnoreCase(name) || "bz2".equalsIgnoreCase(name)) {
+      return BZIP2;
+    } else if ("xz".equalsIgnoreCase(name)) {
+      return XZ;
+    } else if ("none".equalsIgnoreCase(name)) {
+      return NONE;
+    } else {
+      return null;
     }
-
-    public OutputStream toCompressedOutputStream(OutputStream out) throws CompressorException {
-        switch (this) {
-            case GZIP:
-                return new CompressorStreamFactory().createCompressorOutputStream("gz", out);
-            case BZIP2:
-                return new CompressorStreamFactory().createCompressorOutputStream("bzip2", out);
-            case XZ:
-                return new CompressorStreamFactory().createCompressorOutputStream("xz", out);
-            default:
-                return out;
-        }
-    }
-
-    /**
-     * Returns the compression method corresponding to the specified name.
-     * The matching is case insensitive.
-     *
-     * @param name the name of the compression method
-     * @return the compression method, or null if not recognized
-     */
-    public static Compression toEnum(String name) {
-        if ("gzip".equalsIgnoreCase(name) || "gz".equalsIgnoreCase(name)) {
-            return GZIP;
-        } else if ("bzip2".equalsIgnoreCase(name) || "bz2".equalsIgnoreCase(name)) {
-            return BZIP2;
-        } else if ("xz".equalsIgnoreCase(name)) {
-            return XZ;
-        } else if ("none".equalsIgnoreCase(name)) {
-            return NONE;
-        } else {
-            return null;
-        }
-    }
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.tools.ant.Project;
@@ -37,136 +36,205 @@ import org.vafer.jdeb.producers.DataProducerLink;
 
 public final class DataBuilderTestCase extends Assert {
 
-    private static final long EXPECTED_MODIFIED_TIME = 1609455600000L;
+  private static final long EXPECTED_MODIFIED_TIME = 1609455600000L;
 
-    /**
-     * Checks if the file paths in the md5sums file use only unix file separators
-     * (this test can only fail on Windows)
-     */
-    @Test
-    public void testBuildDataWithFileSet() throws Exception {
-        DataBuilder builder = new DataBuilder(new NullConsole(), null);
+  /**
+   * Checks if the file paths in the md5sums file use only unix file separators
+   * (this test can only fail on Windows)
+   */
+  @Test
+  public void testBuildDataWithFileSet() throws Exception {
+    DataBuilder builder = new DataBuilder(new NullConsole(), null);
 
-        Project project = new Project();
-        project.setCoreLoader(getClass().getClassLoader());
-        project.init();
+    Project project = new Project();
+    project.setCoreLoader(getClass().getClassLoader());
+    project.init();
 
-        FileSet fileset = new FileSet();
-        fileset.setDir(new File(getClass().getResource("deb/data").toURI()));
-        fileset.setIncludes("**/*");
-        fileset.setProject(project);
+    FileSet fileset = new FileSet();
+    fileset.setDir(new File(getClass().getResource("deb/data").toURI()));
+    fileset.setIncludes("**/*");
+    fileset.setProject(project);
 
-        StringBuilder md5s = new StringBuilder();
-        builder.buildData(Arrays.asList((DataProducer) new DataProducerFileSet(fileset)), new File("target/data.tar"), md5s, new TarOptions().compression(Compression.GZIP), false);
+    StringBuilder md5s = new StringBuilder();
+    builder.buildData(
+      Arrays.asList((DataProducer) new DataProducerFileSet(fileset)),
+      new File("target/data.tar"),
+      md5s,
+      new TarOptions().compression(Compression.GZIP),
+      false
+    );
 
-        assertTrue("empty md5 file", md5s.length() > 0);
-        assertFalse("windows path separator found", md5s.indexOf("\\") != -1);
-        assertTrue("two spaces between md5 and file, no leading slash, or dot, on file path", md5s.toString().equals("8bc944dbd052ef51652e70a5104492e3  test/testfile\n"));
+    assertTrue("empty md5 file", md5s.length() > 0);
+    assertFalse("windows path separator found", md5s.indexOf("\\") != -1);
+    assertTrue(
+      "two spaces between md5 and file, no leading slash, or dot, on file path",
+      md5s
+        .toString()
+        .equals("8bc944dbd052ef51652e70a5104492e3  test/testfile\n")
+    );
+  }
+
+  @Test
+  public void testCreateParentDirectories() throws Exception {
+    File archive = prepareArchive();
+
+    DataBuilder builder = new DataBuilder(new NullConsole(), null);
+
+    DataProducer producer = new DataProducerFile(
+      new File("pom.xml"),
+      "/usr/share/myapp/pom.xml",
+      null,
+      null,
+      null
+    );
+
+    builder.buildData(
+      Arrays.asList(producer),
+      archive,
+      new StringBuilder(),
+      new TarOptions().compression(Compression.NONE),
+      false
+    );
+
+    int count = 0;
+    try (
+      TarArchiveInputStream in = new TarArchiveInputStream(
+        new FileInputStream(archive)
+      )
+    ) {
+      while (in.getNextEntry() != null) {
+        count++;
+      }
     }
 
-    @Test
-    public void testCreateParentDirectories() throws Exception {
-        File archive = prepareArchive();
+    assertEquals("entries", 4, count);
+  }
 
-        DataBuilder builder = new DataBuilder(new NullConsole(), null);
+  @Test
+  public void testModifiedTimeIsSet() throws Exception {
+    File dir = prepareSubdir();
+    DataProducer dirProducer = new DataProducerDirectory(dir, null, null, null);
+    DataProducer fileProducer = new DataProducerFile(
+      new File("pom.xml"),
+      "/usr/share/myapp/pom.xml",
+      null,
+      null,
+      null
+    );
+    DataProducer linkProducer = new DataProducerLink(
+      "pomLink.xml",
+      "/usr/share/myapp/pom.xml",
+      true,
+      null,
+      null,
+      null
+    );
+    File archive = prepareArchive();
 
-        DataProducer producer = new DataProducerFile(new File("pom.xml"), "/usr/share/myapp/pom.xml", null, null, null);
+    DataBuilder builder = new DataBuilder(
+      new NullConsole(),
+      EXPECTED_MODIFIED_TIME
+    );
+    builder.buildData(
+      Arrays.asList(fileProducer, linkProducer, dirProducer),
+      archive,
+      new StringBuilder(),
+      new TarOptions().compression(Compression.NONE),
+      false
+    );
 
-        builder.buildData(Arrays.asList(producer), archive, new StringBuilder(), new TarOptions().compression(Compression.NONE), false);
+    assertExpectedModTimeInArchive(archive);
+  }
 
-        int count = 0;
-        try (TarArchiveInputStream in = new TarArchiveInputStream(new FileInputStream(archive))) {
-            while (in.getNextEntry() != null) {
-                count++;
-            }
-        }
+  @Test
+  public void testIgnoreBrokenLinks() throws Exception {
+    File dir = prepareSubdirWithSymlink();
+    DataProducer dirProducer = new DataProducerDirectory(dir, null, null, null);
+    File archive = prepareArchive();
 
-        assertEquals("entries", 4, count);
+    DataBuilder builder = new DataBuilder(new NullConsole(), null);
+
+    try {
+      builder.buildData(
+        Arrays.asList(dirProducer),
+        archive,
+        new StringBuilder(),
+        new TarOptions().compression(Compression.NONE),
+        false
+      );
+      fail(
+        "buildData should not be successful with ignoreBrokenLinks set to false"
+      );
+    } catch (ProducerFileNotFoundException e) {
+      // ignoreBrokenLinks set to false, exception should be thrown.
     }
 
-    @Test
-    public void testModifiedTimeIsSet() throws Exception {
-        File dir = prepareSubdir();
-        DataProducer dirProducer = new DataProducerDirectory(dir, null, null, null);
-        DataProducer fileProducer = new DataProducerFile(new File("pom.xml"), "/usr/share/myapp/pom.xml", null, null, null);
-        DataProducer linkProducer = new DataProducerLink("pomLink.xml", "/usr/share/myapp/pom.xml", true, null, null, null);
-        File archive = prepareArchive();
+    // ignoreBrokenLinks set to true, should not throw exception.
+    builder.buildData(
+      Arrays.asList(dirProducer),
+      archive,
+      new StringBuilder(),
+      new TarOptions().compression(Compression.NONE),
+      true
+    );
+  }
 
-        DataBuilder builder = new DataBuilder(new NullConsole(), EXPECTED_MODIFIED_TIME);
-        builder.buildData(Arrays.asList(fileProducer, linkProducer, dirProducer), archive, new StringBuilder(), new TarOptions().compression(Compression.NONE), false);
-
-        assertExpectedModTimeInArchive(archive);
+  private File prepareArchive() {
+    File archive = new File("target/data.tar");
+    if (archive.exists()) {
+      archive.delete();
     }
+    return archive;
+  }
 
-    @Test
-    public void testIgnoreBrokenLinks() throws Exception {
-        File dir = prepareSubdirWithSymlink();
-        DataProducer dirProducer = new DataProducerDirectory(dir, null, null, null);
-        File archive = prepareArchive();
+  private File prepareSubdir() throws IOException {
+    File subDir = new File("target/subDir");
+    subDir.mkdir();
 
-        DataBuilder builder = new DataBuilder(new NullConsole(), null);
+    File file = new File(subDir, "file.txt");
+    file.createNewFile();
 
-        try {
-            builder.buildData(Arrays.asList(dirProducer), archive, new StringBuilder(), new TarOptions().compression(Compression.NONE), false);
-            fail("buildData should not be successful with ignoreBrokenLinks set to false");
-        }
-        catch (ProducerFileNotFoundException e) {
-            // ignoreBrokenLinks set to false, exception should be thrown.
-        }
+    File nestedDir = new File(subDir, "nested-dir");
+    nestedDir.mkdir();
 
-        // ignoreBrokenLinks set to true, should not throw exception.
-        builder.buildData(Arrays.asList(dirProducer), archive, new StringBuilder(), new TarOptions().compression(Compression.NONE), true);
+    File file2 = new File(nestedDir, "file2.txt");
+    file2.createNewFile();
+
+    return subDir;
+  }
+
+  private File prepareSubdirWithSymlink() throws IOException {
+    File subDir = new File("target/subDirWithLinks");
+    subDir.mkdir();
+
+    File file1 = new File(subDir, "file1.txt");
+    file1.createNewFile();
+
+    Path targetPath = Paths.get("nonExistentFile.txt");
+    Path linkPath = Paths.get(subDir.getPath() + "/link.txt");
+
+    // Create broken symlink in data directory
+    Files.deleteIfExists(linkPath);
+    Files.createSymbolicLink(linkPath, targetPath);
+
+    return subDir;
+  }
+
+  private void assertExpectedModTimeInArchive(File archive) throws IOException {
+    try (
+      TarArchiveInputStream in = new TarArchiveInputStream(
+        new FileInputStream(archive)
+      )
+    ) {
+      ArchiveEntry entry = in.getNextEntry();
+      while (entry != null) {
+        assertEquals(
+          EXPECTED_MODIFIED_TIME,
+          entry.getLastModifiedDate().getTime()
+        );
+
+        entry = in.getNextEntry();
+      }
     }
-
-    private File prepareArchive() {
-        File archive = new File("target/data.tar");
-        if (archive.exists()) {
-            archive.delete();
-        }
-        return archive;
-    }
-
-    private File prepareSubdir() throws IOException {
-        File subDir = new File("target/subDir");
-        subDir.mkdir();
-
-        File file = new File(subDir, "file.txt");
-        file.createNewFile();
-
-        File nestedDir = new File(subDir, "nested-dir");
-        nestedDir.mkdir();
-
-        File file2 = new File(nestedDir, "file2.txt");
-        file2.createNewFile();
-
-        return subDir;
-    }
-
-    private File prepareSubdirWithSymlink() throws IOException {
-        File subDir = new File("target/subDirWithLinks");
-        subDir.mkdir();
-
-        File file1 = new File(subDir, "file1.txt");
-        file1.createNewFile();
-
-        Path targetPath = Paths.get("nonExistentFile.txt");
-        Path linkPath = Paths.get(subDir.getPath() + "/link.txt");
-
-        // Create broken symlink in data directory
-        Files.deleteIfExists(linkPath);
-        Files.createSymbolicLink(linkPath, targetPath);
-
-        return subDir;
-    }
-
-    private void assertExpectedModTimeInArchive(File archive) throws IOException {
-        try (TarArchiveInputStream in = new TarArchiveInputStream(new FileInputStream(archive))) {
-            ArchiveEntry entry = in.getNextEntry();
-            while (entry != null) {
-                assertEquals(EXPECTED_MODIFIED_TIME, entry.getLastModifiedDate().getTime());
-
-                entry = in.getNextEntry();
-            }
-        }
-    }
+  }
 }

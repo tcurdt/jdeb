@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,11 @@
  */
 package org.vafer.jdeb.producers;
 
+import java.io.File;
+import java.io.IOException;
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.mapping.Mapper;
 import org.vafer.jdeb.utils.Utils;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * Data producer that places multiple files into a single
@@ -28,28 +27,30 @@ import java.io.IOException;
  */
 public class DataProducerFiles extends AbstractDataProducer {
 
-    private final String[] files;
-    private final String destDir;
+  private final String[] files;
+  private final String destDir;
 
-    public DataProducerFiles( final String[] files,
-                              final String destDir,
-                              final Mapper[] mappers ) {
-        super(null, null, mappers);
-        this.files = files;
-        this.destDir = destDir;
+  public DataProducerFiles(
+    final String[] files,
+    final String destDir,
+    final Mapper[] mappers
+  ) {
+    super(null, null, mappers);
+    this.files = files;
+    this.destDir = destDir;
+  }
+
+  public void produce(DataConsumer receiver) throws IOException {
+    boolean hasDestDir = !Utils.isNullOrEmpty(destDir);
+
+    for (String fileName : files) {
+      File f = new File(fileName);
+
+      if (hasDestDir) {
+        fileName = Utils.movePath(fileName, destDir);
+      }
+
+      produceFile(receiver, f, fileName);
     }
-
-    public void produce( DataConsumer receiver ) throws IOException {
-        boolean hasDestDir = !Utils.isNullOrEmpty(destDir);
-
-        for (String fileName : files) {
-            File f = new File(fileName);
-
-            if (hasDestDir) {
-                fileName = Utils.movePath(fileName, destDir);
-            }
-
-            produceFile(receiver, f, fileName);
-        }
-    }
+  }
 }

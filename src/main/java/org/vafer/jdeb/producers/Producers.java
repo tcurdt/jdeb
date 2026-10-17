@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,82 +15,81 @@
  */
 package org.vafer.jdeb.producers;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-
-import org.apache.commons.io.IOUtils;
-import org.vafer.jdeb.DataConsumer;
-
 import java.io.IOException;
 import java.io.InputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.io.IOUtils;
+import org.vafer.jdeb.DataConsumer;
 
 /**
  * Package-private utility class with common producers functionality.
  */
 class Producers {
 
-    final static int ROOT_UID = 0;
-    final static String ROOT_NAME = "root";
+  static final int ROOT_UID = 0;
+  static final String ROOT_NAME = "root";
 
-    private Producers() {}
+  private Producers() {}
 
+  /**
+   * Creates a tar file entry with defaults parameters.
+   * @param fileName the entry name
+   * @return file entry with reasonable defaults
+   */
+  static TarArchiveEntry defaultFileEntryWithName(final String fileName) {
+    TarArchiveEntry entry = new TarArchiveEntry(fileName, true);
+    entry.setUserId(ROOT_UID);
+    entry.setUserName(ROOT_NAME);
+    entry.setGroupId(ROOT_UID);
+    entry.setGroupName(ROOT_NAME);
+    entry.setMode(TarArchiveEntry.DEFAULT_FILE_MODE);
+    return entry;
+  }
 
-    /**
-     * Creates a tar file entry with defaults parameters.
-     * @param fileName the entry name
-     * @return file entry with reasonable defaults
-     */
-    static TarArchiveEntry defaultFileEntryWithName( final String fileName ) {
-        TarArchiveEntry entry = new TarArchiveEntry(fileName, true);
-        entry.setUserId(ROOT_UID);
-        entry.setUserName(ROOT_NAME);
-        entry.setGroupId(ROOT_UID);
-        entry.setGroupName(ROOT_NAME);
-        entry.setMode(TarArchiveEntry.DEFAULT_FILE_MODE);
-        return entry;
+  /**
+   * Creates a tar directory entry with defaults parameters.
+   * @param dirName the directory name
+   * @return dir entry with reasonable defaults
+   */
+  static TarArchiveEntry defaultDirEntryWithName(final String dirName) {
+    TarArchiveEntry entry = new TarArchiveEntry(dirName, true);
+    entry.setUserId(ROOT_UID);
+    entry.setUserName(ROOT_NAME);
+    entry.setGroupId(ROOT_UID);
+    entry.setGroupName(ROOT_NAME);
+    entry.setMode(TarArchiveEntry.DEFAULT_DIR_MODE);
+    return entry;
+  }
+
+  /**
+   * Forwards tar archive entry entry to a consumer.
+   * @param consumer the consumer
+   * @param dirEntry the entry to pass
+   * @throws IOException
+   */
+  static void produceDirEntry(
+    final DataConsumer consumer,
+    final TarArchiveEntry dirEntry
+  ) throws IOException {
+    consumer.onEachDir(dirEntry);
+  }
+
+  /**
+   * Feeds input stream to data consumer using metadata from tar entry.
+   * @param consumer the consumer
+   * @param inputStream the stream to feed
+   * @param entry the entry to use for metadata
+   * @throws IOException on consume error
+   */
+  static void produceInputStreamWithEntry(
+    final DataConsumer consumer,
+    final InputStream inputStream,
+    final TarArchiveEntry entry
+  ) throws IOException {
+    try {
+      consumer.onEachFile(inputStream, entry);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
     }
-
-    /**
-     * Creates a tar directory entry with defaults parameters.
-     * @param dirName the directory name
-     * @return dir entry with reasonable defaults
-     */
-    static TarArchiveEntry defaultDirEntryWithName( final String dirName ) {
-        TarArchiveEntry entry = new TarArchiveEntry(dirName, true);
-        entry.setUserId(ROOT_UID);
-        entry.setUserName(ROOT_NAME);
-        entry.setGroupId(ROOT_UID);
-        entry.setGroupName(ROOT_NAME);
-        entry.setMode(TarArchiveEntry.DEFAULT_DIR_MODE);
-        return entry;
-    }
-
-    /**
-     * Forwards tar archive entry entry to a consumer.
-     * @param consumer the consumer
-     * @param dirEntry the entry to pass
-     * @throws IOException
-     */
-    static void produceDirEntry( final DataConsumer consumer,
-                                 final TarArchiveEntry dirEntry ) throws IOException {
-        consumer.onEachDir(dirEntry);
-    }
-
-
-    /**
-     * Feeds input stream to data consumer using metadata from tar entry.
-     * @param consumer the consumer
-     * @param inputStream the stream to feed
-     * @param entry the entry to use for metadata
-     * @throws IOException on consume error
-     */
-    static void produceInputStreamWithEntry( final DataConsumer consumer,
-                                             final InputStream inputStream,
-                                             final TarArchiveEntry entry ) throws IOException {
-        try {
-            consumer.onEachFile(inputStream, entry);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
-        }
-    }
-
+  }
 }

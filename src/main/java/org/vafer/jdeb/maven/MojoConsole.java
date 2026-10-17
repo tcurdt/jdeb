@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,25 +25,25 @@ import org.vafer.jdeb.Console;
  */
 class MojoConsole implements Console {
 
-    private final Log log;
-    private final boolean verbose;
+  private final Log log;
+  private final boolean verbose;
 
-    public MojoConsole(Log log, boolean verbose) {
-        this.log = log;
-        this.verbose = verbose;
-    }
+  public MojoConsole(Log log, boolean verbose) {
+    this.log = log;
+    this.verbose = verbose;
+  }
 
-    public void debug(String message) {
-        if (verbose) {
-            log.info(message);
-        }
+  public void debug(String message) {
+    if (verbose) {
+      log.info(message);
     }
+  }
 
-    public void info(String message) {
-        log.info(message);
-    }
+  public void info(String message) {
+    log.info(message);
+  }
 
-    public void warn(String message) {
-        log.warn(message);
-    }
+  public void warn(String message) {
+    log.warn(message);
+  }
 }

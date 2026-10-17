@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,11 @@
 package org.vafer.jdeb;
 
 import java.io.IOException;
-
 import org.apache.commons.compress.archivers.ArchiveEntry;
 
 /**
  * Callback used for inspecting an archive.
  */
 public interface ArchiveVisitor<E extends ArchiveEntry> {
-
-    void visit(E entry, byte[] content) throws IOException;
+  void visit(E entry, byte[] content) throws IOException;
 }

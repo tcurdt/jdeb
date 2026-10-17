@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,29 +16,44 @@
 
 package org.vafer.jdeb.debian;
 
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
 
 public final class ControlFieldTestCase extends Assert {
 
-    @Test
-    public void testFormatSimpleValue() {
-        ControlField field = new ControlField("Field-Name");
+  @Test
+  public void testFormatSimpleValue() {
+    ControlField field = new ControlField("Field-Name");
 
-        assertEquals("Field-Name: value\n", field.format("value"));
-    }
+    assertEquals("Field-Name: value\n", field.format("value"));
+  }
 
-    @Test
-    public void testFormatMultilineValue1() {
-        ControlField field = new ControlField("Field-Name", false, ControlField.Type.MULTILINE);
+  @Test
+  public void testFormatMultilineValue1() {
+    ControlField field = new ControlField(
+      "Field-Name",
+      false,
+      ControlField.Type.MULTILINE
+    );
 
-        assertEquals("Field-Name: value1\n value2\n .\n value3\n", field.format("value1\nvalue2\n\nvalue3"));
-    }
+    assertEquals(
+      "Field-Name: value1\n value2\n .\n value3\n",
+      field.format("value1\nvalue2\n\nvalue3")
+    );
+  }
 
-    @Test
-    public void testFormatMultilineValue2() {
-        ControlField field = new ControlField("Field-Name", false, ControlField.Type.MULTILINE, true);
+  @Test
+  public void testFormatMultilineValue2() {
+    ControlField field = new ControlField(
+      "Field-Name",
+      false,
+      ControlField.Type.MULTILINE,
+      true
+    );
 
-        assertEquals("Field-Name:\n value1\n value2\n .\n value3\n", field.format("value1\nvalue2\n\nvalue3"));
-    }
+    assertEquals(
+      "Field-Name:\n value1\n value2\n .\n value3\n",
+      field.format("value1\nvalue2\n\nvalue3")
+    );
+  }
 }

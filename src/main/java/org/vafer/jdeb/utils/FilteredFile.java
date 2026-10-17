@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,56 +26,77 @@ import java.util.List;
 
 public class FilteredFile {
 
-    public static final String DEFAULT_OPEN_TOKEN = "[[";
-    public static final String DEFAULT_CLOSE_TOKEN = "]]";
+  public static final String DEFAULT_OPEN_TOKEN = "[[";
+  public static final String DEFAULT_CLOSE_TOKEN = "]]";
 
-    private String openToken;
-    private String closeToken;
-    private List<String> lines = new ArrayList<>();
+  private String openToken;
+  private String closeToken;
+  private List<String> lines = new ArrayList<>();
 
-    @Deprecated
-    public FilteredFile(InputStream in, VariableResolver resolver) throws IOException {
-        this(in, resolver, Charset.defaultCharset());
-    }
+  @Deprecated
+  public FilteredFile(InputStream in, VariableResolver resolver)
+    throws IOException {
+    this(in, resolver, Charset.defaultCharset());
+  }
 
-    public FilteredFile(InputStream in, VariableResolver resolver, Charset encoding) throws IOException {
-        this(in, resolver, encoding, DEFAULT_OPEN_TOKEN, DEFAULT_CLOSE_TOKEN);
-    }
+  public FilteredFile(
+    InputStream in,
+    VariableResolver resolver,
+    Charset encoding
+  ) throws IOException {
+    this(in, resolver, encoding, DEFAULT_OPEN_TOKEN, DEFAULT_CLOSE_TOKEN);
+  }
 
-    public FilteredFile(InputStream in, VariableResolver resolver, Charset encoding, String openToken, String closeToken) throws IOException {
-        this.openToken = openToken;
-        this.closeToken = closeToken;
-        parse(in, resolver, encoding);
-    }
+  public FilteredFile(
+    InputStream in,
+    VariableResolver resolver,
+    Charset encoding,
+    String openToken,
+    String closeToken
+  ) throws IOException {
+    this.openToken = openToken;
+    this.closeToken = closeToken;
+    parse(in, resolver, encoding);
+  }
 
-    @Deprecated
-    public void setOpenToken(String token) {
-        openToken = token;
-    }
+  @Deprecated
+  public void setOpenToken(String token) {
+    openToken = token;
+  }
 
-    @Deprecated
-    public void setCloseToken(String token) {
-        closeToken = token;
-    }
+  @Deprecated
+  public void setCloseToken(String token) {
+    closeToken = token;
+  }
 
-    private void parse(InputStream in, VariableResolver resolver, Charset encoding) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, encoding))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (resolver != null) {
-                    lines.add(Utils.replaceVariables(resolver, line, openToken, closeToken));
-                } else {
-                    lines.add(line);
-                }
-            }
+  private void parse(
+    InputStream in,
+    VariableResolver resolver,
+    Charset encoding
+  ) throws IOException {
+    try (
+      BufferedReader reader = new BufferedReader(
+        new InputStreamReader(in, encoding)
+      )
+    ) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        if (resolver != null) {
+          lines.add(
+            Utils.replaceVariables(resolver, line, openToken, closeToken)
+          );
+        } else {
+          lines.add(line);
         }
+      }
     }
+  }
 
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        for (String line : lines) {
-            builder.append(line).append('\n');
-        }
-        return builder.toString();
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    for (String line : lines) {
+      builder.append(line).append('\n');
     }
+    return builder.toString();
+  }
 }

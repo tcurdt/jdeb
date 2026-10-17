@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 The jdeb developers.
+ * Copyright 2007-2026 The jdeb developers.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,18 @@
  */
 package org.vafer.jdeb;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-
 import java.io.IOException;
 import java.io.InputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
  * A DataConsumer consumes Data produced from a producer.
  */
 public interface DataConsumer {
+  void onEachDir(TarArchiveEntry dirEntry) throws IOException;
 
-    void onEachDir( TarArchiveEntry dirEntry ) throws IOException;
+  void onEachFile(InputStream input, TarArchiveEntry fileEntry)
+    throws IOException;
 
-    void onEachFile( InputStream input, TarArchiveEntry fileEntry ) throws IOException;
-
-    void onEachLink( TarArchiveEntry linkEntry ) throws IOException;
-
+  void onEachLink(TarArchiveEntry linkEntry) throws IOException;
 }
